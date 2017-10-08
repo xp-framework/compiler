@@ -180,17 +180,17 @@ class Parse {
       // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;
       // the latter explicitely becomes a statement by pushing a semicolon.
       if ('(' === $this->token->symbol->id) {
-        $name= null;
+        $node= $this->func(null, []);
+        $node->arity= 'closure';
       } else {
         $name= $this->token->value;
         $this->token= $this->advance();
+        $node= $this->func($name, []);
+        $node->arity= 'function';
+        $this->queue= [$this->token];
+        $this->token= new Node($this->symbol(';'));
       }
 
-      $node= $this->func($name, []);
-      $node->arity= 'function';
-
-      $this->queue= $name ? [new Node($this->symbol(';')), $this->token] : [$this->token];
-      $this->token= $this->advance();
       return $node;
     });
 
