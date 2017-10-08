@@ -5,7 +5,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_instance_property() {
     $this->assertNodes(
-      [['class' => ['A', null, [['(variable)' => ['a', ['private'], null, null, null]]]]]],
+      [['class' => ['A', null, [], [['(variable)' => ['a', ['private'], null, null, null]]]]]],
       $this->parse('class A { private $a; }')
     );
   }
@@ -13,7 +13,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_instance_method() {
     $this->assertNodes(
-      [['class' => ['A', null, [['(' => ['a', ['private'], [], [], null, null]]]]]],
+      [['class' => ['A', null, [], [['(' => ['a', ['private'], [], [], null, null]]]]]],
       $this->parse('class A { private function a() { } }')
     );
   }
@@ -21,7 +21,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_static_method() {
     $this->assertNodes(
-      [['class' => ['A', null, [['(' => ['a', ['private', 'static'], [], [], null, null]]]]]],
+      [['class' => ['A', null, [], [['(' => ['a', ['private', 'static'], [], [], null, null]]]]]],
       $this->parse('class A { private static function a() { } }')
     );
   }
@@ -30,8 +30,16 @@ class MembersTest extends ParseTest {
   public function short_method() {
     $block= [['==>' => ['true' => true]]];
     $this->assertNodes(
-      [['class' => ['A', null, [['(' => ['a', ['public'], [], $block, null, null]]]]]],
+      [['class' => ['A', null, [], [['(' => ['a', ['public'], [], $block, null, null]]]]]],
       $this->parse('class A { public function a() ==> true; }')
+    );
+  }
+
+  #[@test]
+  public function method_with_return_type() {
+    $this->assertNodes(
+      [['class' => ['A', null, [], [['(' => ['a', ['public'], [], [], 'void', null]]]]]],
+      $this->parse('class A { public function a(): void { } }')
     );
   }
 

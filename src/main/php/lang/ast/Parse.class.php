@@ -354,15 +354,31 @@ class Parse {
         'final'     => true,
         'abstract'  => true
       ];
-      $t= $this->token->value;
 
+      $t= $this->token->value;
       $this->token= $this->advance();
+
+      $parent= null;
       if ('extends' === $this->token->value) {
         $this->token= $this->advance();
-        $parent= $this->token->value;
+        $parent= $this->scope->resolve($this->token->value);
         $this->token= $this->advance();
-      } else {
-        $parent= null;
+      }
+
+      $implements= [];
+      if ('implements' === $this->token->value) {
+        $this->token= $this->advance();
+        do {
+          $implements[]= $this->scope->resolve($this->token->value);
+          $this->token= $this->advance();
+          if (',' === $this->token->symbol->id) {
+            $this->token= $this->expect(',');
+          } else if ('{' === $this->token->symbol->id) {
+            break;
+          } else {
+            $this->expect(', or {');
+          }
+        } while (true);
       }
 
       $this->token= $this->expect('{');
@@ -434,7 +450,7 @@ class Parse {
       }
       $this->token= $this->expect('}');
 
-      $node->value= [$t, $parent, $body];
+      $node->value= [$t, $parent, $implements, $body];
       $node->arity= 'class';
 
       return $node;
