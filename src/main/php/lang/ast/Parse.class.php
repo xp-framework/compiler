@@ -530,6 +530,14 @@ class Parse {
       if (isset($modifier[$this->token->symbol->id])) {
         $modifiers[]= $this->token->symbol->id;
         $this->token= $this->advance();
+      } else if ('use' === $this->token->symbol->id) {
+        $member= new Node($this->token->symbol);
+        $member->arity= 'use';
+        $this->token= $this->advance();
+        $member->value= $this->scope->resolve($this->token->value);
+        $body[]= $member;
+        $this->token= $this->advance();
+        $this->token= $this->expect(';');
       } else if ('function' === $this->token->symbol->id) {
         $this->token= $this->advance();
         $name= $this->token->value;
