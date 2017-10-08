@@ -87,8 +87,11 @@ class Emitter {
   }
 
   private function class($node) {
-    $this->out->write('class '.$node->value[0].' {'); 
-    foreach ($node->value[2] as $member) {
+    $this->out->write('class '.$node->value[0]);
+    $node->value[1] && $this->out->write('extends '.$node->value[1]);
+    $node->value[2] && $this->out->write('implements '.implode(', ', $node->value[2]));
+    $this->out->write('{');
+    foreach ($node->value[3] as $member) {
       $this->emit($member);
       $this->out->write("\n");
     }
