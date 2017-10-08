@@ -88,10 +88,31 @@ class Emitter {
 
   private function class($node) {
     $this->out->write('class '.$node->value[0]);
-    $node->value[1] && $this->out->write('extends '.$node->value[1]);
-    $node->value[2] && $this->out->write('implements '.implode(', ', $node->value[2]));
+    $node->value[1] && $this->out->write(' extends '.$node->value[1]);
+    $node->value[2] && $this->out->write(' implements '.implode(', ', $node->value[2]));
     $this->out->write('{');
     foreach ($node->value[3] as $member) {
+      $this->emit($member);
+      $this->out->write("\n");
+    }
+    $this->out->write('}');
+  }
+
+  private function interface($node) {
+    $this->out->write('interface '.$node->value[0]);
+    $node->value[1] && $this->out->write(' extends '.implode(', ', $node->value[1]));
+    $this->out->write('{');
+    foreach ($node->value[2] as $member) {
+      $this->emit($member);
+      $this->out->write("\n");
+    }
+    $this->out->write('}');
+  }
+
+  private function trait($node) {
+    $this->out->write('trait '.$node->value[0]);
+    $this->out->write('{');
+    foreach ($node->value[1] as $member) {
       $this->emit($member);
       $this->out->write("\n");
     }
@@ -132,9 +153,13 @@ class Emitter {
     if (isset($node->value[4])) {
       $this->out->write(':'.$node->value[4]);
     }
-    $this->out->write(' {', $promote);
-    $this->emit($node->value[3]);
-    $this->out->write('}');
+    if (null === $node->value[3]) {
+      $this->out->write(';');
+    } else {
+      $this->out->write(' {', $promote);
+      $this->emit($node->value[3]);
+      $this->out->write('}');
+    }
   }
 
   private function binary($node) {

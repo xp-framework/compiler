@@ -481,6 +481,9 @@ class Parse {
         $this->token= $this->advance();
         $statements= $this->statements();
         $this->token= $this->expect('}');
+      } else if (';' === $this->token->value) {
+        $statements= null;
+        $this->token= $this->expect(';');
       } else if ('==>' === $this->token->value) {
         $n= new Node($this->token->symbol);
         $this->token= $this->advance();
