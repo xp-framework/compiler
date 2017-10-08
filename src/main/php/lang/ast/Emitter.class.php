@@ -200,11 +200,14 @@ class Emitter {
           $this->emit($catch[2]);
           $this->out->write('}');
         } else {
+          $last= array_pop($catch[0]);
+          $label= 'c'.crc32($last);
           foreach ($catch[0] as $type) {
-            $this->out->write('catch('.$type.' $'.$catch[1].') {');
-            $this->emit($catch[2]);
-            $this->out->write('}');
+            $this->out->write('catch('.$type.' $'.$catch[1].') { goto '.$label.'; }');
           }
+          $this->out->write('catch('.$last.' $'.$catch[1].') { '.$label.':');
+          $this->emit($catch[2]);
+          $this->out->write('}');
         }
       }
     }
