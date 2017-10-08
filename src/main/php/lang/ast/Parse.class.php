@@ -346,16 +346,7 @@ class Parse {
     });
 
     $this->stmt('class', function($node) {
-      static $modifier= [
-        'private'   => true,
-        'protected' => true,
-        'public'    => true,
-        'static'    => true,
-        'final'     => true,
-        'abstract'  => true
-      ];
-
-      $t= $this->token->value;
+      $type= $this->token->value;
       $this->token= $this->advance();
 
       $parent= null;
@@ -382,81 +373,53 @@ class Parse {
       }
 
       $this->token= $this->expect('{');
-      $body= [];
-      $modifiers= [];
-      $annotations= null;
-      $type= null;
-      while ('}' !== $this->token->symbol->id) {
-        if (isset($modifier[$this->token->symbol->id])) {
-          $modifiers[]= $this->token->symbol->id;
-          $this->token= $this->advance();
-        } else if ('function' === $this->token->symbol->id) {
-          $this->token= $this->advance();
-          $name= $this->token->value;
-          $this->token= $this->advance();
-          $member= $this->func($name, $modifiers);
-          $member->arity= 'method';
-          $member->value[]= $annotations;
-          $body[]= $member;
-          $modifiers= [];
-          $annotations= null;
-        } else if ('name' === $this->token->arity) {
-          $type= $this->scope->resolve($this->token->value);
-          $this->token= $this->advance();
-        } else if ('variable' === $this->token->arity) {
-          while (';' !== $this->token->symbol->id) {
-            $name= $this->token->value;
-            $member= new Node($this->token->symbol);
-            $member->arity= 'property';
-            $this->token= $this->advance();
-
-            if ('=' === $this->token->symbol->id) {
-              $this->token= $this->expect('=');
-              $member->value= [$name, $modifiers, $this->expression(0), $type, $annotations];
-            } else {
-              $member->value= [$name, $modifiers, null, $type, $annotations];
-            }
-
-            $body[]= $member;
-            if (',' === $this->token->symbol->id) {
-              $this->token= $this->expect(',');
-            }
-          }
-          $modifiers= [];
-          $annotations= null;
-          $type= null;
-          $this->token= $this->expect(';');
-        } else if ('<<' === $this->token->symbol->id) {
-          do {
-            $this->token= $this->advance();
-            $annotation= [$this->token->value];
-            $this->token= $this->advance();
-
-            if ('(' === $this->token->symbol->id) {
-              $this->token= $this->expect('(');
-              $annotation[]= $this->arguments();
-              $this->token= $this->expect(')');
-            }
-
-            $annotations[]= $annotation;
-            if (',' === $this->token->symbol->id) {
-              continue;
-            } else if ('>>' === $this->token->symbol->id) {
-              break;
-            } else {
-              $this->expect(', or >>');
-            }
-          } while (true);
-          $this->token= $this->expect('>>');
-        } else {
-          $this->expect('property or method');
-        }
-      }
+      $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= [$t, $parent, $implements, $body];
+      $node->value= [$type, $parent, $implements, $body];
       $node->arity= 'class';
+      return $node;
+    });
 
+    $this->stmt('interface', function($node) {
+      $type= $this->token->value;
+      $this->token= $this->advance();
+
+      $parents= [];
+      if ('extends' === $this->token->value) {
+        $this->token= $this->advance();
+        do {
+          $parents[]= $this->scope->resolve($this->token->value);
+          $this->token= $this->advance();
+          if (',' === $this->token->symbol->id) {
+            $this->token= $this->expect(',');
+          } else if ('{' === $this->token->symbol->id) {
+            break;
+          } else {
+            $this->expect(', or {');
+          }
+        } while (true);
+      }
+
+      $this->token= $this->expect('{');
+      $body= $this->body();
+      $this->token= $this->expect('}');
+
+      $node->value= [$type, $parents, $body];
+      $node->arity= 'interface';
+      return $node;
+    });
+
+    $this->stmt('trait', function($node) {
+      $type= $this->token->value;
+      $this->token= $this->advance();
+
+      $this->token= $this->expect('{');
+      $body= $this->body();
+      $this->token= $this->expect('}');
+
+      $node->value= [$type, $body];
+      $node->arity= 'traits';
       return $node;
     });
   }
@@ -544,6 +507,89 @@ class Parse {
       }
     }
     return $arguments;
+  }
+
+  private function body() {
+    static $modifier= [
+      'private'   => true,
+      'protected' => true,
+      'public'    => true,
+      'static'    => true,
+      'final'     => true,
+      'abstract'  => true
+    ];
+
+    $body= [];
+    $modifiers= [];
+    $annotations= null;
+    $type= null;
+    while ('}' !== $this->token->symbol->id) {
+      if (isset($modifier[$this->token->symbol->id])) {
+        $modifiers[]= $this->token->symbol->id;
+        $this->token= $this->advance();
+      } else if ('function' === $this->token->symbol->id) {
+        $this->token= $this->advance();
+        $name= $this->token->value;
+        $this->token= $this->advance();
+        $member= $this->func($name, $modifiers);
+        $member->arity= 'method';
+        $member->value[]= $annotations;
+        $body[]= $member;
+        $modifiers= [];
+        $annotations= null;
+      } else if ('name' === $this->token->arity) {
+        $type= $this->scope->resolve($this->token->value);
+        $this->token= $this->advance();
+      } else if ('variable' === $this->token->arity) {
+        while (';' !== $this->token->symbol->id) {
+          $name= $this->token->value;
+          $member= new Node($this->token->symbol);
+          $member->arity= 'property';
+          $this->token= $this->advance();
+
+          if ('=' === $this->token->symbol->id) {
+            $this->token= $this->expect('=');
+            $member->value= [$name, $modifiers, $this->expression(0), $type, $annotations];
+          } else {
+            $member->value= [$name, $modifiers, null, $type, $annotations];
+          }
+
+          $body[]= $member;
+          if (',' === $this->token->symbol->id) {
+            $this->token= $this->expect(',');
+          }
+        }
+        $modifiers= [];
+        $annotations= null;
+        $type= null;
+        $this->token= $this->expect(';');
+      } else if ('<<' === $this->token->symbol->id) {
+        do {
+          $this->token= $this->advance();
+          $annotation= [$this->token->value];
+          $this->token= $this->advance();
+
+          if ('(' === $this->token->symbol->id) {
+            $this->token= $this->expect('(');
+            $annotation[]= $this->arguments();
+            $this->token= $this->expect(')');
+          }
+
+          $annotations[]= $annotation;
+          if (',' === $this->token->symbol->id) {
+            continue;
+          } else if ('>>' === $this->token->symbol->id) {
+            break;
+          } else {
+            $this->expect(', or >>');
+          }
+        } while (true);
+        $this->token= $this->expect('>>');
+      } else {
+        $this->expect('property or method');
+      }
+    }
+    return $body;
   }
 
   private function expression($rbp, $nud= true) {
