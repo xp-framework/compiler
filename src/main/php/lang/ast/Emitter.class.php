@@ -127,7 +127,7 @@ class Emitter {
       $this->out->write("\n");
       $this->annotations($node->value[4]);
     }
-    $this->out->write('public $'.$node->value[0]);
+    $this->out->write(implode(' ', $node->value[1]).' $'.$node->value[0]);
     if (isset($node->value[2])) {
       $this->out->write('=');
       $this->emit($node->value[2]);
@@ -149,7 +149,7 @@ class Emitter {
       $this->out->write("\n");
       $this->annotations($node->value[5]);
     }
-    $this->out->write('public function '.$node->value[0].'('.substr($params, 2).')');
+    $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'('.substr($params, 2).')');
     if (isset($node->value[4])) {
       $this->out->write(':'.$node->value[4]);
     }
