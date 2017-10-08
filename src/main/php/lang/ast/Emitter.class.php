@@ -87,7 +87,7 @@ class Emitter {
   }
 
   private function class($node) {
-    $this->out->write('class '.$node->value[0]->value.' {'); 
+    $this->out->write('class '.$node->value[0].' {'); 
     foreach ($node->value[2] as $member) {
       $this->emit($member);
       $this->out->write("\n");

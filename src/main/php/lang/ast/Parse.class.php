@@ -142,7 +142,8 @@ class Parse {
 
       // ($a) ==> $a + 1 vs. ($a ?? $b)->invoke();
       if ('==>' === $this->token->value) {
-        $node= $this->func([]);
+        $this->token= $this->advance();
+        $node= $this->func(null, []);
         $node->arity= 'closure';
         $this->queue= [$this->token];
         $this->token= new Node($this->symbol(';'));
@@ -170,6 +171,25 @@ class Parse {
       $node->arity= 'unpack';
       $node->value= $this->token;
 
+      $this->token= $this->advance();
+      return $node;
+    });
+
+    $this->prefix('function', function($node) {
+
+      // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;
+      // the latter explicitely becomes a statement by pushing a semicolon.
+      if ('(' === $this->token->symbol->id) {
+        $name= null;
+      } else {
+        $name= $this->token->value;
+        $this->token= $this->advance();
+      }
+
+      $node= $this->func($name, []);
+      $node->arity= 'function';
+
+      $this->queue= $name ? [new Node($this->symbol(';')), $this->token] : [$this->token];
       $this->token= $this->advance();
       return $node;
     });
@@ -325,19 +345,21 @@ class Parse {
       return $result;
     });
 
-    $this->stmt('function', function($node) {
-      $node= $this->func([]);
-      $node->arity= 'function';
-      return $node;
-    });
-
     $this->stmt('class', function($node) {
-      $t= $this->token;
+      static $modifier= [
+        'private'   => true,
+        'protected' => true,
+        'public'    => true,
+        'static'    => true,
+        'final'     => true,
+        'abstract'  => true
+      ];
+      $t= $this->token->value;
 
       $this->token= $this->advance();
-      if (':' === $this->token->symbol->id) {
-        $this->token= $this->expect(':');
-        $parent= $this->token;
+      if ('extends' === $this->token->value) {
+        $this->token= $this->advance();
+        $parent= $this->token->value;
         $this->token= $this->advance();
       } else {
         $parent= null;
@@ -349,12 +371,14 @@ class Parse {
       $annotations= null;
       $type= null;
       while ('}' !== $this->token->symbol->id) {
-        if ('public' === $this->token->symbol->id || 'protected' === $this->token->symbol->id || 'private' === $this->token->symbol->id) {
+        if (isset($modifier[$this->token->symbol->id])) {
           $modifiers[]= $this->token->symbol->id;
           $this->token= $this->advance();
         } else if ('function' === $this->token->symbol->id) {
           $this->token= $this->advance();
-          $member= $this->func($modifiers);
+          $name= $this->token->value;
+          $this->token= $this->advance();
+          $member= $this->func($name, $modifiers);
           $member->arity= 'method';
           $member->value[]= $annotations;
           $body[]= $member;
@@ -454,10 +478,8 @@ class Parse {
     return $parameters;
   }
 
-  private function func($modifiers) {
+  private function func($name, $modifiers) {
     $node= new Node($this->token->symbol);
-    $name= $this->token->value;
-    $this->token= $this->advance();
 
     $this->scope= new Scope($this->scope); {
       $this->token= $this->expect('(');
@@ -484,7 +506,7 @@ class Parse {
         $statements= [$n];
         $this->token= $this->expect(';');
       } else {
-        $this->expect('{ or ==>');
+        $this->token= $this->expect('{ or ==>');
       }
     }
 
