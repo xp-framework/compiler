@@ -427,7 +427,7 @@ class Parse {
           $type= null;
           $this->token= $this->expect(';');
         } else if ('<<' === $this->token->symbol->id) {
-          while ('>>' !== $this->token->symbol->id) {
+          do {
             $this->token= $this->advance();
             $annotation= [$this->token->value];
             $this->token= $this->advance();
@@ -438,11 +438,15 @@ class Parse {
               $this->token= $this->expect(')');
             }
 
-            if (',' === $this->token->symbol->id) {
-              $this->token= $this->expect(',');
-            }
             $annotations[]= $annotation;
-          }
+            if (',' === $this->token->symbol->id) {
+              continue;
+            } else if ('>>' === $this->token->symbol->id) {
+              break;
+            } else {
+              $this->expect(', or >>');
+            }
+          } while (true);
           $this->token= $this->expect('>>');
         } else {
           $this->expect('property or method');
