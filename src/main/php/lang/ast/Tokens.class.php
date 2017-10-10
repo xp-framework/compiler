@@ -47,15 +47,24 @@ class Tokens implements \IteratorAggregate {
         yield 'variable' => [$this->source->nextToken(), $line];
       } else if ('"' === $token || "'" === $token) {
         $string= '';
-        while ($this->source->hasMoreTokens()) {
-          if ($token === ($part= $this->source->nextToken($token))) {
-            yield 'string' => [$string, $line];
-            $line+= substr_count($string, "\n");
-            continue 2;
+        do {
+          // Empty string, e.g. "" or ''
+          if ($token === ($t= $this->source->nextToken($token))) break;
+
+          $string.= $t;
+          $l= strlen($string);
+          if ($l > 0 && '\\' === $string{$l - 1} && !($l > 1 && '\\' === $string{$l - 2})) {
+            $string= substr($string, 0, -1).$this->source->nextToken($token);
+            continue;
           }
-          $string.= $part;
-        }
-        throw new FormatException('Unclosed string literal');
+          if ($token !== $this->source->nextToken($token)) {
+            throw new FormatException('Unclosed string literal starting at line '.$line);
+          }
+          break;
+        } while ($this->source->hasMoreTokens());
+
+        yield 'string' => [str_replace('\\\\', '\\', $string), $line];
+        $line+= substr_count($string, "\n");
       } else if (0 === strcspn($token, " \r\n\t")) {
         $line+= substr_count($token, "\n");
         continue;

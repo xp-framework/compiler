@@ -32,6 +32,7 @@ class TokensTest extends \unittest\TestCase {
   #  ["''", ''],
   #  ['"Test"', 'Test'],
   #  ["'Test'", 'Test'],
+  #  ["'Test\''", 'Test\'']
   #])]
   public function string_literals($input, $expected) {
     $this->assertTokens([['string' => $expected]], new Tokens(new StringTokenizer($input)));
