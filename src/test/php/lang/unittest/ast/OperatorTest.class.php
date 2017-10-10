@@ -65,6 +65,22 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
+  public function assignment_to_offset() {
+    $this->assertNodes(
+      [['=' => [['[' => [['(variable)' => 'a'], ['(literal)' => 0]]], ['(literal)' => 1]]]],
+      $this->parse('$a[0]= 1;')
+    );
+  }
+
+  #[@test]
+  public function append_array() {
+    $this->assertNodes(
+      [['=' => [['[' => [['(variable)' => 'a'], null]], ['(literal)' => 1]]]],
+      $this->parse('$a[]= 1;')
+    );
+  }
+
+  #[@test]
   public function clone() {
     $this->assertNodes(
       [['clone' => ['(variable)' => 'a']]],

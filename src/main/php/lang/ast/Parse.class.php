@@ -29,25 +29,12 @@ class Parse {
     $this->constant('false', false);
     $this->constant('null', null);
 
-    $this->infix('==>', 10, function($node, $left) {
-      $this->scope->define($left->value, $left);
-
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
-
-      $node->value= [$left, $statements];
-      $node->arity= 'closure';
-      return $node;
-    });
-
     $this->infix('->', 20, function($node, $left) {
       $expression= $this->expression(0);
       $node->value= [$left, $expression];
       $node->arity= 'instance';
       return $node;
     });
-
 
     $this->infix('::', 20, function($node, $left) {
       $expression= $this->expression(0);
@@ -94,8 +81,13 @@ class Parse {
     });
 
     $this->infix('[', 80, function($node, $left) {
-      $expr= $this->expression(0);
+      if (']' === $this->token->symbol->id) {
+        $expr= null;
+      } else {
+        $expr= $this->expression(0);
+      }
       $this->token= $this->expect(']');
+
       $node->value= [$left, $expr];
       $node->arity= 'offset';
       return $node;

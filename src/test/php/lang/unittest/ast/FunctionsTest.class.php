@@ -27,6 +27,14 @@ class FunctionsTest extends ParseTest {
   }
 
   #[@test]
+  public function dangling_comma_in_parameter_lists() {
+    $this->assertNodes(
+      [['(' => ['a', [], [['param', null, false, null, null]], [], null]]],
+      $this->parse('function a($param, ) { }')
+    );
+  }
+
+  #[@test]
   public function with_typed_parameter() {
     $this->assertNodes(
       [['(' => ['a', [], [['param', 'string', false, null, null]], [], null]]],
