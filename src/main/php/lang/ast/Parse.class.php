@@ -194,8 +194,13 @@ class Parse {
       $arguments= $this->arguments();
       $this->token= $this->expect(')');
 
+      // Anonymous classes
       $node->arity= 'new';
-      $node->value= [$this->scope->resolve($type), $arguments];
+      if ('class' === $type) {
+        $node->value= [null, $arguments, $this->type(null)];
+      } else {
+        $node->value= [$type, $arguments];
+      }
       return $node;
     });
 
@@ -447,34 +452,7 @@ class Parse {
       $type= $this->token->value;
       $this->token= $this->advance();
 
-      $parent= null;
-      if ('extends' === $this->token->value) {
-        $this->token= $this->advance();
-        $parent= $this->scope->resolve($this->token->value);
-        $this->token= $this->advance();
-      }
-
-      $implements= [];
-      if ('implements' === $this->token->value) {
-        $this->token= $this->advance();
-        do {
-          $implements[]= $this->scope->resolve($this->token->value);
-          $this->token= $this->advance();
-          if (',' === $this->token->symbol->id) {
-            $this->token= $this->expect(',');
-          } else if ('{' === $this->token->symbol->id) {
-            break;
-          } else {
-            $this->expect(', or {');
-          }
-        } while (true);
-      }
-
-      $this->token= $this->expect('{');
-      $body= $this->body();
-      $this->token= $this->expect('}');
-
-      $node->value= [$type, $parent, $implements, $body];
+      $node->value= $this->type($type);
       $node->arity= 'class';
       return $node;
     });
@@ -597,6 +575,37 @@ class Parse {
     $this->scope= $this->scope->parent;
     $node->value= [$name, $modifiers, $parameters, $statements, $return];
     return $node;
+  }
+
+  private function type($name) {
+    $parent= null;
+    if ('extends' === $this->token->value) {
+      $this->token= $this->advance();
+      $parent= $this->scope->resolve($this->token->value);
+      $this->token= $this->advance();
+    }
+
+    $implements= [];
+    if ('implements' === $this->token->value) {
+      $this->token= $this->advance();
+      do {
+        $implements[]= $this->scope->resolve($this->token->value);
+        $this->token= $this->advance();
+        if (',' === $this->token->symbol->id) {
+          $this->token= $this->expect(',');
+        } else if ('{' === $this->token->symbol->id) {
+          break;
+        } else {
+          $this->expect(', or {');
+        }
+      } while (true);
+    }
+
+    $this->token= $this->expect('{');
+    $body= $this->body();
+    $this->token= $this->expect('}');
+
+    return [$name, $parent, $implements, $body];
   }
 
   private function arguments() {

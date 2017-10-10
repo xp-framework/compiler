@@ -62,4 +62,36 @@ class OperatorTest extends ParseTest {
       $this->parse('$a '.$operator.' $b;')
     );
   }
+
+  #[@test]
+  public function new_type() {
+    $this->assertNodes(
+      [['new' => ['T', []]]],
+      $this->parse('new T();')
+    );
+  }
+
+  #[@test]
+  public function new_type_with_args() {
+    $this->assertNodes(
+      [['new' => ['T', [['(variable)' => 'a'], ['(variable)' => 'b']]]]],
+      $this->parse('new T($a, $b);')
+    );
+  }
+
+  #[@test]
+  public function new_anonymous_extends() {
+    $this->assertNodes(
+      [['new' => [null, [], [null, 'T', [], []]]]],
+      $this->parse('new class() extends T { };')
+    );
+  }
+
+  #[@test]
+  public function new_anonymous_implements() {
+    $this->assertNodes(
+      [['new' => [null, [], [null, null, ['A', 'B'], []]]]],
+      $this->parse('new class() implements A, B { };')
+    );
+  }
 }
