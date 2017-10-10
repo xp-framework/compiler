@@ -6,7 +6,8 @@ class OperatorTest extends ParseTest {
   #  '+', '-', '*', '/', '.', '|', '&', '**',
   #  '??', '?:',
   #  '&&', '||',
-  #  '>>', '<<'
+  #  '>>', '<<',
+  #  'instanceof'
   #])]
   public function binary($operator) {
     $this->assertNodes(
@@ -60,6 +61,14 @@ class OperatorTest extends ParseTest {
     $this->assertNodes(
       [[$operator => [['(variable)' => 'a'], ['(variable)' => 'b']]]],
       $this->parse('$a '.$operator.' $b;')
+    );
+  }
+
+  #[@test]
+  public function clone() {
+    $this->assertNodes(
+      [['clone' => ['(variable)' => 'a']]],
+      $this->parse('clone $a;')
     );
   }
 
