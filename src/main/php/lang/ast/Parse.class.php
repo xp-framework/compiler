@@ -263,20 +263,58 @@ class Parse {
       return $node;
     });
 
-    $this->stmt('foreach', function($node) {
+    $this->stmt('do', function($node) {
+      $this->token= $this->expect('{');
+      $statements= $this->statements();
+      $this->token= $this->expect('}');
+
+      $this->token= $this->expect('while');
       $this->token= $this->expect('(');
       $expression= $this->expression(0);
+      $this->token= $this->expect(')');
 
-      $this->token= $this->advance('as');
-      $variable= $this->expression(0);
-      $this->scope->define($variable->value, $variable);
+      $node->value= [$expression, $statements];
+      $node->arity= 'do';
+      return $node;
+    });
+
+    $this->stmt('while', function($node) {
+      $this->token= $this->expect('(');
+      $expression= $this->expression(0);
       $this->token= $this->expect(')');
 
       $this->token= $this->expect('{');
       $statements= $this->statements();
       $this->token= $this->expect('}');
 
-      $node->value= [$expression, $variable, $statements];
+      $node->value= [$expression, $statements];
+      $node->arity= 'while';
+      return $node;
+    });
+
+    $this->stmt('foreach', function($node) {
+      $this->token= $this->expect('(');
+      $expression= $this->expression(0);
+
+      $this->token= $this->advance('as');
+      $expr= $this->expression(0);
+
+      if ('=>' === $this->token->symbol->id) {
+        $this->token= $this->advance();
+        $key= $expr;
+        $value= $this->expression(0);
+      } else {
+        $key= null;
+        $value= $expr;
+      }
+
+      $this->token= $this->expect(')');
+
+      $this->token= $this->expect('{');
+      $statements= $this->statements();
+      $this->token= $this->expect('}');
+
+      $node->value= [$expression, $key, $value, $statements];
       $node->arity= 'foreach';
       return $node;
     });
