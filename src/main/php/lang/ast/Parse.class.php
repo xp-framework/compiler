@@ -263,6 +263,34 @@ class Parse {
       return $node;
     });
 
+    $this->stmt('switch', function($node) {
+      $this->token= $this->expect('(');
+      $condition= $this->expression(0);
+      $this->token= $this->expect(')');
+
+      $cases= [];
+      $this->token= $this->expect('{');
+      while ('}' !== $this->token->symbol->id) {
+        if ('default' === $this->token->symbol->id) {
+          $this->token= $this->advance();
+          $this->token= $this->expect(':');
+          $cases[]= [null, []];
+        } else if ('case' === $this->token->symbol->id) {
+          $this->token= $this->advance();
+          $expr= $this->expression(0);
+          $this->token= $this->expect(':');
+          $cases[]= [$expr, []];
+        } else {
+          $cases[sizeof($cases) - 1][1][]= $this->statement();
+        }
+      };
+      $this->token= $this->expect('}');
+
+      $node->value= [$condition, $cases];
+      $node->arity= 'if';
+      return $node;
+    });
+
     $this->stmt('do', function($node) {
       $this->token= $this->expect('{');
       $statements= $this->statements();

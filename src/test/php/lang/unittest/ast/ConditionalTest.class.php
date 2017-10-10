@@ -42,4 +42,43 @@ class ConditionalTest extends ParseTest {
       $this->parse('if ($condition) action1(); else action2();')
     );
   }
+
+  #[@test]
+  public function empty_switch() {
+    $this->assertNodes(
+      [['switch' => [['(variable)' => 'condition'], []]]],
+      $this->parse('switch ($condition) { }')
+    );
+  }
+
+  #[@test]
+  public function switch_with_one_case() {
+    $this->assertNodes(
+      [['switch' => [['(variable)' => 'condition'], [
+        [['(literal)' => 1], $this->blocks[0]],
+      ]]]],
+      $this->parse('switch ($condition) { case 1: action1(); }')
+    );
+  }
+
+  #[@test]
+  public function switch_with_two_cases() {
+    $this->assertNodes(
+      [['switch' => [['(variable)' => 'condition'], [
+        [['(literal)' => 1], $this->blocks[0]],
+        [['(literal)' => 2], $this->blocks[1]],
+      ]]]],
+      $this->parse('switch ($condition) { case 1: action1(); case 2: action2(); }')
+    );
+  }
+
+  #[@test]
+  public function switch_with_default() {
+    $this->assertNodes(
+      [['switch' => [['(variable)' => 'condition'], [
+        [null, $this->blocks[0]]
+      ]]]],
+      $this->parse('switch ($condition) { default: action1(); }')
+    );
+  }
 }
