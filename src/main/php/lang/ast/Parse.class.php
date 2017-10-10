@@ -100,6 +100,15 @@ class Parse {
       return $node;
     });
 
+    $this->infix('?', 80, function($node, $left) {
+      $when= $this->expression(0);
+      $this->token= $this->expect(':');
+      $else= $this->expression(0);
+      $node->value= [$left, $when, $else];
+      $node->arity= 'ternary';
+      return $node;
+    });
+
     $this->suffix('++', 50);
     $this->suffix('--', 50);
 

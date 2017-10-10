@@ -15,6 +15,14 @@ class OperatorTest extends ParseTest {
     );
   }
 
+  #[@test]
+  public function ternary() {
+    $this->assertNodes(
+      [['?' => [['(variable)' => 'a'], ['(literal)' => 1], ['(literal)' => 2]]]],
+      $this->parse('$a ? 1 : 2;')
+    );
+  }
+
   #[@test, @values([
   #  '==', '!=',
   #  '===', '!==',
