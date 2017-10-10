@@ -39,4 +39,12 @@ class LoopsTest extends ParseTest {
       $this->parse('do { loop(); } while ($continue)')
     );
   }
+
+  #[@test, @ignore('Unsure how to implement')]
+  public function goto_statement() {
+    $this->assertNodes(
+      [['do' => [['(variable)' => 'continue'], $this->block]]],
+      $this->parse('label: loop(); goto loop;')
+    );
+  }
 }
