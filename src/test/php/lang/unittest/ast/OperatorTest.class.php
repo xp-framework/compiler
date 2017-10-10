@@ -81,7 +81,7 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
-  public function clone() {
+  public function clone_expression() {
     $this->assertNodes(
       [['clone' => ['(variable)' => 'a']]],
       $this->parse('clone $a;')
