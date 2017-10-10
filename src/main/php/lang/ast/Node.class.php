@@ -4,7 +4,7 @@ use util\Objects;
 
 class Node implements \lang\Value {
   public $symbol;
-  public $value= null, $arity= null;
+  public $value= null, $arity= null, $line= null;
 
   public function __construct(Symbol $symbol) {
     $this->symbol= $symbol;

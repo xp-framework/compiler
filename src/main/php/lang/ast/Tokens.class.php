@@ -40,34 +40,37 @@ class Tokens implements \IteratorAggregate {
 
   /** @return php.Iterator */
   public function getIterator() {
+    $line= 1;
     while ($this->source->hasMoreTokens()) {
       $token= $this->source->nextToken();
       if ('$' === $token) {
-        yield 'variable' => $this->source->nextToken();
+        yield 'variable' => [$this->source->nextToken(), $line];
       } else if ('"' === $token || "'" === $token) {
         $string= '';
         while ($this->source->hasMoreTokens()) {
           if ($token === ($part= $this->source->nextToken($token))) {
-            yield 'string' => $string;
+            yield 'string' => [$string, $line];
+            $line+= substr_count($string, "\n");
             continue 2;
           }
           $string.= $part;
         }
         throw new FormatException('Unclosed string literal');
       } else if (0 === strcspn($token, " \r\n\t")) {
+        $line+= substr_count($token, "\n");
         continue;
       } else if (0 === strcspn($token, '0123456789')) {
         if ('.' === ($next= $this->source->nextToken())) {
-          yield 'decimal' => (float)($token.$next.$this->source->nextToken());
+          yield 'decimal' => [(float)($token.$next.$this->source->nextToken()), $line];
         } else {
           $this->source->pushBack($next);
-          yield 'integer' => (int)$token;
+          yield 'integer' => [(int)$token, $line];
         }
       } else if (0 === strcspn($token, self::DELIMITERS)) {
         if ('.' === $token) {
           $next= $this->source->nextToken();
           if (0 === strcspn($next, '0123456789')) {
-            yield 'decimal' => (float)"0.$next";
+            yield 'decimal' => [(float)"0.$next", $line];
             continue;
           }
           $this->source->pushBack($next);
@@ -97,9 +100,9 @@ class Tokens implements \IteratorAggregate {
 
           $this->source->pushBack(substr($combined, strlen($token)));
         }
-        yield 'operator' => $token;
+        yield 'operator' => [$token, $line];
       } else {
-        yield 'name' => $token;
+        yield 'name' => [$token, $line];
       }
     }
   }

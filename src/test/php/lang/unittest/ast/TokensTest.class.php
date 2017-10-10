@@ -17,7 +17,7 @@ class TokensTest extends \unittest\TestCase {
   private function assertTokens($expected, $tokens) {
     $actual= [];
     foreach ($tokens as $type => $value) {
-      $actual[]= [$type => $value];
+      $actual[]= [$type => $value[0]];
     }
     $this->assertEquals($expected, $actual);
   }

@@ -27,6 +27,14 @@ class MembersTest extends ParseTest {
   }
 
   #[@test]
+  public function class_constant() {
+    $this->assertNodes(
+      [['class' => ['A', null, [], [['const' => ['T', ['(literal)' => 1]]]]]]],
+      $this->parse('class A { const T = 1; }')
+    );
+  }
+
+  #[@test]
   public function short_method() {
     $block= [['==>' => ['true' => true]]];
     $this->assertNodes(

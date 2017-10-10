@@ -670,6 +670,19 @@ class Parse {
         $body[]= $member;
         $modifiers= [];
         $annotations= null;
+      } else if ('const' === $this->token->symbol->id) {
+        $member= new Node($this->token->symbol);
+        $member->arity= 'const';
+
+        $this->token= $this->advance();
+        $name= $this->token->value;
+
+        $this->token= $this->advance();
+        $this->token= $this->expect('=');
+
+        $member->value= [$name, $this->expression(0)];
+        $body[]= $member;
+        $this->token= $this->advance();
       } else if ('name' === $this->token->arity) {
         $type= $this->scope->resolve($this->token->value);
         $this->token= $this->advance();
@@ -719,7 +732,7 @@ class Parse {
         } while (true);
         $this->token= $this->expect('>>');
       } else {
-        $this->expect('property or method');
+        $this->expect('property, constant or method');
       }
     }
     return $body;
@@ -857,7 +870,7 @@ class Parse {
 
   private function expect($id) {
     if ($id !== $this->token->symbol->id) {
-      throw new Error('Expected `'.$id.'`, have `'.$this->token->symbol->id.'`');
+      throw new Error('Expected `'.$id.'`, have `'.$this->token->symbol->id.'` on line '.$this->token->line);
     }
 
     return $this->advance();
@@ -867,8 +880,8 @@ class Parse {
     if ($this->queue) return array_shift($this->queue);
 
     if ($this->tokens->valid()) {
-      $value= $this->tokens->current();
       $type= $this->tokens->key();
+      list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
         $node= $this->scope->find($value) ?: new Node($this->symbol($value) ?: clone $this->symbol('(name)'));
@@ -881,10 +894,11 @@ class Parse {
         $node= new Node(clone $this->symbol('(variable)'));
         $type= 'variable';
       } else {
-        throw new Error('Unexpected token '.$value);
+        throw new Error('Unexpected token '.$value.' on line '.$line);
       }
       $node->arity= $type;
       $node->value= $value;
+      $node->line= $line;
       // \util\cmd\Console::writeLine('-> ', $node);
       return $node;
     } else {
