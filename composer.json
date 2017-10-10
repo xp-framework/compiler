@@ -1,0 +1,19 @@
+{
+  "name" : "xp-framework/ast",
+  "type" : "library",
+  "homepage" : "http://xp-framework.net/",
+  "license" : "BSD-3-Clause",
+  "description" : "AST for the XP Framework",
+  "keywords": ["module", "xp"],
+  "require" : {
+    "xp-framework/core": "^9.0 | ^8.0 | ^7.0 | ^6.10",
+    "xp-framework/tokenize": "^8.0",
+    "php" : ">=5.6.0"
+  },
+  "require-dev" : {
+    "xp-framework/unittest": "^9.0 | ^8.0 | ^7.0 | ^6.5"
+  },
+  "autoload" : {
+    "files" : ["src/main/php/autoload.php"]
+  }
+}
