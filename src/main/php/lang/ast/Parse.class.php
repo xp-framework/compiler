@@ -198,6 +198,22 @@ class Parse {
       return $node;
     });
 
+    $this->prefix('yield', function($node) {
+      $node->arity= 'yield';
+      if (';' === $this->token->symbol->id) {
+        $node->value= [null, null];
+      } else {
+        $expr= $this->expression(0);
+        if ('=>' === $this->token->symbol->id) {
+          $this->token= $this->advance();
+          $node->value= [$expr, $this->expression(0)];
+        } else {
+          $node->value= [null, $expr];
+        }
+      }
+      return $node;
+    });
+
     $this->prefix('...', function($node) {
       $node->arity= 'unpack';
       $node->value= $this->token;

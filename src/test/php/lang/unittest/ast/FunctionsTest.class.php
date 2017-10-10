@@ -83,4 +83,31 @@ class FunctionsTest extends ParseTest {
       $this->parse('($a) ==> $a + 1;')
     );
   }
+
+  #[@test]
+  public function generator() {
+    $statement= ['yield' => [null, null]];
+    $this->assertNodes(
+      [['(' => ['a', [], [], [$statement], null]]],
+      $this->parse('function a() { yield; }')
+    );
+  }
+
+  #[@test]
+  public function generator_with_value() {
+    $statement= ['yield' => [null, ['(literal)' => 1]]];
+    $this->assertNodes(
+      [['(' => ['a', [], [], [$statement], null]]],
+      $this->parse('function a() { yield 1; }')
+    );
+  }
+
+  #[@test]
+  public function generator_with_key_and_value() {
+    $statement= ['yield' => [['(literal)' => 'number'], ['(literal)' => 1]]];
+    $this->assertNodes(
+      [['(' => ['a', [], [], [$statement], null]]],
+      $this->parse('function a() { yield "number" => 1; }')
+    );
+  }
 }
