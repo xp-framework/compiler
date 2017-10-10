@@ -80,6 +80,7 @@ class Parse {
     $this->infix('/', 60);
     $this->infix('.', 60);
     $this->infix('**', 60);
+    $this->infix('instanceof', 60);
 
     $this->infixr('<<', 70);
     $this->infixr('>>', 70);
@@ -116,6 +117,7 @@ class Parse {
     $this->prefix('!');
     $this->prefix('++');
     $this->prefix('--');
+    $this->prefix('clone');
 
     $this->assignment('=');
     $this->assignment('&=');
@@ -526,13 +528,18 @@ class Parse {
         $variadic= false;
       }
 
-      $this->scope->define($this->token->value, $this->token);
-      $parameters[]= [$this->token->value, $type, $variadic, $promote];
+      $name= $this->token->value;
       $this->token= $this->advance();
 
-      if (',' === $this->token->symbol->id) {
-        $this->token= $this->expect(',');
+      $default= null;
+      if ('=' === $this->token->symbol->id) {
+        $this->token= $this->advance();
+        $default= $this->expression(0);
       }
+      $parameters[]= [$name, $type, $variadic, $promote, $default];
+
+      if (')' === $this->token->symbol->id) break;
+      $this->token= $this->expect(',');
     }
     return $parameters;
   }

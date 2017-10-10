@@ -21,7 +21,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_parameter() {
     $this->assertNodes(
-      [['(' => ['a', [], [['param', null, false, null]], [], null]]],
+      [['(' => ['a', [], [['param', null, false, null, null]], [], null]]],
       $this->parse('function a($param) { }')
     );
   }
@@ -29,7 +29,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_typed_parameter() {
     $this->assertNodes(
-      [['(' => ['a', [], [['param', 'string', false, null]], [], null]]],
+      [['(' => ['a', [], [['param', 'string', false, null, null]], [], null]]],
       $this->parse('function a(string $param) { }')
     );
   }
@@ -37,8 +37,16 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_variadic_parameter() {
     $this->assertNodes(
-      [['(' => ['a', [], [['param', null, true, null]], [], null]]],
+      [['(' => ['a', [], [['param', null, true, null, null]], [], null]]],
       $this->parse('function a(... $param) { }')
+    );
+  }
+
+  #[@test]
+  public function with_optional_parameter() {
+    $this->assertNodes(
+      [['(' => ['a', [], [['param', null, false, null, ['null' => null]]], [], null]]],
+      $this->parse('function a($param= null) { }')
     );
   }
 
@@ -54,7 +62,7 @@ class FunctionsTest extends ParseTest {
   public function default_closure() {
     $block= ['+' => [['(variable)' => 'a'], ['(literal)' => 1]]];
     $this->assertNodes(
-      [['(' => [null, [], [['a', null, false, null]], [['return' => $block]], null]]],
+      [['(' => [null, [], [['a', null, false, null, null]], [['return' => $block]], null]]],
       $this->parse('function($a) { return $a + 1; };')
     );
   }
@@ -63,7 +71,7 @@ class FunctionsTest extends ParseTest {
   public function short_closure() {
     $block= ['+' => [['(variable)' => 'a'], ['(literal)' => 1]]];
     $this->assertNodes(
-      [['(' => [null, [], [['a', null, false, null]], [['==>' => $block]], null]]],
+      [['(' => [null, [], [['a', null, false, null, null]], [['==>' => $block]], null]]],
       $this->parse('($a) ==> $a + 1;')
     );
   }
