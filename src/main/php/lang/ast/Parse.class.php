@@ -163,6 +163,29 @@ class Parse {
       return $node;
     });
 
+    $this->prefix('[', function($node) {
+      $i= 0;
+      $values= [];
+      while (']' !== $this->token->symbol->id) {
+        $expr= $this->expression(0);
+
+        if ('=>' === $this->token->symbol->id) {
+          $this->token= $this->advance();
+          $values[$expr->value]= $this->expression(0);
+        } else {
+          $values[$i++]= $expr;
+        }
+
+        if (']' === $this->token->symbol->id) break;
+        $this->token= $this->expect(',');
+      }
+
+      $this->token= $this->expect(']');
+      $node->arity= 'array';
+      $node->value= $values;
+      return $node;
+    });
+
     $this->prefix('new', function($node) {
       $type= $this->token->value;
       $this->token= $this->advance();
