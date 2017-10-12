@@ -2,24 +2,40 @@
 
 class LiteralsTest extends ParseTest {
 
-  #[@test, @values([0, 1])]
-  public function integer($i) {
-    $this->assertNodes([['(literal)' => $i]], $this->parse($i.';'));
+  #[@test, @values(map= [
+  #  '0' => 0,
+  #  '1' => 1
+  #])]
+  public function integer($input, $expect) {
+    $this->assertNodes([['(literal)' => $expect]], $this->parse($input.';'));
   }
 
-  #[@test]
-  public function hexadecimal() {
-    $this->assertNodes([['(literal)' => 0x01]], $this->parse('0x01;'));
+  #[@test, @values(map= [
+  #  '0x00' => 0,
+  #  '0x01' => 1,
+  #  '0xFF' => 255,
+  #  '0xff' => 255
+  #])]
+  public function hexadecimal($input, $expect) {
+    $this->assertNodes([['(literal)' => $expect]], $this->parse($input.';'));
   }
 
-  #[@test]
-  public function octal() {
-    $this->assertNodes([['(literal)' => 0777]], $this->parse('0777;'));
+  #[@test, @values(map= [
+  #  '00' => 0,
+  #  '01' => 1,
+  #  '010' => 8,
+  #  '0777' => 511
+  #])]
+  public function octal($input, $expect) {
+    $this->assertNodes([['(literal)' => $expect]], $this->parse($input.';'));
   }
 
-  #[@test]
-  public function decimal() {
-    $this->assertNodes([['(literal)' => 1.5]], $this->parse('1.5;'));
+  #[@test, @values(map= [
+  #  '1.0' => 1.0,
+  #  '1.5' => 1.5
+  #])]
+  public function decimal($input, $expect) {
+    $this->assertNodes([['(literal)' => $expect]], $this->parse($input.';'));
   }
 
   #[@test]
