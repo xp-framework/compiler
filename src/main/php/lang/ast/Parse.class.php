@@ -485,6 +485,26 @@ class Parse {
       return $result;
     });
 
+    $this->stmt('abstract', function($node) {
+      $this->token= $this->advance();
+      $type= $this->token->value;
+      $this->token= $this->advance();
+
+      $node->value= $this->type($type);
+      $node->arity= 'class';
+      return $node;
+    });
+
+    $this->stmt('final', function($node) {
+      $this->token= $this->advance();
+      $type= $this->token->value;
+      $this->token= $this->advance();
+
+      $node->value= $this->type($type);
+      $node->arity= 'class';
+      return $node;
+    });
+
     $this->stmt('class', function($node) {
       $type= $this->token->value;
       $this->token= $this->advance();

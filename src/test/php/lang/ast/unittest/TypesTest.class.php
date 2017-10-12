@@ -35,6 +35,22 @@ class TypesTest extends ParseTest {
   }
 
   #[@test]
+  public function abstract_class() {
+    $this->assertNodes(
+      [['abstract' => ['A', null, [], []]]],
+      $this->parse('abstract class A { }')
+    );
+  }
+
+  #[@test]
+  public function final_class() {
+    $this->assertNodes(
+      [['final' => ['A', null, [], []]]],
+      $this->parse('final class A { }')
+    );
+  }
+
+  #[@test]
   public function empty_interface() {
     $this->assertNodes(
       [['interface' => ['A', [], []]]],
