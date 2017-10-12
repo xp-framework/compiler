@@ -1,5 +1,10 @@
 <?php namespace lang\ast;
 
+/**
+ * Scope
+ *
+ * @test  xp://lang.unittest.ast.ScopeTest
+ */
 class Scope {
   private static $reserved= [
     'string'   => true,
@@ -31,14 +36,32 @@ class Scope {
     $this->defines[$name]= $definition;
   }
 
+  /**
+   * Sets package
+   *
+   * @param  string $name
+   * @return void
+   */
   public function package($name) {
     $this->package= '\\'.$name;
   }
 
+  /**
+   * Adds an import
+   *
+   * @param  string $name
+   * @return void
+   */
   public function import($name) {
     $this->imports[substr($name, strrpos($name,  '\\') + 1)]= '\\'.$name;
   }
 
+  /**
+   * Resolves a type
+   *
+   * @param  string $name
+   * @return string
+   */
   public function resolve($name) {
     if (isset(self::$reserved[$name])) {
       return $name;
