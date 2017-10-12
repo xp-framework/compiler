@@ -30,6 +30,7 @@ class TokensTest extends \unittest\TestCase {
   #[@test, @values([
   #  ['""', ''],
   #  ["''", ''],
+  #  ["'\\\\'", '\\'],
   #  ['"Test"', 'Test'],
   #  ["'Test'", 'Test'],
   #  ["'Test\''", 'Test\'']

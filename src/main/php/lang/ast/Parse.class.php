@@ -93,6 +93,15 @@ class Parse {
       return $node;
     });
 
+    $this->infix('{', 80, function($node, $left) {
+      $expr= $this->expression(0);
+      $this->token= $this->expect('}');
+
+      $node->value= [$left, $expr];
+      $node->arity= 'offset';
+      return $node;
+    });
+
     $this->infix('?', 80, function($node, $left) {
       $when= $this->expression(0);
       $this->token= $this->expect(':');
