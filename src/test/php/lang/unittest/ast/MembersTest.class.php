@@ -87,7 +87,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function instance_method_invocation() {
     $this->assertNodes(
-      [['->' => [['(variable)' => 'a'], ['(' => [['member' => 'member'], [['(literal)' => 1]]]]]]],
+      [['(' => [['->' => [['(variable)' => 'a'], ['member' => 'member']]], [['(literal)' => 1]]]]],
       $this->parse('$a->member(1);')
     );
   }
@@ -95,7 +95,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function static_method_invocation() {
     $this->assertNodes(
-      [['::' => ['A', ['(' => [['member' => 'member'], [['(literal)' => 1]]]]]]],
+      [['(' => [['::' => ['A', ['member' => 'member']]], [['(literal)' => 1]]]]],
       $this->parse('A::member(1);')
     );
   }

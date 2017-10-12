@@ -119,4 +119,26 @@ class OperatorTest extends ParseTest {
       $this->parse('new class() implements A, B { };')
     );
   }
+
+  #[@test]
+  public function precedence_of_object_operator() {
+    $this->assertNodes(
+      [['.' => [
+        ['->' => [['(variable)' => 'this'], ['a' => 'a']]],
+        ['(literal)' => 'test']
+      ]]],
+      $this->parse('$this->a."test";')
+    );
+  }
+
+  #[@test]
+  public function precedence_of_scope_resolution_operator() {
+    $this->assertNodes(
+      [['.' => [
+        ['::' => ['self', ['class' => 'class']]],
+        ['(literal)' => 'test']
+      ]]],
+      $this->parse('self::class."test";')
+    );
+  }
 }

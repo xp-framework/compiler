@@ -13,7 +13,7 @@ class Node implements \lang\Value {
   public function nud() {
     return $this->symbol->nud
       ? $this->symbol->nud->__invoke($this)
-      : $this // $this->symbol->error('Unexpected symbol')
+      : $this
     ;
   }
 

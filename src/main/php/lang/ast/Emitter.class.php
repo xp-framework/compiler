@@ -168,6 +168,14 @@ class Emitter {
     $this->emit($node->value[1]);
   }
 
+  private function ternary($node) {
+    $this->emit($node->value[0]);
+    $this->out->write('?');
+    $this->emit($node->value[1]);
+    $this->out->write(':');
+    $this->emit($node->value[1]);
+  }
+
   private function offset($node) {
     $this->emit($node->value[0]);
     $this->out->write('[');
@@ -216,6 +224,11 @@ class Emitter {
       $this->emit($node->value[2]);
       $this->out->write('}');
     }
+  }
+
+  private function throw($node) {
+    $this->out->write('throw ');
+    $this->emit($node->value);
   }
 
   private function new($node) {
