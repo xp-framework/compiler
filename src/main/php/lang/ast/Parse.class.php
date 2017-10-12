@@ -51,6 +51,7 @@ class Parse {
 
     $this->infix('*', 60);
     $this->infix('/', 60);
+    $this->infix('%', 60);
     $this->infix('.', 60);
     $this->infix('**', 60);
     $this->infix('instanceof', 60);

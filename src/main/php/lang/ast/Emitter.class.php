@@ -71,6 +71,11 @@ class Emitter {
     $this->out->write('$'.$node->value);
   }
 
+  private function emitCast($node) {
+    $this->out->write('('.$node->value[0].')');
+    $this->emit($node->value[1]);
+  }
+
   private function emitArray($node) {
     if (empty($node->value)) {
       $this->out->write('[]');
@@ -196,7 +201,7 @@ class Emitter {
 
   private function emitBinary($node) {
     $this->emit($node->value[0]);
-    $this->out->write($node->symbol->id);
+    $this->out->write(' '.$node->symbol->id.' ');
     $this->emit($node->value[1]);
   }
 
@@ -280,6 +285,7 @@ class Emitter {
   private function emitThrow($node) {
     $this->out->write('throw ');
     $this->emit($node->value);
+    $this->out->write(';');
   }
 
   private function emitForeach($node) {
