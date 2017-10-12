@@ -1,4 +1,4 @@
-<?php namespace lang\unittest\ast;
+<?php namespace lang\ast\unittest;
 
 class LoopsTest extends ParseTest {
   private $block;
@@ -37,6 +37,22 @@ class LoopsTest extends ParseTest {
     $this->assertNodes(
       [['do' => [['(variable)' => 'continue'], $this->block]]],
       $this->parse('do { loop(); } while ($continue)')
+    );
+  }
+
+  #[@test]
+  public function break_statement() {
+    $this->assertNodes(
+      [['break' => 'break']],
+      $this->parse('break;')
+    );
+  }
+
+  #[@test]
+  public function continue_statement() {
+    $this->assertNodes(
+      [['continue' => 'continue']],
+      $this->parse('continue;')
     );
   }
 

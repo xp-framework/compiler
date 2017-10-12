@@ -1,4 +1,4 @@
-<?php namespace lang\unittest\ast;
+<?php namespace lang\ast\unittest;
 
 class OperatorTest extends ParseTest {
 

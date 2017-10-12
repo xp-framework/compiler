@@ -1,4 +1,4 @@
-<?php namespace lang\unittest\ast;
+<?php namespace lang\ast\unittest;
 
 use lang\ast\Emitter;
 use io\streams\MemoryOutputStream;

@@ -3,6 +3,7 @@
 class Emitter {
   private $out;
 
+  /** @param io.streams.Writer */
   public function __construct($out) {
     $this->out= $out;
   }
@@ -46,31 +47,31 @@ class Emitter {
     $this->out->write("]\n");
   }
 
-  private function start($node) {
+  private function emitStart($node) {
     $this->out->write('<?php ');
   }
 
-  private function package($node) {
+  private function emitPackage($node) {
     $this->out->write('namespace '.$node->value.";\n");
   }
 
-  private function import($node) {
+  private function emitImport($node) {
     $this->out->write('');
   }
 
-  private function literal($node) {
+  private function emitLiteral($node) {
     $this->out->write(var_export($node->value, true));
   }
 
-  private function name($node) {
+  private function emitName($node) {
     $this->out->write($node->value);
   }
 
-  private function variable($node) {
+  private function emitVariable($node) {
     $this->out->write('$'.$node->value);
   }
 
-  private function array($node) {
+  private function emitArray($node) {
     if (empty($node->value)) {
       $this->out->write('[]');
       return;
@@ -85,7 +86,7 @@ class Emitter {
     $this->out->write(']');
   }
 
-  private function function($node) {
+  private function emitFunction($node) {
     $this->out->write('function '.$node->value[0].'('); 
     $this->params($node->value[2]);
     $this->out->write(') {');
@@ -93,7 +94,7 @@ class Emitter {
     $this->out->write('}');
   }
 
-  private function closure($node) {
+  private function emitClosure($node) {
     $this->out->write('function('); 
     $this->params($node->value[2]);
     $this->out->write(') {');
@@ -101,7 +102,7 @@ class Emitter {
     $this->out->write('}');
   }
 
-  private function class($node) {
+  private function emitClass($node) {
     $this->out->write('class '.$node->value[0]);
     $node->value[1] && $this->out->write(' extends '.$node->value[1]);
     $node->value[2] && $this->out->write(' implements '.implode(', ', $node->value[2]));
@@ -113,7 +114,7 @@ class Emitter {
     $this->out->write('}');
   }
 
-  private function interface($node) {
+  private function emitInterface($node) {
     $this->out->write('interface '.$node->value[0]);
     $node->value[1] && $this->out->write(' extends '.implode(', ', $node->value[1]));
     $this->out->write('{');
@@ -124,7 +125,7 @@ class Emitter {
     $this->out->write('}');
   }
 
-  private function trait($node) {
+  private function emitTrait($node) {
     $this->out->write('trait '.$node->value[0]);
     $this->out->write('{');
     foreach ($node->value[1] as $member) {
@@ -134,7 +135,7 @@ class Emitter {
     $this->out->write('}');
   }
 
-  private function property($node) {
+  private function emitProperty($node) {
     if (isset($node->value[3])) {
       $this->out->write("\n/** @var ".$node->value[3]." */\n");
     }
@@ -150,7 +151,7 @@ class Emitter {
     $this->out->write(';');
   }
 
-  private function method($node) {
+  private function emitMethod($node) {
     $declare= $promote= $params= '';
     foreach ($node->value[2] as $param) {
       if (isset($param[3])) {
@@ -177,18 +178,18 @@ class Emitter {
     }
   }
 
-  private function binary($node) {
+  private function emitBinary($node) {
     $this->emit($node->value[0]);
     $this->out->write($node->symbol->id);
     $this->emit($node->value[1]);
   }
 
-  private function unary($node) {
+  private function emitUnary($node) {
     $this->out->write($node->symbol->id);
     $this->emit($node->value);
   }
 
-  private function ternary($node) {
+  private function emitTernary($node) {
     $this->emit($node->value[0]);
     $this->out->write('?');
     $this->emit($node->value[1]);
@@ -196,26 +197,26 @@ class Emitter {
     $this->emit($node->value[1]);
   }
 
-  private function offset($node) {
+  private function emitOffset($node) {
     $this->emit($node->value[0]);
     $this->out->write('[');
     $this->emit($node->value[1]);
     $this->out->write(']');
   }
 
-  private function assignment($node) {
+  private function emitAssignment($node) {
     $this->emit($node->value[0]);
     $this->out->write('=');
     $this->emit($node->value[1]);
   }
 
-  private function return($node) {
+  private function emitReturn($node) {
     $this->out->write('return ');
     $this->emit($node->value);
     $this->out->write(';');
   }
 
-  private function if($node) {
+  private function emitIf($node) {
     $this->out->write('if (');
     $this->emit($node->value[0]);
     $this->out->write(') {');
@@ -229,7 +230,7 @@ class Emitter {
     }
   }
 
-  private function try($node) {
+  private function emitTry($node) {
     $this->out->write('try {');
     $this->emit($node->value[0]);
     $this->out->write('}');
@@ -260,30 +261,54 @@ class Emitter {
     }
   }
 
-  private function throw($node) {
+  private function emitThrow($node) {
     $this->out->write('throw ');
     $this->emit($node->value);
   }
 
-  private function new($node) {
+  private function emitForeach($node) {
+    
+  }
+
+  private function emitFor($node) {
+    
+  }
+
+  private function emitDo($node) {
+    
+  }
+
+  private function emitWhile($node) {
+    
+  }
+
+  private function emitBreak($node) {
+    
+  }
+
+  private function emitContinue($node) {
+    
+  }
+
+  private function emitNew($node) {
     $this->out->write('new '.$node->value[0].'(');
     $this->arguments($node->value[1]);
     $this->out->write(')');
   }
 
-  private function invoke($node) {
+  private function emitInvoke($node) {
     $this->emit($node->value[0]);
     $this->out->write('(');
     $this->arguments($node->value[1]);
     $this->out->write(')');
   }
 
-  private function static($node) {
+  private function emitStatic($node) {
     $this->out->write($node->value[0].'::');
     $this->emit($node->value[1]);
   }
 
-  private function instance($node) {
+  private function emitInstance($node) {
     if ('new' === $node->value[0]->arity) {
       $this->out->write('(');
       $this->emit($node->value[0]);
@@ -295,17 +320,17 @@ class Emitter {
     $this->emit($node->value[1]);
   }
 
-  private function unpack($node) {
+  private function emitUnpack($node) {
     $this->out->write('...');
     $this->emit($node->value);
   }
 
   public function emit($arg) {
     if ($arg instanceof Node) {
-      $this->{$arg->arity}($arg);
+      $this->{'emit'.$arg->arity}($arg);
     } else {
       foreach ($arg as $node) {
-        $this->{$node->arity}($node);
+        $this->{'emit'.$node->arity}($node);
         isset($node->symbol->std) || $this->out->write(";\n"); 
       }
     }
