@@ -8,6 +8,11 @@ class LiteralsTest extends ParseTest {
   }
 
   #[@test]
+  public function hexadecimal() {
+    $this->assertNodes([['(literal)' => 1]], $this->parse('0x01;'));
+  }
+
+  #[@test]
   public function decimal() {
     $this->assertNodes([['(literal)' => 1.5]], $this->parse('1.5;'));
   }

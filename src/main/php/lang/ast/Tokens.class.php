@@ -69,7 +69,9 @@ class Tokens implements \IteratorAggregate {
         $line+= substr_count($token, "\n");
         continue;
       } else if (0 === strcspn($token, '0123456789')) {
-        if ('.' === ($next= $this->source->nextToken())) {
+        if (strpos($token, 'x') > 0) {
+          yield 'integer' => [hexdec($token), $line];
+        } else if ('.' === ($next= $this->source->nextToken())) {
           yield 'decimal' => [(float)($token.$next.$this->source->nextToken()), $line];
         } else {
           $this->source->pushBack($next);
