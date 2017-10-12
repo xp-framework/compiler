@@ -181,7 +181,7 @@ class Parse {
     });
 
     $this->prefix('new', function($node) {
-      $type= $this->token->value;
+      $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
       $this->token= $this->expect('(');

@@ -156,7 +156,7 @@ class Emitter {
     if (null === $node->value[3]) {
       $this->out->write(';');
     } else {
-      $this->out->write(' {', $promote);
+      $this->out->write(' {'.$promote);
       $this->emit($node->value[3]);
       $this->out->write('}');
     }
