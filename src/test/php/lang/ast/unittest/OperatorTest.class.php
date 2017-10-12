@@ -44,7 +44,7 @@ class OperatorTest extends ParseTest {
     );
   }
 
-  #[@test, @values(['!', '~', '++', '--'])]
+  #[@test, @values(['!', '~', '-', '++', '--'])]
   public function prefix($operator) {
     $this->assertNodes(
       [[$operator => ['(variable)' => 'a']]],
