@@ -97,7 +97,11 @@ class Emitter {
   private function emitClosure($node) {
     $this->out->write('function('); 
     $this->params($node->value[2]);
-    $this->out->write(') {');
+    $this->out->write(') ');
+    if (isset($node->value[5])) {
+      $this->out->write('use('.implode(',', $node->value[5]).') ');
+    }
+    $this->out->write('{');
     $this->emit($node->value[3]);
     $this->out->write('}');
   }
@@ -167,9 +171,9 @@ class Emitter {
       $params.= ', '.$this->param($param);
     }
     $this->out->write($declare);
-    if (isset($node->value[5])) {
+    if (isset($node->value[6])) {
       $this->out->write("\n");
-      $this->annotations($node->value[5]);
+      $this->annotations($node->value[6]);
     }
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'('.substr($params, 2).')');
     if (isset($node->value[4])) {

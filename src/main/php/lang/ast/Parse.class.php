@@ -619,6 +619,21 @@ class Parse {
         $return= null;
       }
 
+      if ('use' === $this->token->value) {
+        $this->token= $this->advance();
+        $this->token= $this->advance();
+        $use= [];
+        while (')' !== $this->token->symbol->id) {
+          $use[]= '$'.$this->token->value;
+          $this->token= $this->advance();
+          if (')' === $this->token->symbol->id) break;
+          $this->token= $this->expect(',');
+        }
+        $this->token= $this->expect(')');
+      } else {
+        $use= null;
+      }
+
       if ('{' === $this->token->value) {
         $this->token= $this->advance();
         $statements= $this->statements();
@@ -639,7 +654,7 @@ class Parse {
     }
 
     $this->scope= $this->scope->parent;
-    $node->value= [$name, $modifiers, $parameters, $statements, $return];
+    $node->value= [$name, $modifiers, $parameters, $statements, $return, $use];
     return $node;
   }
 
