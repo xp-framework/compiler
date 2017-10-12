@@ -10,6 +10,7 @@ class Scope {
     'string'   => true,
     'int'      => true,
     'float'    => true,
+    'double'   => true,
     'bool'     => true,
     'array'    => true,
     'callable' => true,

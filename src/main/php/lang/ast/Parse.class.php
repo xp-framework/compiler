@@ -48,6 +48,7 @@ class Parse {
     $this->infix('-', 50);
     $this->infix('&', 50);
     $this->infix('|', 50);
+    $this->infix('^', 50);
 
     $this->infix('*', 60);
     $this->infix('/', 60);
