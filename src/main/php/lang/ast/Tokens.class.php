@@ -73,6 +73,9 @@ class Tokens implements \IteratorAggregate {
           yield 'integer' => [hexdec($token), $line];
         } else if ('.' === ($next= $this->source->nextToken())) {
           yield 'decimal' => [(float)($token.$next.$this->source->nextToken()), $line];
+        } else if ('0' === $token{0} && strlen($token) > 1) {
+          $this->source->pushBack($next);
+          yield 'integer' => [octdec($token), $line];
         } else {
           $this->source->pushBack($next);
           yield 'integer' => [(int)$token, $line];

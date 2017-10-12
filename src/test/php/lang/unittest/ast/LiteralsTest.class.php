@@ -2,14 +2,19 @@
 
 class LiteralsTest extends ParseTest {
 
-  #[@test]
-  public function integer() {
-    $this->assertNodes([['(literal)' => 1]], $this->parse('1;'));
+  #[@test, @values([0, 1])]
+  public function integer($i) {
+    $this->assertNodes([['(literal)' => $i]], $this->parse($i.';'));
   }
 
   #[@test]
   public function hexadecimal() {
-    $this->assertNodes([['(literal)' => 1]], $this->parse('0x01;'));
+    $this->assertNodes([['(literal)' => 0x01]], $this->parse('0x01;'));
+  }
+
+  #[@test]
+  public function octal() {
+    $this->assertNodes([['(literal)' => 0777]], $this->parse('0777;'));
   }
 
   #[@test]
