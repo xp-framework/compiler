@@ -25,6 +25,19 @@ class LoopsTest extends ParseTest {
   }
 
   #[@test]
+  public function for_loop() {
+    $this->assertNodes(
+      [['for' => [
+        [['=' => [['(variable)' => 'i'], ['(literal)' => 0]]]],
+        [['<' => [['(variable)' => 'i'], ['(literal)' => 10]]]],
+        [['++' => ['(variable)' => 'i']]],
+        $this->block
+      ]]],
+      $this->parse('for ($i= 0; $i < 10; $i++) { loop(); }')
+    );
+  }
+
+  #[@test]
   public function while_loop() {
     $this->assertNodes(
       [['while' => [['(variable)' => 'continue'], $this->block]]],

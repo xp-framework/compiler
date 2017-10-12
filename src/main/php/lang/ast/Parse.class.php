@@ -376,6 +376,24 @@ class Parse {
       return $node;
     });
 
+    $this->stmt('for', function($node) {
+      $this->token= $this->expect('(');
+      $init= $this->arguments(';');
+      $this->token= $this->advance(';');
+      $cond= $this->arguments(';');
+      $this->token= $this->advance(';');
+      $loop= $this->arguments(')');
+      $this->token= $this->advance(')');
+
+      $this->token= $this->expect('{');
+      $statements= $this->statements();
+      $this->token= $this->expect('}');
+
+      $node->value= [$init, $cond, $loop, $statements];
+      $node->arity= 'while';
+      return $node;
+    });
+
     $this->stmt('foreach', function($node) {
       $this->token= $this->expect('(');
       $expression= $this->expression(0);
@@ -632,9 +650,9 @@ class Parse {
     return [$name, $parent, $implements, $body];
   }
 
-  private function arguments() {
+  private function arguments($end= ')') {
     $arguments= [];
-    while (')' !== $this->token->symbol->id) {
+    while ($end !== $this->token->symbol->id) {
       $arguments[]= $this->expression(0, false);    // Undefined arguments are OK
       if (',' === $this->token->symbol->id) {
         $this->token= $this->expect(',');
