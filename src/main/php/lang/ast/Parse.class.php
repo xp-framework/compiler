@@ -156,12 +156,15 @@ class Parse {
       if ('==>' === $this->token->value) {
         $this->token= $this->advance();
         $node= $this->func(null, []);
-        $node->arity= 'closure';
         $this->queue= [$this->token];
         $this->token= new Node($this->symbol(';'));
+        $node->arity= 'closure';
       } else {
+        $this->token= $this->advance();
+        $this->token= $this->expect('(');
+        $node->value= $this->expression(0);
+        $this->token= $this->expect(')');
         $node->arity= 'braced';
-        $node->value= $this->expression(0);        
       }
       return $node;
     });

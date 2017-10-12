@@ -73,6 +73,14 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
+  public function comparison_to_assignment() {
+    $this->assertNodes(
+      [['===' => [['(literal)' => 1], ['(' => ['=' => [['(variable)' => 'a'], ['(literal)' => 1]]]]]]],
+      $this->parse('1 === ($a= 1);')
+    );
+  }
+
+  #[@test]
   public function append_array() {
     $this->assertNodes(
       [['=' => [['[' => [['(variable)' => 'a'], null]], ['(literal)' => 1]]]],

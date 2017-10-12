@@ -135,6 +135,12 @@ class Emitter {
     $this->out->write('}');
   }
 
+  private function emitConst($node) {
+    $this->out->write('const '.$node->value[0].'=');
+    $this->emit($node->value[1]);
+    $this->out->write(';');
+  }
+
   private function emitProperty($node) {
     if (isset($node->value[3])) {
       $this->out->write("\n/** @var ".$node->value[3]." */\n");
@@ -176,6 +182,12 @@ class Emitter {
       $this->emit($node->value[3]);
       $this->out->write('}');
     }
+  }
+
+  private function emitBraced($node) {
+    $this->out->write('(');
+    $this->emit($node->value);
+    $this->out->write(')');
   }
 
   private function emitBinary($node) {
