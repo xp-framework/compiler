@@ -70,6 +70,21 @@ class Emitter {
     $this->out->write('$'.$node->value);
   }
 
+  private function array($node) {
+    if (empty($node->value)) {
+      $this->out->write('[]');
+      return;
+    }
+
+    $this->out->write('[');
+    foreach ($node->value as $key => $value) {
+      $this->out->write((is_string($key) ? "'".$key."'" : $key).'=>');
+      $this->emit($value);
+      $this->out->write(',');
+    }
+    $this->out->write(']');
+  }
+
   private function function($node) {
     $this->out->write('function '.$node->value[0].'('); 
     $this->params($node->value[2]);
@@ -168,6 +183,11 @@ class Emitter {
     $this->emit($node->value[1]);
   }
 
+  private function unary($node) {
+    $this->out->write($node->symbol->id);
+    $this->emit($node->value);
+  }
+
   private function ternary($node) {
     $this->emit($node->value[0]);
     $this->out->write('?');
@@ -193,6 +213,20 @@ class Emitter {
     $this->out->write('return ');
     $this->emit($node->value);
     $this->out->write(';');
+  }
+
+  private function if($node) {
+    $this->out->write('if (');
+    $this->emit($node->value[0]);
+    $this->out->write(') {');
+    $this->emit($node->value[1]);
+    $this->out->write('}');
+
+    if (isset($node->value[2])) {
+      $this->out->write('else {');
+      $this->emit($node->value[2]);
+      $this->out->write('}');
+    }
   }
 
   private function try($node) {
