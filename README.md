@@ -67,8 +67,8 @@ The following table gives an overview of the current implementation status. The 
 
 Notes:
 
-- *1: Currently unchecked.*
-- *2: Namespaces and imports are resolved by the compiler and not emitted.*
+1. *Currently unchecked.*
+2. *Namespaces and imports are resolved by the compiler and not emitted.*
 
 * * *
 
