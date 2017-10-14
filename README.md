@@ -35,24 +35,35 @@ class HelloWorld {
 Features supported
 ------------------
 
-### Future
+The following table gives an overview of the current implementation status. The goal is to have check marks everywhere!
 
-| Feature                                                             | PHP 5.6  | PHP 7.0  | PHP 7.1  |
-| ------------------------------------------------------------------- | -------- | -------- | -------- |
-| **Future**                                                          |          |          |          |
-| [Property types](https://wiki.php.net/rfc/property_type_hints)      | ✔      | ✔      | ✔       |
-| [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda)   | ✔      | ✔      | ✔       |
-| [Compact functions](https://github.com/xp-framework/rfc/issues/241) | ✔      | ✔      | ✔       |
-| [Annotations](https://docs.hhvm.com/hack/attributes/introduction)   | ✔      | ✔      | ✔       |
-| [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔      | ✔      | ✔       |
-| **PHP 7.1**                                                         |          |          |          |
-| [Multiple catch](https://wiki.php.net/rfc/multiple-catch)           | ✔      | ✔      | *native* |
-| [Void](https://wiki.php.net/rfc/void_return_type)                   | ✔(1)   | ✔(1)   | *native* |
-| [Iterable](https://wiki.php.net/rfc/iterable)                       | ✔(1)   | ✔(1)   | *native* |
-| **PHP 7.0**                                                         |          |          |          |
-| [Grouped use](https://wiki.php.net/rfc/group_use_declarations)      | ✖      | *native* | *native* |
-| [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)        | ✔      | *native* | *native* |
-| [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✖      | *native* | *native* |
+| Feature                                                                   | PHP 5.6  | PHP 7.0  | PHP 7.1  | PHP 7.2  |
+| ------------------------------------------------------------------------- | -------- | -------- | -------- | -------- |
+| **Future** - these might or might not be part of PHP next                 |          |          |          |          |
+| [Property types](https://wiki.php.net/rfc/property_type_hints)            | ✔      | ✔      | ✔       | ✔       |
+| [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda)         | ✔      | ✔      | ✔       | ✔       |
+| [Compact functions](https://github.com/xp-framework/rfc/issues/241)       | ✔      | ✔      | ✔       | ✔       |
+| [Hack attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔ | ✔       |
+| [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |
+| **PHP 7.2**                                                               |          |          |          |          |
+| [Object type](https://wiki.php.net/rfc/object-typehint                    | ✔(1)   | ✔(1)   | ✔(1)    | *native*  |
+| **PHP 7.1**                                                               |          |          |          |          |
+| [Multiple catch](https://wiki.php.net/rfc/multiple-catch)                 | ✔      | ✔      | *native* | *native*  |
+| [Void](https://wiki.php.net/rfc/void_return_type)                         | ✔(1)   | ✔(1)   | *native* | *native*  |
+| [Iterable](https://wiki.php.net/rfc/iterable)                             | ✔(1)   | ✔(1)   | *native* | *native*  |
+| [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)     | ✖      | ✖       | *native* | *native* |
+| [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✖      | ✖       | ✖      | ✖       |
+| [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✖      | ✖       | ✖      | ✖       |
+| **PHP 7.0**                                                               |          |          |          |          |
+| [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✖      | *native* | *native* | *native*  |
+| [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)              | ✔      | *native* | *native* | *native*  |
+| [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✖      | *native* | *native* | *native*  |
+| [Scalar types](https://wiki.php.net/rfc/scalar_type_hints_v5)             | ✔(1)   | *native* | *native* | *native*  |
+| [Return types](https://wiki.php.net/rfc/return_types)                     | ✔(1)   | *native* | *native* | *native*  |
+| [Variable syntax](https://wiki.php.net/rfc/uniform_variable_syntax)       | ✔      | *native* | *native* | *native*  |
+| [Anonymous classes](https://wiki.php.net/rfc/anonymous_classes)           | ✖      | *native* | *native* | *native*  |
+| [Generator "yield from"](https://wiki.php.net/rfc/generator-delegation)   | ✖      | *native* | *native* | *native*  |
+| [Generator return](https://wiki.php.net/rfc/generator-return-expressions) | ✖      | *native* | *native* | *native*  |
 
 *1: Currently unchecked*.
 
