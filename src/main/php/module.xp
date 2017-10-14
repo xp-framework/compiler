@@ -5,10 +5,10 @@ use lang\ClassLoader;
 /**
  * XP Compiler
  */
-module xp-framework/ast {
+module xp-framework/compiler {
 
   /** @return void */
   public function initialize() {
-    ClassLoader::registerLoader(Compiler::instanceFor('.'));
+    ClassLoader::registerLoader(CompilingClassloader::instanceFor('.'));
   }
 }

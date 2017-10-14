@@ -9,7 +9,7 @@ use lang\ElementNotFoundException;
 use text\StreamTokenizer;
 use io\streams\MemoryOutputStream;
 
-class Compiler implements \lang\IClassLoader {
+class CompilingClassLoader implements \lang\IClassLoader {
   private static $instance= null;
   private $loaders= null;
 
@@ -201,7 +201,7 @@ class Compiler implements \lang\IClassLoader {
    * @return string
    */
   public function toString() {
-    return 'Compiler<>';
+    return 'CompilingCL<>';
   }
 
   /**
