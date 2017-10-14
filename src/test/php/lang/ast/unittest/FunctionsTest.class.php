@@ -18,11 +18,11 @@ class FunctionsTest extends ParseTest {
     );
   }
 
-  #[@test]
-  public function with_parameter() {
+  #[@test, @values(['param', 'protected'])]
+  public function with_parameter($name) {
     $this->assertNodes(
-      [['(' => ['a', [], [['param', null, false, null, null]], [], null, null]]],
-      $this->parse('function a($param) { }')
+      [['(' => ['a', [], [[$name, null, false, null, null]], [], null, null]]],
+      $this->parse('function a($'.$name.') { }')
     );
   }
 

@@ -570,7 +570,7 @@ class Parse {
 
     $parameters= [];
     while (')' !== $this->token->symbol->id) {
-      if (isset($promotion[$this->token->value])) {
+      if ('name' === $this->token->arity && isset($promotion[$this->token->value])) {
         $promote= $this->token->value;
         $this->token= $this->advance();
       } else {
