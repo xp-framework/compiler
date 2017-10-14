@@ -114,6 +114,14 @@ class MembersTest extends ParseTest {
     );
   }
 
+  #[@test, @values(['self', 'parent', 'static', 'A'])]
+  public function class_resolution($scope) {
+    $this->assertNodes(
+      [['::' => [$scope, ['class' => 'class']]]],
+      $this->parse($scope.'::class;')
+    );
+  }
+
   #[@test]
   public function instance_method_invocation() {
     $this->assertNodes(

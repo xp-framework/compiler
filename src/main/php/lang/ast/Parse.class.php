@@ -273,26 +273,26 @@ class Parse {
     });
 
     $this->prefix('static', function($node) {
-      $node->arity= 'static';
-      $node->value= [];
+      if ('variable' === $this->token->arity) {
+        $node->arity= 'static';
+        $node->value= [];
+        while (';' !== $this->token->symbol->id) {
+          $variable= $this->token->value;
+          $this->token= $this->advance();
 
-      while (';' !== $this->token->symbol->id) {
-        $variable= $this->token->value;
-        $this->token= $this->advance();
+          if ('=' === $this->token->symbol->id) {
+            $this->token= $this->expect('=');
+            $initial= $this->expression(0);
+          } else {
+            $initial= null;
+          }
 
-        if ('=' === $this->token->symbol->id) {
-          $this->token= $this->expect('=');
-          $initial= $this->expression(0);
-        } else {
-          $initial= null;
-        }
-
-        $node->value[$variable]= $initial;
-        if (',' === $this->token->symbol->id) {
-          $this->token= $this->expect(',');
+          $node->value[$variable]= $initial;
+          if (',' === $this->token->symbol->id) {
+            $this->token= $this->expect(',');
+          }
         }
       }
-
       return $node;
     });
 
