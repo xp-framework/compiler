@@ -787,26 +787,34 @@ class Parse {
         $modifiers= [];
         $annotations= null;
       } else if ('const' === $this->token->symbol->id) {
-        $member= new Node($this->token->symbol);
-        $member->arity= 'const';
-
+        $n= new Node($this->token->symbol);
+        $n->arity= 'const';
         $this->token= $this->advance();
-        $name= $this->token->value;
 
-        $this->token= $this->advance();
-        $this->token= $this->expect('=');
+        while (';' !== $this->token->symbol->id) {
+          $member= clone $n;
+          $name= $this->token->value;
 
-        $member->value= [$name, $this->expression(0)];
-        $body[]= $member;
-        $this->token= $this->advance();
+          $this->token= $this->advance();
+          $this->token= $this->expect('=');
+
+          $member->value= [$name, $this->expression(0)];
+          $body[]= $member;
+          if (',' === $this->token->symbol->id) {
+            $this->token= $this->expect(',');
+          }
+        }
+        $this->token= $this->expect(';');
       } else if ('name' === $this->token->arity) {
         $type= $this->scope->resolve($this->token->value);
         $this->token= $this->advance();
       } else if ('variable' === $this->token->arity) {
+        $n= new Node($this->token->symbol);
+        $n->arity= 'property';
+
         while (';' !== $this->token->symbol->id) {
+          $member= clone $n;
           $name= $this->token->value;
-          $member= new Node($this->token->symbol);
-          $member->arity= 'property';
           $this->token= $this->advance();
 
           if ('=' === $this->token->symbol->id) {

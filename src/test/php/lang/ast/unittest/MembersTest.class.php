@@ -11,6 +11,17 @@ class MembersTest extends ParseTest {
   }
 
   #[@test]
+  public function private_instance_properties() {
+    $this->assertNodes(
+      [['class' => ['A', [], null, [], [
+        ['(variable)' => ['a', ['private'], null, null, null]],
+        ['(variable)' => ['b', ['private'], null, null, null]],
+      ]]]],
+      $this->parse('class A { private $a, $b; }')
+    );
+  }
+
+  #[@test]
   public function private_instance_method() {
     $this->assertNodes(
       [['class' => ['A', [], null, [], [['(' => ['a', ['private'], [], [], null, null, null]]]]]],
@@ -31,6 +42,17 @@ class MembersTest extends ParseTest {
     $this->assertNodes(
       [['class' => ['A', [], null, [], [['const' => ['T', ['(literal)' => 1]]]]]]],
       $this->parse('class A { const T = 1; }')
+    );
+  }
+
+  #[@test]
+  public function class_constants() {
+    $this->assertNodes(
+      [['class' => ['A', [], null, [], [
+        ['const' => ['T', ['(literal)' => 1]]],
+        ['const' => ['S', ['(literal)' => 2]]]
+      ]]]],
+      $this->parse('class A { const T = 1, S = 2; }')
     );
   }
 
