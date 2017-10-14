@@ -39,32 +39,26 @@ Features supported
 
 | Feature                                                             | PHP 5.6  | PHP 7.0  | PHP 7.1  |
 | ------------------------------------------------------------------- | -------- | -------- | -------- |
-| [HHVM lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda)   | ✔      | ✔      | ✔       |
+| **Future**                                                          |          |          |          |
+| [Property types](https://wiki.php.net/rfc/property_type_hints)      | ✔      | ✔      | ✔       |
+| [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda)   | ✔      | ✔      | ✔       |
 | [Compact functions](https://github.com/xp-framework/rfc/issues/241) | ✔      | ✔      | ✔       |
 | [Annotations](https://docs.hhvm.com/hack/attributes/introduction)   | ✔      | ✔      | ✔       |
 | [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔      | ✔      | ✔       |
-
-### PHP 7.1
-
-| Feature                                                             | PHP 5.6  | PHP 7.0  | PHP 7.1  |
-| ------------------------------------------------------------------- | -------- | -------- | -------- |
+| **PHP 7.1**                                                         |          |          |          |
 | [Multiple catch](https://wiki.php.net/rfc/multiple-catch)           | ✔      | ✔      | *native* |
-| [Void](https://wiki.php.net/rfc/void_return_type)                   | ✔`*`   | ✔`*`   | *native* |
-| [Iterable](https://wiki.php.net/rfc/iterable)                       | ✔`*`   | ✔`*`   | *native* |
-
-*`*`: Currently unchecked*.
-
-### PHP 7.0
-
-| Feature                                                             | PHP 5.6  | PHP 7.0  | PHP 7.1  |
-| ------------------------------------------------------------------- | -------- | -------- | -------- |
+| [Void](https://wiki.php.net/rfc/void_return_type)                   | ✔(1)   | ✔(1)   | *native* |
+| [Iterable](https://wiki.php.net/rfc/iterable)                       | ✔(1)   | ✔(1)   | *native* |
+| **PHP 7.0**                                                         |          |          |          |
 | [Grouped use](https://wiki.php.net/rfc/group_use_declarations)      | ✖      | *native* | *native* |
 | [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)        | ✔      | *native* | *native* |
+| [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✖      | *native* | *native* |
 
+*1: Currently unchecked*.
 
-Show me some more code!
------------------------
-Sure :smile:
+* * *
+
+Here's some more code:
 
 ```php
 <?php namespace test;
