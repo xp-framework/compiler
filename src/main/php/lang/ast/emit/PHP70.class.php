@@ -1,5 +1,17 @@
 <?php namespace lang\ast\emit;
 
+/**
+ * PHP 7.0 syntax
+ *
+ * @see  https://wiki.php.net/rfc/generator-delegation - Not yet implemented
+ * @see  https://wiki.php.net/rfc/generator-return-expressions - Not yet implemented
+ * @see  https://wiki.php.net/rfc/anonymous_classes
+ * @see  https://wiki.php.net/rfc/return_types
+ * @see  https://wiki.php.net/rfc/isset_ternary
+ * @see  https://wiki.php.net/rfc/uniform_variable_syntax
+ * @see  https://wiki.php.net/rfc/group_use_declarations
+ * @see  https://wiki.php.net/rfc/scalar_type_hints_v5
+ */
 class PHP70 extends \lang\ast\Emitter {
 
   protected function type($name) {
