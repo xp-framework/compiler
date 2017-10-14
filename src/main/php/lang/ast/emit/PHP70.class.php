@@ -17,7 +17,7 @@ class PHP70 extends \lang\ast\Emitter {
   protected function type($name) {
     static $unsupported= ['void' => 71, 'iterable' => 71, 'object' => 72];
 
-    return isset($unsupported[$name]) ? null : $name;
+    return isset($unsupported[$name]) ? null : ltrim($name, '?');
   }
 
   protected function catches($catch) {

@@ -53,7 +53,7 @@ The following table gives an overview of the current implementation status. The 
 | • [Iterable](https://wiki.php.net/rfc/iterable)                             | ✔(1)   | ✔(1)   | *native* | *native*  |
 | • [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)     | ✔(1)   | ✔(1)   | *native* | *native*  |
 | • [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✔      | ✔      | *native* | *native*  |
-| • [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✖      | ✖       | ✖      | ✖       |
+| • [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✔(1)   | ✔(1)   | *native* | *native*  |
 | **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                              |          |          |          |          |
 | • [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✔(2)   | ✔(2)    | ✔(2)   | ✔(2)    |
 | • [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)              | ✔      | *native* | *native* | *native*  |

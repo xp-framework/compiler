@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for nullable types from PHP 7.1 - @thekid
 * Implemented short `list(...)` syntax from PHP 7.1 - @thekid
 * Added support for anonymous classes from PHP 7.0 - @thekid
 * Implemented constant modifiers from PHP 7.1 - @thekid
