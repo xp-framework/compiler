@@ -11,11 +11,7 @@ use io\streams\MemoryOutputStream;
 
 class Compiler implements \lang\IClassLoader {
   private static $instance= null;
-  private $loaders;
-
-  public function __construct() {
-    $this->loaders= ClassLoader::getDefault()->getLoaders();
-  }
+  private $loaders= null;
 
   /**
    * Locate a class' sourcecode
@@ -25,8 +21,10 @@ class Compiler implements \lang\IClassLoader {
    */
   protected function locateSource($class) {
     if (!isset($this->source[$class])) {
+      $this->loaders= $this->loaders ?: ClassLoader::getDefault()->getLoaders();
       $uri= strtr($class, '.', '/').'.php';
       foreach ($this->loaders as $loader) {
+        if ($loader instanceof self) continue;
         if ($loader->providesResource($uri)) return $this->source[$class]= $loader;
       }
       return null;
@@ -81,7 +79,17 @@ class Compiler implements \lang\IClassLoader {
    * @return string[]
    */
   public function packageContents($package) {
-    return [];
+    $this->loaders= $this->loaders ?: ClassLoader::getDefault()->getLoaders();
+    $r= [];
+    foreach ($this->loaders as $loader) {
+      if ($loader instanceof self) continue;
+      foreach ($loader->packageContents($package) as $content) {
+        if ('.php' === substr($content, $p= strpos($content, '.'))) {
+          $r[]= substr($content, 0, $p).\xp::CLASS_FILE_EXT;
+        }
+      }
+    }
+    return $r;
   }
 
   /**
@@ -105,6 +113,24 @@ class Compiler implements \lang\IClassLoader {
   public function loadClass0($class) {
     if (isset(\xp::$cl[$class])) return literal($class);
 
+    try {
+      eval('?>'.$this->loadClassBytes($class));
+    } catch (\Throwable $e) {
+      throw new ClassLinkageException('Compile error', $e);
+    }
+
+    \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
+    return literal($class);
+  }
+
+  /**
+   * Loads class bytes
+   *
+   * @param  string $class
+   * @return string
+   * @throws lang.ClassLoadingException
+   */
+  public function loadClassBytes($class) {
     if (null === ($source= $this->locateSource($class))) {
       throw new ClassNotFoundException($class);  
     }
@@ -117,17 +143,12 @@ class Compiler implements \lang\IClassLoader {
       $emitter= new Emitter($declaration);
       $emitter->emit($parse->execute());
 
-      eval('?>'.$declaration->getBytes());
+      return $declaration->getBytes();
     } catch (Error $e) {
       throw new ClassFormatException('Syntax error', $e);
-    } catch (\Throwable $e) {
-      throw new ClassLinkageException('Compile error', $e);
     } finally {
       $file->close();
     }
-
-    \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
-    return literal($class);
   }
 
   /**
@@ -199,6 +220,6 @@ class Compiler implements \lang\IClassLoader {
    * @return int
    */
   public function compareTo($value) {
-    return 1;
+    return $value === $this ? 0 : 1;
   }
 }
