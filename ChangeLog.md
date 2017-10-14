@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for comparison operator `<=>` from PHP 7.0 - @thekid
 * Added support for `object` typehint from PHP 7.2 - @thekid
 
 ## 0.2.0 / 2017-10-14

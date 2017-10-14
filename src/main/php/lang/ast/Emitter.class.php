@@ -21,6 +21,11 @@ abstract class Emitter {
   /** @param io.streams.Writer */
   public function __construct($out) {
     $this->out= $out;
+    $this->id= 0;
+  }
+
+  protected function temp() {
+    return '$T'.($this->id++);
   }
 
   protected abstract function type($name);

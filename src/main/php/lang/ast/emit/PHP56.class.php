@@ -43,6 +43,14 @@ class PHP56 extends \lang\ast\Emitter {
       $this->emit($node->value[0]);
       $this->out->write(' : ');
       $this->emit($node->value[1]);
+    } else if ('<=>' === $node->symbol->id) {
+      $l= $this->temp();
+      $r= $this->temp();
+      $this->out->write('('.$l.'= ');
+      $this->emit($node->value[0]);
+      $this->out->write(') < ('.$r.'=');
+      $this->emit($node->value[1]);
+      $this->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
       $this->emit($node->value[0]);
       $this->out->write(' '.$node->symbol->id.' ');

@@ -57,7 +57,7 @@ The following table gives an overview of the current implementation status. The 
 | **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                              |          |          |          |          |
 | · [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✖      | *native* | *native* | *native*  |
 | · [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)              | ✔      | *native* | *native* | *native*  |
-| · [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✖      | *native* | *native* | *native*  |
+| · [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✔      | *native* | *native* | *native*  |
 | · [Scalar types](https://wiki.php.net/rfc/scalar_type_hints_v5)             | ✔(1)   | *native* | *native* | *native*  |
 | · [Return types](https://wiki.php.net/rfc/return_types)                     | ✔(1)   | *native* | *native* | *native*  |
 | · [Variable syntax](https://wiki.php.net/rfc/uniform_variable_syntax)       | ✔      | *native* | *native* | *native*  |
