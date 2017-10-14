@@ -1,15 +1,34 @@
 <?php namespace lang\ast;
 
-class Emitter {
-  private $out;
+use lang\reflect\Package;
+use lang\IllegalArgumentException;
+
+abstract class Emitter {
+  protected $out;
+
+  public static function forRuntime($version) {
+    sscanf($version, '%d.%d', $major, $minor);
+    $p= Package::forName('lang.ast.emit');
+
+    do {
+      $impl= 'PHP'.$major.$minor;
+      if ($p->providesClass($impl)) return $p->loadClass($impl);
+    } while ($minor-- > 0);
+
+    throw new IllegalArgumentException('XP Compiler does not support PHP '.$version.' yet');
+  }
 
   /** @param io.streams.Writer */
   public function __construct($out) {
     $this->out= $out;
   }
 
+  protected abstract function type($name);
+
+  protected abstract function catches($catch);
+
   private function param($param) {
-    $this->out->write($param[2]);
+    $this->out->write($this->type($param[2]));
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
     } else {
@@ -204,8 +223,8 @@ class Emitter {
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
     $this->params($node->value[2]);
     $this->out->write(')');
-    if (isset($node->value[4])) {
-      $this->out->write(':'.$node->value[4]);
+    if ($t= $this->type($node->value[4])) {
+      $this->out->write(':'.$t);
     }
     if (null === $node->value[3]) {
       $this->out->write(';');
@@ -297,22 +316,7 @@ class Emitter {
     $this->out->write('}');
     if (isset($node->value[1])) {
       foreach ($node->value[1] as $catch) {
-
-        // TODO: Refactor into subclasses!
-        if (PHP_VERSION_ID >= 70100) {
-          $this->out->write('catch('.implode('|', $catch[0]).' $'.$catch[1].') {');
-          $this->emit($catch[2]);
-          $this->out->write('}');
-        } else {
-          $last= array_pop($catch[0]);
-          $label= 'c'.crc32($last);
-          foreach ($catch[0] as $type) {
-            $this->out->write('catch('.$type.' $'.$catch[1].') { goto '.$label.'; }');
-          }
-          $this->out->write('catch('.$last.' $'.$catch[1].') { '.$label.':');
-          $this->emit($catch[2]);
-          $this->out->write('}');
-        }
+        $this->catches($catch);
       }
     }
     if (isset($node->value[2])) {

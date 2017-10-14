@@ -1,17 +1,24 @@
 <?php namespace lang\ast;
 
 use lang\XPClass;
+use lang\reflect\Package;
 use lang\ClassLoader;
 use lang\ClassNotFoundException;
 use lang\ClassFormatException;
 use lang\ClassLinkageException;
 use lang\ElementNotFoundException;
+use lang\IllegalStateException;
 use text\StreamTokenizer;
 use io\streams\MemoryOutputStream;
 
 class CompilingClassLoader implements \lang\IClassLoader {
-  private static $instance= null;
+  private static $instance= [];
   private $loaders= null;
+  private $emit;
+
+  public function __construct($emit) {
+    $this->emit= $emit;
+  }
 
   /**
    * Locate a class' sourcecode
@@ -116,7 +123,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
     try {
       eval('?>'.$this->loadClassBytes($class));
     } catch (\Throwable $e) {
-      throw new ClassLinkageException('Compile error', $e);
+      throw new ClassFormatException('Compiler error', $e);
     }
 
     \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
@@ -140,7 +147,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
 
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($file->in())));
-      $emitter= new Emitter($declaration);
+      $emitter= $this->emit->newInstance($declaration);
       $emitter->emit($parse->execute());
 
       return $declaration->getBytes();
@@ -179,7 +186,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return string
    */
   public function instanceId() {
-    return 'compiler';
+    return $this->emit->getSimpleName();
   }
 
   /**
@@ -188,11 +195,11 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @param   string path the identifier
    * @return  lang.IClassLoader
    */
-  public static function instanceFor($path) {
-    if (null === self::$instance) {
-      self::$instance= new self();
+  public static function instanceFor($version) {
+    if (!isset(self::$instance[$version])) {
+      self::$instance[$version]= new self(Emitter::forRuntime($version));
     }
-    return self::$instance;
+    return self::$instance[$version];
   }
 
   /**
@@ -201,7 +208,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return string
    */
   public function toString() {
-    return 'CompilingCL<>';
+    return 'CompilingCL<'.$this->emit->getName().'>';
   }
 
   /**

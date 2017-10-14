@@ -14,6 +14,6 @@ class EmitterTest extends \unittest\TestCase {
 
   #[@test]
   public function can_create() {
-    new Emitter(new StringWriter($this->out));
+    Emitter::forRuntime(PHP_VERSION)->newInstance(new StringWriter($this->out));
   }
 }

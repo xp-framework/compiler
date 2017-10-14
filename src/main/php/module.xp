@@ -9,6 +9,6 @@ module xp-framework/compiler {
 
   /** @return void */
   public function initialize() {
-    ClassLoader::registerLoader(CompilingClassloader::instanceFor('.'));
+    ClassLoader::registerLoader(CompilingClassloader::instanceFor(PHP_VERSION));
   }
 }
