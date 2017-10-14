@@ -54,7 +54,8 @@ class OperatorTest extends ParseTest {
 
   #[@test, @values([
   #  '=',
-  #  '+=', '-=', '*=', '/=', '.=', '&=', '|=', '**=',
+  #  '+=', '-=', '*=', '/=', '.=', '**=',
+  #  '&=', '|=', '^=',
   #  '>>=', '<<='
   #])]
   public function assignment($operator) {

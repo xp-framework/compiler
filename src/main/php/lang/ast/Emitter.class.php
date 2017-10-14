@@ -9,10 +9,10 @@ class Emitter {
   }
 
   private function param($param) {
-    if ($param[2]) {
-      return $param[1].' ... $'.$param[0];  
+    if ($param[3]) {
+      return $param[2].'... $'.$param[0];
     } else {
-      return $param[1].' $'.$param[0];
+      return $param[2].' '.($param[2] ? '&' : '').'$'.$param[0];
     }
   }
 
@@ -169,8 +169,8 @@ class Emitter {
   private function emitMethod($node) {
     $declare= $promote= $params= '';
     foreach ($node->value[2] as $param) {
-      if (isset($param[3])) {
-        $declare= $param[3].' $'.$param[0].';';
+      if (isset($param[4])) {
+        $declare= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
       }
       $params.= ', '.$this->param($param);

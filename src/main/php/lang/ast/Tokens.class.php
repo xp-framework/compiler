@@ -4,7 +4,7 @@ use text\Tokenizer;
 use lang\FormatException;
 
 class Tokens implements \IteratorAggregate {
-  const DELIMITERS = " |&?!.:;,@%~=<>(){}[]#+-*/'\$\"\r\n\t";
+  const DELIMITERS = " |&^?!.:;,@%~=<>(){}[]#+-*/'\$\"\r\n\t";
 
   private $operators= [
     '<' => ['<=', '<<', '<>', '<=>', '<<=', '<?php'],

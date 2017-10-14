@@ -127,6 +127,7 @@ class Parse {
     $this->assignment('=');
     $this->assignment('&=');
     $this->assignment('|=');
+    $this->assignment('^=');
     $this->assignment('+=');
     $this->assignment('-=');
     $this->assignment('*=');
@@ -591,6 +592,13 @@ class Parse {
         $variadic= false;
       }
 
+      if ('&' === $this->token->value) {
+        $byref= true;
+        $this->token= $this->advance();
+      } else {
+        $byref= false;
+      }
+
       $name= $this->token->value;
       $this->token= $this->advance();
 
@@ -599,7 +607,7 @@ class Parse {
         $this->token= $this->advance();
         $default= $this->expression(0);
       }
-      $parameters[]= [$name, $type, $variadic, $promote, $default];
+      $parameters[]= [$name, $byref, $type, $variadic, $promote, $default];
 
       if (')' === $this->token->symbol->id) break;
       $this->token= $this->expect(',');
