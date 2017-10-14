@@ -27,7 +27,7 @@ abstract class Emitter {
 
   protected abstract function catches($catch);
 
-  private function param($param) {
+  protected function param($param) {
     $this->out->write($this->type($param[2]));
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
@@ -40,7 +40,7 @@ abstract class Emitter {
     }
   }
 
-  private function params($params) {
+  protected function params($params) {
     $s= sizeof($params) - 1;
     foreach ($params as $i => $param) {
       $this->param($param);
@@ -48,7 +48,7 @@ abstract class Emitter {
     }
   }
 
-  private function arguments($list) {
+  protected function arguments($list) {
     $s= sizeof($list) - 1;
     foreach ($list as $i => $argument) {
       $this->emit($argument);
@@ -56,7 +56,7 @@ abstract class Emitter {
     }
   }
 
-  private function annotations($list) {
+  protected function annotations($list) {
     $s= sizeof($list) - 1;
     $this->out->write('#[');
     foreach ($list as $i => $annotation) {
@@ -71,33 +71,33 @@ abstract class Emitter {
     $this->out->write("]\n");
   }
 
-  private function emitStart($node) {
+  protected function emitStart($node) {
     $this->out->write('<?php ');
   }
 
-  private function emitPackage($node) {
+  protected function emitPackage($node) {
     $this->out->write('namespace '.$node->value.";\n");
   }
 
-  private function emitImport($node) {
+  protected function emitImport($node) {
     $this->out->write('');
   }
 
-  private function emitLiteral($node) {
+  protected function emitLiteral($node) {
     $this->out->write($node->value);
   }
 
-  private function emitName($node) {
+  protected function emitName($node) {
     $this->out->write($node->value);
   }
 
-  private function emitBlock($node) {
+  protected function emitBlock($node) {
     $this->out->write('{');
     $this->emit($node->value);
     $this->out->write('}');
   }
 
-  private function emitStatic($node) {
+  protected function emitStatic($node) {
     foreach ($node->value as $variable => $initial) {
       $this->out->write('static $'.$variable);
       if ($initial) {
@@ -108,16 +108,16 @@ abstract class Emitter {
     }
   }
 
-  private function emitVariable($node) {
+  protected function emitVariable($node) {
     $this->out->write('$'.$node->value);
   }
 
-  private function emitCast($node) {
+  protected function emitCast($node) {
     $this->out->write('('.$node->value[0].')');
     $this->emit($node->value[1]);
   }
 
-  private function emitArray($node) {
+  protected function emitArray($node) {
     if (empty($node->value)) {
       $this->out->write('[]');
       return;
@@ -132,7 +132,7 @@ abstract class Emitter {
     $this->out->write(']');
   }
 
-  private function emitFunction($node) {
+  protected function emitFunction($node) {
     $this->out->write('function '.$node->value[0].'('); 
     $this->params($node->value[2]);
     $this->out->write(') {');
@@ -140,7 +140,7 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
-  private function emitClosure($node) {
+  protected function emitClosure($node) {
     $this->out->write('function('); 
     $this->params($node->value[2]);
     $this->out->write(') ');
@@ -152,7 +152,7 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
-  private function emitClass($node) {
+  protected function emitClass($node) {
     $this->out->write(implode(' ', $node->value[1]).' class '.$node->value[0]);
     $node->value[2] && $this->out->write(' extends '.$node->value[2]);
     $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
@@ -164,7 +164,7 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
-  private function emitInterface($node) {
+  protected function emitInterface($node) {
     $this->out->write('interface '.$node->value[0]);
     $node->value[2] && $this->out->write(' extends '.implode(', ', $node->value[2]));
     $this->out->write('{');
@@ -175,7 +175,7 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
-  private function emitTrait($node) {
+  protected function emitTrait($node) {
     $this->out->write('trait '.$node->value[0]);
     $this->out->write('{');
     foreach ($node->value[2] as $member) {
@@ -185,13 +185,13 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
-  private function emitConst($node) {
+  protected function emitConst($node) {
     $this->out->write('const '.$node->value[0].'=');
     $this->emit($node->value[1]);
     $this->out->write(';');
   }
 
-  private function emitProperty($node) {
+  protected function emitProperty($node) {
     if (isset($node->value[3])) {
       $this->out->write("\n/** @var ".$node->value[3]." */\n");
     }
@@ -207,7 +207,7 @@ abstract class Emitter {
     $this->out->write(';');
   }
 
-  private function emitMethod($node) {
+  protected function emitMethod($node) {
     $declare= $promote= $params= '';
     foreach ($node->value[2] as $param) {
       if (isset($param[4])) {
@@ -235,24 +235,24 @@ abstract class Emitter {
     }
   }
 
-  private function emitBraced($node) {
+  protected function emitBraced($node) {
     $this->out->write('(');
     $this->emit($node->value);
     $this->out->write(')');
   }
 
-  private function emitBinary($node) {
+  protected function emitBinary($node) {
     $this->emit($node->value[0]);
     $this->out->write(' '.$node->symbol->id.' ');
     $this->emit($node->value[1]);
   }
 
-  private function emitUnary($node) {
+  protected function emitUnary($node) {
     $this->out->write($node->symbol->id);
     $this->emit($node->value);
   }
 
-  private function emitTernary($node) {
+  protected function emitTernary($node) {
     $this->emit($node->value[0]);
     $this->out->write('?');
     $this->emit($node->value[1]);
@@ -260,26 +260,26 @@ abstract class Emitter {
     $this->emit($node->value[1]);
   }
 
-  private function emitOffset($node) {
+  protected function emitOffset($node) {
     $this->emit($node->value[0]);
     $this->out->write('[');
     $this->emit($node->value[1]);
     $this->out->write(']');
   }
 
-  private function emitAssignment($node) {
+  protected function emitAssignment($node) {
     $this->emit($node->value[0]);
     $this->out->write('=');
     $this->emit($node->value[1]);
   }
 
-  private function emitReturn($node) {
+  protected function emitReturn($node) {
     $this->out->write('return ');
     $this->emit($node->value);
     $this->out->write(';');
   }
 
-  private function emitIf($node) {
+  protected function emitIf($node) {
     $this->out->write('if (');
     $this->emit($node->value[0]);
     $this->out->write(') {');
@@ -293,7 +293,7 @@ abstract class Emitter {
     }
   }
 
-  private function emitSwitch($node) {
+  protected function emitSwitch($node) {
     $this->out->write('switch (');
     $this->emit($node->value[0]);
     $this->out->write(') {');
@@ -310,7 +310,7 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
-  private function emitTry($node) {
+  protected function emitTry($node) {
     $this->out->write('try {');
     $this->emit($node->value[0]);
     $this->out->write('}');
@@ -326,13 +326,13 @@ abstract class Emitter {
     }
   }
 
-  private function emitThrow($node) {
+  protected function emitThrow($node) {
     $this->out->write('throw ');
     $this->emit($node->value);
     $this->out->write(';');
   }
 
-  private function emitForeach($node) {
+  protected function emitForeach($node) {
     $this->out->write('foreach (');
     $this->emit($node->value[0]);
     $this->out->write(' as ');
@@ -352,7 +352,7 @@ abstract class Emitter {
     }
   }
 
-  private function emitFor($node) {
+  protected function emitFor($node) {
     $this->out->write('for (');
     $this->arguments($node->value[0]);
     $this->out->write(';');
@@ -370,7 +370,7 @@ abstract class Emitter {
     }
   }
 
-  private function emitDo($node) {
+  protected function emitDo($node) {
     $this->out->write('do');
     if ('block' === $node->value[1]->arity) {
       $this->out->write('{');
@@ -385,7 +385,7 @@ abstract class Emitter {
     $this->out->write(');');
   }
 
-  private function emitWhile($node) {
+  protected function emitWhile($node) {
     $this->out->write('while (');
     $this->emit($node->value[0]);
     $this->out->write(')');
@@ -399,37 +399,37 @@ abstract class Emitter {
     }
   }
 
-  private function emitBreak($node) {
+  protected function emitBreak($node) {
     $this->out->write('break ');
     $node->value && $this->emit($node->value);
     $this->out->write(';');
   }
 
-  private function emitContinue($node) {
+  protected function emitContinue($node) {
     $this->out->write('continue ');
     $node->value && $this->emit($node->value);
     $this->out->write(';');
   }
 
-  private function emitNew($node) {
+  protected function emitNew($node) {
     $this->out->write('new '.$node->value[0].'(');
     $this->arguments($node->value[1]);
     $this->out->write(')');
   }
 
-  private function emitInvoke($node) {
+  protected function emitInvoke($node) {
     $this->emit($node->value[0]);
     $this->out->write('(');
     $this->arguments($node->value[1]);
     $this->out->write(')');
   }
 
-  private function emitScope($node) {
+  protected function emitScope($node) {
     $this->out->write($node->value[0].'::');
     $this->emit($node->value[1]);
   }
 
-  private function emitInstance($node) {
+  protected function emitInstance($node) {
     if ('new' === $node->value[0]->arity) {
       $this->out->write('(');
       $this->emit($node->value[0]);
@@ -441,12 +441,12 @@ abstract class Emitter {
     $this->emit($node->value[1]);
   }
 
-  private function emitUnpack($node) {
+  protected function emitUnpack($node) {
     $this->out->write('...');
     $this->emit($node->value);
   }
 
-  private function emitYield($node) {
+  protected function emitYield($node) {
     $this->out->write('yield ');
     if ($node->value[0]) {
       $this->emit($node->value[0]);

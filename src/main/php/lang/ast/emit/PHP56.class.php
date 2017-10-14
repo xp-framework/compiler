@@ -34,4 +34,19 @@ class PHP56 extends \lang\ast\Emitter {
     $this->emit($catch[2]);
     $this->out->write('}');
   }
+
+  protected function emitBinary($node) {
+    if ('??' === $node->symbol->id) {
+      $this->out->write('isset(');
+      $this->emit($node->value[0]);
+      $this->out->write(') ?');
+      $this->emit($node->value[0]);
+      $this->out->write(' : ');
+      $this->emit($node->value[1]);
+    } else {
+      $this->emit($node->value[0]);
+      $this->out->write(' '.$node->symbol->id.' ');
+      $this->emit($node->value[1]);
+    }
+  }
 }
