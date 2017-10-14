@@ -306,7 +306,17 @@ class Emitter {
   }
 
   private function emitForeach($node) {
-    
+    $this->out->write('foreach (');
+    $this->emit($node->value[0]);
+    $this->out->write(' as ');
+    if ($node->value[1]) {
+      $this->emit($node->value[1]);
+      $this->out->write(' => ');
+    }
+    $this->emit($node->value[2]);
+    $this->out->write(') {');
+    $this->emit($node->value[3]);
+    $this->out->write('}');
   }
 
   private function emitFor($node) {
