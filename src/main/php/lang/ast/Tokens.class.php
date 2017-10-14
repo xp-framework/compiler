@@ -97,9 +97,10 @@ class Tokens implements \IteratorAggregate {
           } else if ('*' === $next) {
             do {
               $t= $this->source->nextToken('/');
-              $line+= substr_count($token, "\n");
+              $line+= substr_count($t, "\n");
             } while ('*' !== $t{strlen($t)- 1} && $this->source->hasMoreTokens());
-            $this->source->nextToken('/');
+            $t= $this->source->nextToken('/');
+            $line+= substr_count($t, "\n");
             continue;
           }
           $this->source->pushBack($next);
