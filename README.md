@@ -17,7 +17,7 @@ After adding the compiler to your project via `composer xp-framework/compiler` c
 
 Example
 -------
-The following code can be used in all of PHP 7.1 (which is what it's written in) as well as PHP 7.0 and PHP 5.6:
+The following code can be used in all of PHP 7.1 (which is what it's written in) as well as PHP 7.0 and PHP 5.6. In the latter two cases, builtin functionality from newer versions is translated to work with the executing runtime.
 
 ```php
 <?php // In a file "HelloWorld.php"
