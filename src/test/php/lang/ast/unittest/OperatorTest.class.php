@@ -158,20 +158,4 @@ class OperatorTest extends ParseTest {
       $this->parse('self::class."test";')
     );
   }
-
-  #[@test]
-  public function array_offset() {
-    $this->assertNodes(
-      [['[' => [['(variable)' => 'a'], ['(literal)' => 0]]]],
-      $this->parse('$a[0];')
-    );
-  }
-
-  #[@test]
-  public function string_offset() {
-    $this->assertNodes(
-      [['{' => [['(variable)' => 'a'], ['(literal)' => 0]]]],
-      $this->parse('$a{0};')
-    );
-  }
 }

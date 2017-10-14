@@ -197,6 +197,13 @@ class Parse {
       return $node;
     });
 
+    $this->prefix('{', function($node) {
+      $node->arity= 'block';
+      $node->value= $this->statements();
+      $this->token= new Node($this->symbol(';'));
+      return $node;
+    });
+
     $this->prefix('new', function($node) {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
