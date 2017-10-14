@@ -390,7 +390,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= [$condition, $cases];
-      $node->arity= 'if';
+      $node->arity= 'switch';
       return $node;
     });
 

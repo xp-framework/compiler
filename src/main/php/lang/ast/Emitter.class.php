@@ -72,6 +72,10 @@ class Emitter {
     $this->out->write($node->value);
   }
 
+  private function emitBlock($node) {
+    $this->emit($node->value);
+  }
+
   private function emitStatic($node) {
     foreach ($node->value as $variable => $initial) {
       $this->out->write('static $'.$variable);
@@ -266,6 +270,23 @@ class Emitter {
       $this->emit($node->value[2]);
       $this->out->write('}');
     }
+  }
+
+  private function emitSwitch($node) {
+    $this->out->write('switch (');
+    $this->emit($node->value[0]);
+    $this->out->write(') {');
+    foreach ($node->value[1] as $case) {
+      if ($case[0]) {
+        $this->out->write('case ');
+        $this->emit($case[0]);
+        $this->out->write(':');
+      } else {
+        $this->out->write('default:');
+      }
+      $this->emit($case[1]);
+    }
+    $this->out->write('}');
   }
 
   private function emitTry($node) {
