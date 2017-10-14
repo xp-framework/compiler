@@ -636,7 +636,11 @@ class Parse {
         $promote= null;
       }
 
-      if ('name' === $this->token->arity) {
+      if ('?' === $this->token->symbol->id) {
+        $this->token= $this->advance();
+        $type= '?'.$this->scope->resolve($this->token->value);
+        $this->token= $this->advance();
+      } else if ('name' === $this->token->arity) {
         $type= $this->scope->resolve($this->token->value);
         $this->token= $this->advance();
       } else {

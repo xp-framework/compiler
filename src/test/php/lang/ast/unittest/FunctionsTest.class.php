@@ -51,6 +51,14 @@ class FunctionsTest extends ParseTest {
   }
 
   #[@test]
+  public function with_nullable_typed_parameter() {
+    $this->assertNodes(
+      [['(' => ['a', [], [['param', false, '?string', false, null, null]], [], null, null]]],
+      $this->parse('function a(?string $param) { }')
+    );
+  }
+
+  #[@test]
   public function with_variadic_parameter() {
     $this->assertNodes(
       [['(' => ['a', [], [['param', false, null, true, null, null]], [], null, null]]],
