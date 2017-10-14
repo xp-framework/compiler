@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.3.0 / 2017-10-15
+
 * Registered `xp compile` subcommand - @thekid
 * Simulated `yield from` in PHP 5.6 in a limited fashion - @thekid
 * Added support for nullable types from PHP 7.1 - @thekid
