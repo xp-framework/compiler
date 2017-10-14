@@ -17,6 +17,23 @@ After adding the compiler to your project via `composer xp-framework/compiler` c
 
 Example
 -------
+The following code can be used in all of PHP 7.1 (which is what it's written in) as well as PHP 7.0 and PHP 5.6:
+
+```php
+<?php // In a file "HelloWorld.php"
+
+use util\cmd\Console;
+
+class HelloWorld {
+
+  public static function main(array $args): void {
+    Console::writeLine('Hello, ', $args[0] ?? 'World', '!');
+  }
+}
+```
+
+Features supported
+------------------
 
 ```php
 <?php namespace test;
