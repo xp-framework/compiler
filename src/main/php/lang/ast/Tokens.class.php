@@ -92,7 +92,6 @@ class Tokens implements \IteratorAggregate {
           $next= $this->source->nextToken();
           if ('/' === $next) {
             $this->source->nextToken("\r\n");
-            $line++;
             continue;
           } else if ('*' === $next) {
             do {
