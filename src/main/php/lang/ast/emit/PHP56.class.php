@@ -21,7 +21,8 @@ class PHP56 extends \lang\ast\Emitter {
       'float'    => 70
     ];
 
-    return isset($unsupported[$name]) ? null : ltrim($name, '?');
+    if ('?' === $name{0} || isset($unsupported[$name])) return null;
+    return $name;
   }
 
   protected function catches($catch) {
