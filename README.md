@@ -55,7 +55,7 @@ The following table gives an overview of the current implementation status. The 
 | • [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✖      | ✖       | ✖      | ✖       |
 | • [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✖      | ✖       | ✖      | ✖       |
 | **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                              |          |          |          |          |
-| • [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✖      | *native* | *native* | *native*  |
+| • [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✔(2)   | ✔(2)    | ✔(2)   | ✔(2)    |
 | • [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)              | ✔      | *native* | *native* | *native*  |
 | • [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✔      | *native* | *native* | *native*  |
 | • [Scalar types](https://wiki.php.net/rfc/scalar_type_hints_v5)             | ✔(1)   | *native* | *native* | *native*  |
@@ -65,7 +65,8 @@ The following table gives an overview of the current implementation status. The 
 | • [Generator "yield from"](https://wiki.php.net/rfc/generator-delegation)   | ✖      | *native* | *native* | *native*  |
 | • [Generator return](https://wiki.php.net/rfc/generator-return-expressions) | ✖      | *native* | *native* | *native*  |
 
-*1: Currently unchecked*.
+*1: Currently unchecked.*
+*2: Namespaces and imports are resolved by the compiler and not emitted.*
 
 * * *
 
