@@ -40,7 +40,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function class_constant() {
     $this->assertNodes(
-      [['class' => ['A', [], null, [], [['const' => ['T', ['(literal)' => '1']]]]]]],
+      [['class' => ['A', [], null, [], [['const' => ['T', [], ['(literal)' => '1']]]]]]],
       $this->parse('class A { const T = 1; }')
     );
   }
@@ -49,10 +49,18 @@ class MembersTest extends ParseTest {
   public function class_constants() {
     $this->assertNodes(
       [['class' => ['A', [], null, [], [
-        ['const' => ['T', ['(literal)' => '1']]],
-        ['const' => ['S', ['(literal)' => '2']]]
+        ['const' => ['T', [], ['(literal)' => '1']]],
+        ['const' => ['S', [], ['(literal)' => '2']]]
       ]]]],
       $this->parse('class A { const T = 1, S = 2; }')
+    );
+  }
+
+  #[@test]
+  public function private_class_constant() {
+    $this->assertNodes(
+      [['class' => ['A', [], null, [], [['const' => ['T', ['private'], ['(literal)' => '1']]]]]]],
+      $this->parse('class A { private const T = 1; }')
     );
   }
 

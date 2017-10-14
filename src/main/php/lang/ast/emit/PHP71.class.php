@@ -17,10 +17,4 @@ class PHP71 extends \lang\ast\Emitter {
 
     return isset($unsupported[$name]) ? null : $name;
   }
-
-  protected function catches($catch) {
-    $this->out->write('catch('.implode('|', $catch[0]).' $'.$catch[1].') {');
-    $this->emit($catch[2]);
-    $this->out->write('}');
-  }
 }

@@ -818,13 +818,14 @@ class Parse {
           $this->token= $this->advance();
           $this->token= $this->expect('=');
 
-          $member->value= [$name, $this->expression(0)];
+          $member->value= [$name, $modifiers, $this->expression(0)];
           $body[]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
           }
         }
         $this->token= $this->expect(';');
+        $modifiers= [];
       } else if ('name' === $this->token->arity) {
         $type= $this->scope->resolve($this->token->value);
         $this->token= $this->advance();

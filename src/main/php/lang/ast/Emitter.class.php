@@ -42,7 +42,11 @@ abstract class Emitter {
 
   protected abstract function type($name);
 
-  protected abstract function catches($catch);
+  protected function catches($catch) {
+    $this->out->write('catch('.implode('|', $catch[0]).' $'.$catch[1].') {');
+    $this->emit($catch[2]);
+    $this->out->write('}');
+  }
 
   protected function param($param) {
     $this->out->write($this->type($param[2]));
@@ -203,8 +207,8 @@ abstract class Emitter {
   }
 
   protected function emitConst($node) {
-    $this->out->write('const '.$node->value[0].'=');
-    $this->emit($node->value[1]);
+    $this->out->write(implode(' ', $node->value[0]).' const '.$node->value[0].'=');
+    $this->emit($node->value[2]);
     $this->out->write(';');
   }
 

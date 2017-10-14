@@ -31,4 +31,10 @@ class PHP70 extends \lang\ast\Emitter {
     $this->emit($catch[2]);
     $this->out->write('}');
   }
+
+  protected function emitConst($node) {
+    $this->out->write('const '.$node->value[0].'=');
+    $this->emit($node->value[2]);
+    $this->out->write(';');
+  }
 }

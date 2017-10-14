@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented constant modifiers from PHP 7.1 - @thekid
 * Added support for comparison operator `<=>` from PHP 7.0 - @thekid
 * Added support for `object` typehint from PHP 7.2 - @thekid
 
