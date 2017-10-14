@@ -9,19 +9,24 @@ class Emitter {
   }
 
   private function param($param) {
+    $this->out->write($param[2]);
     if ($param[3]) {
-      return $param[2].'... $'.$param[0];
+      $this->out->write('... $'.$param[0]);
     } else {
-      return $param[2].' '.($param[1] ? '&' : '').'$'.$param[0];
+      $this->out->write(' '.($param[1] ? '&' : '').'$'.$param[0]);
+    }
+    if ($param[5]) {
+      $this->out->write('=');
+      $this->emit($param[5]);
     }
   }
 
   private function params($params) {
-    $r= '';
-    foreach ($params as $param) {
-      $r.= ', '.$this->param($param);
+    $s= sizeof($params) - 1;
+    foreach ($params as $i => $param) {
+      $this->param($param);
+      if ($i < $s) $this->out->write(', ');
     }
-    $this->out->write(substr($r, 2));
   }
 
   private function arguments($list) {
@@ -184,14 +189,15 @@ class Emitter {
         $declare= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
       }
-      $params.= ', '.$this->param($param);
     }
     $this->out->write($declare);
     if (isset($node->value[6])) {
       $this->out->write("\n");
       $this->annotations($node->value[6]);
     }
-    $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'('.substr($params, 2).')');
+    $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
+    $this->params($node->value[2]);
+    $this->out->write(')');
     if (isset($node->value[4])) {
       $this->out->write(':'.$node->value[4]);
     }
