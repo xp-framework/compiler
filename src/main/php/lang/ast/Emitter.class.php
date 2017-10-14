@@ -107,7 +107,7 @@ abstract class Emitter {
       $this->out->write("'".$annotation[0]."' => ");
       if (isset($annotation[1])) {
         $this->emit($annotation[1]);
-        $this->out->write('null');
+        $this->out->write(',');
       } else {
         $this->out->write('null,');
       }

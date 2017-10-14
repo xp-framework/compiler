@@ -584,7 +584,7 @@ class Parse {
 
         if ('(' === $this->token->symbol->id) {
           $this->token= $this->expect('(');
-          $annotation[]= $this->arguments();
+          $annotation[]= $this->expression(0);
           $this->token= $this->expect(')');
         }
 
@@ -901,7 +901,7 @@ class Parse {
 
           if ('(' === $this->token->symbol->id) {
             $this->token= $this->expect('(');
-            $annotation[]= $this->arguments();
+            $annotation[]= $this->expression(0);
             $this->token= $this->expect(')');
           }
 
