@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed annotation parsing - @thekid
 * Made `xp help compile` display something useful - @thekid
 * Fixed compatibility with XP7 console streaming - @thekid
 

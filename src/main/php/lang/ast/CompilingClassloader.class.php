@@ -14,10 +14,11 @@ use io\streams\MemoryOutputStream;
 class CompilingClassLoader implements \lang\IClassLoader {
   private static $instance= [];
   private $loaders= null;
-  private $emit;
+  private $version, $emit;
 
-  public function __construct($emit) {
-    $this->emit= $emit;
+  public function __construct($version) {
+    $this->version= $version;
+    $this->emit= Emitter::forRuntime($version);
   }
 
   /**
@@ -186,7 +187,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return string
    */
   public function instanceId() {
-    return $this->emit->getSimpleName();
+    return $this->version;
   }
 
   /**
@@ -197,7 +198,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
    */
   public static function instanceFor($version) {
     if (!isset(self::$instance[$version])) {
-      self::$instance[$version]= new self(Emitter::forRuntime($version));
+      self::$instance[$version]= new self($version);
     }
     return self::$instance[$version];
   }
@@ -217,7 +218,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return string
    */
   public function hashCode() {
-    return spl_object_hash($this);
+    return 'C'.$this->version;
   }
 
   /**
