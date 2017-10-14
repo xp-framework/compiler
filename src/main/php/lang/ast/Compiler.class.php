@@ -11,10 +11,10 @@ use io\streams\MemoryOutputStream;
 
 class Compiler implements \lang\IClassLoader {
   private static $instance= null;
-  private $cl;
+  private $loaders;
 
   public function __construct() {
-    $this->cl= ClassLoader::getDefault()->getLoaders();
+    $this->loaders= ClassLoader::getDefault()->getLoaders();
   }
 
   /**
@@ -26,8 +26,8 @@ class Compiler implements \lang\IClassLoader {
   protected function locateSource($class) {
     if (!isset($this->source[$class])) {
       $uri= strtr($class, '.', '/').'.php';
-      foreach ($this->cl as $cl) {
-        if ($cl->providesResource($uri)) return $this->source[$class]= $cl;
+      foreach ($this->loaders as $loader) {
+        if ($loader->providesResource($uri)) return $this->source[$class]= $loader;
       }
       return null;
     }
