@@ -415,6 +415,17 @@ class Emitter {
     $this->emit($node->value);
   }
 
+  private function emitYield($node) {
+    $this->out->write('yield ');
+    if ($node->value[0]) {
+      $this->emit($node->value[0]);
+      $this->out->write('=>');
+    }
+    if ($node->value[1]) {
+      $this->emit($node->value[1]);
+    }
+  }
+
   public function emit($arg) {
     if ($arg instanceof Node) {
       $this->{'emit'.$arg->arity}($arg);
