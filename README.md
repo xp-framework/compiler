@@ -45,16 +45,16 @@ The following table gives an overview of the current implementation status. The 
 | [Compact functions](https://github.com/xp-framework/rfc/issues/241)       | ✔      | ✔      | ✔       | ✔       |
 | [Hack attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔ | ✔       |
 | [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |
-| **PHP 7.2**                                                               |          |          |          |          |
+| **[PHP 7.2](https://wiki.php.net/rfc#php_72)**                            |          |          |          |          |
 | [Object type](https://wiki.php.net/rfc/object-typehint)                   | ✔(1)   | ✔(1)   | ✔(1)    | *native*  |
-| **PHP 7.1**                                                               |          |          |          |          |
+| **[PHP 7.1](https://wiki.php.net/rfc#php_71)**                            |          |          |          |          |
 | [Multiple catch](https://wiki.php.net/rfc/multiple-catch)                 | ✔      | ✔      | *native* | *native*  |
 | [Void](https://wiki.php.net/rfc/void_return_type)                         | ✔(1)   | ✔(1)   | *native* | *native*  |
 | [Iterable](https://wiki.php.net/rfc/iterable)                             | ✔(1)   | ✔(1)   | *native* | *native*  |
 | [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)     | ✖      | ✖       | *native* | *native* |
 | [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✖      | ✖       | ✖      | ✖       |
 | [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✖      | ✖       | ✖      | ✖       |
-| **PHP 7.0**                                                               |          |          |          |          |
+| **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                            |          |          |          |          |
 | [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✖      | *native* | *native* | *native*  |
 | [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)              | ✔      | *native* | *native* | *native*  |
 | [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✖      | *native* | *native* | *native*  |
