@@ -804,6 +804,10 @@ class Parse {
       $arguments[]= $this->expression(0, false);    // Undefined arguments are OK
       if (',' === $this->token->symbol->id) {
         $this->token= $this->expect(',');
+      } else if ($end === $this->token->symbol->id) {
+        break;
+      } else {
+        $this->expect($end.' or ,');
       }
     }
     return $arguments;

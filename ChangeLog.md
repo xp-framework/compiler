@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed endless loop for unclosed argument lists - @thekid
 * Fixed type annotations not being parsed - @thekid
 
 ## 0.4.0 / 2017-10-15
