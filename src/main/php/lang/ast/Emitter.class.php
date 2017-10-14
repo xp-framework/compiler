@@ -123,11 +123,11 @@ class Emitter {
   }
 
   private function emitClass($node) {
-    $this->out->write('class '.$node->value[0]);
-    $node->value[1] && $this->out->write(' extends '.$node->value[1]);
-    $node->value[2] && $this->out->write(' implements '.implode(', ', $node->value[2]));
+    $this->out->write(implode(' ', $node->value[1]).' class '.$node->value[0]);
+    $node->value[2] && $this->out->write(' extends '.$node->value[2]);
+    $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
     $this->out->write('{');
-    foreach ($node->value[3] as $member) {
+    foreach ($node->value[4] as $member) {
       $this->emit($member);
       $this->out->write("\n");
     }
@@ -136,9 +136,9 @@ class Emitter {
 
   private function emitInterface($node) {
     $this->out->write('interface '.$node->value[0]);
-    $node->value[1] && $this->out->write(' extends '.implode(', ', $node->value[1]));
+    $node->value[2] && $this->out->write(' extends '.implode(', ', $node->value[2]));
     $this->out->write('{');
-    foreach ($node->value[2] as $member) {
+    foreach ($node->value[3] as $member) {
       $this->emit($member);
       $this->out->write("\n");
     }
@@ -148,7 +148,7 @@ class Emitter {
   private function emitTrait($node) {
     $this->out->write('trait '.$node->value[0]);
     $this->out->write('{');
-    foreach ($node->value[1] as $member) {
+    foreach ($node->value[2] as $member) {
       $this->emit($member);
       $this->out->write("\n");
     }

@@ -523,7 +523,7 @@ class Parse {
       $type= $this->token->value;
       $this->token= $this->advance();
 
-      $node->value= $this->type($type);
+      $node->value= $this->type($type, ['abstract']);
       $node->arity= 'class';
       return $node;
     });
@@ -533,7 +533,7 @@ class Parse {
       $type= $this->token->value;
       $this->token= $this->advance();
 
-      $node->value= $this->type($type);
+      $node->value= $this->type($type, ['final']);
       $node->arity= 'class';
       return $node;
     });
@@ -571,7 +571,7 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= [$type, $parents, $body];
+      $node->value= [$type, [], $parents, $body];
       $node->arity= 'interface';
       return $node;
     });
@@ -584,7 +584,7 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= [$type, $body];
+      $node->value= [$type, [], $body];
       $node->arity= 'traits';
       return $node;
     });
@@ -694,7 +694,7 @@ class Parse {
     return $node;
   }
 
-  private function type($name) {
+  private function type($name, $modifiers= []) {
     $parent= null;
     if ('extends' === $this->token->value) {
       $this->token= $this->advance();
@@ -722,7 +722,7 @@ class Parse {
     $body= $this->body();
     $this->token= $this->expect('}');
 
-    return [$name, $parent, $implements, $body];
+    return [$name, $modifiers, $parent, $implements, $body];
   }
 
   private function arguments($end= ')') {
