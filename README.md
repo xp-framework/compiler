@@ -17,17 +17,23 @@ After adding the compiler to your project via `composer xp-framework/compiler` c
 
 Example
 -------
-The following code uses PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 5.6. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 5.6. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
 
 use util\cmd\Console;
+use lang\Type;
 
+<<author('Timm Friebe')>>
 class HelloWorld {
+  public const GREETING = 'Hello';
 
   public static function main(array $args): void {
-    Console::writeLine('Hello, ', $args[0] ?? 'World', '!');
+    $greet= ($to, $from) ==> self::GREETING.' '.$to.' from '.$from;
+    $author= Type::forName(self::class)->getAnnotation('author');
+
+    Console::writeLine($greet($args[0] ?? 'World', $author));
   }
 }
 ```
