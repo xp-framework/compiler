@@ -56,16 +56,32 @@ class LoopsTest extends ParseTest {
   #[@test]
   public function break_statement() {
     $this->assertNodes(
-      [['break' => 'break']],
+      [['break' => null]],
       $this->parse('break;')
+    );
+  }
+
+  #[@test]
+  public function break_statement_with_level() {
+    $this->assertNodes(
+      [['break' => ['(literal)' => 2]]],
+      $this->parse('break 2;')
     );
   }
 
   #[@test]
   public function continue_statement() {
     $this->assertNodes(
-      [['continue' => 'continue']],
+      [['continue' => null]],
       $this->parse('continue;')
+    );
+  }
+
+  #[@test]
+  public function continue_statement_with_level() {
+    $this->assertNodes(
+      [['continue' => ['(literal)' => 2]]],
+      $this->parse('continue 2;')
     );
   }
 

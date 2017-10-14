@@ -322,11 +322,15 @@ class Emitter {
   }
 
   private function emitBreak($node) {
-    
+    $this->out->write('break');
+    $node->value && $this->emit($node->value);
+    $this->out->write(';');
   }
 
   private function emitContinue($node) {
-    
+    $this->out->write('continue');
+    $node->value && $this->emit($node->value);
+    $this->out->write(';');
   }
 
   private function emitNew($node) {

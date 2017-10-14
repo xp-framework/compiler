@@ -393,6 +393,34 @@ class Parse {
       return $node;
     });
 
+    $this->stmt('break', function($node) {
+      if (';' === $this->token->value) {
+        $expr= null;
+        $this->token= $this->advance();
+      } else {
+        $expr= $this->expression(0);
+        $this->token= $this->expect(';');
+      }
+
+      $node->value= $expr;
+      $node->arity= 'break';
+      return $node;
+    });
+
+    $this->stmt('continue', function($node) {
+      if (';' === $this->token->value) {
+        $expr= null;
+        $this->token= $this->advance();
+      } else {
+        $expr= $this->expression(0);
+        $this->token= $this->expect(';');
+      }
+
+      $node->value= $expr;
+      $node->arity= 'continue';
+      return $node;
+    });
+
     $this->stmt('do', function($node) {
       $this->token= $this->expect('{');
       $statements= $this->statements();
