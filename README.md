@@ -1,5 +1,5 @@
-AST
-===
+XP Compiler
+===========
 
 [![Build Status on TravisCI](https://secure.travis-ci.org/xp-forge/sequence.svg)](http://travis-ci.org/xp-framework/ast)
 [![XP Framework Module](https://raw.githubusercontent.com/xp-framework/web/master/static/xp-framework-badge.png)](https://github.com/xp-framework/core)
@@ -9,7 +9,14 @@ AST
 [![Supports HHVM 3.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/hhvm-3_4plus.png)](http://hhvm.com/)
 [![Latest Stable Version](https://poser.pugx.org/xp-framework/ast/version.png)](https://packagist.org/packages/xp-forge/sequence)
 
-Abstract syntax tree
+Compiles future PHP to today's PHP.
+
+Usage
+-----
+After adding the compiler to your project via `composer xp-framework/compiler` classes will be passed through the compiler during autoloading. Code inside files with a *.class.php* ending is considered already compiled; files need to renamed `T.class.php` => `T.php` in order to be picked up.
+
+Example
+-------
 
 ```php
 <?php namespace test;
