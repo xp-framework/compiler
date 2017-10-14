@@ -13,7 +13,9 @@
 class PHP71 extends \lang\ast\Emitter {
 
   protected function type($name) {
-    return $name;
+    static $unsupported= ['object' => 72];
+
+    return isset($unsupported[$name]) ? null : $name;
   }
 
   protected function catches($catch) {

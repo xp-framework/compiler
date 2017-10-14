@@ -46,7 +46,7 @@ The following table gives an overview of the current implementation status. The 
 | [Hack attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔ | ✔       |
 | [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |
 | **PHP 7.2**                                                               |          |          |          |          |
-| [Object type](https://wiki.php.net/rfc/object-typehint                    | ✔(1)   | ✔(1)   | ✔(1)    | *native*  |
+| [Object type](https://wiki.php.net/rfc/object-typehint)                   | ✔(1)   | ✔(1)   | ✔(1)    | *native*  |
 | **PHP 7.1**                                                               |          |          |          |          |
 | [Multiple catch](https://wiki.php.net/rfc/multiple-catch)                 | ✔      | ✔      | *native* | *native*  |
 | [Void](https://wiki.php.net/rfc/void_return_type)                         | ✔(1)   | ✔(1)   | *native* | *native*  |
