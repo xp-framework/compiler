@@ -362,6 +362,7 @@ class Parse {
       $this->token= $this->expect('(');
       $expression= $this->expression(0);
       $this->token= $this->expect(')');
+      $this->token= $this->expect(';');
 
       $node->value= [$expression, $statements];
       $node->arity= 'do';

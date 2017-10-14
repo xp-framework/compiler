@@ -49,7 +49,7 @@ class LoopsTest extends ParseTest {
   public function do_loop() {
     $this->assertNodes(
       [['do' => [['(variable)' => 'continue'], $this->block]]],
-      $this->parse('do { loop(); } while ($continue)')
+      $this->parse('do { loop(); } while ($continue);')
     );
   }
 
