@@ -97,4 +97,10 @@ class PHP56 extends \lang\ast\Emitter {
       parent::emitNew($node);
     }
   }
+
+  protected function emitFrom($node) {
+    $this->out->write('foreach (');
+    $this->emit($node->value);
+    $this->out->write(' as $key => $val) yield $key => $val;');
+  }
 }

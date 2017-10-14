@@ -515,6 +515,11 @@ abstract class Emitter {
     }
   }
 
+  protected function emitFrom($node) {
+    $this->out->write('yield from ');
+    $this->emit($node->value);
+  }
+
   public function emit($arg) {
     if ($arg instanceof Node) {
       $this->{'emit'.$arg->arity}($arg);

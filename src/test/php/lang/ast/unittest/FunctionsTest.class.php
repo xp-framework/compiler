@@ -135,4 +135,13 @@ class FunctionsTest extends ParseTest {
       $this->parse('function a() { yield "number" => 1; }')
     );
   }
+
+  #[@test]
+  public function generator_delegation() {
+    $statement= ['yield' => ['[' => []]];
+    $this->assertNodes(
+      [['(' => ['a', [], [], [$statement], null, null]]],
+      $this->parse('function a() { yield from []; }')
+    );
+  }
 }

@@ -232,10 +232,15 @@ class Parse {
     });
 
     $this->prefix('yield', function($node) {
-      $node->arity= 'yield';
       if (';' === $this->token->symbol->id) {
+        $node->arity= 'yield';
         $node->value= [null, null];
+      } else if ('from' === $this->token->value) {
+        $this->token= $this->advance();
+        $node->arity= 'from';
+        $node->value= $this->expression(0);
       } else {
+        $node->arity= 'yield';
         $expr= $this->expression(0);
         if ('=>' === $this->token->symbol->id) {
           $this->token= $this->advance();
