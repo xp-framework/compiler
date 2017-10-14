@@ -6,6 +6,13 @@ use lang\IllegalArgumentException;
 abstract class Emitter {
   protected $out;
 
+  /**
+   * Selects the correct emitter for a given runtime version
+   *
+   * @param  string $version E.g. PHP_VERSION
+   * @return self
+   * @throws lang.IllegalArgumentException
+   */
   public static function forRuntime($version) {
     sscanf($version, '%d.%d', $major, $minor);
     $p= Package::forName('lang.ast.emit');
@@ -24,6 +31,11 @@ abstract class Emitter {
     $this->id= 0;
   }
 
+  /**
+   * Creates a temporary variable and returns its name
+   *
+   * @param  string
+   */
   protected function temp() {
     return '$T'.($this->id++);
   }
