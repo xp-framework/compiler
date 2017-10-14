@@ -577,6 +577,32 @@ class Parse {
       return $node;
     });
 
+    $this->stmt('<<', function($node) {
+      do {
+        $annotation= [$this->token->value];
+        $this->token= $this->advance();
+
+        if ('(' === $this->token->symbol->id) {
+          $this->token= $this->expect('(');
+          $annotation[]= $this->arguments();
+          $this->token= $this->expect(')');
+        }
+
+        $this->scope->annotations[]= $annotation;
+        if (',' === $this->token->symbol->id) {
+          continue;
+        } else if ('>>' === $this->token->symbol->id) {
+          break;
+        } else {
+          $this->expect(', or >>');
+        }
+      } while (true);
+
+      $this->token= $this->expect('>>');
+      $node->arity= 'annotation';
+      return $node;
+    });
+
     $this->stmt('class', function($node) {
       $type= $this->token->value;
       $this->token= $this->advance();
@@ -610,8 +636,9 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= [$type, [], $parents, $body];
+      $node->value= [$type, [], $parents, $body, $this->scope->annotations];
       $node->arity= 'interface';
+      $this->scope->annotations= [];
       return $node;
     });
 
@@ -765,7 +792,9 @@ class Parse {
     $body= $this->body();
     $this->token= $this->expect('}');
 
-    return [$name, $modifiers, $parent, $implements, $body];
+    $return= [$name, $modifiers, $parent, $implements, $body, $this->scope->annotations];
+    $this->scope->annotations= [];
+    return $return;
   }
 
   private function arguments($end= ')') {

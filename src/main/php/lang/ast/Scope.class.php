@@ -23,6 +23,7 @@ class Scope {
 
   public $parent, $package;
   public $imports= [];
+  public $annotations= [];
 
   public function __construct(self $parent= null) {
     $this->parent= $parent;

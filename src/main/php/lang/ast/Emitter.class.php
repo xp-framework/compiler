@@ -102,6 +102,18 @@ abstract class Emitter {
     }
   }
 
+  private function annotations($list) {
+    foreach ($list as $annotation) {
+      $this->out->write("'".$annotation[0]."' => ");
+      if (isset($annotation[1])) {
+        $this->emit($annotation[1]);
+        $this->out->write('null');
+      } else {
+        $this->out->write('null,');
+      }
+    }
+  }
+
   protected function emitStart($node) {
     $this->out->write('<?php ');
   }
@@ -111,7 +123,11 @@ abstract class Emitter {
   }
 
   protected function emitImport($node) {
-    $this->out->write('');
+    // NOOP
+  }
+
+  protected function emitAnnotation($node) {
+    // NOOP
   }
 
   protected function emitLiteral($node) {
@@ -197,19 +213,15 @@ abstract class Emitter {
 
     // Cache annotations
     $this->out->write('\xp::$meta[\''.$node->value[0].'\']= [');
+    $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
+    $this->annotations($node->value[5]);
+    $this->out->write(']],');
+
     foreach (array_shift($this->meta) as $type => $lookup) {
       $this->out->write($type.' => [');
       foreach ($lookup as $key => $annotations) {
         $this->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
-        foreach ($annotations as $annotation) {
-          $this->out->write("'".$annotation[0]."' => ");
-          if (isset($annotation[1])) {
-            $this->emit($annotation[1]);
-            $this->out->write('null');
-          } else {
-            $this->out->write('null,');
-          }
-        }
+        $this->annotations($annotations);
         $this->out->write(']],');
       }
       $this->out->write('],');

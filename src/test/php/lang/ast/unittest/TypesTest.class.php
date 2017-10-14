@@ -5,7 +5,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function empty_class() {
     $this->assertNodes(
-      [['class' => ['A', [], null, [], []]]],
+      [['class' => ['A', [], null, [], [], []]]],
       $this->parse('class A { }')
     );
   }
@@ -13,7 +13,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function class_with_parent() {
     $this->assertNodes(
-      [['class' => ['A', [], 'B', [], []]]],
+      [['class' => ['A', [], 'B', [], [], []]]],
       $this->parse('class A extends B { }')
     );
   }
@@ -21,7 +21,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function class_with_interface() {
     $this->assertNodes(
-      [['class' => ['A', [], null, ['C'], []]]],
+      [['class' => ['A', [], null, ['C'], [], []]]],
       $this->parse('class A implements C { }')
     );
   }
@@ -29,7 +29,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function class_with_interfaces() {
     $this->assertNodes(
-      [['class' => ['A', [], null, ['C', 'D'], []]]],
+      [['class' => ['A', [], null, ['C', 'D'], [], []]]],
       $this->parse('class A implements C, D { }')
     );
   }
@@ -37,7 +37,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function abstract_class() {
     $this->assertNodes(
-      [['abstract' => ['A', ['abstract'], null, [], []]]],
+      [['abstract' => ['A', ['abstract'], null, [], [], []]]],
       $this->parse('abstract class A { }')
     );
   }
@@ -45,7 +45,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function final_class() {
     $this->assertNodes(
-      [['final' => ['A', ['final'], null, [], []]]],
+      [['final' => ['A', ['final'], null, [], [], []]]],
       $this->parse('final class A { }')
     );
   }
@@ -53,7 +53,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function empty_interface() {
     $this->assertNodes(
-      [['interface' => ['A', [], [], []]]],
+      [['interface' => ['A', [], [], [], []]]],
       $this->parse('interface A { }')
     );
   }
@@ -61,7 +61,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function interface_with_parent() {
     $this->assertNodes(
-      [['interface' => ['A', [], ['B'], []]]],
+      [['interface' => ['A', [], ['B'], [], []]]],
       $this->parse('interface A extends B { }')
     );
   }
@@ -69,7 +69,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function interface_with_parents() {
     $this->assertNodes(
-      [['interface' => ['A', [], ['B', 'C'], []]]],
+      [['interface' => ['A', [], ['B', 'C'], [], []]]],
       $this->parse('interface A extends B, C { }')
     );
   }
@@ -85,7 +85,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function class_with_trait() {
     $this->assertNodes(
-      [['class' => ['A', [], null, [], [['use' => 'B']]]]],
+      [['class' => ['A', [], null, [], [['use' => 'B']], []]]],
       $this->parse('class A { use B; }')
     );
   }
@@ -93,7 +93,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function class_with_traits() {
     $this->assertNodes(
-      [['class' => ['A', [], null, [], [['use' => 'B'], ['use' => 'C']]]]],
+      [['class' => ['A', [], null, [], [['use' => 'B'], ['use' => 'C']], []]]],
       $this->parse('class A { use B; use C; }')
     );
   }

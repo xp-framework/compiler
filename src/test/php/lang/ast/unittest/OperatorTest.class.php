@@ -140,7 +140,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function new_anonymous_extends() {
     $this->assertNodes(
-      [['new' => [null, [], [null, [], 'T', [], []]]]],
+      [['new' => [null, [], [null, [], 'T', [], [], []]]]],
       $this->parse('new class() extends T { };')
     );
   }
@@ -148,7 +148,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function new_anonymous_implements() {
     $this->assertNodes(
-      [['new' => [null, [], [null, [], null, ['A', 'B'], []]]]],
+      [['new' => [null, [], [null, [], null, ['A', 'B'], [], []]]]],
       $this->parse('new class() implements A, B { };')
     );
   }
