@@ -41,7 +41,7 @@ The following table gives an overview of the current implementation status. The 
 | --------------------------------------------------------------------------- | -------- | -------- | -------- | -------- |
 | **Future** - these might or might not be part of PHP next                   |          |          |          |          |
 | • [Property types](https://wiki.php.net/rfc/property_type_hints)            | ✔      | ✔      | ✔       | ✔       |
-| • [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda)         | ✔      | ✔      | ✔       | ✔       |
+| • [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda) (a.k.a arrow functions) | ✔ | ✔ | ✔ | ✔       |
 | • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)    | ✔      | ✔      | ✔       | ✔       |
 | • [Hack attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔ | ✔       |
 | • [Hack constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |

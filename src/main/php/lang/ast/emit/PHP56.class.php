@@ -12,6 +12,7 @@ class PHP56 extends \lang\ast\Emitter {
 
   protected function type($name) {
     static $unsupported= [
+      'object'   => 72,
       'void'     => 71,
       'iterable' => 71,
       'string'   => 70,
