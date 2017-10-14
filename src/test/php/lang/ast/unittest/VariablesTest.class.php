@@ -21,7 +21,7 @@ class VariablesTest extends ParseTest {
   #[@test]
   public function static_variable_with_initialization() {
     $this->assertNodes(
-      [['static' => ['id' => ['(literal)' => 0]]]],
+      [['static' => ['id' => ['(literal)' => '0']]]],
       $this->parse('static $id= 0;')
     );
   }
@@ -29,7 +29,7 @@ class VariablesTest extends ParseTest {
   #[@test]
   public function array_offset() {
     $this->assertNodes(
-      [['[' => [['(variable)' => 'a'], ['(literal)' => 0]]]],
+      [['[' => [['(variable)' => 'a'], ['(literal)' => '0']]]],
       $this->parse('$a[0];')
     );
   }
@@ -37,7 +37,7 @@ class VariablesTest extends ParseTest {
   #[@test]
   public function string_offset() {
     $this->assertNodes(
-      [['{' => [['(variable)' => 'a'], ['(literal)' => 0]]]],
+      [['{' => [['(variable)' => 'a'], ['(literal)' => '0']]]],
       $this->parse('$a{0};')
     );
   }

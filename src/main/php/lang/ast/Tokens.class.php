@@ -46,7 +46,7 @@ class Tokens implements \IteratorAggregate {
       if ('$' === $token) {
         yield 'variable' => [$this->source->nextToken(), $line];
       } else if ('"' === $token || "'" === $token) {
-        $string= '';
+        $string= $token;
         do {
           // Empty string, e.g. "" or ''
           if ($token === ($t= $this->source->nextToken($token))) break;
@@ -54,7 +54,7 @@ class Tokens implements \IteratorAggregate {
           $string.= $t;
           $l= strlen($string);
           if ($l > 0 && '\\' === $string{$l - 1} && !($l > 1 && '\\' === $string{$l - 2})) {
-            $string= substr($string, 0, -1).$this->source->nextToken($token);
+            $string.= $this->source->nextToken($token);
             continue;
           }
           if ($token !== $this->source->nextToken($token)) {
@@ -63,28 +63,23 @@ class Tokens implements \IteratorAggregate {
           break;
         } while ($this->source->hasMoreTokens());
 
-        yield 'string' => [str_replace('\\\\', '\\', $string), $line];
+        yield 'string' => [$string.$token, $line];
         $line+= substr_count($string, "\n");
       } else if (0 === strcspn($token, " \r\n\t")) {
         $line+= substr_count($token, "\n");
         continue;
       } else if (0 === strcspn($token, '0123456789')) {
-        if (strpos($token, 'x') > 0) {
-          yield 'integer' => [hexdec($token), $line];
-        } else if ('.' === ($next= $this->source->nextToken())) {
-          yield 'decimal' => [(float)($token.$next.$this->source->nextToken()), $line];
-        } else if ('0' === $token{0} && strlen($token) > 1) {
-          $this->source->pushBack($next);
-          yield 'integer' => [octdec($token), $line];
+        if ('.' === ($next= $this->source->nextToken())) {
+          yield 'decimal' => [$token.$next.$this->source->nextToken(), $line];
         } else {
           $this->source->pushBack($next);
-          yield 'integer' => [(int)$token, $line];
+          yield 'integer' => [$token, $line];
         }
       } else if (0 === strcspn($token, self::DELIMITERS)) {
         if ('.' === $token) {
           $next= $this->source->nextToken();
           if (0 === strcspn($next, '0123456789')) {
-            yield 'decimal' => [(float)"0.$next", $line];
+            yield 'decimal' => [".$next", $line];
             continue;
           }
           $this->source->pushBack($next);

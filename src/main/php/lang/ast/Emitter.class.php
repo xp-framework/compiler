@@ -65,7 +65,7 @@ class Emitter {
   }
 
   private function emitLiteral($node) {
-    $this->out->write(var_export($node->value, true));
+    $this->out->write($node->value);
   }
 
   private function emitName($node) {
@@ -100,7 +100,7 @@ class Emitter {
 
     $this->out->write('[');
     foreach ($node->value as $key => $value) {
-      $this->out->write((is_string($key) ? "'".$key."'" : $key).'=>');
+      $this->out->write($key.'=>');
       $this->emit($value);
       $this->out->write(',');
     }

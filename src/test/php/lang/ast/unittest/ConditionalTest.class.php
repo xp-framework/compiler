@@ -55,7 +55,7 @@ class ConditionalTest extends ParseTest {
   public function switch_with_one_case() {
     $this->assertNodes(
       [['switch' => [['(variable)' => 'condition'], [
-        [['(literal)' => 1], $this->blocks[0]],
+        [['(literal)' => '1'], $this->blocks[0]],
       ]]]],
       $this->parse('switch ($condition) { case 1: action1(); }')
     );
@@ -65,8 +65,8 @@ class ConditionalTest extends ParseTest {
   public function switch_with_two_cases() {
     $this->assertNodes(
       [['switch' => [['(variable)' => 'condition'], [
-        [['(literal)' => 1], $this->blocks[0]],
-        [['(literal)' => 2], $this->blocks[1]],
+        [['(literal)' => '1'], $this->blocks[0]],
+        [['(literal)' => '2'], $this->blocks[1]],
       ]]]],
       $this->parse('switch ($condition) { case 1: action1(); case 2: action2(); }')
     );

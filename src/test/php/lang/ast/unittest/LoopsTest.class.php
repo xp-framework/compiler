@@ -28,8 +28,8 @@ class LoopsTest extends ParseTest {
   public function for_loop() {
     $this->assertNodes(
       [['for' => [
-        [['=' => [['(variable)' => 'i'], ['(literal)' => 0]]]],
-        [['<' => [['(variable)' => 'i'], ['(literal)' => 10]]]],
+        [['=' => [['(variable)' => 'i'], ['(literal)' => '0']]]],
+        [['<' => [['(variable)' => 'i'], ['(literal)' => '10']]]],
         [['++' => ['(variable)' => 'i']]],
         $this->block
       ]]],
@@ -64,7 +64,7 @@ class LoopsTest extends ParseTest {
   #[@test]
   public function break_statement_with_level() {
     $this->assertNodes(
-      [['break' => ['(literal)' => 2]]],
+      [['break' => ['(literal)' => '2']]],
       $this->parse('break 2;')
     );
   }
@@ -80,7 +80,7 @@ class LoopsTest extends ParseTest {
   #[@test]
   public function continue_statement_with_level() {
     $this->assertNodes(
-      [['continue' => ['(literal)' => 2]]],
+      [['continue' => ['(literal)' => '2']]],
       $this->parse('continue 2;')
     );
   }

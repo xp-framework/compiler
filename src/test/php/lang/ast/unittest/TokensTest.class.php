@@ -28,15 +28,15 @@ class TokensTest extends \unittest\TestCase {
   }
 
   #[@test, @values([
-  #  ['""', ''],
-  #  ["''", ''],
-  #  ["'\\\\'", '\\'],
-  #  ['"Test"', 'Test'],
-  #  ["'Test'", 'Test'],
-  #  ["'Test\''", 'Test\'']
+  #  '""',
+  #  "''",
+  #  "'\\\\'",
+  #  '"Test"',
+  #  "'Test'",
+  #  "'Test\''",
   #])]
-  public function string_literals($input, $expected) {
-    $this->assertTokens([['string' => $expected]], new Tokens(new StringTokenizer($input)));
+  public function string_literals($input) {
+    $this->assertTokens([['string' => $input]], new Tokens(new StringTokenizer($input)));
   }
 
   #[@test, @expect(class= FormatException::class, withMessage= '/Unclosed string literal/'), @values([
@@ -50,21 +50,14 @@ class TokensTest extends \unittest\TestCase {
     $t->current();
   }
 
-  #[@test, @values([
-  #  ['0', 0],
-  #  ['1', 1]
-  #])]
-  public function integer_literal($input, $expected) {
-    $this->assertTokens([['integer' => $expected]], new Tokens(new StringTokenizer($input)));
+  #[@test, @values(['0', '1'])]
+  public function integer_literal($input) {
+    $this->assertTokens([['integer' => $input]], new Tokens(new StringTokenizer($input)));
   }
 
-  #[@test, @values([
-  #  ['0.0', 0.0],
-  #  ['6.1', 6.1],
-  #  ['.5', 0.5]
-  #])]
-  public function float_literal($input, $expected) {
-    $this->assertTokens([['decimal' => $expected]], new Tokens(new StringTokenizer($input)));
+  #[@test, @values(['0.0', '6.1', '.5'])]
+  public function float_literal($input) {
+    $this->assertTokens([['decimal' => $input]], new Tokens(new StringTokenizer($input)));
   }
 
   #[@test, @values([

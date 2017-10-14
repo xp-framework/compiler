@@ -25,9 +25,9 @@ class Parse {
     $this->symbol('(literal)')->nud= function($node) { return $node; };    
     $this->symbol('(variable)')->nud= function($node) { return $node; };    
 
-    $this->constant('true', true);
-    $this->constant('false', false);
-    $this->constant('null', null);
+    $this->constant('true', 'true');
+    $this->constant('false', 'false');
+    $this->constant('null', 'null');
 
     $this->infixr('??', 30);
     $this->infixr('?:', 30);
