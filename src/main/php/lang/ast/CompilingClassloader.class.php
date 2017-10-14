@@ -228,6 +228,6 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return int
    */
   public function compareTo($value) {
-    return $value === $this ? 0 : 1;
+    return $value instanceof self ? version_compare($this->version, $value->version) : 1;
   }
 }
