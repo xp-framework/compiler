@@ -77,7 +77,7 @@ class TypesTest extends ParseTest {
   #[@test]
   public function empty_trait() {
     $this->assertNodes(
-      [['trait' => ['A', [], []]]],
+      [['trait' => ['A', [], [], []]]],
       $this->parse('trait A { }')
     );
   }
