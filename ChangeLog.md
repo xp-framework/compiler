@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed type annotations not being parsed - @thekid
+
 ## 0.4.0 / 2017-10-15
 
 * Optimized runtime performance by including annotations as 
