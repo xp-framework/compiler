@@ -65,8 +65,10 @@ The following table gives an overview of the current implementation status. The 
 | • [Generator "yield from"](https://wiki.php.net/rfc/generator-delegation)   | ✖      | *native* | *native* | *native*  |
 | • [Generator return](https://wiki.php.net/rfc/generator-return-expressions) | ✖      | *native* | *native* | *native*  |
 
-*1: Currently unchecked.*
-*2: Namespaces and imports are resolved by the compiler and not emitted.*
+Notes:
+
+- *1: Currently unchecked.*
+- *2: Namespaces and imports are resolved by the compiler and not emitted.*
 
 * * *
 
