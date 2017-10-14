@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Optimized runtime performance by including annotations as 
+  metadata inside code, see issue #1.
+  (@thekid)
 * Fixed annotation parsing - @thekid
 * Made `xp help compile` display something useful - @thekid
 * Fixed compatibility with XP7 console streaming - @thekid

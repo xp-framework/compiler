@@ -6,7 +6,11 @@ use io\streams\MemoryOutputStream;
 use io\streams\StringWriter;
 
 abstract class Emitter {
+  const PROPERTY = 0;
+  const METHOD   = 1;
+
   protected $out;
+  protected $meta= [];
 
   /**
    * Selects the correct emitter for a given runtime version
@@ -98,21 +102,6 @@ abstract class Emitter {
     }
   }
 
-  protected function annotations($list) {
-    $s= sizeof($list) - 1;
-    $this->out->write('#[');
-    foreach ($list as $i => $annotation) {
-      $this->out->write('@'.$annotation[0]);
-      if (isset($annotation[1])) {
-        $this->out->write('(');
-        $this->arguments($annotation[1]);
-        $this->out->write(')');
-      }
-      if ($i < $s) $this->out->write(', ');
-    }
-    $this->out->write("]\n");
-  }
-
   protected function emitStart($node) {
     $this->out->write('<?php ');
   }
@@ -195,6 +184,7 @@ abstract class Emitter {
   }
 
   protected function emitClass($node) {
+    array_unshift($this->meta, []);
     $this->out->write(implode(' ', $node->value[1]).' class '.$node->value[0]);
     $node->value[2] && $this->out->write(' extends '.$node->value[2]);
     $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
@@ -204,6 +194,27 @@ abstract class Emitter {
       $this->out->write("\n");
     }
     $this->out->write('}');
+
+    // Cache annotations
+    $this->out->write('\xp::$meta[\''.$node->value[0].'\']= [');
+    foreach (array_shift($this->meta) as $type => $lookup) {
+      $this->out->write($type.' => [');
+      foreach ($lookup as $key => $annotations) {
+        $this->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
+        foreach ($annotations as $annotation) {
+          $this->out->write("'".$annotation[0]."' => ");
+          if (isset($annotation[1])) {
+            $this->emit($annotation[1]);
+            $this->out->write('null');
+          } else {
+            $this->out->write('null,');
+          }
+        }
+        $this->out->write(']],');
+      }
+      $this->out->write('],');
+    }
+    $this->out->write('];');
   }
 
   protected function emitInterface($node) {
@@ -238,8 +249,7 @@ abstract class Emitter {
       $this->out->write("\n/** @var ".$node->value[3]." */\n");
     }
     if (isset($node->value[4])) {
-      $this->out->write("\n");
-      $this->annotations($node->value[4]);
+      $this->meta[0][self::PROPERTY][$node->value[0]]= $node->value[4];
     }
     $this->out->write(implode(' ', $node->value[1]).' $'.$node->value[0]);
     if (isset($node->value[2])) {
@@ -259,8 +269,7 @@ abstract class Emitter {
     }
     $this->out->write($declare);
     if (isset($node->value[6])) {
-      $this->out->write("\n");
-      $this->annotations($node->value[6]);
+      $this->meta[0][self::METHOD][$node->value[0]]= $node->value[6];
     }
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
     $this->params($node->value[2]);
