@@ -1,0 +1,14 @@
+<?php namespace lang\ast;
+
+use lang\ClassLoader;
+
+/**
+ * XP Compiler
+ */
+module xp-framework/ast {
+
+  /** @return void */
+  public function initialize() {
+    ClassLoader::registerLoader(Compiler::instanceFor(realpath('.')), true);
+  }
+}
