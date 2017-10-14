@@ -80,60 +80,6 @@ Notes:
 
 * * *
 
-Here's some more code:
+See also:
 
-```php
-<?php namespace test;
-
-use util\cmd\Console;
-use peer\http\HttpConnection;
-
-// https://wiki.php.net/rfc/group_use_declarations
-use peer\{ConnectException, SocketException};
-
-// https://wiki.php.net/rfc/variadics
-function println(... $_) {
-
-  // https://wiki.php.net/rfc/argument_unpacking
-  return Console::writeLine(...$_);
-}
-
-class Uri {
-  // https://docs.hhvm.com/hack/types/annotations#class-properties
-  // (https://wiki.php.net/rfc/property_type_hints)
-  private HttpConnection $conn= null;
-
-  // https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion
-  public function __construct(private string $uri) { }
-
-  // https://github.com/xp-framework/rfc/issues/241
-  public function __toString(): string ==> $this->uri;
-
-  // https://docs.hhvm.com/hack/attributes/introduction
-  <<deprecated('Use connection() instead')>>
-  public function getConnection() ==> $this->connection();
-
-  // https://wiki.php.net/rfc/isset_ternary
-  public function connection(): HttpConnection {
-    return $this->conn ?? $this->conn= new HttpConnection($this);
-  }
-}
-
-// https://docs.hhvm.com/hack/operators/lambda
-// (https://wiki.php.net/rfc/arrow_functions)
-$get= (Uri $uri) ==> $uri->connection()->get();
-
-try {
-  $r= $get(new Uri($argv[1] ?? 'http://localhost'));
-  println($r);
-
-  $s= $r->header('Content-Length')[0];
-  println('read(', $s, ') => ', strlen($r->readData($s)));
-} catch (ConnectException | SocketException $e) {
-
-  // https://wiki.php.net/rfc/multiple-catch
-  println('Error ', $e->compoundMessage());
-} finally {
-  println('Done');
-}
-```
+* [XP RFC #0299: Make XP compiler the TypeScript of PHP](https://github.com/xp-framework/rfc/issues/299)
