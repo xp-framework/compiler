@@ -9,6 +9,6 @@ module xp-framework/ast {
 
   /** @return void */
   public function initialize() {
-    ClassLoader::registerLoader(Compiler::instanceFor(realpath('.')), true);
+    ClassLoader::registerLoader(Compiler::instanceFor('.'));
   }
 }

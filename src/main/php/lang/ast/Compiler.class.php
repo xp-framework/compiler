@@ -5,14 +5,16 @@ use lang\ClassLoader;
 use lang\ClassNotFoundException;
 use lang\ClassFormatException;
 use lang\ClassLinkageException;
+use lang\ElementNotFoundException;
 use text\StreamTokenizer;
 use io\streams\MemoryOutputStream;
 
 class Compiler implements \lang\IClassLoader {
+  private static $instance= null;
   private $cl;
 
   public function __construct() {
-    $this->cl= ClassLoader::getDefault();
+    $this->cl= ClassLoader::getDefault()->getLoaders();
   }
 
   /**
@@ -23,8 +25,11 @@ class Compiler implements \lang\IClassLoader {
    */
   protected function locateSource($class) {
     if (!isset($this->source[$class])) {
-      if (null === ($source= $this->cl->findResource(strtr($class, '.', '/').'.php'))) return null;
-      $this->source[$class]= $source;
+      $uri= strtr($class, '.', '/').'.php';
+      foreach ($this->cl as $cl) {
+        if ($cl->providesResource($uri)) return $this->source[$class]= $cl;
+      }
+      return null;
     }
     return $this->source[$class];
   }
@@ -162,13 +167,11 @@ class Compiler implements \lang\IClassLoader {
    * @param   string path the identifier
    * @return  lang.IClassLoader
    */
-  public static function instanceFor($path, $debug= false) {
-    static $pool= [];
-
-    if (!isset($pool[$path.$debug])) {
-      $pool[$path.$debug]= new self($path, $debug);
+  public static function instanceFor($path) {
+    if (null === self::$instance) {
+      self::$instance= new self();
     }
-    return $pool[$path.$debug];
+    return self::$instance;
   }
 
   /**
