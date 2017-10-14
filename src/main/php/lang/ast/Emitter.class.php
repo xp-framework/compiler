@@ -324,21 +324,29 @@ class Emitter {
   }
 
   private function emitDo($node) {
-    
+    $this->out->write('do {');
+    $this->emit($node->value[1]);
+    $this->out->write('} while (');
+    $this->emit($node->value[0]);
+    $this->out->write(');');
   }
 
   private function emitWhile($node) {
-    
+    $this->out->write('while (');
+    $this->emit($node->value[0]);
+    $this->out->write(') {');
+    $this->emit($node->value[1]);
+    $this->out->write('}');
   }
 
   private function emitBreak($node) {
-    $this->out->write('break');
+    $this->out->write('break ');
     $node->value && $this->emit($node->value);
     $this->out->write(';');
   }
 
   private function emitContinue($node) {
-    $this->out->write('continue');
+    $this->out->write('continue ');
     $node->value && $this->emit($node->value);
     $this->out->write(';');
   }
