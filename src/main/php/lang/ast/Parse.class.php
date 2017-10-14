@@ -69,7 +69,7 @@ class Parse {
 
     $this->infix('::', 80, function($node, $left) {
       $node->value= [$this->scope->resolve($left->value), $this->token];
-      $node->arity= 'static';
+      $node->arity= 'scope';
       $this->token= $this->advance();
       return $node;
     });
@@ -253,6 +253,30 @@ class Parse {
         $node->arity= 'function';
         $this->queue= [$this->token];
         $this->token= new Node($this->symbol(';'));
+      }
+
+      return $node;
+    });
+
+    $this->prefix('static', function($node) {
+      $node->arity= 'static';
+      $node->value= [];
+
+      while (';' !== $this->token->symbol->id) {
+        $variable= $this->token->value;
+        $this->token= $this->advance();
+
+        if ('=' === $this->token->symbol->id) {
+          $this->token= $this->expect('=');
+          $initial= $this->expression(0);
+        } else {
+          $initial= null;
+        }
+
+        $node->value[$variable]= $initial;
+        if (',' === $this->token->symbol->id) {
+          $this->token= $this->expect(',');
+        }
       }
 
       return $node;

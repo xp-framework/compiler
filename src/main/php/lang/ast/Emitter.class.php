@@ -12,7 +12,7 @@ class Emitter {
     if ($param[3]) {
       return $param[2].'... $'.$param[0];
     } else {
-      return $param[2].' '.($param[2] ? '&' : '').'$'.$param[0];
+      return $param[2].' '.($param[1] ? '&' : '').'$'.$param[0];
     }
   }
 
@@ -65,6 +65,17 @@ class Emitter {
 
   private function emitName($node) {
     $this->out->write($node->value);
+  }
+
+  private function emitStatic($node) {
+    foreach ($node->value as $variable => $initial) {
+      $this->out->write('static $'.$variable);
+      if ($initial) {
+        $this->out->write('=');
+        $this->emit($initial);
+      }
+      $this->out->write(';');
+    }
   }
 
   private function emitVariable($node) {
@@ -325,7 +336,7 @@ class Emitter {
     $this->out->write(')');
   }
 
-  private function emitStatic($node) {
+  private function emitScope($node) {
     $this->out->write($node->value[0].'::');
     $this->emit($node->value[1]);
   }
