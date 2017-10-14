@@ -1,6 +1,8 @@
 <?php namespace xp\compiler;
 
 use io\streams\FileInputStream;
+use io\streams\ConsoleInputStream;
+use io\streams\ConsoleOutputStream;
 use text\StreamTokenizer;
 use lang\ast\Tokens;
 use lang\ast\Parse;
@@ -17,8 +19,8 @@ class CompileRunner {
       return 2;
     }
 
-    $in= '-' === $args[0] ? Console::$in->stream() : new FileInputStream($args[0]);
-    $out= !isset($args[1]) ? Console::$out->stream() : new FileOutputStream($args[1]);
+    $in= '-' === $args[0] ? new ConsoleInputStream(STDIN) : new FileInputStream($args[0]);
+    $out= !isset($args[1]) ? new ConsoleOutputStream(STDOUT) : new FileOutputStream($args[1]);
     $emit= Emitter::forRuntime(PHP_VERSION);
 
     $t= (new Timer())->start();

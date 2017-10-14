@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed compatibility with XP7 console streaming - @thekid
+
 ## 0.3.0 / 2017-10-15
 
 * Registered `xp compile` subcommand - @thekid
