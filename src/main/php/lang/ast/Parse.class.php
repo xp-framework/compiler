@@ -126,6 +126,7 @@ class Parse {
     $this->prefix('@');
     $this->prefix('~');
     $this->prefix('!');
+    $this->prefix('+');
     $this->prefix('-');
     $this->prefix('++');
     $this->prefix('--');
