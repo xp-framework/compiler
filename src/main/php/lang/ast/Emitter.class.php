@@ -2,6 +2,8 @@
 
 use lang\reflect\Package;
 use lang\IllegalArgumentException;
+use io\streams\MemoryOutputStream;
+use io\streams\StringWriter;
 
 abstract class Emitter {
   protected $out;
@@ -38,6 +40,25 @@ abstract class Emitter {
    */
   protected function temp() {
     return '$T'.($this->id++);
+  }
+
+  /**
+   * Collects emitted code into a buffer and returns it
+   *
+   * @param  function(): void $callable
+   * @return string
+   */
+  protected function buffer($callable) {
+    $o= $this->out;
+    $buffer= new MemoryOutputStream();
+    $this->out= new StringWriter($buffer  );
+
+    try {
+      $callable();
+      return $buffer->getBytes();
+    } finally {
+      $this->out= $o;
+    }
   }
 
   protected abstract function type($name);
@@ -433,9 +454,25 @@ abstract class Emitter {
   }
 
   protected function emitNew($node) {
-    $this->out->write('new '.$node->value[0].'(');
-    $this->arguments($node->value[1]);
-    $this->out->write(')');
+    if (null === $node->value[0]) {
+      $this->out->write('new class(');
+      $this->arguments($node->value[1]);
+      $this->out->write(')');
+
+      $definition= $node->value[2];
+      $definition[2] && $this->out->write(' extends '.$definition[2]);
+      $definition[3] && $this->out->write(' implements '.implode(', ', $definition[3]));
+      $this->out->write('{');
+      foreach ($definition[4] as $member) {
+        $this->emit($member);
+        $this->out->write("\n");
+      }
+      $this->out->write('}');
+    } else {
+      $this->out->write('new '.$node->value[0].'(');
+      $this->arguments($node->value[1]);
+      $this->out->write(')');
+    }
   }
 
   protected function emitInvoke($node) {

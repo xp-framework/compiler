@@ -59,9 +59,29 @@ class PHP56 extends \lang\ast\Emitter {
       $this->emit($node->value[1]);
       $this->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
-      $this->emit($node->value[0]);
-      $this->out->write(' '.$node->symbol->id.' ');
-      $this->emit($node->value[1]);
+      parent::emitBinary($node);
+    }
+  }
+
+  protected function emitNew($node) {
+    if (null === $node->value[0]) {
+      $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5($node->hashCode()).'", ["kind" => "class"');
+      $definition= $node->value[2];
+      $this->out->write(', "extends" => '.($definition[2] ? '[\''.$definition[2].'\']' : 'null'));
+      $this->out->write(', "implements" => '.($definition[3] ? '[\''.implode('\', \'', $definition[3]).'\']' : 'null'));
+      $this->out->write(', "use" => []');
+      $this->out->write('], \'{');
+      $this->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
+        foreach ($definition[4] as $member) {
+          $this->emit($member);
+          $this->out->write("\n");
+        }
+      })));
+      $this->out->write('}\')->newInstance(');
+      $this->arguments($definition[1]);
+      $this->out->write(')');
+    } else {
+      parent::emitNew($node);
     }
   }
 }
