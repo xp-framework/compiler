@@ -5,13 +5,18 @@ class LoopsTest extends ParseTest {
 
   /** @return void */
   public function setUp() {
-    $this->block= [['(' => [['loop' => 'loop'], []]]];
+    $this->block= ['(' => [['loop' => 'loop'], []]];
   }
 
   #[@test]
   public function foreach_value() {
     $this->assertNodes(
-      [['foreach' => [['(variable)' => 'iterable'], null, ['(variable)' => 'value'], $this->block]]],
+      [['foreach' => [
+        ['(variable)' => 'iterable'],
+        null,
+        ['(variable)' => 'value'],
+        ['{' => [$this->block]]
+      ]]],
       $this->parse('foreach ($iterable as $value) { loop(); }')
     );
   }
@@ -19,8 +24,26 @@ class LoopsTest extends ParseTest {
   #[@test]
   public function foreach_key_value() {
     $this->assertNodes(
-      [['foreach' => [['(variable)' => 'iterable'], ['(variable)' => 'key'], ['(variable)' => 'value'], $this->block]]],
+      [['foreach' => [
+        ['(variable)' => 'iterable'],
+        ['(variable)' => 'key'],
+        ['(variable)' => 'value'],
+        ['{' => [$this->block]]
+      ]]],
       $this->parse('foreach ($iterable as $key => $value) { loop(); }')
+    );
+  }
+
+  #[@test]
+  public function foreach_value_without_curly_braces() {
+    $this->assertNodes(
+      [['foreach' => [
+        ['(variable)' => 'iterable'],
+        null,
+        ['(variable)' => 'value'],
+        $this->block
+      ]]],
+      $this->parse('foreach ($iterable as $value) loop();')
     );
   }
 
@@ -31,7 +54,7 @@ class LoopsTest extends ParseTest {
         [['=' => [['(variable)' => 'i'], ['(literal)' => '0']]]],
         [['<' => [['(variable)' => 'i'], ['(literal)' => '10']]]],
         [['++' => ['(variable)' => 'i']]],
-        $this->block
+        ['{' => [$this->block]]
       ]]],
       $this->parse('for ($i= 0; $i < 10; $i++) { loop(); }')
     );
@@ -40,16 +63,32 @@ class LoopsTest extends ParseTest {
   #[@test]
   public function while_loop() {
     $this->assertNodes(
-      [['while' => [['(variable)' => 'continue'], $this->block]]],
+      [['while' => [['(variable)' => 'continue'], ['{' => [$this->block]]]]],
       $this->parse('while ($continue) { loop(); }')
+    );
+  }
+
+  #[@test]
+  public function while_loop_without_curly_braces() {
+    $this->assertNodes(
+      [['while' => [['(variable)' => 'continue'], $this->block]]],
+      $this->parse('while ($continue) loop();')
     );
   }
 
   #[@test]
   public function do_loop() {
     $this->assertNodes(
-      [['do' => [['(variable)' => 'continue'], $this->block]]],
+      [['do' => [['(variable)' => 'continue'], ['{' => [$this->block]]]]],
       $this->parse('do { loop(); } while ($continue);')
+    );
+  }
+
+  #[@test]
+  public function do_loop_without_curly_braces() {
+    $this->assertNodes(
+      [['do' => [['(variable)' => 'continue'], $this->block]]],
+      $this->parse('do loop(); while ($continue);')
     );
   }
 

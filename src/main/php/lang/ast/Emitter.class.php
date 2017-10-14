@@ -73,7 +73,9 @@ class Emitter {
   }
 
   private function emitBlock($node) {
+    $this->out->write('{');
     $this->emit($node->value);
+    $this->out->write('}');
   }
 
   private function emitStatic($node) {
@@ -335,9 +337,15 @@ class Emitter {
       $this->out->write(' => ');
     }
     $this->emit($node->value[2]);
-    $this->out->write(') {');
-    $this->emit($node->value[3]);
-    $this->out->write('}');
+    $this->out->write(')');
+    if ('block' === $node->value[3]->arity) {
+      $this->out->write('{');
+      $this->emit($node->value[3]->value);
+      $this->out->write('}');
+    } else {
+      $this->emit($node->value[3]);
+      $this->out->write(';');
+    }
   }
 
   private function emitFor($node) {
@@ -347,15 +355,28 @@ class Emitter {
     $this->arguments($node->value[1]);
     $this->out->write(';');
     $this->arguments($node->value[2]);
-    $this->out->write(') {');
-    $this->emit($node->value[3]);
-    $this->out->write('}');
+    $this->out->write(')');
+    if ('block' === $node->value[3]->arity) {
+      $this->out->write('{');
+      $this->emit($node->value[3]->value);
+      $this->out->write('}');
+    } else {
+      $this->emit($node->value[3]);
+      $this->out->write(';');
+    }
   }
 
   private function emitDo($node) {
-    $this->out->write('do {');
-    $this->emit($node->value[1]);
-    $this->out->write('} while (');
+    $this->out->write('do');
+    if ('block' === $node->value[1]->arity) {
+      $this->out->write('{');
+      $this->emit($node->value[1]->value);
+      $this->out->write('}');
+    } else {
+      $this->emit($node->value[1]);
+      $this->out->write(';');
+    }
+    $this->out->write('while (');
     $this->emit($node->value[0]);
     $this->out->write(');');
   }
@@ -363,9 +384,15 @@ class Emitter {
   private function emitWhile($node) {
     $this->out->write('while (');
     $this->emit($node->value[0]);
-    $this->out->write(') {');
-    $this->emit($node->value[1]);
-    $this->out->write('}');
+    $this->out->write(')');
+    if ('block' === $node->value[1]->arity) {
+      $this->out->write('{');
+      $this->emit($node->value[1]->value);
+      $this->out->write('}');
+    } else {
+      $this->emit($node->value[1]);
+      $this->out->write(';');
+    }
   }
 
   private function emitBreak($node) {

@@ -424,9 +424,7 @@ class Parse {
     });
 
     $this->stmt('do', function($node) {
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
+      $loop= $this->statement();
 
       $this->token= $this->expect('while');
       $this->token= $this->expect('(');
@@ -434,7 +432,7 @@ class Parse {
       $this->token= $this->expect(')');
       $this->token= $this->expect(';');
 
-      $node->value= [$expression, $statements];
+      $node->value= [$expression, $loop];
       $node->arity= 'do';
       return $node;
     });
@@ -443,12 +441,9 @@ class Parse {
       $this->token= $this->expect('(');
       $expression= $this->expression(0);
       $this->token= $this->expect(')');
+      $loop= $this->statement();
 
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
-
-      $node->value= [$expression, $statements];
+      $node->value= [$expression, $loop];
       $node->arity= 'while';
       return $node;
     });
@@ -462,11 +457,9 @@ class Parse {
       $loop= $this->arguments(')');
       $this->token= $this->advance(')');
 
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
+      $stmt= $this->statement();
 
-      $node->value= [$init, $cond, $loop, $statements];
+      $node->value= [$init, $cond, $loop, $stmt];
       $node->arity= 'for';
       return $node;
     });
@@ -489,11 +482,8 @@ class Parse {
 
       $this->token= $this->expect(')');
 
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
-
-      $node->value= [$expression, $key, $value, $statements];
+      $loop= $this->statement();
+      $node->value= [$expression, $key, $value, $loop];
       $node->arity= 'foreach';
       return $node;
     });
