@@ -61,7 +61,14 @@ class Parse {
     $this->infixr('>>', 70);
 
     $this->infix('->', 80, function($node, $left) {
-      $node->value= [$left, $this->token];
+      if ('{' === $this->token->value) {
+        $this->token= $this->expect('{');
+        $expr= $this->expression(0);
+      } else {
+        $expr= $this->token;
+      }
+
+      $node->value= [$left, $expr];
       $node->arity= 'instance';
       $this->token= $this->advance();
       return $node;
