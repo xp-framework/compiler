@@ -1,5 +1,5 @@
 {
-  "name" : "xp-framework/ast",
+  "name" : "xp-framework/compiler",
   "type" : "library",
   "homepage" : "http://xp-framework.net/",
   "license" : "BSD-3-Clause",
