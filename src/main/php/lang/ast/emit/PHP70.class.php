@@ -32,6 +32,18 @@ class PHP70 extends \lang\ast\Emitter {
     $this->out->write('}');
   }
 
+  protected function emitAssignment($node) {
+    if ('[' === $node->value[0]->symbol->id) {
+      $this->out->write('list(');
+      $this->arguments($node->value[0]->value);
+      $this->out->write(')');
+      $this->out->write($node->symbol->id);
+      $this->emit($node->value[1]);
+    } else {
+      parent::emitAssignment($node);
+    }
+  }
+
   protected function emitConst($node) {
     $this->out->write('const '.$node->value[0].'=');
     $this->emit($node->value[2]);

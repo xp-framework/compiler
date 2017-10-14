@@ -74,6 +74,14 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
+  public function destructuring_assignment() {
+    $this->assertNodes(
+      [['=' => [['[' => [['(variable)' => 'a'], ['(variable)' => 'b']]], ['(' => [['result' => 'result'], []]]]]],
+      $this->parse('[$a, $b]= result();')
+    );
+  }
+
+  #[@test]
   public function comparison_to_assignment() {
     $this->assertNodes(
       [['===' => [['(literal)' => '1'], ['(' => ['=' => [['(variable)' => 'a'], ['(literal)' => '1']]]]]]],

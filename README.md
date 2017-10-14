@@ -51,8 +51,8 @@ The following table gives an overview of the current implementation status. The 
 | • [Multiple catch](https://wiki.php.net/rfc/multiple-catch)                 | ✔      | ✔      | *native* | *native*  |
 | • [Void](https://wiki.php.net/rfc/void_return_type)                         | ✔(1)   | ✔(1)   | *native* | *native*  |
 | • [Iterable](https://wiki.php.net/rfc/iterable)                             | ✔(1)   | ✔(1)   | *native* | *native*  |
-| • [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)     | ✔(1)   | ✔(1)   | *native* | *native* |
-| • [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✖      | ✖       | ✖      | ✖       |
+| • [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)     | ✔(1)   | ✔(1)   | *native* | *native*  |
+| • [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✔      | ✔      | *native* | *native*  |
 | • [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✖      | ✖       | ✖      | ✖       |
 | **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                              |          |          |          |          |
 | • [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✔(2)   | ✔(2)    | ✔(2)   | ✔(2)    |
