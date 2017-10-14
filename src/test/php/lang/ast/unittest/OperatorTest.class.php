@@ -97,6 +97,14 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
+  public function error_suppression() {
+    $this->assertNodes(
+      [['@' => ['(variable)' => 'a']]],
+      $this->parse('@$a;')
+    );
+  }
+
+  #[@test]
   public function new_type() {
     $this->assertNodes(
       [['new' => ['T', []]]],
