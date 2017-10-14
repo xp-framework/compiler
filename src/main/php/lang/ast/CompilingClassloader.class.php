@@ -213,7 +213,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
   }
 
   /**
-   * Gets a string representation
+   * Gets a hash code
    *
    * @return string
    */
