@@ -320,7 +320,15 @@ class Emitter {
   }
 
   private function emitFor($node) {
-    
+    $this->out->write('for (');
+    $this->emit($node->value[0]);
+    $this->out->write(';');
+    $this->emit($node->value[1]);
+    $this->out->write(';');
+    $this->emit($node->value[2]);
+    $this->out->write(') {');
+    $this->emit($node->value[3]);
+    $this->out->write('}');
   }
 
   private function emitDo($node) {

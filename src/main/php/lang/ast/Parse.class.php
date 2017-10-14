@@ -465,7 +465,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= [$init, $cond, $loop, $statements];
-      $node->arity= 'while';
+      $node->arity= 'for';
       return $node;
     });
 
