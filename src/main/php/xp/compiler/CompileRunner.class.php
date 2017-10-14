@@ -11,9 +11,25 @@ use lang\ast\Emitter;
 use util\cmd\Console;
 use util\profiling\Timer;
 
+/**
+ * Compiles future PHP to today's PHP.
+ *
+ * - Compile code and write result to a class file
+ *   ```sh
+ *   $ xp compile HelloWorld.php HelloWorld.class.php
+ *   ```
+ *
+ * - Compile standard input and write to standard output.
+ *   ```sh
+ *   $ echo "<?php ..." | xp compile -
+ *   ```
+ *
+ * @see  https://github.com/xp-framework/rfc/issues/299
+ */
 class CompileRunner {
 
-  public static function main($args) {
+  /** @return int */
+  public static function main(array $args) {
     if (empty($args)) {
       Console::$err->writeLine('Usage: xp compile <in> [<out>]');
       return 2;

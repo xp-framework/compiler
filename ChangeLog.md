@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Made `xp help compile` display something useful - @thekid
 * Fixed compatibility with XP7 console streaming - @thekid
 
 ## 0.3.0 / 2017-10-15
