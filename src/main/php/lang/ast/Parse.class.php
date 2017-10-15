@@ -649,7 +649,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= [$type, [], $body, $this->scope->annotations];
-      $node->arity= 'traits';
+      $node->arity= 'trait';
       $this->scope->annotations= [];
       return $node;
     });

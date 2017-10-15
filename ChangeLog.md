@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed trait declaration - @thekid
 * Fixed issue #3: Annotations in package - @thekid
 * Fixed issue #4: "xp compile" installation - @thekid
 
