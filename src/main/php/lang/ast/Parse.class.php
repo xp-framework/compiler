@@ -168,17 +168,19 @@ class Parse {
 
       // ($a) ==> $a + 1 vs. ($a ?? $b)->invoke();
       if (':' ===  $this->token->value || '==>' === $this->token->value) {
-        $this->token= $this->advance();
-        $node= $this->func(null, []);
-        $this->queue= [$this->token];
-        $this->token= new Node($this->symbol(';'));
         $node->arity= 'lambda';
+
+        $this->token= $this->advance();
+        $signature= $this->signature();
+        $this->token= $this->advance();
+        $node->value= [$signature, $this->expression(0)];
       } else {
+        $node->arity= 'braced';
+
         $this->token= $this->advance();
         $this->token= $this->expect('(');
         $node->value= $this->expression(0);
         $this->token= $this->expect(')');
-        $node->arity= 'braced';
       }
       return $node;
     });
@@ -267,15 +269,56 @@ class Parse {
       // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;
       // the latter explicitely becomes a statement by pushing a semicolon.
       if ('(' === $this->token->symbol->id) {
-        $node= $this->func(null, []);
         $node->arity= 'closure';
+        $signature= $this->signature();
+
+        if ('use' === $this->token->value) {
+          $this->token= $this->advance();
+          $this->token= $this->advance();
+          $use= [];
+          while (')' !== $this->token->symbol->id) {
+            if ('&' === $this->token->value) {
+              $this->token= $this->advance();
+              $use[]= '&$'.$this->token->value;
+            } else {
+              $use[]= '$'.$this->token->value;
+            }
+            $this->token= $this->advance();
+            if (')' === $this->token->symbol->id) break;
+            $this->token= $this->expect(',');
+          }
+          $this->token= $this->expect(')');
+        } else {
+          $use= null;
+        }
+
+        $this->token= $this->expect('{');
+        $statements= $this->statements();
+        $this->token= $this->expect('}');
+
+        $node->value= [$signature, $use, $statements];
       } else {
+        $node->arity= 'function';
         $name= $this->token->value;
         $this->token= $this->advance();
-        $node= $this->func($name, []);
-        $node->arity= 'function';
+        $signature= $this->signature();
+
+        if ('==>' === $this->token->value) {  // Compact syntax, terminated with ';'
+          $n= new Node($this->token->symbol);
+          $this->token= $this->advance();
+          $n->value= $this->expression(0);
+          $n->arity= 'return';
+          $statements= [$n];
+          $this->token= $this->expect(';');
+        } else {                              // Regular function
+          $this->token= $this->expect('{');
+          $statements= $this->statements();
+          $this->token= $this->expect('}');
+        }
+
         $this->queue= [$this->token];
         $this->token= new Node($this->symbol(';'));
+        $node->value= [$name, $signature, $statements];
       }
 
       return $node;
@@ -710,64 +753,20 @@ class Parse {
     return $parameters;
   }
 
-  private function func($name, $modifiers) {
-    $node= new Node($this->token->symbol);
+  private function signature() {
+    $this->token= $this->expect('(');
+    $parameters= $this->parameters();
+    $this->token= $this->expect(')');
 
-    $this->scope= new Scope($this->scope); {
-      $this->token= $this->expect('(');
-      $parameters= $this->parameters();
-      $this->token= $this->expect(')');
-
-      if (':' === $this->token->value) {
-        $this->token= $this->advance();
-        $return= $this->scope->resolve($this->token->value);
-        $this->token= $this->advance();
-      } else {
-        $return= null;
-      }
-
-      if ('use' === $this->token->value) {
-        $this->token= $this->advance();
-        $this->token= $this->advance();
-        $use= [];
-        while (')' !== $this->token->symbol->id) {
-          if ('&' === $this->token->value) {
-            $this->token= $this->advance();
-            $use[]= '&$'.$this->token->value;
-          } else {
-            $use[]= '$'.$this->token->value;
-          }
-          $this->token= $this->advance();
-          if (')' === $this->token->symbol->id) break;
-          $this->token= $this->expect(',');
-        }
-        $this->token= $this->expect(')');
-      } else {
-        $use= null;
-      }
-
-      if ('{' === $this->token->value) {
-        $this->token= $this->advance();
-        $statements= $this->statements();
-        $this->token= $this->expect('}');
-      } else if (';' === $this->token->value) {
-        $statements= null;
-        $this->token= $this->expect(';');
-      } else if ('==>' === $this->token->value) {
-        $n= new Node($this->token->symbol);
-        $this->token= $this->advance();
-        $n->value= $this->expression(0);
-        $n->arity= 'return';
-        $statements= [$n];
-        $this->token= $this->expect(';');
-      } else {
-        $this->token= $this->expect('{ or ==>');
-      }
+    if (':' === $this->token->value) {
+      $this->token= $this->advance();
+      $return= $this->scope->resolve($this->token->value);
+      $this->token= $this->advance();
+    } else {
+      $return= null;
     }
 
-    $this->scope= $this->scope->parent;
-    $node->value= [$name, $modifiers, $parameters, $statements, $return, $use];
-    return $node;
+    return [$parameters, $return];
   }
 
   private function type($name, $modifiers= []) {
@@ -845,12 +844,33 @@ class Parse {
         $this->token= $this->advance();
         $this->token= $this->expect(';');
       } else if ('function' === $this->token->symbol->id) {
+        $member= new Node($this->token->symbol);
+        $member->arity= 'method';
+
         $this->token= $this->advance();
         $name= $this->token->value;
         $this->token= $this->advance();
-        $member= $this->func($name, $modifiers);
-        $member->arity= 'method';
-        $member->value[]= $annotations;
+        $signature= $this->signature();
+
+        if ('{' === $this->token->value) {          // Regular body
+          $this->token= $this->advance();
+          $statements= $this->statements();
+          $this->token= $this->expect('}');
+        } else if (';' === $this->token->value) {   // Abstract or interface method
+          $statements= null;
+          $this->token= $this->expect(';');
+        } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
+          $n= new Node($this->token->symbol);
+          $this->token= $this->advance();
+          $n->value= $this->expression(0);
+          $n->arity= 'return';
+          $statements= [$n];
+          $this->token= $this->expect(';');
+        } else {
+          $this->token= $this->expect('{, ; or ==>');
+        }
+
+        $member->value= [$name, $modifiers, $signature, $annotations, $statements];
         $body[]= $member;
         $modifiers= [];
         $annotations= null;

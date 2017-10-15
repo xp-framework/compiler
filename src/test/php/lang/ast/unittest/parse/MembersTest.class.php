@@ -24,7 +24,9 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_instance_method() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['private'], [], [], null, null, null]]], []]]],
+      [['class' => ['\\A', [], null, [], [
+        ['function' => ['a', ['private'], [[], null], null, []]]
+      ], []]]],
       $this->parse('class A { private function a() { } }')
     );
   }
@@ -32,7 +34,9 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_static_method() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['private', 'static'], [], [], null, null, null]]], []]]],
+      [['class' => ['\\A', [], null, [], [
+        ['function' => ['a', ['private', 'static'], [[], null], null, []]]
+      ], []]]],
       $this->parse('class A { private static function a() { } }')
     );
   }
@@ -65,18 +69,11 @@ class MembersTest extends ParseTest {
   }
 
   #[@test]
-  public function short_method() {
-    $block= [['==>' => ['true' => 'true']]];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], $block, null, null, null]]], []]]],
-      $this->parse('class A { public function a() ==> true; }')
-    );
-  }
-
-  #[@test]
   public function method_with_return_type() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], [], 'void', null, null]]], []]]],
+      [['class' => ['\\A', [], null, [], [
+        ['function' => ['a', ['public'], [[], 'void'], null, []]]
+      ], []]]],
       $this->parse('class A { public function a(): void { } }')
     );
   }
@@ -85,7 +82,9 @@ class MembersTest extends ParseTest {
   public function method_with_annotation() {
     $annotations= ['member' => [['test']]];
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], [], null, null, $annotations]]], []]]],
+      [['class' => ['\\A', [], null, [], [
+        ['function' => ['a', ['public'], [[], null], $annotations, []]]
+      ], []]]],
       $this->parse('class A { <<test>> public function a() { } }')
     );
   }
@@ -94,7 +93,9 @@ class MembersTest extends ParseTest {
   public function method_with_annotations() {
     $annotations= ['member' => [['test'], ['ignore', ['(literal)' => '"Not implemented"']]]];
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], [], null, null, $annotations]]], []]]],
+      [['class' => ['\\A', [], null, [], [
+        ['function' => ['a', ['public'], [[], null], $annotations, []]]
+      ], []]]],
       $this->parse('class A { <<test, ignore("Not implemented")>> public function a() { } }')
     );
   }

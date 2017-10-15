@@ -121,6 +121,10 @@ abstract class Emitter {
   }
 
   protected function param($param) {
+    if (empty($param)) {
+      throw new \Exception("Parameter borked: ".\util\Objects::stringOf($param));
+    }
+
     $param[2] && $this->out->write($this->paramType($param[2]).' ');
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
@@ -226,54 +230,57 @@ abstract class Emitter {
     $this->out->write(']');
   }
 
+  // [$name, $signature, $statements]
   protected function emitFunction($node) {
     $this->out->write('function '.$node->value[0].'('); 
-    $this->params($node->value[2]);
+    $this->params($node->value[1][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[4])) {
+    if ($t= $this->returnType($node->value[1][1])) {
       $this->out->write(':'.$t);
     }
     $this->out->write('{');
-    $this->emit($node->value[3]);
+    $this->emit($node->value[2]);
     $this->out->write('}');
   }
 
+  // [$signature, $use, $statements]
   protected function emitClosure($node) {
     $this->out->write('function('); 
-    $this->params($node->value[2]);
+    $this->params($node->value[0][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[4])) {
+    if ($t= $this->returnType($node->value[0][1])) {
       $this->out->write(':'.$t);
     }
-    if (isset($node->value[5])) {
-      $this->out->write(' use('.implode(',', $node->value[5]).') ');
+    if (isset($node->value[1])) {
+      $this->out->write(' use('.implode(',', $node->value[1]).') ');
     }
     $this->out->write('{');
-    $this->emit($node->value[3]);
+    $this->emit($node->value[2]);
     $this->out->write('}');
   }
 
+  // [$signature, $expression]
   protected function emitLambda($node) {
     $this->out->write('function('); 
-    $this->params($node->value[2]);
+    $this->params($node->value[0][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[4])) {
+    if ($t= $this->returnType($node->value[0][1])) {
       $this->out->write(':'.$t);
     }
 
     $capture= [];
-    foreach ($this->search($node->value[3], 'variable') as $var) {
+    foreach ($this->search($node->value[1], 'variable') as $var) {
       $capture[$var->value]= true;
     }
     unset($capture['this']);
-    foreach ($node->value[2] as $param) {
+    foreach ($node->value[0][0] as $param) {
       unset($capture[$param[0]]);
     }
     $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
 
-    $this->out->write('{');
-    $this->emit($node->value[3]);
-    $this->out->write('}');
+    $this->out->write('{ return ');
+    $this->emit($node->value[1]);
+    $this->out->write('; }');
   }
 
   protected function emitClass($node) {
@@ -352,15 +359,16 @@ abstract class Emitter {
     $this->out->write(';');
   }
 
+  // [$name, $modifiers, $signature, $annotations, $statements]
   protected function emitMethod($node) {
     $this->meta[0][self::METHOD][$node->value[0]]= [
-      DETAIL_RETURNS     => $this->name($node->value[4]) ?: 'var',
-      DETAIL_ANNOTATIONS => isset($node->value[6]['member']) ? $node->value[6]['member'] : [],
-      DETAIL_TARGET_ANNO => isset($node->value[6]['param']) ? $node->value[6]['param'] : [],
+      DETAIL_RETURNS     => $this->name($node->value[2][1]) ?: 'var',
+      DETAIL_ANNOTATIONS => isset($node->value[3]['member']) ? $node->value[3]['member'] : [],
+      DETAIL_TARGET_ANNO => isset($node->value[3]['param']) ? $node->value[3]['param'] : [],
     ];
 
     $declare= $promote= $params= '';
-    foreach ($node->value[2] as $param) {
+    foreach ($node->value[2][0] as $param) {
       if (isset($param[4])) {
         $declare= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
@@ -368,16 +376,16 @@ abstract class Emitter {
     }
     $this->out->write($declare);
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
-    $this->params($node->value[2]);
+    $this->params($node->value[2][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[4])) {
+    if ($t= $this->returnType($node->value[2][1])) {
       $this->out->write(':'.$t);
     }
-    if (null === $node->value[3]) {
+    if (null === $node->value[4]) {
       $this->out->write(';');
     } else {
       $this->out->write(' {'.$promote);
-      $this->emit($node->value[3]);
+      $this->emit($node->value[4]);
       $this->out->write('}');
     }
   }

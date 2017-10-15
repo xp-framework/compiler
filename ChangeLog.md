@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Improved function, closure, lambda and method node layouts - @thekid
 * Fixed closures not being able to use by reference - @thekid
 * Implemented parameter annotations via `$param: inject` - @thekid
 
