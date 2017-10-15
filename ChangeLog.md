@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.5.0 / 2017-10-15
+
 * Removed unused scope defines - @thekid
 * Fixed endless loop for unclosed argument lists - @thekid
 * Fixed type annotations not being parsed - @thekid
