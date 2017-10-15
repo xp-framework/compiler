@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\IllegalArgumentException;
+
 /**
  * Annotations support
  *
@@ -20,6 +22,18 @@ class AnnotationsTest extends EmittingTest {
   public function primitive_value() {
     $t= $this->type('<<author("Timm")>> class <T> { }');
     $this->assertEquals(['author' => 'Timm'], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function array_value() {
+    $t= $this->type('<<authors(["Timm", "Alex"])>> class <T> { }');
+    $this->assertEquals(['authors' => ['Timm', 'Alex']], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function map_value() {
+    $t= $this->type('<<expect(["class" => \lang\IllegalArgumentException::class])>> class <T> { }');
+    $this->assertEquals(['expect' => ['class' => IllegalArgumentException::class]], $t->getAnnotations());
   }
 
   #[@test]
