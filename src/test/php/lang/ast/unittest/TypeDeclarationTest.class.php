@@ -14,6 +14,16 @@ class TypeDeclarationTest extends EmittingTest {
   }
 
   #[@test]
+  public function abstract_class_type() {
+    $this->assertTrue(Modifiers::isAbstract($this->declare('abstract class <T> { }')->getModifiers()));
+  }
+
+  #[@test]
+  public function final_class_type() {
+    $this->assertTrue(Modifiers::isFinal($this->declare('final class <T> { }')->getModifiers()));
+  }
+
+  #[@test]
   public function trait_type() {
     $this->assertTrue($this->declare('trait <T> { }')->isTrait());
   }
@@ -37,8 +47,9 @@ class TypeDeclarationTest extends EmittingTest {
   }
 
   #[@test, @values([
-  #  'public', 'private', 'protected',
-  #  'public static', 'private static', 'protected static'
+  #  'public', 'protected', 'private',
+  #  'public final', 'protected final',
+  #  'public static', 'protected static', 'private static'
   #])]
   public function method($modifiers) {
     $m= $this->declare('class <T> { '.$modifiers.' function test() { } }')->getMethod('test');
@@ -47,5 +58,11 @@ class TypeDeclarationTest extends EmittingTest {
       ['name' => 'test', 'type' => 'var', 'modifiers' => $modifiers],
       ['name' => $m->getName(), 'type' => $m->getReturnTypeName(), 'modifiers' => $n]
     );
+  }
+
+  #[@test]
+  public function abstract_method() {
+    $m= $this->declare('abstract class <T> { abstract function test(); }')->getMethod('test');
+    $this->assertTrue(Modifiers::isAbstract($m->getModifiers()));
   }
 }
