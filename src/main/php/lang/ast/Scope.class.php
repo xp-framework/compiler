@@ -13,15 +13,17 @@ class Scope {
     'double'   => true,
     'bool'     => true,
     'array'    => true,
+    'void'     => true,
     'callable' => true,
     'iterable' => true,
     'object'   => true,
     'self'     => true,
     'static'   => true,
-    'parent'   => true
+    'parent'   => true,
   ];
 
-  public $parent, $package;
+  public $parent;
+  public $package= null;
   public $imports= [];
   public $annotations= [];
 
@@ -50,7 +52,7 @@ class Scope {
   }
 
   /**
-   * Resolves a type
+   * Resolves a type to a fully qualified name
    *
    * @param  string $name
    * @return string
@@ -67,7 +69,7 @@ class Scope {
     } else if ($this->parent) {
       return $this->parent->resolve($name);
     } else {
-      return $name;
+      return '\\'.$name;
     }
   }
 }

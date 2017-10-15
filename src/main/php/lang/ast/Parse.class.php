@@ -214,7 +214,7 @@ class Parse {
     });
 
     $this->prefix('new', function($node) {
-      $type= $this->scope->resolve($this->token->value);
+      $type= $this->token->value;
       $this->token= $this->advance();
 
       $this->token= $this->expect('(');
@@ -226,7 +226,7 @@ class Parse {
       if ('class' === $type) {
         $node->value= [null, $arguments, $this->type(null)];
       } else {
-        $node->value= [$type, $arguments];
+        $node->value= [$this->scope->resolve($type), $arguments];
       }
       return $node;
     });
@@ -557,7 +557,7 @@ class Parse {
 
     $this->stmt('abstract', function($node) {
       $this->token= $this->advance();
-      $type= $this->token->value;
+      $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
       $node->value= $this->type($type, ['abstract']);
@@ -567,7 +567,7 @@ class Parse {
 
     $this->stmt('final', function($node) {
       $this->token= $this->advance();
-      $type= $this->token->value;
+      $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
       $node->value= $this->type($type, ['final']);
@@ -602,7 +602,7 @@ class Parse {
     });
 
     $this->stmt('class', function($node) {
-      $type= $this->token->value;
+      $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
       $node->value= $this->type($type);
@@ -611,7 +611,7 @@ class Parse {
     });
 
     $this->stmt('interface', function($node) {
-      $type= $this->token->value;
+      $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
       $parents= [];
@@ -641,7 +641,7 @@ class Parse {
     });
 
     $this->stmt('trait', function($node) {
-      $type= $this->token->value;
+      $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
       $this->token= $this->expect('{');

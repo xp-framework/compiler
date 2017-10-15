@@ -65,6 +65,16 @@ abstract class Emitter {
     }
   }
 
+  /**
+   * Returns the simple name for use in a declaration
+   *
+   * @param  string $name E.g. `\lang\ast\Parse`
+   * @return string In the above example, `Parse`.
+   */
+  protected function declaration($name) {
+    return substr($name, strrpos($name, '\\') + 1);
+  }
+
   protected abstract function type($name);
 
   protected function catches($catch) {
@@ -201,7 +211,7 @@ abstract class Emitter {
 
   protected function emitClass($node) {
     array_unshift($this->meta, []);
-    $this->out->write(implode(' ', $node->value[1]).' class '.$node->value[0]);
+    $this->out->write(implode(' ', $node->value[1]).' class '.$this->declaration($node->value[0]));
     $node->value[2] && $this->out->write(' extends '.$node->value[2]);
     $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
     $this->out->write('{');
@@ -230,7 +240,7 @@ abstract class Emitter {
   }
 
   protected function emitInterface($node) {
-    $this->out->write('interface '.$node->value[0]);
+    $this->out->write('interface '.$this->declaration($node->value[0]));
     $node->value[2] && $this->out->write(' extends '.implode(', ', $node->value[2]));
     $this->out->write('{');
     foreach ($node->value[3] as $member) {
@@ -241,7 +251,7 @@ abstract class Emitter {
   }
 
   protected function emitTrait($node) {
-    $this->out->write('trait '.$node->value[0]);
+    $this->out->write('trait '.$this->declaration($node->value[0]));
     $this->out->write('{');
     foreach ($node->value[2] as $member) {
       $this->emit($member);

@@ -21,7 +21,7 @@ class ScopeTest extends \unittest\TestCase {
   public function resolve_in_global_scope() {
     $s= new Scope();
 
-    $this->assertEquals('Parse', $s->resolve('Parse'));
+    $this->assertEquals('\\Parse', $s->resolve('Parse'));
   }
 
   #[@test]
