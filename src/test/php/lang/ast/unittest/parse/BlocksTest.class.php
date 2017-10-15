@@ -1,4 +1,4 @@
-<?php namespace lang\ast\unittest;
+<?php namespace lang\ast\unittest\parse;
 
 class BlocksTest extends ParseTest {
   private $block;

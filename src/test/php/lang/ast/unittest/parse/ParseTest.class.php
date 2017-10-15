@@ -1,4 +1,4 @@
-<?php namespace lang\ast\unittest;
+<?php namespace lang\ast\unittest\parse;
 
 use text\StringTokenizer;
 use lang\ast\Parse;

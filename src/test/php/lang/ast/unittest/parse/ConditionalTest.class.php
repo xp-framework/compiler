@@ -1,4 +1,4 @@
-<?php namespace lang\ast\unittest;
+<?php namespace lang\ast\unittest\parse;
 
 class ConditionalTest extends ParseTest {
   private $blocks;
