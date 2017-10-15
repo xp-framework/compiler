@@ -3,6 +3,10 @@
 /**
  * Lambdas (a.k.a. arrow functions) support
  *
+ * NOTE: Like in Hack, all captured variables are captured by value;
+ * capturing by reference is not supported. If you need to capture by
+ * reference, use a full PHP closure.
+ *
  * @see  https://docs.hhvm.com/hack/operators/lambda
  * @see  https://wiki.php.net/rfc/arrow_functions (Under Discussion)
  */
