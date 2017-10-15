@@ -167,7 +167,7 @@ class Parse {
       $this->queue= $skipped;
 
       // ($a) ==> $a + 1 vs. ($a ?? $b)->invoke();
-      if ('==>' === $this->token->value) {
+      if (':' ===  $this->token->value || '==>' === $this->token->value) {
         $this->token= $this->advance();
         $node= $this->func(null, []);
         $this->queue= [$this->token];

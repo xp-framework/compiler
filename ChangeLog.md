@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Ensured types are checked where natively supported - @thekid
 * Implemented capturing locals in lambda expressions - @thekid
 * Recorded property types in cached meta data - @thekid
 * Implemented support for dynamic new via `new $type`- @thekid

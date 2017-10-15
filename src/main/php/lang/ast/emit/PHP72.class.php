@@ -7,7 +7,11 @@
  */
 class PHP72 extends \lang\ast\Emitter {
 
-  protected function type($name) {
+  protected function paramType($name) {
+    return $name;
+  }
+
+  protected function returnType($name) {
     return $name;
   }
 }

@@ -110,7 +110,9 @@ abstract class Emitter {
     }
   }
 
-  protected abstract function type($name);
+  protected abstract function returnType($name);
+
+  protected abstract function paramType($name);
 
   protected function catches($catch) {
     $this->out->write('catch('.implode('|', $catch[0]).' $'.$catch[1].') {');
@@ -119,7 +121,7 @@ abstract class Emitter {
   }
 
   protected function param($param) {
-    $param[2] && $this->out->write($this->type($param[2]).' ');
+    $param[2] && $this->out->write($this->paramType($param[2]).' ');
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
     } else {
@@ -227,7 +229,11 @@ abstract class Emitter {
   protected function emitFunction($node) {
     $this->out->write('function '.$node->value[0].'('); 
     $this->params($node->value[2]);
-    $this->out->write(') {');
+    $this->out->write(')');
+    if ($t= $this->returnType($node->value[4])) {
+      $this->out->write(':'.$t);
+    }
+    $this->out->write('{');
     $this->emit($node->value[3]);
     $this->out->write('}');
   }
@@ -235,9 +241,12 @@ abstract class Emitter {
   protected function emitClosure($node) {
     $this->out->write('function('); 
     $this->params($node->value[2]);
-    $this->out->write(') ');
+    $this->out->write(')');
+    if ($t= $this->returnType($node->value[4])) {
+      $this->out->write(':'.$t);
+    }
     if (isset($node->value[5])) {
-      $this->out->write('use('.implode(',', $node->value[5]).') ');
+      $this->out->write(' use('.implode(',', $node->value[5]).') ');
     }
     $this->out->write('{');
     $this->emit($node->value[3]);
@@ -247,7 +256,10 @@ abstract class Emitter {
   protected function emitLambda($node) {
     $this->out->write('function('); 
     $this->params($node->value[2]);
-    $this->out->write(') ');
+    $this->out->write(')');
+    if ($t= $this->returnType($node->value[4])) {
+      $this->out->write(':'.$t);
+    }
 
     $capture= [];
     foreach ($this->search($node->value[3], 'variable') as $var) {
@@ -257,7 +269,7 @@ abstract class Emitter {
     foreach ($node->value[2] as $param) {
       unset($capture[$param[0]]);
     }
-    $capture && $this->out->write('use($'.implode(', $', array_keys($variables)).')');
+    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
 
     $this->out->write('{');
     $this->emit($node->value[3]);
@@ -350,7 +362,7 @@ abstract class Emitter {
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
     $this->params($node->value[2]);
     $this->out->write(')');
-    if ($t= $this->type($node->value[4])) {
+    if ($t= $this->returnType($node->value[4])) {
       $this->out->write(':'.$t);
     }
     if (null === $node->value[3]) {

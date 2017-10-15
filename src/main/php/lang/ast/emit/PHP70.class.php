@@ -21,6 +21,14 @@ class PHP70 extends \lang\ast\Emitter {
     return $name;
   }
 
+  protected function paramType($name) {
+    return $this->type($name);
+  }
+
+  protected function returnType($name) {
+    return $this->type($name);
+  }
+
   protected function catches($catch) {
     $last= array_pop($catch[0]);
     $label= 'c'.crc32($last);

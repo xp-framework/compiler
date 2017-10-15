@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\actions\RuntimeVersion;
+
 /**
  * Lambdas (a.k.a. arrow functions) support
  *
@@ -8,6 +10,7 @@
  * reference, use a full PHP closure.
  *
  * @see  https://docs.hhvm.com/hack/operators/lambda
+ * @see  https://docs.hhvm.com/hack/lambdas/introduction
  * @see  https://wiki.php.net/rfc/arrow_functions (Under Discussion)
  */
 class LambdasTest extends EmittingTest {
@@ -69,5 +72,27 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
+  public function typed_parameters() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return (\\lang\\Value $in) ==> $in;
+      }
+    }');
+
+    $this->assertEquals('lang.Value', typeof($r)->signature()[0]->getName());
+  }
+
+  #[@test, @action(new RuntimeVersion('>=7.0'))]
+  public function typed_return() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return ($in): \\lang\\Value ==> $in;
+      }
+    }');
+
+    $this->assertEquals('lang.Value', typeof($r)->returns()->getName());
   }
 }
