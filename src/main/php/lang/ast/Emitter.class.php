@@ -66,6 +66,16 @@ abstract class Emitter {
   }
 
   /**
+   * Returns the qualified name for use with the XP type system
+   *
+   * @param  string $name E.g. `\lang\ast\Parse`
+   * @return string In the above example, `lang.ast.Parse`.
+   */
+  protected function name($name) {
+    return '\\' === $name{0} ? strtr(substr($name, 1), '\\', '.') : $name;
+  }
+
+  /**
    * Returns the simple name for use in a declaration
    *
    * @param  string $name E.g. `\lang\ast\Parse`
@@ -220,18 +230,17 @@ abstract class Emitter {
       $this->out->write("\n");
     }
 
-    $meta= substr(str_replace('\\', '.', $node->value[0]), 1);
-    $this->out->write('static function __init() { \xp::$meta[\''.$meta.'\']= [');
+    $this->out->write('static function __init() { \xp::$meta[\''.$this->name($node->value[0]).'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->annotations($node->value[5]);
     $this->out->write(']],');
 
     foreach (array_shift($this->meta) as $type => $lookup) {
       $this->out->write($type.' => [');
-      foreach ($lookup as $key => $annotations) {
+      foreach ($lookup as $key => $meta) {
         $this->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
-        $this->annotations($annotations);
-        $this->out->write(']],');
+        $this->annotations($meta[DETAIL_ANNOTATIONS]);
+        $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'],');
       }
       $this->out->write('],');
     }
@@ -266,12 +275,11 @@ abstract class Emitter {
   }
 
   protected function emitProperty($node) {
-    if (isset($node->value[3])) {
-      $this->out->write("\n/** @var ".$node->value[3]." */\n");
-    }
-    if (isset($node->value[4])) {
-      $this->meta[0][self::PROPERTY][$node->value[0]]= $node->value[4];
-    }
+    $this->meta[0][self::PROPERTY][$node->value[0]]= [
+      DETAIL_RETURNS     => $this->name($node->value[3]) ?: 'var',
+      DETAIL_ANNOTATIONS => $node->value[4] ?: []
+    ];
+
     $this->out->write(implode(' ', $node->value[1]).' $'.$node->value[0]);
     if (isset($node->value[2])) {
       $this->out->write('=');
@@ -281,6 +289,11 @@ abstract class Emitter {
   }
 
   protected function emitMethod($node) {
+    $this->meta[0][self::METHOD][$node->value[0]]= [
+      DETAIL_RETURNS     => $this->name($node->value[4]) ?: 'var',
+      DETAIL_ANNOTATIONS => $node->value[6] ?: []
+    ];
+
     $declare= $promote= $params= '';
     foreach ($node->value[2] as $param) {
       if (isset($param[4])) {
@@ -289,9 +302,6 @@ abstract class Emitter {
       }
     }
     $this->out->write($declare);
-    if (isset($node->value[6])) {
-      $this->meta[0][self::METHOD][$node->value[0]]= $node->value[6];
-    }
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
     $this->params($node->value[2]);
     $this->out->write(')');

@@ -46,7 +46,7 @@ The following table gives an overview of the current implementation status. The 
 | Feature                                                                     | PHP 5.6  | PHP 7.0  | PHP 7.1  | PHP 7.2  |
 | --------------------------------------------------------------------------- | -------- | -------- | -------- | -------- |
 | **Future** - these might or might not be part of PHP next                   |          |          |          |          |
-| • [Property types](https://wiki.php.net/rfc/property_type_hints) (as `@var`)| ✔      | ✔      | ✔       | ✔       |
+| • [Property types](https://wiki.php.net/rfc/property_type_hints)            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
 | • [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda) (a.k.a arrow functions) | ✔ | ✔ | ✔ | ✔       |
 | • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)    | ✔      | ✔      | ✔       | ✔       |
 | • [Hack attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔ | ✔       |

@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Recorded property types in cached meta data - @thekid
 * Implemented support for dynamic new via `new $type`- @thekid
 * Fixed assignment operator - @thekid
 * Fixed parameter types - @thekid
