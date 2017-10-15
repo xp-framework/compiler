@@ -1,6 +1,18 @@
 <?php namespace lang\ast\unittest\emit;
 
+/** @see http://php.net/manual/en/language.generators.syntax.php */
 class YieldTest extends EmittingTest {
+
+  #[@test]
+  public function yield_without_argument() {
+    $r= $this->run('class <T> {
+      public function run() {
+        yield;
+        yield;
+      }
+    }');
+    $this->assertEquals([null, null], iterator_to_array($r));
+  }
 
   #[@test]
   public function yield_values() {
@@ -49,5 +61,17 @@ class YieldTest extends EmittingTest {
       }
     }');
     $this->assertEquals([1, 2, 3], iterator_to_array($r));
+  }
+
+  #[@test]
+  public function yield_from_and_yield() {
+    $r= $this->run('class <T> {
+      public function run() {
+        yield 1;
+        yield from [2, 3];
+        yield 4;
+      }
+    }');
+    $this->assertEquals([1, 2, 3, 4], iterator_to_array($r, false));
   }
 }
