@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #3: Annotations in package - @thekid
 * Fixed issue #4: "xp compile" installation - @thekid
 
 ## 0.5.0 / 2017-10-15
