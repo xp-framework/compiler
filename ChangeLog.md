@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented support for dynamic new via `new $type`- @thekid
 * Fixed assignment operator - @thekid
 * Fixed parameter types - @thekid
 * Fixed annotations not having access to class scope - @thekid

@@ -214,7 +214,7 @@ class Parse {
     });
 
     $this->prefix('new', function($node) {
-      $type= $this->token->value;
+      $type= $this->token;
       $this->token= $this->advance();
 
       $this->token= $this->expect('(');
@@ -223,10 +223,12 @@ class Parse {
 
       // Anonymous classes
       $node->arity= 'new';
-      if ('class' === $type) {
+      if ('variable' === $type->arity) {
+        $node->value= ['$'.$type->value, $arguments];
+      } else if ('class' === $type->value) {
         $node->value= [null, $arguments, $this->type(null)];
       } else {
-        $node->value= [$this->scope->resolve($type), $arguments];
+        $node->value= [$this->scope->resolve($type->value), $arguments];
       }
       return $node;
     });

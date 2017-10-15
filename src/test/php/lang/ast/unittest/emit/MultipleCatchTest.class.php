@@ -18,13 +18,13 @@ class MultipleCatchTest extends EmittingTest {
     $t= $this->type('class <T> {
       public function run($t) {
         try {
-          throw $t;
+          throw new $t("test");
         } catch (\\lang\\IllegalArgumentException | \\lang\\IllegalStateException $e) {
           return "caught ".get_class($e);
         }
       }
     }');
 
-    $this->assertEquals('caught '.$type, $t->newInstance()->run(new $type('test')));
+    $this->assertEquals('caught '.$type, $t->newInstance()->run($type));
   }
 }
