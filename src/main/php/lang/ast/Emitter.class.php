@@ -85,6 +85,31 @@ abstract class Emitter {
     return substr($name, strrpos($name, '\\') + 1);
   }
 
+  /**
+   * Search a given scope recursively for nodes with a given arity
+   *
+   * @param  lang.ast.Node|lang.ast.Node[] $arg
+   * @param  string $arity
+   * @return iterable
+   */
+  protected function search($arg, $arity) {
+    if ($arg instanceof Node) {
+      if ($arg->arity === $arity) {
+        yield $arg;
+      } else {
+        foreach ($this->search($arg->value, $arity) as $result) {
+          yield $result;
+        }
+      }
+    } else if (is_array($arg)) {
+      foreach ($arg as $node) {
+        foreach ($this->search($node, $arity) as $result) {
+          yield $result;
+        }
+      }
+    }
+  }
+
   protected abstract function type($name);
 
   protected function catches($catch) {
@@ -213,6 +238,28 @@ abstract class Emitter {
     $this->out->write(') ');
     if (isset($node->value[5])) {
       $this->out->write('use('.implode(',', $node->value[5]).') ');
+    }
+    $this->out->write('{');
+    $this->emit($node->value[3]);
+    $this->out->write('}');
+  }
+
+  protected function emitLambda($node) {
+    $this->out->write('function('); 
+    $this->params($node->value[2]);
+    $this->out->write(') ');
+
+    // Find all variables used in the scope that are not
+    $variables= [];
+    foreach ($this->search($node->value[3], 'variable') as $var) {
+      $variables[$var->value]= true;
+    }
+    unset($variables['this']);
+    foreach ($node->value[2] as $param) {
+      unset($variables[$param[0]]);
+    }
+    if ($variables) {
+      $this->out->write('use($'.implode(', $', array_keys($variables)).')');
     }
     $this->out->write('{');
     $this->emit($node->value[3]);

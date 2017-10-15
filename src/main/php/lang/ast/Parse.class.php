@@ -172,7 +172,7 @@ class Parse {
         $node= $this->func(null, []);
         $this->queue= [$this->token];
         $this->token= new Node($this->symbol(';'));
-        $node->arity= 'closure';
+        $node->arity= 'lambda';
       } else {
         $this->token= $this->advance();
         $this->token= $this->expect('(');
