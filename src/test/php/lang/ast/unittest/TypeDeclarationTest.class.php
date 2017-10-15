@@ -33,6 +33,12 @@ class TypeDeclarationTest extends EmittingTest {
     $this->assertTrue($this->declare('interface <T> { }')->isInterface());
   }
 
+  #[@test, @values(['public', 'private', 'protected'])]
+  public function constant($modifiers) {
+    $c= $this->declare('class <T> { '.$modifiers.' const test = 1; }')->getConstant('test');
+    $this->assertEquals(1, $c);
+  }
+
   #[@test, @values([
   #  'public', 'private', 'protected',
   #  'public static', 'private static', 'protected static'

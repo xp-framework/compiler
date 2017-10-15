@@ -261,7 +261,7 @@ abstract class Emitter {
   }
 
   protected function emitConst($node) {
-    $this->out->write(implode(' ', $node->value[0]).' const '.$node->value[0].'=');
+    $this->out->write(implode(' ', $node->value[1]).' const '.$node->value[0].'=');
     $this->emit($node->value[2]);
     $this->out->write(';');
   }

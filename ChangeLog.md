@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed constant emittance in PHP 7.1+ - @thekid
 * Fixed trait declaration - @thekid
 * Fixed issue #3: Annotations in package - @thekid
 * Fixed issue #4: "xp compile" installation - @thekid
