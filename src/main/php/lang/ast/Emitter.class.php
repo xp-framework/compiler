@@ -341,7 +341,7 @@ abstract class Emitter {
 
   protected function emitAssignment($node) {
     $this->emit($node->value[0]);
-    $this->out->write('=');
+    $this->out->write($node->symbol->id);
     $this->emit($node->value[1]);
   }
 

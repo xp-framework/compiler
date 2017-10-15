@@ -29,7 +29,7 @@ class CompactFunctionsTest extends EmittingTest {
   #[@test]
   public function combined_with_argument_promotion() {
     $r= $this->run('class <T> {
-      public function withId(private $id) { return $this; }
+      public function withId(private $id) ==> $this;
       public function id() ==> $this->id;
 
       public function run() {

@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed assignment operator - @thekid
 * Fixed parameter types - @thekid
 * Fixed annotations not having access to class scope - @thekid
 * Fixed constant emittance in PHP 7.1+ - @thekid
