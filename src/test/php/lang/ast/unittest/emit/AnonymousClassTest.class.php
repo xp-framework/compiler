@@ -3,7 +3,12 @@
 use lang\Runnable;
 use util\AbstractDeferredInvokationHandler;
 
-/** @see https://wiki.php.net/rfc/anonymous_classes */
+/**
+ * Anonymous class support
+ *
+ * @see  https://github.com/xp-framework/rfc/issues/80
+ * @see  https://wiki.php.net/rfc/anonymous_classes
+ */
 class AnonymousClassTest extends EmittingTest {
 
   #[@test]
