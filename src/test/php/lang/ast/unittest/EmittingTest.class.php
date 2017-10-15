@@ -34,4 +34,15 @@ abstract class EmittingTest extends \unittest\TestCase {
     self::$cl->setClassBytes($name, $out->getBytes());
     return self::$cl->loadClass($name);
   }
+
+  /**
+   * Run code
+   *
+   * @param  string $code
+   * @param  var... $args
+   * @return var
+   */
+  protected function run($code, ... $args) {
+    return $this->declare($code)->newInstance()->run(...$args);
+  }
 }
