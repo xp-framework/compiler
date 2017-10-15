@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.6.0 / 2017-10-15
+
 * Ensured types are checked where natively supported - @thekid
 * Implemented capturing locals in lambda expressions - @thekid
 * Recorded property types in cached meta data - @thekid
