@@ -249,18 +249,16 @@ abstract class Emitter {
     $this->params($node->value[2]);
     $this->out->write(') ');
 
-    // Find all variables used in the scope that are not
-    $variables= [];
+    $capture= [];
     foreach ($this->search($node->value[3], 'variable') as $var) {
-      $variables[$var->value]= true;
+      $capture[$var->value]= true;
     }
-    unset($variables['this']);
+    unset($capture['this']);
     foreach ($node->value[2] as $param) {
-      unset($variables[$param[0]]);
+      unset($capture[$param[0]]);
     }
-    if ($variables) {
-      $this->out->write('use($'.implode(', $', array_keys($variables)).')');
-    }
+    $capture && $this->out->write('use($'.implode(', $', array_keys($variables)).')');
+
     $this->out->write('{');
     $this->emit($node->value[3]);
     $this->out->write('}');
