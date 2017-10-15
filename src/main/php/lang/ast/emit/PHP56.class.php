@@ -84,6 +84,20 @@ class PHP56 extends \lang\ast\Emitter {
     }
   }
 
+  protected function emitInvoke($node) {
+    if ('braced' === $node->value[0]->arity) {
+      $t= $this->temp();
+      $this->out->write('(('.$t.'=');
+      $this->emit($node->value[0]->value);
+      $this->out->write(') ? '.$t);
+      $this->out->write('(');
+      $this->arguments($node->value[1]);
+      $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
+    } else {
+      parent::emitInvoke($node);
+    }
+  }
+
   protected function emitNew($node) {
     if (null === $node->value[0]) {
       $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5($node->hashCode()).'", ["kind" => "class"');
