@@ -222,7 +222,7 @@ abstract class Emitter {
     $this->out->write('}');
 
     // Cache annotations
-    $this->out->write('\xp::$meta[\''.$node->value[0].'\']= [');
+    $this->out->write('\xp::$meta[\''.substr(str_replace('\\', '.', $node->value[0]), 1).'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->annotations($node->value[5]);
     $this->out->write(']],');
