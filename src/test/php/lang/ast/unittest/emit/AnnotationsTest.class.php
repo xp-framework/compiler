@@ -67,4 +67,14 @@ class AnnotationsTest extends EmittingTest {
     $t= $this->type('class <T> { <<$param: test>> public function fixture($param) { } }');
     $this->assertEquals(['test' => null], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
   }
+
+  #[@test]
+  public function params() {
+    $t= $this->type('class <T> { <<$a: inject(["name" => "a"]), $b: inject>> public function fixture($a, $b) { } }');
+    $m=$t->getMethod('fixture');
+    $this->assertEquals(
+      [['inject' => ['name' => 'a']], ['inject' => null]],
+      [$m->getParameter(0)->getAnnotations(), $m->getParameter(1)->getAnnotations()]
+    );
+  }
 }
