@@ -23,7 +23,7 @@ abstract class EmittingTest extends \unittest\TestCase {
    * @param  string $code
    * @return lang.XPClass
    */
-  protected function declare($code) {
+  protected function type($code) {
     $name= 'T'.(self::$id++);
 
     $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))));
@@ -43,6 +43,6 @@ abstract class EmittingTest extends \unittest\TestCase {
    * @return var
    */
   protected function run($code, ... $args) {
-    return $this->declare($code)->newInstance()->run(...$args);
+    return $this->type($code)->newInstance()->run(...$args);
   }
 }
