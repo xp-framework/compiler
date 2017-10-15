@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed closures not being able to use by reference - @thekid
 * Implemented parameter annotations via `$param: inject` - @thekid
 
 ## 0.6.0 / 2017-10-15

@@ -92,11 +92,20 @@ class FunctionsTest extends ParseTest {
   }
 
   #[@test]
-  public function default_closure_with_use() {
+  public function default_closure_with_use_by_vaue() {
     $block= ['+' => [['(variable)' => 'a'], ['(literal)' => '1']]];
     $this->assertNodes(
       [['(' => [null, [], [], [['return' => $block]], null, ['$a', '$b']]]],
       $this->parse('function() use($a, $b) { return $a + 1; };')
+    );
+  }
+
+  #[@test]
+  public function default_closure_with_use_by_reference() {
+    $block= ['+' => [['(variable)' => 'a'], ['(literal)' => '1']]];
+    $this->assertNodes(
+      [['(' => [null, [], [], [['return' => $block]], null, ['$a', '&$b']]]],
+      $this->parse('function() use($a, &$b) { return $a + 1; };')
     );
   }
 

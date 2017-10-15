@@ -731,7 +731,12 @@ class Parse {
         $this->token= $this->advance();
         $use= [];
         while (')' !== $this->token->symbol->id) {
-          $use[]= '$'.$this->token->value;
+          if ('&' === $this->token->value) {
+            $this->token= $this->advance();
+            $use[]= '&$'.$this->token->value;
+          } else {
+            $use[]= '$'.$this->token->value;
+          }
           $this->token= $this->advance();
           if (')' === $this->token->symbol->id) break;
           $this->token= $this->expect(',');
