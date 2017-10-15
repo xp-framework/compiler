@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #4: "xp compile" installation - @thekid
+
 ## 0.5.0 / 2017-10-15
 
 * Removed unused scope defines - @thekid
