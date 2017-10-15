@@ -297,6 +297,12 @@ abstract class Emitter {
       foreach ($lookup as $key => $meta) {
         $this->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
         $this->annotations($meta[DETAIL_ANNOTATIONS]);
+        $this->out->write('], DETAIL_TARGET_ANNO => [');
+        foreach ($meta[DETAIL_TARGET_ANNO] as $target => $annotations) {
+          $this->out->write("'$".$target."' => [");
+          $this->annotations($annotations);
+          $this->out->write('],');
+        }
         $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'],');
       }
       $this->out->write('],');
@@ -334,7 +340,8 @@ abstract class Emitter {
   protected function emitProperty($node) {
     $this->meta[0][self::PROPERTY][$node->value[0]]= [
       DETAIL_RETURNS     => $this->name($node->value[3]) ?: 'var',
-      DETAIL_ANNOTATIONS => $node->value[4] ?: []
+      DETAIL_ANNOTATIONS => $node->value[4] ? $node->value[4]['member'] : [],
+      DETAIL_TARGET_ANNO => []
     ];
 
     $this->out->write(implode(' ', $node->value[1]).' $'.$node->value[0]);
@@ -348,7 +355,8 @@ abstract class Emitter {
   protected function emitMethod($node) {
     $this->meta[0][self::METHOD][$node->value[0]]= [
       DETAIL_RETURNS     => $this->name($node->value[4]) ?: 'var',
-      DETAIL_ANNOTATIONS => $node->value[6] ?: []
+      DETAIL_ANNOTATIONS => isset($node->value[6]['member']) ? $node->value[6]['member'] : [],
+      DETAIL_TARGET_ANNO => isset($node->value[6]['param']) ? $node->value[6]['param'] : [],
     ];
 
     $declare= $promote= $params= '';

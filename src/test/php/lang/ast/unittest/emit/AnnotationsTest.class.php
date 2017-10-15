@@ -6,6 +6,7 @@ use lang\IllegalArgumentException;
  * Annotations support
  *
  * @see  https://github.com/xp-framework/rfc/issues/16
+ * @see  https://github.com/xp-framework/rfc/issues/218
  * @see  https://docs.hhvm.com/hack/attributes/introduction
  * @see  https://wiki.php.net/rfc/simple-annotations (Draft)
  * @see  https://wiki.php.net/rfc/attributes (Declined)
@@ -47,5 +48,23 @@ class AnnotationsTest extends EmittingTest {
   public function has_access_to_class() {
     $t= $this->type('<<expect(self::SUCCESS)>> class <T> { const SUCCESS = true; }');
     $this->assertEquals(['expect' => true], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function method() {
+    $t= $this->type('class <T> { <<test>> public function fixture() { } }');
+    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getAnnotations());
+  }
+
+  #[@test]
+  public function field() {
+    $t= $this->type('class <T> { <<test>> public $fixture; }');
+    $this->assertEquals(['test' => null], $t->getField('fixture')->getAnnotations());
+  }
+
+  #[@test]
+  public function param() {
+    $t= $this->type('class <T> { <<$param: test>> public function fixture($param) { } }');
+    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
   }
 }

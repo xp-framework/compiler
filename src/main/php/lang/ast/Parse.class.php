@@ -900,16 +900,27 @@ class Parse {
       } else if ('<<' === $this->token->symbol->id) {
         do {
           $this->token= $this->advance();
+
+          // `$param: inject` vs. `inject`
+          if ('variable' === $this->token->arity) {
+            $target= &$annotations['param'][$this->token->value];
+            $this->token= $this->advance();
+            $this->token= $this->expect(':');
+          } else {
+            $target= &$annotations['member'];
+          }
+
           $annotation= [$this->token->value];
           $this->token= $this->advance();
 
+          // Parameterized annotation
           if ('(' === $this->token->symbol->id) {
             $this->token= $this->expect('(');
             $annotation[]= $this->expression(0);
             $this->token= $this->expect(')');
           }
 
-          $annotations[]= $annotation;
+          $target[]= $annotation;
           if (',' === $this->token->symbol->id) {
             continue;
           } else if ('>>' === $this->token->symbol->id) {

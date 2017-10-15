@@ -83,15 +83,16 @@ class MembersTest extends ParseTest {
 
   #[@test]
   public function method_with_annotation() {
+    $annotations= ['member' => [['test']]];
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], [], null, null, [['test']]]]], []]]],
+      [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], [], null, null, $annotations]]], []]]],
       $this->parse('class A { <<test>> public function a() { } }')
     );
   }
 
   #[@test]
   public function method_with_annotations() {
-    $annotations= [['test'], ['ignore', ['(literal)' => '"Not implemented"']]];
+    $annotations= ['member' => [['test'], ['ignore', ['(literal)' => '"Not implemented"']]]];
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [['(' => ['a', ['public'], [], [], null, null, $annotations]]], []]]],
       $this->parse('class A { <<test, ignore("Not implemented")>> public function a() { } }')

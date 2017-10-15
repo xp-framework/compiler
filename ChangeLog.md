@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented parameter annotations via `$param: inject` - @thekid
+
 ## 0.6.0 / 2017-10-15
 
 * Ensured types are checked where natively supported - @thekid
