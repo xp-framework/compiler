@@ -1,4 +1,4 @@
-<?php namespace lang\ast\unittest;
+<?php namespace lang\ast\unittest\emit;
 
 class YieldTest extends EmittingTest {
 

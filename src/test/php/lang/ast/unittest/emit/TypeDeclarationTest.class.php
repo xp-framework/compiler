@@ -1,4 +1,4 @@
-<?php namespace lang\ast\unittest;
+<?php namespace lang\ast\unittest\emit;
 
 use lang\reflect\Modifiers;
 use lang\XPClass;
@@ -33,7 +33,7 @@ class TypeDeclarationTest extends EmittingTest {
   public function class_with_parent() {
     $this->assertEquals(
       new XPClass(EmittingTest::class),
-      $this->type('class <T> extends \\lang\\ast\\unittest\\EmittingTest { }')->getParentclass()
+      $this->type('class <T> extends \\lang\\ast\\unittest\\emit\\EmittingTest { }')->getParentclass()
     );
   }
 
