@@ -219,10 +219,9 @@ abstract class Emitter {
       $this->emit($member);
       $this->out->write("\n");
     }
-    $this->out->write('}');
 
-    // Cache annotations
-    $this->out->write('\xp::$meta[\''.substr(str_replace('\\', '.', $node->value[0]), 1).'\']= [');
+    $meta= substr(str_replace('\\', '.', $node->value[0]), 1);
+    $this->out->write('static function __init() { \xp::$meta[\''.$meta.'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->annotations($node->value[5]);
     $this->out->write(']],');
@@ -236,7 +235,7 @@ abstract class Emitter {
       }
       $this->out->write('],');
     }
-    $this->out->write('];');
+    $this->out->write(']; }} '.$node->value[0].'::__init();');
   }
 
   protected function emitInterface($node) {

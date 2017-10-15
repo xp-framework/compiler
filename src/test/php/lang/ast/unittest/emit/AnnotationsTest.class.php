@@ -1,8 +1,5 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\Runnable;
-use util\AbstractDeferredInvokationHandler;
-
 /**
  * Annotations support
  *
@@ -23,5 +20,11 @@ class AnnotationsTest extends EmittingTest {
   public function primitive_value() {
     $t= $this->type('<<author("Timm")>> class <T> { }');
     $this->assertEquals(['author' => 'Timm'], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function has_access_to_class() {
+    $t= $this->type('<<expect(self::SUCCESS)>> class <T> { const SUCCESS = true; }');
+    $this->assertEquals(['expect' => true], $t->getAnnotations());
   }
 }
