@@ -519,8 +519,6 @@ class Parse {
         }
 
         $variable= $this->token;
-        $this->scope->define($variable->value, $variable);
-  
         $this->token= $this->advance();
         $this->token= $this->expect(')');
 
@@ -1072,7 +1070,7 @@ class Parse {
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
-        $node= $this->scope->find($value) ?: new Node($this->symbol($value) ?: clone $this->symbol('(name)'));
+        $node= new Node($this->symbol($value) ?: clone $this->symbol('(name)'));
       } else if ('operator' === $type) {
         $node= new Node($this->symbol($value));
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {
