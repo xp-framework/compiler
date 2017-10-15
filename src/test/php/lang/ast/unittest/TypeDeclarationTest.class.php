@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest;
 
 use lang\reflect\Modifiers;
+use lang\XPClass;
 
 class TypeDeclarationTest extends EmittingTest {
 
@@ -21,6 +22,19 @@ class TypeDeclarationTest extends EmittingTest {
   #[@test]
   public function final_class_type() {
     $this->assertTrue(Modifiers::isFinal($this->declare('final class <T> { }')->getModifiers()));
+  }
+
+  #[@test]
+  public function class_without_parent() {
+    $this->assertNull($this->declare('class <T> { }')->getParentclass());
+  }
+
+  #[@test]
+  public function class_with_parent() {
+    $this->assertEquals(
+      new XPClass(EmittingTest::class),
+      $this->declare('class <T> extends \\lang\\ast\\unittest\\EmittingTest { }')->getParentclass()
+    );
   }
 
   #[@test]
