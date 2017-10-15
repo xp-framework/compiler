@@ -37,6 +37,13 @@ class AnnotationsTest extends EmittingTest {
   }
 
   #[@test]
+  public function closure_value() {
+    $t= $this->type('<<verify(function($arg) { return $arg; })>> class <T> { }');
+    $f= $t->getAnnotation('verify');
+    $this->assertEquals('test', $f('test'));
+  }
+
+  #[@test]
   public function has_access_to_class() {
     $t= $this->type('<<expect(self::SUCCESS)>> class <T> { const SUCCESS = true; }');
     $this->assertEquals(['expect' => true], $t->getAnnotations());

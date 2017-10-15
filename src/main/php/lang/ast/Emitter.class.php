@@ -84,11 +84,11 @@ abstract class Emitter {
   }
 
   protected function param($param) {
-    $this->out->write($this->type($param[2]));
+    $param[2] && $this->out->write($this->type($param[2]).' ');
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
     } else {
-      $this->out->write(' '.($param[1] ? '&' : '').'$'.$param[0]);
+      $this->out->write(($param[1] ? '&' : '').'$'.$param[0]);
     }
     if ($param[5]) {
       $this->out->write('=');
