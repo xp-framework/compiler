@@ -30,7 +30,7 @@ abstract class EmittingTest extends \unittest\TestCase {
     $out= new MemoryOutputStream();
     $emit= Emitter::forRuntime(PHP_VERSION)->newInstance(new StringWriter($out));
     $emit->emit($parse->execute());
-
+    // var_dump($out->getBytes());
     self::$cl->setClassBytes($name, $out->getBytes());
     return self::$cl->loadClass($name);
   }

@@ -31,7 +31,7 @@ class PHP70 extends \lang\ast\Emitter {
 
   protected function catches($catch) {
     $last= array_pop($catch[0]);
-    $label= 'c'.crc32($last);
+    $label= sprintf('c%u', crc32($last));
     foreach ($catch[0] as $type) {
       $this->out->write('catch('.$type.' $'.$catch[1].') { goto '.$label.'; }');
     }
