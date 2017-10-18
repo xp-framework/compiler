@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.8.0 / 2017-10-18
+
+* Ensured line numbers are kept; this is important for tracing
+  warnings, errors and exceptions.
+  (@thekid)
+
 ## 0.7.0 / 2017-10-15
 
 * Improved function, closure, lambda and method node layouts - @thekid
