@@ -10,6 +10,7 @@ abstract class Emitter {
   const METHOD   = 1;
 
   protected $out;
+  protected $line= 1;
   protected $meta= [];
 
   /**
@@ -635,11 +636,19 @@ abstract class Emitter {
 
   public function emit($arg) {
     if ($arg instanceof Node) {
+      while ($arg->line > $this->line) {
+        $this->out->write("\n");
+        $this->line++;
+      }
       $this->{'emit'.$arg->arity}($arg);
     } else {
       foreach ($arg as $node) {
+        while ($node->line > $this->line) {
+          $this->out->write("\n");
+          $this->line++;
+        }
         $this->{'emit'.$node->arity}($node);
-        isset($node->symbol->std) || $this->out->write(";\n"); 
+        isset($node->symbol->std) || $this->out->write(';');
       }
     }
   }
