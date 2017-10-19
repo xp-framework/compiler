@@ -228,7 +228,7 @@ class Parse {
       if ('variable' === $type->arity) {
         $node->value= ['$'.$type->value, $arguments];
       } else if ('class' === $type->value) {
-        $node->value= [null, $arguments, $this->type(null)];
+        $node->value= [null, $arguments, $this->clazz(null)];
       } else {
         $node->value= [$this->scope->resolve($type->value), $arguments];
       }
@@ -605,7 +605,7 @@ class Parse {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
-      $node->value= $this->type($type, ['abstract']);
+      $node->value= $this->clazz($type, ['abstract']);
       $node->arity= 'class';
       return $node;
     });
@@ -615,7 +615,7 @@ class Parse {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
-      $node->value= $this->type($type, ['final']);
+      $node->value= $this->clazz($type, ['final']);
       $node->arity= 'class';
       return $node;
     });
@@ -650,7 +650,7 @@ class Parse {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
 
-      $node->value= $this->type($type);
+      $node->value= $this->clazz($type);
       $node->arity= 'class';
       return $node;
     });
@@ -700,6 +700,20 @@ class Parse {
     });
   }
 
+  private function type() {
+    if ('?' === $this->token->symbol->id) {
+      $this->token= $this->advance();
+      $type= '?'.$this->scope->resolve($this->token->value);
+      $this->token= $this->advance();
+    } else if ('name' === $this->token->arity) {
+      $type= $this->scope->resolve($this->token->value);
+      $this->token= $this->advance();
+    } else {
+      $type= null;
+    }
+    return $type;
+  }
+
   private function parameters() {
     static $promotion= ['private' => true, 'protected' => true, 'public' => true];
 
@@ -712,16 +726,7 @@ class Parse {
         $promote= null;
       }
 
-      if ('?' === $this->token->symbol->id) {
-        $this->token= $this->advance();
-        $type= '?'.$this->scope->resolve($this->token->value);
-        $this->token= $this->advance();
-      } else if ('name' === $this->token->arity) {
-        $type= $this->scope->resolve($this->token->value);
-        $this->token= $this->advance();
-      } else {
-        $type= null;
-      }
+      $type= $this->type();
 
       if ('...' === $this->token->value) {
         $variadic= true;
@@ -769,7 +774,7 @@ class Parse {
     return [$parameters, $return];
   }
 
-  private function type($name, $modifiers= []) {
+  private function clazz($name, $modifiers= []) {
     $parent= null;
     if ('extends' === $this->token->value) {
       $this->token= $this->advance();
