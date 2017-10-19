@@ -712,6 +712,21 @@ class Parse {
       return null;
     }
 
+    if ('<' === $this->token->symbol->id) {
+      $components= [];
+      do {
+        $this->token= $this->advance();
+        $components[]= $this->type();
+      } while ('>' !== $this->token->symbol->id);
+      $this->token= $this->expect('>');
+      
+      // return new Generic($type, $components);
+      if ('array' === $type) {
+        if (1 === sizeof($components)) return $components[0].'[]';
+        if (2 === sizeof($components)) return '[:'.$components[1].']';
+      }
+    }
+
     return $type;
   }
 

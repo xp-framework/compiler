@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented `array<int>` and `array<string, string>` type notations
+  as per https://docs.hhvm.com/hack/types/type-system
+  (@thekid)
+
 ## 0.8.0 / 2017-10-18
 
 * Ensured line numbers are kept; this is important for tracing
