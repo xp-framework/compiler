@@ -709,8 +709,13 @@ class Parse {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
     } else {
-      $type= null;
+      return null;
     }
+
+    if ('<' === $this->token->symbol->id) {
+      echo "GENERIC";
+    }
+
     return $type;
   }
 
