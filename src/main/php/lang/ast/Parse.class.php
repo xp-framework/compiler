@@ -712,10 +712,6 @@ class Parse {
       return null;
     }
 
-    if ('<' === $this->token->symbol->id) {
-      echo "GENERIC";
-    }
-
     return $type;
   }
 
@@ -904,9 +900,6 @@ class Parse {
         }
         $this->token= $this->expect(';');
         $modifiers= [];
-      } else if ('name' === $this->token->arity) {
-        $type= $this->scope->resolve($this->token->value);
-        $this->token= $this->advance();
       } else if ('variable' === $this->token->arity) {
         $n= new Node($this->token->symbol);
         $n->arity= 'property';
@@ -965,8 +958,10 @@ class Parse {
           }
         } while (true);
         $this->token= $this->expect('>>');
+      } else if ($type= $this->type()) {
+        continue;
       } else {
-        $this->expect('property, constant or method');
+        $this->expect('a type, modifier, property, annotation or method');
       }
     }
     return $body;
