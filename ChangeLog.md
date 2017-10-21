@@ -3,8 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Implemented `array<int>` and `array<string, string>` type notations
-  as per https://docs.hhvm.com/hack/types/type-system
+* Implemented `array<int>` and `array<string, string>` as well as
+  function types (e.g. `(function(int, string): string)`) as seen in
+  [Hack's type system](https://docs.hhvm.com/hack/types/type-system)
   (@thekid)
 
 ## 0.8.0 / 2017-10-18
