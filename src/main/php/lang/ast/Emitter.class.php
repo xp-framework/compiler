@@ -437,7 +437,7 @@ abstract class Emitter {
     $this->out->write('?');
     $this->emit($node->value[1]);
     $this->out->write(':');
-    $this->emit($node->value[1]);
+    $this->emit($node->value[2]);
   }
 
   protected function emitOffset($node) {
