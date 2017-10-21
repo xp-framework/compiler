@@ -122,11 +122,7 @@ abstract class Emitter {
   }
 
   protected function param($param) {
-    if (empty($param)) {
-      throw new \Exception("Parameter borked: ".\util\Objects::stringOf($param));
-    }
-
-    $param[2] && $this->out->write($this->paramType($param[2]).' ');
+    $param[2] && $this->out->write($this->paramType($param[2]->literal()).' ');
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
     } else {
@@ -265,7 +261,7 @@ abstract class Emitter {
     $this->out->write('function('); 
     $this->params($node->value[0][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[0][1])) {
+    if ($node->value[0][1] && $t= $this->returnType($node->value[0][1]->literal())) {
       $this->out->write(':'.$t);
     }
 
@@ -347,7 +343,7 @@ abstract class Emitter {
 
   protected function emitProperty($node) {
     $this->meta[0][self::PROPERTY][$node->value[0]]= [
-      DETAIL_RETURNS     => $this->name($node->value[3]) ?: 'var',
+      DETAIL_RETURNS     => $node->value[3] ? $node->value[3]->name() : 'var',
       DETAIL_ANNOTATIONS => $node->value[4] ? $node->value[4]['member'] : [],
       DETAIL_TARGET_ANNO => []
     ];
@@ -363,7 +359,7 @@ abstract class Emitter {
   // [$name, $modifiers, $signature, $annotations, $statements]
   protected function emitMethod($node) {
     $this->meta[0][self::METHOD][$node->value[0]]= [
-      DETAIL_RETURNS     => $this->name($node->value[2][1]) ?: 'var',
+      DETAIL_RETURNS     => $node->value[2][1] ? $node->value[2][1]->name() : 'var',
       DETAIL_ANNOTATIONS => isset($node->value[3]['member']) ? $node->value[3]['member'] : [],
       DETAIL_TARGET_ANNO => isset($node->value[3]['param']) ? $node->value[3]['param'] : [],
     ];

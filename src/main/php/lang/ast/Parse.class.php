@@ -719,15 +719,11 @@ class Parse {
         $components[]= $this->type();
       } while ('>' !== $this->token->symbol->id);
       $this->token= $this->expect('>');
-      
-      // return new Generic($type, $components);
-      if ('array' === $type) {
-        if (1 === sizeof($components)) return $components[0].'[]';
-        if (2 === sizeof($components)) return '[:'.$components[1].']';
-      }
+
+      return new GenericType($type, $components);
     }
 
-    return $type;
+    return new Type($type);
   }
 
   private function parameters() {
@@ -781,8 +777,7 @@ class Parse {
 
     if (':' === $this->token->value) {
       $this->token= $this->advance();
-      $return= $this->scope->resolve($this->token->value);
-      $this->token= $this->advance();
+      $return= $this->type();
     } else {
       $return= null;
     }

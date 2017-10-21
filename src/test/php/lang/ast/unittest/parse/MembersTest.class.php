@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\Type;
+
 class MembersTest extends ParseTest {
 
   #[@test]
@@ -72,7 +74,7 @@ class MembersTest extends ParseTest {
   public function method_with_return_type() {
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        ['function' => ['a', ['public'], [[], 'void'], null, []]]
+        ['function' => ['a', ['public'], [[], new Type('void')], null, []]]
       ], []]]],
       $this->parse('class A { public function a(): void { } }')
     );
