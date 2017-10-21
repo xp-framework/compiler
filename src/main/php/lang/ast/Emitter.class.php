@@ -591,6 +591,16 @@ abstract class Emitter {
     $this->out->write(';');
   }
 
+  protected function emitInstanceOf($node) {
+    $this->emit($node->value[0]);
+    $this->out->write(' instanceof ');
+    if ($node->value[1] instanceof Node) {
+      $this->emit($node->value[1]);
+    } else {
+      $this->out->write($node->value[1]);
+    }
+  }
+
   protected function emitNew($node) {
     if (null === $node->value[0]) {
       $this->out->write('new class(');

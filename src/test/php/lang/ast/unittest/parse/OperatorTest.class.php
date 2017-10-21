@@ -6,8 +6,7 @@ class OperatorTest extends ParseTest {
   #  '+', '-', '*', '/', '.', '%', '|', '&', '**',
   #  '??', '?:',
   #  '&&', '||',
-  #  '>>', '<<',
-  #  'instanceof'
+  #  '>>', '<<'
   #])]
   public function binary($operator) {
     $this->assertNodes(

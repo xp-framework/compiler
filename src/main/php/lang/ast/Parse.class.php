@@ -55,10 +55,21 @@ class Parse {
     $this->infix('%', 60);
     $this->infix('.', 60);
     $this->infix('**', 60);
-    $this->infix('instanceof', 60);
 
     $this->infixr('<<', 70);
     $this->infixr('>>', 70);
+
+    $this->infix('instanceof', 60, function($node, $left) {
+      if ('name' === $this->token->arity) {
+        $node->value= [$left, $this->scope->resolve($this->token->value)];
+        $this->token= $this->advance();
+      } else {
+        $node->value= [$left, $this->expression(0)];
+      }
+
+      $node->arity= 'instanceof';
+      return $node;
+    });
 
     $this->infix('->', 80, function($node, $left) {
       if ('{' === $this->token->value) {
