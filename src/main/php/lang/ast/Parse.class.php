@@ -764,7 +764,11 @@ class Parse {
       } while (true);
       $this->token= $this->expect('>');
 
-      return new GenericType($type, $components);
+      if ('array' === $type) {
+        return 1 === sizeof($components) ? new ArrayType($components[0]) : new MapType($components[0], $components[1]);
+      } else {
+        return new GenericType($type, $components);
+      }
     } else {
       return new Type($type);
     }
