@@ -7,6 +7,7 @@ use lang\Primitive;
  * Function types
  *
  * @see  https://docs.hhvm.com/hack/types/summary-table
+ * @see  https://docs.hhvm.com/hack/callables/introduction
  */
 class FunctionTypesTest extends EmittingTest {
 

@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented support for union types, e.g. `int|float`, as supported
+  by [this PHP RFC](https://wiki.php.net/rfc/union_types)
+  (@thekid)
 * Implemented `array<int>` and `array<string, string>` as well as
   function types (e.g. `(function(int, string): string)`) as seen in
   [Hack's type system](https://docs.hhvm.com/hack/types/type-system)

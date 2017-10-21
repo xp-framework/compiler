@@ -701,6 +701,18 @@ class Parse {
   }
 
   private function type($optional= true) {
+    $t= [];
+    do {
+      $t[]= $this->type0($optional);
+      if ('|' === $this->token->symbol->id) {
+        $this->token= $this->advance();
+        continue;
+      }
+      return 1 === sizeof($t) ? $t[0] : new UnionType($t);
+    } while (true);
+  }
+
+  private function type0($optional) {
     if ('?' === $this->token->symbol->id) {
       $this->token= $this->advance();
       $type= '?'.$this->scope->resolve($this->token->value);
