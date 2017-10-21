@@ -329,7 +329,8 @@ abstract class Emitter {
           $this->annotations($annotations);
           $this->out->write('],');
         }
-        $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'],');
+        $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
+        $this->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
       }
       $this->out->write('],');
     }
@@ -367,7 +368,8 @@ abstract class Emitter {
     $this->meta[0][self::PROPERTY][$node->value[0]]= [
       DETAIL_RETURNS     => $node->value[3] ? $node->value[3]->name() : 'var',
       DETAIL_ANNOTATIONS => $node->value[4] ? $node->value[4]['member'] : [],
-      DETAIL_TARGET_ANNO => []
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
     ];
 
     $this->out->write(implode(' ', $node->value[1]).' $'.$node->value[0]);
@@ -380,10 +382,11 @@ abstract class Emitter {
 
   // [$name, $modifiers, $signature, $annotations, $statements]
   protected function emitMethod($node) {
-    $this->meta[0][self::METHOD][$node->value[0]]= [
+    $meta= [
       DETAIL_RETURNS     => $node->value[2][1] ? $node->value[2][1]->name() : 'var',
       DETAIL_ANNOTATIONS => isset($node->value[3]['member']) ? $node->value[3]['member'] : [],
       DETAIL_TARGET_ANNO => isset($node->value[3]['param']) ? $node->value[3]['param'] : [],
+      DETAIL_ARGUMENTS   => []
     ];
 
     $declare= $promote= $params= '';
@@ -392,6 +395,7 @@ abstract class Emitter {
         $declare= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
       }
+      $meta[DETAIL_ARGUMENTS][]= $param[2] ? $param[2]->name() : 'var';
     }
     $this->out->write($declare);
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
@@ -407,6 +411,8 @@ abstract class Emitter {
       $this->emit($node->value[4]);
       $this->out->write('}');
     }
+
+    $this->meta[0][self::METHOD][$node->value[0]]= $meta;
   }
 
   protected function emitBraced($node) {
