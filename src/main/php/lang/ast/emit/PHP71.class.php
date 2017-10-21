@@ -11,18 +11,8 @@
  * @see  https://wiki.php.net/rfc/iterable
  */
 class PHP71 extends \lang\ast\Emitter {
+  protected $unsupported= [
+    'object'   => 72
+  ];
 
-  private function type($name) {
-    static $unsupported= ['object' => 72];
-
-    return isset($unsupported[$name]) ? null : $name;
-  }
-
-  protected function paramType($name) {
-    return $this->type($name);
-  }
-
-  protected function returnType($name) {
-    return $this->type($name);
-  }
 }

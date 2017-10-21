@@ -9,25 +9,15 @@
  * @see  https://wiki.php.net/rfc/use_function - Not yet implemented
  */
 class PHP56 extends \lang\ast\Emitter {
-
-  protected function type($name) {
-    static $unsupported= [
-      'object'   => 72,
-      'void'     => 71,
-      'iterable' => 71,
-      'string'   => 70,
-      'int'      => 70,
-      'bool'     => 70,
-      'float'    => 70
-    ];
-
-    if ('?' === $name{0} || isset($unsupported[$name])) return null;
-    return $name;
-  }
-
-  protected function paramType($name) {
-    return $this->type($name);
-  }
+  protected $unsupported= [
+    'object'   => 72,
+    'void'     => 71,
+    'iterable' => 71,
+    'string'   => 70,
+    'int'      => 70,
+    'bool'     => 70,
+    'float'    => 70
+  ];
 
   protected function returnType($name) {
     return null;

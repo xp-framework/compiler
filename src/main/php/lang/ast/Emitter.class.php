@@ -12,6 +12,7 @@ abstract class Emitter {
   protected $out;
   protected $line= 1;
   protected $meta= [];
+  protected $unsupported= [];
 
   /**
    * Selects the correct emitter for a given runtime version
@@ -87,6 +88,21 @@ abstract class Emitter {
   }
 
   /**
+   * Returns type literal or NULL
+   *
+   * @param  string $name
+   * @return string
+   */
+  protected function type($name) {
+    return (
+      '?' === $name{0} ||                     // nullable
+      0 === strncmp($name, 'function', 8) ||  // function
+      strstr($name, '|') ||                   // union
+      isset($this->unsupported[$name])
+    ) ? null : $name;
+  }
+
+  /**
    * Search a given scope recursively for nodes with a given arity
    *
    * @param  lang.ast.Node|lang.ast.Node[] $arg
@@ -111,9 +127,13 @@ abstract class Emitter {
     }
   }
 
-  protected abstract function returnType($name);
+  protected function paramType($name) {
+    return $this->type($name);
+  }
 
-  protected abstract function paramType($name);
+  protected function returnType($name) {
+    return $this->type($name);
+  }
 
   protected function catches($catch) {
     $this->out->write('catch('.implode('|', $catch[0]).' $'.$catch[1].') {');
@@ -122,7 +142,9 @@ abstract class Emitter {
   }
 
   protected function param($param) {
-    $param[2] && $this->out->write($this->paramType($param[2]->literal()).' ');
+    if ($param[2] && $t= $this->paramType($param[2]->literal())) {
+      $this->out->write($t.' ');
+    }
     if ($param[3]) {
       $this->out->write('... $'.$param[0]);
     } else {
@@ -245,7 +267,7 @@ abstract class Emitter {
     $this->out->write('function('); 
     $this->params($node->value[0][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[0][1])) {
+    if ($node->value[0][1] && $t= $this->returnType($node->value[0][1]->literal())) {
       $this->out->write(':'.$t);
     }
     if (isset($node->value[1])) {
@@ -375,7 +397,7 @@ abstract class Emitter {
     $this->out->write(implode(' ', $node->value[1]).' function '.$node->value[0].'(');
     $this->params($node->value[2][0]);
     $this->out->write(')');
-    if ($t= $this->returnType($node->value[2][1])) {
+    if ($node->value[2][1] && $t= $this->returnType($node->value[2][1]->literal())) {
       $this->out->write(':'.$t);
     }
     if (null === $node->value[4]) {

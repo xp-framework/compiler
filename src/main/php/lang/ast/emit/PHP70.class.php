@@ -13,21 +13,11 @@
  * @see  https://wiki.php.net/rfc/scalar_type_hints_v5
  */
 class PHP70 extends \lang\ast\Emitter {
-
-  protected function type($name) {
-    static $unsupported= ['void' => 71, 'iterable' => 71, 'object' => 72];
-
-    if ('?' === $name{0} || isset($unsupported[$name])) return null;
-    return $name;
-  }
-
-  protected function paramType($name) {
-    return $this->type($name);
-  }
-
-  protected function returnType($name) {
-    return $this->type($name);
-  }
+  protected $unsupported= [
+    'object'   => 72,
+    'void'     => 71,
+    'iterable' => 71
+  ];
 
   protected function catches($catch) {
     $last= array_pop($catch[0]);
