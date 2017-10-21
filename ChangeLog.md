@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #6: instanceof does not resolve class names - @thekid
 * Implemented support for union types, e.g. `int|float`, as supported
   by [this PHP RFC](https://wiki.php.net/rfc/union_types)
   (@thekid)
