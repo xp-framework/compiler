@@ -3,7 +3,7 @@
 /**
  * Array types
  *
- * @see  https://docs.hhvm.com/hack/types/type-system
+ * @see  https://docs.hhvm.com/hack/types/summary-table
  */
 class ArrayTypesTest extends EmittingTest {
 
