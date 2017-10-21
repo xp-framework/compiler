@@ -1,14 +1,12 @@
 <?php namespace lang\ast;
 
-use util\Objects;
-
-class GenericType implements \lang\Value {
+class GenericType extends Type {
   public $base, $components;
 
   /**
    * Creates a new type
    *
-   * @param  string $type
+   * @param  string $base
    * @param  self[] $components
    */
   public function __construct($base, $components= []) {
@@ -17,36 +15,14 @@ class GenericType implements \lang\Value {
   }
 
   /** @return string */
+  public function literal() { return literal($this->name()); }
+
+  /** @return string */
   public function name() {
-    return $this->base.($this->components
-      ? '<'.implode(', ', array_map([Objects::class, 'stringOf'], $this->components)).'>'
-      : ''
-    );
-  }
-
-  /** @return string */
-  public function toString() {
-    return $this->base.($this->components
-      ? '<'.implode(', ', array_map([Objects::class, 'stringOf'], $this->components)).'>'
-      : ''
-    );
-  }
-
-  /** @return string */
-  public function hashCode() {
-    return Objects::hashOf([$this->base, $this->components]);
-  }
-
-  /**
-   * Compare
-   *
-   * @param  var $value
-   * @return int
-   */
-  public function compareTo($value) {
-    return $value instanceof self
-      ? Objects::compare([$this->base, $this->components], [$value->base, $value->components])
-      : 1
-    ;
+    $n= '';
+    foreach ($this->components as $type) {
+      $n.= ', '.$type->name();
+    }
+    return $this->base.'<'.substr($n, 2).'>';
   }
 }

@@ -13,10 +13,10 @@ class Type implements \lang\Value {
   public function name() { return strtr(ltrim($this->literal, '\\'), '\\', '.'); }
 
   /** @return string */
-  public function toString() { return $this->literal; }
+  public function toString() { return $this->name(); /* return nameof($this).'('.$this->name().')'; */ }
 
   /** @return string */
-  public function hashCode() { return crc32($this->literal); }
+  public function hashCode() { return crc32($this->name()); }
 
   /**
    * Compare
@@ -25,6 +25,6 @@ class Type implements \lang\Value {
    * @return int
    */
   public function compareTo($value) {
-    return $value instanceof self ? strcmp($this->literal, $value->literal) : 1;
+    return $value instanceof self ? strcmp($this->name(), $value->name()) : 1;
   }
 }

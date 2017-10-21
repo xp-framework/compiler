@@ -705,6 +705,28 @@ class Parse {
       $this->token= $this->advance();
       $type= '?'.$this->scope->resolve($this->token->value);
       $this->token= $this->advance();
+    } else if ('(' === $this->token->symbol->id) {
+      $this->token= $this->advance();
+      $type= $this->type(false);
+      $this->token= $this->advance();
+      return $type;
+    } else if ('function' === $this->token->value) {
+      $this->token= $this->advance();
+      $this->token= $this->expect('(');
+      $signature= [];
+      if (')' !== $this->token->symbol->id) do {
+        $signature[]= $this->type(false);
+        if (',' === $this->token->symbol->id) {
+          $this->token= $this->advance();
+        } else if (')' === $this->token->symbol->id) {
+          break;
+        } else {
+          $this->expect(', or )');
+        }
+      } while (true);
+      $this->token= $this->expect(')');
+      $this->token= $this->expect(':');
+      return new FunctionType($signature, $this->type(false));
     } else if ('name' === $this->token->arity) {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
@@ -731,9 +753,9 @@ class Parse {
       $this->token= $this->expect('>');
 
       return new GenericType($type, $components);
+    } else {
+      return new Type($type);
     }
-
-    return new Type($type);
   }
 
   private function parameters() {
