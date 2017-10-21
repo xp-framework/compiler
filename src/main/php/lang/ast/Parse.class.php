@@ -700,7 +700,7 @@ class Parse {
     });
   }
 
-  private function type() {
+  private function type($optional= true) {
     if ('?' === $this->token->symbol->id) {
       $this->token= $this->advance();
       $type= '?'.$this->scope->resolve($this->token->value);
@@ -708,16 +708,26 @@ class Parse {
     } else if ('name' === $this->token->arity) {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
-    } else {
+    } else if ($optional) {
       return null;
+    } else {
+      $this->expect('type name');
     }
 
     if ('<' === $this->token->symbol->id) {
+      $this->token= $this->advance();
       $components= [];
       do {
-        $this->token= $this->advance();
-        $components[]= $this->type();
-      } while ('>' !== $this->token->symbol->id);
+        $components[]= $this->type(false);
+        if (',' === $this->token->symbol->id) {
+          $this->token= $this->advance();
+        } else if ('>' === $this->token->symbol->id) {
+          break;
+        } else if ('>>' === $this->token->symbol->id) {
+          $this->queue[]= $this->token= new Node($this->symbol('>'));
+          break;
+        }
+      } while (true);
       $this->token= $this->expect('>');
 
       return new GenericType($type, $components);

@@ -24,4 +24,13 @@ class ArrayTypesTest extends EmittingTest {
 
     $this->assertEquals('[:int]', $t->getField('test')->getType()->getName());
   }
+
+  #[@test]
+  public function nested_map_type() {
+    $t= $this->type('class <T> {
+      private array<string, array<int>> $test;
+    }');
+
+    $this->assertEquals('[:int[]]', $t->getField('test')->getType()->getName());
+  }
 }
