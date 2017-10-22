@@ -392,7 +392,7 @@ abstract class Emitter {
     $declare= $promote= $params= '';
     foreach ($node->value[2][0] as $param) {
       if (isset($param[4])) {
-        $declare= $param[4].' $'.$param[0].';';
+        $declare.= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
         $this->meta[0][self::PROPERTY][$param[0]]= [
           DETAIL_RETURNS     => $param[2] ? $param[2]->name() : 'var',

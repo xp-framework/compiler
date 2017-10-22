@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.9.1 / 2017-10-21
+
+* Fixed promoted argument types not being recorded - @thekid
+
 ## 0.9.0 / 2017-10-21
 
 * Added support for `$arg ==> $arg++` lambdas without argument braces
