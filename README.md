@@ -53,7 +53,7 @@ The following table gives an overview of the current implementation status. The 
 | **[Hack](https://docs.hhvm.com/hack/)**                                     |          |          |          |          |
 | • [Function types](https://docs.hhvm.com/hack/callables/introduction)       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
 | • [Array and map types](https://docs.hhvm.com/hack/types/summary-table)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [Lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda) (a.k.a arrow functions) | ✔ | ✔ | ✔      | ✔       |
+| • [Lambdas / arrow functions](wiki/Arrow-functions)                         | ✔      | ✔       | ✔      | ✔       |
 | • [Attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔      | ✔       |
 | • [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |
 |                                                                             |          |          |          |          |
