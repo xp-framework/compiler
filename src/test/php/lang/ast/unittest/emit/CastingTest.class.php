@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\ClassCastException;
+
 class CastingTest extends EmittingTest {
 
   #[@test, @values([
@@ -63,5 +65,26 @@ class CastingTest extends EmittingTest {
       }',
       $this
     ));
+  }
+
+  #[@test]
+  public function int_array_cast() {
+    $this->assertEquals([1, 2, 3], $this->run(
+      'class <T> {
+        public function run($value) {
+          return (array<int>)$value;
+        }
+      }',
+      [1, 2, 3]
+    ));
+  }
+
+  #[@test, @expect(ClassCastException::class)]
+  public function cannot_cast_object_to_int_array() {
+    $this->run('class <T> {
+      public function run() {
+        return (array<int>)$this;
+      }
+    }');
   }
 }

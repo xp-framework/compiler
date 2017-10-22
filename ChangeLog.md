@@ -3,7 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Added support for casting value types - @thekid
+* Added support for casting value and array types - @thekid
 
 ## 0.9.1 / 2017-10-21
 

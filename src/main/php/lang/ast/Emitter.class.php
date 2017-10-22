@@ -230,13 +230,16 @@ abstract class Emitter {
   }
 
   protected function emitCast($node) {
-    if ('\\' === $node->value[0]{0}) {
+    static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true];
+
+    $name= $node->value[0]->name();
+    if (isset($native[$name])) {
+      $this->out->write('('.$node->value[0]->literal().')');
+      $this->emit($node->value[1]);
+    } else {
       $this->out->write('cast(');
       $this->emit($node->value[1]);
-      $this->out->write(','.$node->value[0].'::class)');
-    } else {
-      $this->out->write('('.$node->value[0].')');
-      $this->emit($node->value[1]);
+      $this->out->write(',\''.$name.'\')');
     }
   }
 

@@ -179,16 +179,9 @@ class Parse {
         $skipped[]= $this->token;
       }
 
-      // (int)$i
-      if (4 === sizeof($skipped) && 'name' === $skipped[1]->arity) {
-        $node->arity= 'cast';
-        $node->value= [$this->scope->resolve($skipped[1]->value), $this->expression(0)];
-        return $node;
-      }
-
       $this->queue= array_merge($skipped, $this->queue);
 
-      // ($a) ==> $a + 1 vs. ($a ?? $b)->invoke();
+      // `($a) ==> $a + 1` vs. `(int)$a` vs. `($a ?? $b)->invoke()`;
       if (':' ===  $this->token->value || '==>' === $this->token->value) {
         $node->arity= 'lambda';
 
@@ -196,6 +189,14 @@ class Parse {
         $signature= $this->signature();
         $this->token= $this->advance();
         $node->value= [$signature, $this->expression(0)];
+      } else if ('name' === $skipped[1]->arity) {
+        $node->arity= 'cast';
+
+        $this->token= $this->advance();
+        $this->token= $this->expect('(');
+        $type= $this->type0(false);
+        $this->token= $this->expect(')');
+        $node->value= [$type, $this->expression(0)];
       } else {
         $node->arity= 'braced';
 
