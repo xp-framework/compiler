@@ -106,4 +106,15 @@ class LambdasTest extends EmittingTest {
 
     $this->assertEquals(2, $r(1));
   }
+
+  #[@test]
+  public function without_params() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return () ==> 1;
+      }
+    }');
+
+    $this->assertEquals(1, $r());
+  }
 }
