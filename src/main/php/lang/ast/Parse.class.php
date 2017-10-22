@@ -169,21 +169,25 @@ class Parse {
 
       // Look ahead, resolving ambiguities
       $skipped= [$node, $this->token];
-      while (')' !== $this->token->symbol->id) {
+      $level= 1;
+      while ($level > 0 && null !== $this->token->value) {
+        if ('(' === $this->token->symbol->id) {
+          $level++;
+        } else if (')' === $this->token->symbol->id) {
+          $level--;
+        }
         $this->token= $this->advance();
         $skipped[]= $this->token;
       }
-      $this->token= $this->advance();
 
       // (int)$i
-      if (3 === sizeof($skipped) && 'name' === $skipped[1]->arity) {
+      if (4 === sizeof($skipped) && 'name' === $skipped[1]->arity) {
         $node->arity= 'cast';
         $node->value= [$this->scope->resolve($skipped[1]->value), $this->expression(0)];
         return $node;
       }
 
-      $skipped[]= $this->token;
-      $this->queue= $skipped;
+      $this->queue= array_merge($skipped, $this->queue);
 
       // ($a) ==> $a + 1 vs. ($a ?? $b)->invoke();
       if (':' ===  $this->token->value || '==>' === $this->token->value) {
