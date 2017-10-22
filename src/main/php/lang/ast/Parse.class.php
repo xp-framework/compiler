@@ -164,9 +164,14 @@ class Parse {
     $this->assignment('>>=');
     $this->assignment('<<=');
 
+    // This is ambiguous:
+    //
+    // - An arrow function `($a) ==> $a + 1`
+    // - An expression surrounded by parentheses `($a ?? $b)->invoke()`;
+    // - A cast `(int)$a`
+    //
+    // Resolve by looking ahead after the closing ")"
     $this->prefix('(', function($node) {
-
-      // Look ahead, resolving ambiguities
       $skipped= [$node, $this->token];
       $level= 1;
       while ($level > 0 && null !== $this->token->value) {
@@ -178,10 +183,8 @@ class Parse {
         $this->token= $this->advance();
         $skipped[]= $this->token;
       }
-
       $this->queue= array_merge($skipped, $this->queue);
 
-      // `($a) ==> $a + 1` vs. `(int)$a` vs. `($a ?? $b)->invoke()`;
       if (':' ===  $this->token->value || '==>' === $this->token->value) {
         $node->arity= 'lambda';
 
