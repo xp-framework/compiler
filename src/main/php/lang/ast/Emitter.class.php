@@ -234,11 +234,9 @@ abstract class Emitter {
 
     $name= $node->value[0]->name();
     if ('?' === $name{0}) {
-      $t= $this->temp();
-      $this->out->write('(null === ('.$t.'= ');
+      $this->out->write('cast(');
       $this->emit($node->value[1]);
-      $this->out->write(') ? null : ');
-      $this->out->write(isset($native[$name]) ? '('.$node->value[0]->literal().')'.$t.')' : 'cast('.$t.', \''.substr($name, 1).'\'))');
+      $this->out->write(',\''.$name.'\', false)');
     } else if (isset($native[$name])) {
       $this->out->write('('.$node->value[0]->literal().')');
       $this->emit($node->value[1]);
