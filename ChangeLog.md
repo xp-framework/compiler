@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for casting value types - @thekid
+
 ## 0.9.1 / 2017-10-21
 
 * Fixed promoted argument types not being recorded - @thekid

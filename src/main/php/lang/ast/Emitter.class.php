@@ -230,8 +230,14 @@ abstract class Emitter {
   }
 
   protected function emitCast($node) {
-    $this->out->write('('.$node->value[0].')');
-    $this->emit($node->value[1]);
+    if ('\\' === $node->value[0]{0}) {
+      $this->out->write('cast(');
+      $this->emit($node->value[1]);
+      $this->out->write(','.$node->value[0].'::class)');
+    } else {
+      $this->out->write('('.$node->value[0].')');
+      $this->emit($node->value[1]);
+    }
   }
 
   protected function emitArray($node) {
