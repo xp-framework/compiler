@@ -29,7 +29,7 @@ use lang\Type;
 class HelloWorld {
   public const GREETING = 'Hello';
 
-  public static function main(array $args): void {
+  public static function main(array<string> $args): void {
     $greet= ($to, $from) ==> self::GREETING.' '.$to.' from '.$from;
     $author= Type::forName(self::class)->getAnnotation('author');
 
@@ -47,7 +47,7 @@ The following table gives an overview of the current implementation status. The 
 | --------------------------------------------------------------------------- | -------- | -------- | -------- | -------- |
 | **Future** - these might or might not be part of PHP next                   |          |          |          |          |
 | • [Union types](https://wiki.php.net/rfc/union_types)                       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)    | ✔      | ✔      | ✔       | ✔       |
+| • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)    | ✔      | ✔       | ✔      | ✔       |
 | • [Property types](https://wiki.php.net/rfc/property_type_hints)            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
 |                                                                             |          |          |          |          |
 | **[Hack](https://docs.hhvm.com/hack/)**                                     |          |          |          |          |
