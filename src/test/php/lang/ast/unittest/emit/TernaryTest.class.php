@@ -25,4 +25,16 @@ class TernaryTest extends EmittingTest {
       $value
     ));
   }
+
+  #[@test, @values([[['OK']], [[]]])]
+  public function null_coalesce($value) {
+    $this->assertEquals('OK', $this->run(
+      'class <T> {
+        public function run($value) {
+          return $value[0] ?? "OK";
+        }
+      }',
+      $value
+    ));
+  }
 }
