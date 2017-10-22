@@ -172,6 +172,13 @@ class Parse {
     //
     // Resolve by looking ahead after the closing ")"
     $this->prefix('(', function($node) {
+      static $keywords= [
+        'new'      => true,
+        'clone'    => true,
+        'yield'    => true,
+        'function' => true,
+      ];
+
       $skipped= [$node, $this->token];
       $level= 1;
       while ($level > 0 && null !== $this->token->value) {
@@ -192,7 +199,7 @@ class Parse {
         $signature= $this->signature();
         $this->token= $this->advance();
         $node->value= [$signature, $this->expression(0)];
-      } else if ('?' === $skipped[1]->value || 'name' === $skipped[1]->arity && 'new' !== $skipped[1]->value) {
+      } else if ('?' === $skipped[1]->value || 'name' === $skipped[1]->arity && !isset($keywords[$skipped[1]->value])) {
         $node->arity= 'cast';
 
         $this->token= $this->advance();
