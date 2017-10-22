@@ -108,6 +108,18 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
+  public function without_braces_as_argument() {
+    $r= $this->run('class <T> {
+      private function apply($f, ... $args) { return $f(...$args); }
+      public function run() {
+        return $this->apply($a ==> $a + 1, 2);
+      }
+    }');
+
+    $this->assertEquals(3, $r);
+  }
+
+  #[@test]
   public function without_params() {
     $r= $this->run('class <T> {
       public function run() {

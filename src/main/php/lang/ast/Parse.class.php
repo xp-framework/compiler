@@ -96,7 +96,6 @@ class Parse {
       $signature= [[[$left->value, false, null, false, false, null]], null];
       $node->value= [$signature, $this->expression(0)];
       $node->arity= 'lambda';
-      $this->token= new Node($this->symbol(';'));
       return $node;
     });
 
