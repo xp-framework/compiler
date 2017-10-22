@@ -48,7 +48,8 @@ The following table gives an overview of the current implementation status. The 
 | **Future** - these might or might not be part of PHP next                   |          |          |          |          |
 | • [Union types](https://wiki.php.net/rfc/union_types)                       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
 | • [Property types](https://wiki.php.net/rfc/property_type_hints)            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [Array and function types](https://docs.hhvm.com/hack/types/summary-table)| ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
+| • [Function types](https://docs.hhvm.com/hack/callables/introduction)       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
+| • [Array and map types](https://docs.hhvm.com/hack/types/summary-table)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
 | • [Hack lambdas (==>)](https://docs.hhvm.com/hack/operators/lambda) (a.k.a arrow functions) | ✔ | ✔ | ✔ | ✔       |
 | • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)    | ✔      | ✔      | ✔       | ✔       |
 | • [Hack attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔ | ✔       |
