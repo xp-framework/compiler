@@ -5,6 +5,8 @@ XP Compiler ChangeLog
 
 ## 0.9.0 / 2017-10-21
 
+* Added support for `$arg ==> $arg++` lambdas without argument braces
+  (@thekid)
 * Fixed issue #8: Member types missing for constructor argument promotion
   (@thekid)
 * Fixed issue #7: Ternary operator broken - @thekid

@@ -95,4 +95,15 @@ class LambdasTest extends EmittingTest {
 
     $this->assertEquals('lang.Value', typeof($r)->returns()->getName());
   }
+
+  #[@test]
+  public function without_braces() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return $a ==> $a + 1;
+      }
+    }');
+
+    $this->assertEquals(2, $r(1));
+  }
 }

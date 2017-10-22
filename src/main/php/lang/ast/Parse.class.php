@@ -92,6 +92,14 @@ class Parse {
       return $node;
     });
 
+    $this->infix('==>', 80, function($node, $left) {
+      $signature= [[[$left->value, false, null, false, false, null]], null];
+      $node->value= [$signature, $this->expression(0)];
+      $node->arity= 'lambda';
+      $this->token= new Node($this->symbol(';'));
+      return $node;
+    });
+
     $this->infix('(', 80, function($node, $left) {
       $arguments= $this->arguments();
       $this->token= $this->expect(')');
