@@ -53,7 +53,7 @@ The following table gives an overview of the current implementation status. The 
 | **[Hack](https://docs.hhvm.com/hack/)**                                     |          |          |          |          |
 | • [Function types](https://docs.hhvm.com/hack/callables/introduction)       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
 | • [Array and map types](https://docs.hhvm.com/hack/types/summary-table)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [Lambdas / arrow functions](/xp-framework/compiler/wiki/Arrow-functions)  | ✔      | ✔       | ✔      | ✔       |
+| • [Lambdas / arrow functions](https://github.com/xp-framework/compiler/wiki/Arrow-functions)| ✔ | ✔ | ✔ | ✔       |
 | • [Attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔      | ✔       |
 | • [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |
 |                                                                             |          |          |          |          |
