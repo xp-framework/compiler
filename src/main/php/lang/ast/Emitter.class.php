@@ -394,6 +394,12 @@ abstract class Emitter {
       if (isset($param[4])) {
         $declare= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
+        $this->meta[0][self::PROPERTY][$param[0]]= [
+          DETAIL_RETURNS     => $param[2] ? $param[2]->name() : 'var',
+          DETAIL_ANNOTATIONS => [],
+          DETAIL_TARGET_ANNO => [],
+          DETAIL_ARGUMENTS   => []
+        ];
       }
       $meta[DETAIL_ARGUMENTS][]= $param[2] ? $param[2]->name() : 'var';
     }

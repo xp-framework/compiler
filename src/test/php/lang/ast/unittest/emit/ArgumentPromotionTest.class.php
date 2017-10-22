@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\Primitive;
+
 /**
  * Argument promotion
  *
@@ -50,5 +52,14 @@ class ArgumentPromotionTest extends EmittingTest {
       }
     }');
     $this->assertEquals('test', $r);
+  }
+
+  #[@test]
+  public function type_information() {
+    $t= $this->type('class <T> {
+      public function __construct(private int $id) {
+      }
+    }');
+    $this->assertEquals(Primitive::$INT, $t->getField('id')->getType());
   }
 }

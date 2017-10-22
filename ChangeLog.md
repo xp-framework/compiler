@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.9.0 / 2017-10-21
+
+* Fixed issue #8: Member types missing for constructor argument promotion
+  (@thekid)
 * Fixed issue #7: Ternary operator broken - @thekid
 * Fixed issue #6: instanceof does not resolve class names - @thekid
 * Implemented support for union types, e.g. `int|float`, as supported
