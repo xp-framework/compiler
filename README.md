@@ -43,42 +43,42 @@ Features supported
 
 The following table gives an overview of the current implementation status. The goal is to have check marks everywhere!
 
-| Feature                                                                     | PHP 5.6  | PHP 7.0  | PHP 7.1  | PHP 7.2  |
-| --------------------------------------------------------------------------- | -------- | -------- | -------- | -------- |
-| **Future** - these might or might not be part of PHP next                   |          |          |          |          |
-| • [Union types](https://wiki.php.net/rfc/union_types)                       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)    | ✔      | ✔       | ✔      | ✔       |
-| • [Property types](https://wiki.php.net/rfc/property_type_hints)            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-|                                                                             |          |          |          |          |
-| **[Hack](https://docs.hhvm.com/hack/)**                                     |          |          |          |          |
-| • [Function types](https://docs.hhvm.com/hack/callables/introduction)       | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [Array and map types](https://docs.hhvm.com/hack/types/summary-table)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
-| • [Lambdas / arrow functions](https://github.com/xp-framework/compiler/wiki/Arrow-functions)| ✔ | ✔ | ✔ | ✔       |
-| • [Attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations) | ✔ | ✔ | ✔      | ✔       |
+| Feature                                                                                     | PHP 5.6  | PHP 7.0  | PHP 7.1  | PHP 7.2  |
+| ------------------------------------------------------------------------------------------- | -------- | -------- | -------- | -------- |
+| **Future** - these might or might not be part of PHP next                                   |          |          |          |          |
+| • [Union types](https://github.com/xp-framework/compiler/wiki/Type-system#type-unions)      | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
+| • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)                    | ✔      | ✔       | ✔      | ✔       |
+| • [Property types](https://wiki.php.net/rfc/property_type_hints)                            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
+|                                                                                             |          |          |          |          |
+| **[Hack](https://docs.hhvm.com/hack/)**                                                     |          |          |          |          |
+| • [Function types](https://github.com/xp-framework/compiler/wiki/Type-system#functions)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
+| • [Array and map types](https://github.com/xp-framework/compiler/wiki/Type-system#arrays)   | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    |
+| • [Lambdas / arrow functions](https://github.com/xp-framework/compiler/wiki/Arrow-functions)| ✔      | ✔       | ✔      | ✔       |
+| • [Attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations)      | ✔      | ✔       | ✔      | ✔       |
 | • [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔ |
-|                                                                             |          |          |          |          |
-| **[PHP 7.2](https://wiki.php.net/rfc#php_72)**                              |          |          |          |          |
-| • [Object type](https://wiki.php.net/rfc/object-typehint)                   | ✔(1)   | ✔(1)   | ✔(1)    | *native*  |
-|                                                                             |          |          |          |          |
-| **[PHP 7.1](https://wiki.php.net/rfc#php_71)**                              |          |          |          |          |
-| • [Multiple catch](https://wiki.php.net/rfc/multiple-catch)                 | ✔      | ✔      | *native* | *native*  |
-| • [Void](https://wiki.php.net/rfc/void_return_type)                         | ✔(1)   | ✔(1)   | *native* | *native*  |
-| • [Iterable](https://wiki.php.net/rfc/iterable)                             | ✔(1)   | ✔(1)   | *native* | *native*  |
-| • [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)     | ✔(1)   | ✔(1)   | *native* | *native*  |
-| • [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)           | ✔      | ✔      | *native* | *native*  |
-| • [Nullabe types](https://wiki.php.net/rfc/nullable_types)                  | ✔(1)   | ✔(1)   | *native* | *native*  |
-|                                                                             |          |          |          |          |
-| **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                              |          |          |          |          |
-| • [Grouped use](https://wiki.php.net/rfc/group_use_declarations)            | ✔(2)   | ✔(2)    | ✔(2)   | ✔(2)    |
-| • [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)              | ✔      | *native* | *native* | *native*  |
-| • [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator) | ✔      | *native* | *native* | *native*  |
-| • [Scalar types](https://wiki.php.net/rfc/scalar_type_hints_v5)             | ✔(1)   | *native* | *native* | *native*  |
-| • [Return types](https://wiki.php.net/rfc/return_types)                     | ✔(1)   | *native* | *native* | *native*  |
-| • [Variable syntax](https://wiki.php.net/rfc/uniform_variable_syntax)       | ✔      | *native* | *native* | *native*  |
-| • [Anonymous classes](https://wiki.php.net/rfc/anonymous_classes)           | ✔      | *native* | *native* | *native*  |
-| • [Generator "yield from"](https://wiki.php.net/rfc/generator-delegation)   | ✔(3)   | *native* | *native* | *native*  |
-| • [Generator return](https://wiki.php.net/rfc/generator-return-expressions) | ✖      | *native* | *native* | *native*  |
-| • [Keywords as methods](https://wiki.php.net/rfc/context_sensitive_lexer)   | ✖      | *native* | *native* | *native*  |
+|                                                                                             |          |          |          |          |
+| **[PHP 7.2](https://wiki.php.net/rfc#php_72)**                                              |          |          |          |          |
+| • [Object type](https://wiki.php.net/rfc/object-typehint)                                   | ✔(1)   | ✔(1)   | ✔(1)    | *native*  |
+|                                                                                             |          |          |          |          |
+| **[PHP 7.1](https://wiki.php.net/rfc#php_71)**                                              |          |          |          |          |
+| • [Multiple catch](https://wiki.php.net/rfc/multiple-catch)                                 | ✔      | ✔      | *native* | *native*  |
+| • [Void](https://github.com/xp-framework/compiler/wiki/Type-system#void)                    | ✔(1)   | ✔(1)   | *native* | *native*  |
+| • [Iterable](https://github.com/xp-framework/compiler/wiki/Type-system#iteration)           | ✔(1)   | ✔(1)   | *native* | *native*  |
+| • [Constant modifiers](https://wiki.php.net/rfc/class_const_visibility)                     | ✔(1)   | ✔(1)   | *native* | *native*  |
+| • [Short list syntax](https://wiki.php.net/rfc/short_list_syntax)                           | ✔      | ✔      | *native* | *native*  |
+| • [Nullabe types](https://wiki.php.net/rfc/nullable_types)                                  | ✔(1)   | ✔(1)   | *native* | *native*  |
+|                                                                                             |          |          |          |          |
+| **[PHP 7.0](https://wiki.php.net/rfc#php_70)**                                              |          |          |          |          |
+| • [Grouped use](https://wiki.php.net/rfc/group_use_declarations)                            | ✔(2)   | ✔(2)    | ✔(2)   | ✔(2)    |
+| • [Null coalesce (??)](https://wiki.php.net/rfc/isset_ternary)                              | ✔      | *native* | *native* | *native*  |
+| • [Comparison (<=>)](https://wiki.php.net/rfc/combined-comparison-operator)                 | ✔      | *native* | *native* | *native*  |
+| • [Scalar types](https://wiki.php.net/rfc/scalar_type_hints_v5)                             | ✔(1)   | *native* | *native* | *native*  |
+| • [Return types](https://wiki.php.net/rfc/return_types)                                     | ✔(1)   | *native* | *native* | *native*  |
+| • [Variable syntax](https://wiki.php.net/rfc/uniform_variable_syntax)                       | ✔      | *native* | *native* | *native*  |
+| • [Anonymous classes](https://wiki.php.net/rfc/anonymous_classes)                           | ✔      | *native* | *native* | *native*  |
+| • [Generator "yield from"](https://wiki.php.net/rfc/generator-delegation)                   | ✔(3)   | *native* | *native* | *native*  |
+| • [Generator return](https://wiki.php.net/rfc/generator-return-expressions)                 | ✖      | *native* | *native* | *native*  |
+| • [Keywords as methods](https://wiki.php.net/rfc/context_sensitive_lexer)                   | ✖      | *native* | *native* | *native*  |
 
 Notes:
 
