@@ -91,8 +91,10 @@ class TypeDeclarationTest extends EmittingTest {
     $t= $this->type('class <T> {
       private $items;
 
-      public function __construct($items) {
-        $this->items= $items;
+      public static function new($items) {
+        $self= new self();
+        $self->items= $items;
+        return $self;
       }
 
       public function forEach(callable $callback) {
@@ -100,7 +102,7 @@ class TypeDeclarationTest extends EmittingTest {
       }
 
       public static function run($values) {
-        return new self($values)->forEach(function($a) { return $a * 2; });
+        return self::new($values)->forEach(function($a) { return $a * 2; });
       }
     }');
     $this->assertEquals([2, 4, 6], $t->getMethod('run')->invoke(null, [[1, 2, 3]]));

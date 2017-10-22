@@ -19,6 +19,72 @@ class PHP56 extends \lang\ast\Emitter {
     'float'    => 70
   ];
   private $call= [];
+  private static $keywords= [
+    'callable'     => true,
+    'class'        => true,
+    'trait'        => true,
+    'extends'      => true,
+    'implements'   => true,
+    'static'       => true,
+    'abstract'     => true,
+    'final'        => true,
+    'public'       => true,
+    'protected'    => true,
+    'private'      => true,
+    'const'        => true,
+    'enddeclare'   => true,
+    'endfor'       => true,
+    'endforeach'   => true,
+    'endif'        => true,
+    'endwhile'     => true,
+    'and'          => true,
+    'global'       => true,
+    'goto'         => true,
+    'instanceof'   => true,
+    'insteadof'    => true,
+    'interface'    => true,
+    'namespace'    => true,
+    'new'          => true,
+    'or'           => true,
+    'xor'          => true,
+    'try'          => true,
+    'use'          => true,
+    'var'          => true,
+    'exit'         => true,
+    'list'         => true,
+    'clone'        => true,
+    'include'      => true,
+    'include_once' => true,
+    'throw'        => true,
+    'array'        => true,
+    'print'        => true,
+    'echo'         => true,
+    'require'      => true,
+    'require_once' => true,
+    'return'       => true,
+    'else'         => true,
+    'elseif'       => true,
+    'default'      => true,
+    'break'        => true,
+    'continue'     => true,
+    'switch'       => true,
+    'yield'        => true,
+    'function'     => true,
+    'if'           => true,
+    'endswitch'    => true,
+    'finally'      => true,
+    'for'          => true,
+    'foreach'      => true,
+    'declare'      => true,
+    'case'         => true,
+    'do'           => true,
+    'while'        => true,
+    'as'           => true,
+    'catch'        => true,
+    'die'          => true,
+    'self'         => true,
+    'parent'       => true
+  ];
 
   protected function returnType($name) {
     return null;
@@ -75,15 +141,22 @@ class PHP56 extends \lang\ast\Emitter {
     }
   }
 
+  /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitInvoke($node) {
-    if ('braced' === $node->value[0]->arity) {
+    $expr= $node->value[0];
+    if ('braced' === $expr->arity) {
       $t= $this->temp();
       $this->out->write('(('.$t.'=');
-      $this->emit($node->value[0]->value);
+      $this->emit($expr->value);
       $this->out->write(') ? '.$t);
       $this->out->write('(');
       $this->arguments($node->value[1]);
       $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
+    } else if ('scope' === $expr->arity && 'name' === $expr->value[1]->arity && isset(self::$keywords[strtolower($expr->value[1]->value)])) {
+      $this->out->write($expr->value[0].'::{\''.$expr->value[1]->value.'\'}');
+      $this->out->write('(');
+      $this->arguments($node->value[1]);
+      $this->out->write(')');
     } else {
       parent::emitInvoke($node);
     }
@@ -119,84 +192,17 @@ class PHP56 extends \lang\ast\Emitter {
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitMethod($node) {
-    static $keywords= [
-      'callable'     => true,
-      'class'        => true,
-      'trait'        => true,
-      'extends'      => true,
-      'implements'   => true,
-      'static'       => true,
-      'abstract'     => true,
-      'final'        => true,
-      'public'       => true,
-      'protected'    => true,
-      'private'      => true,
-      'const'        => true,
-      'enddeclare'   => true,
-      'endfor'       => true,
-      'endforeach'   => true,
-      'endif'        => true,
-      'endwhile'     => true,
-      'and'          => true,
-      'global'       => true,
-      'goto'         => true,
-      'instanceof'   => true,
-      'insteadof'    => true,
-      'interface'    => true,
-      'namespace'    => true,
-      'new'          => true,
-      'or'           => true,
-      'xor'          => true,
-      'try'          => true,
-      'use'          => true,
-      'var'          => true,
-      'exit'         => true,
-      'list'         => true,
-      'clone'        => true,
-      'include'      => true,
-      'include_once' => true,
-      'throw'        => true,
-      'array'        => true,
-      'print'        => true,
-      'echo'         => true,
-      'require'      => true,
-      'require_once' => true,
-      'return'       => true,
-      'else'         => true,
-      'elseif'       => true,
-      'default'      => true,
-      'break'        => true,
-      'continue'     => true,
-      'switch'       => true,
-      'yield'        => true,
-      'function'     => true,
-      'if'           => true,
-      'endswitch'    => true,
-      'finally'      => true,
-      'for'          => true,
-      'foreach'      => true,
-      'declare'      => true,
-      'case'         => true,
-      'do'           => true,
-      'while'        => true,
-      'as'           => true,
-      'catch'        => true,
-      'die'          => true,
-      'self'         => true,
-      'parent'       => true
-    ];
-
-    if (isset($keywords[strtolower($node->value[0])])) {
-      $this->call[]= $node->value[0];
+    if (isset(self::$keywords[strtolower($node->value[0])])) {
+      $this->call[in_array('static', $node->value[1])][]= $node->value[0];
       $node->value[0]= '__'.$node->value[0];
-    } else if ('__call' === $node->value[0]) {
-      $node->value[0]= '__call0';
+    } else if ('__call' === $node->value[0] || '__callStatic' === $node->value[0]) {
+      $node->value[0].= '0';
     }
     parent::emitMethod($node);
   }
 
   protected function emitClass($node) {
-    $this->call= [];
+    $this->call= [false => [], true => []];
     array_unshift($this->meta, []);
     $this->out->write(implode(' ', $node->value[1]).' class '.$this->declaration($node->value[0]));
     $node->value[2] && $this->out->write(' extends '.$node->value[2]);
@@ -206,12 +212,19 @@ class PHP56 extends \lang\ast\Emitter {
       $this->emit($member);
     }
 
-    if ($this->call) {
+    if ($this->call[false]) {
       $this->out->write('function __call($name, $args) {');
-      foreach ($this->call as $name) {
+      foreach ($this->call[false] as $name) {
         $this->out->write('if (\''.$name.'\' === $name) return $this->__'.$name.'(...$args); else ');
       }
       $this->out->write('return $this->__call0($name, $args); }');
+    }
+    if ($this->call[true]) {
+      $this->out->write('static function __callStatic($name, $args) {');
+      foreach ($this->call[true] as $name) {
+        $this->out->write('if (\''.$name.'\' === $name) return self::__'.$name.'(...$args); else ');
+      }
+      $this->out->write('return self::__callStatic0($name, ...$args); }');
     }
 
     $this->emitMeta($node);
