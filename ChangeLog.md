@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented xp-framework/rfc#326: Cast and nullable types - @thekid
 * Added support for casting value and array types - @thekid
 
 ## 0.9.1 / 2017-10-21

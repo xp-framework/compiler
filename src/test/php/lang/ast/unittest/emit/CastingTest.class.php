@@ -87,4 +87,16 @@ class CastingTest extends EmittingTest {
       }
     }');
   }
+
+  #[@test]
+  public function nullable_string_cast() {
+    $this->assertNull($this->run(
+      'class <T> {
+        public function run($value) {
+          return (?string)$value;
+        }
+      }',
+      null
+    ));
+  }
 }

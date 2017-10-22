@@ -189,7 +189,7 @@ class Parse {
         $signature= $this->signature();
         $this->token= $this->advance();
         $node->value= [$signature, $this->expression(0)];
-      } else if ('name' === $skipped[1]->arity) {
+      } else if ('?' === $skipped[1]->value || 'name' === $skipped[1]->arity) {
         $node->arity= 'cast';
 
         $this->token= $this->advance();
