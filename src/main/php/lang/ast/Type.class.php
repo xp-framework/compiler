@@ -13,7 +13,7 @@ class Type implements \lang\Value {
   public function name() { return strtr(ltrim($this->literal, '\\'), '\\', '.'); }
 
   /** @return string */
-  public function toString() { return $this->name(); /* return nameof($this).'('.$this->name().')'; */ }
+  public function toString() { return nameof($this).'('.$this->name().')'; }
 
   /** @return string */
   public function hashCode() { return crc32($this->name()); }
