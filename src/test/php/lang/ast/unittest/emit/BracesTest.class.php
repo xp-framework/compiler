@@ -42,4 +42,17 @@ class BracesTest extends EmittingTest {
 
     $this->assertEquals('test', $r);
   }
+
+  #[@test]
+  public function nested_braces() {
+    $r= $this->run('class <T> {
+      private function test() { return "test"; }
+
+      public function run() {
+        return (($this->test()));
+      }
+    }');
+
+    $this->assertEquals('test', $r);
+  }
 }
