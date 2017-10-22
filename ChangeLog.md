@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for keywords as methods in PHP 5.6 - @thekid
 * Implemented xp-framework/rfc#326: Cast and nullable types - @thekid
 * Added support for casting value and array types - @thekid
 

@@ -85,4 +85,24 @@ class TypeDeclarationTest extends EmittingTest {
     $m= $this->type('abstract class <T> { abstract function test(); }')->getMethod('test');
     $this->assertTrue(Modifiers::isAbstract($m->getModifiers()));
   }
+
+  #[@test]
+  public function method_with_keyword() {
+    $t= $this->type('class <T> {
+      private $items;
+
+      public function __construct($items) {
+        $this->items= $items;
+      }
+
+      public function forEach(callable $callback) {
+        return array_map($callback, $this->items);
+      }
+
+      public static function run($values) {
+        return new self($values)->forEach(function($a) { return $a * 2; });
+      }
+    }');
+    $this->assertEquals([2, 4, 6], $t->getMethod('run')->invoke(null, [[1, 2, 3]]));
+  }
 }

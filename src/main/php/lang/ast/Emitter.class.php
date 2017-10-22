@@ -323,9 +323,13 @@ abstract class Emitter {
     $this->out->write('{');
     foreach ($node->value[4] as $member) {
       $this->emit($member);
-      $this->out->write("\n");
     }
 
+    $this->emitMeta($node);
+    $this->out->write('} '.$node->value[0].'::__init();');
+  }
+
+  protected function emitMeta($node) {
     $this->out->write('static function __init() { \xp::$meta[\''.$this->name($node->value[0]).'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->annotations($node->value[5]);
@@ -347,7 +351,7 @@ abstract class Emitter {
       }
       $this->out->write('],');
     }
-    $this->out->write(']; }} '.$node->value[0].'::__init();');
+    $this->out->write(']; }');
   }
 
   protected function emitInterface($node) {

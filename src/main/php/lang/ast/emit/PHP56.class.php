@@ -18,6 +18,7 @@ class PHP56 extends \lang\ast\Emitter {
     'bool'     => 70,
     'float'    => 70
   ];
+  private $call= [];
 
   protected function returnType($name) {
     return null;
@@ -114,5 +115,106 @@ class PHP56 extends \lang\ast\Emitter {
     $this->out->write('foreach (');
     $this->emit($node->value);
     $this->out->write(' as $key => $val) yield $key => $val;');
+  }
+
+  /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
+  protected function emitMethod($node) {
+    static $keywords= [
+      'callable'     => true,
+      'class'        => true,
+      'trait'        => true,
+      'extends'      => true,
+      'implements'   => true,
+      'static'       => true,
+      'abstract'     => true,
+      'final'        => true,
+      'public'       => true,
+      'protected'    => true,
+      'private'      => true,
+      'const'        => true,
+      'enddeclare'   => true,
+      'endfor'       => true,
+      'endforeach'   => true,
+      'endif'        => true,
+      'endwhile'     => true,
+      'and'          => true,
+      'global'       => true,
+      'goto'         => true,
+      'instanceof'   => true,
+      'insteadof'    => true,
+      'interface'    => true,
+      'namespace'    => true,
+      'new'          => true,
+      'or'           => true,
+      'xor'          => true,
+      'try'          => true,
+      'use'          => true,
+      'var'          => true,
+      'exit'         => true,
+      'list'         => true,
+      'clone'        => true,
+      'include'      => true,
+      'include_once' => true,
+      'throw'        => true,
+      'array'        => true,
+      'print'        => true,
+      'echo'         => true,
+      'require'      => true,
+      'require_once' => true,
+      'return'       => true,
+      'else'         => true,
+      'elseif'       => true,
+      'default'      => true,
+      'break'        => true,
+      'continue'     => true,
+      'switch'       => true,
+      'yield'        => true,
+      'function'     => true,
+      'if'           => true,
+      'endswitch'    => true,
+      'finally'      => true,
+      'for'          => true,
+      'foreach'      => true,
+      'declare'      => true,
+      'case'         => true,
+      'do'           => true,
+      'while'        => true,
+      'as'           => true,
+      'catch'        => true,
+      'die'          => true,
+      'self'         => true,
+      'parent'       => true
+    ];
+
+    if (isset($keywords[strtolower($node->value[0])])) {
+      $this->call[]= $node->value[0];
+      $node->value[0]= '__'.$node->value[0];
+    } else if ('__call' === $node->value[0]) {
+      $node->value[0]= '__call0';
+    }
+    parent::emitMethod($node);
+  }
+
+  protected function emitClass($node) {
+    $this->call= [];
+    array_unshift($this->meta, []);
+    $this->out->write(implode(' ', $node->value[1]).' class '.$this->declaration($node->value[0]));
+    $node->value[2] && $this->out->write(' extends '.$node->value[2]);
+    $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
+    $this->out->write('{');
+    foreach ($node->value[4] as $member) {
+      $this->emit($member);
+    }
+
+    if ($this->call) {
+      $this->out->write('function __call($name, $args) {');
+      foreach ($this->call as $name) {
+        $this->out->write('if (\''.$name.'\' === $name) return $this->__'.$name.'(...$args); else ');
+      }
+      $this->out->write('return $this->__call0($name, $args); }');
+    }
+
+    $this->emitMeta($node);
+    $this->out->write('} '.$node->value[0].'::__init();');
   }
 }

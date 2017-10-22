@@ -76,9 +76,9 @@ The following table gives an overview of the current implementation status. The 
 | • [Return types](https://wiki.php.net/rfc/return_types)                                     | ✔(1)   | *native* | *native* | *native*  |
 | • [Variable syntax](https://wiki.php.net/rfc/uniform_variable_syntax)                       | ✔      | *native* | *native* | *native*  |
 | • [Anonymous classes](https://wiki.php.net/rfc/anonymous_classes)                           | ✔      | *native* | *native* | *native*  |
+| • [Keywords as methods](https://wiki.php.net/rfc/context_sensitive_lexer)                   | ✔      | *native* | *native* | *native*  |
 | • [Generator "yield from"](https://wiki.php.net/rfc/generator-delegation)                   | ✔(3)   | *native* | *native* | *native*  |
 | • [Generator return](https://wiki.php.net/rfc/generator-return-expressions)                 | ✖      | *native* | *native* | *native*  |
-| • [Keywords as methods](https://wiki.php.net/rfc/context_sensitive_lexer)                   | ✖      | *native* | *native* | *native*  |
 
 Notes:
 
