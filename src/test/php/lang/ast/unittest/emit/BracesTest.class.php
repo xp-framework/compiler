@@ -16,6 +16,17 @@ class BracesTest extends EmittingTest {
   }
 
   #[@test]
+  public function braces_around_new() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return (new \\util\\Date(250905600))->getTime();
+      }
+    }');
+
+    $this->assertEquals(250905600, $r);
+  }
+
+  #[@test]
   public function no_braces_necessary_around_new() {
     $r= $this->run('class <T> {
       public function run() {
