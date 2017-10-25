@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.0.0 / 2017-10-25
+
 * Indexed type members by name; implementing feature suggested in #10 
   (@thekid)
 * **Heads up:** Implemented syntax for parameter annotations as stated 
