@@ -36,4 +36,16 @@ class ArraysTest extends EmittingTest {
 
     $this->assertEquals([1, 2, 3], $r);
   }
+
+  #[@test]
+  public function destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [$a, $b]= [1, 2];
+        return [$a, $b];
+      }
+    }');
+
+    $this->assertEquals([1, 2], $r);
+  }
 }

@@ -109,7 +109,7 @@ class PHP56 extends \lang\ast\Emitter {
   }
 
   protected function emitAssignment($node) {
-    if ('[' === $node->value[0]->symbol->id) {
+    if ('array' === $node->value[0]->arity) {
       $this->out->write('list(');
       $this->arguments($node->value[0]->value);
       $this->out->write(')');
