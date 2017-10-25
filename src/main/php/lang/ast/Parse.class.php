@@ -811,7 +811,34 @@ class Parse {
     static $promotion= ['private' => true, 'protected' => true, 'public' => true];
 
     $parameters= [];
+    $annotations= [];
     while (')' !== $this->token->symbol->id) {
+      if ('<<' === $this->token->symbol->id) {
+        do {
+          $this->token= $this->advance();
+
+          $annotation= [$this->token->value];
+          $this->token= $this->advance();
+
+          // Parameterized annotation
+          if ('(' === $this->token->symbol->id) {
+            $this->token= $this->expect('(');
+            $annotation[]= $this->expression(0);
+            $this->token= $this->expect(')');
+          }
+
+          $annotations[]= $annotation;
+          if (',' === $this->token->symbol->id) {
+            continue;
+          } else if ('>>' === $this->token->symbol->id) {
+            break;
+          } else {
+            $this->expect(', or >>');
+          }
+        } while (true);
+        $this->token= $this->expect('>>');
+      }
+
       if ('name' === $this->token->arity && isset($promotion[$this->token->value])) {
         $promote= $this->token->value;
         $this->token= $this->advance();
@@ -843,10 +870,11 @@ class Parse {
         $this->token= $this->advance();
         $default= $this->expression(0);
       }
-      $parameters[]= [$name, $byref, $type, $variadic, $promote, $default];
+      $parameters[]= [$name, $byref, $type, $variadic, $promote, $default, $annotations];
 
       if (')' === $this->token->symbol->id) break;
       $this->token= $this->expect(',');
+      $annotations= [];
     }
     return $parameters;
   }
@@ -1020,15 +1048,6 @@ class Parse {
         do {
           $this->token= $this->advance();
 
-          // `$param: inject` vs. `inject`
-          if ('variable' === $this->token->arity) {
-            $target= &$annotations['param'][$this->token->value];
-            $this->token= $this->advance();
-            $this->token= $this->expect(':');
-          } else {
-            $target= &$annotations['member'];
-          }
-
           $annotation= [$this->token->value];
           $this->token= $this->advance();
 
@@ -1039,7 +1058,7 @@ class Parse {
             $this->token= $this->expect(')');
           }
 
-          $target[]= $annotation;
+          $annotations[]= $annotation;
           if (',' === $this->token->symbol->id) {
             continue;
           } else if ('>>' === $this->token->symbol->id) {

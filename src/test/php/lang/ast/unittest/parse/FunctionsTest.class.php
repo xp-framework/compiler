@@ -23,7 +23,7 @@ class FunctionsTest extends ParseTest {
   #[@test, @values(['param', 'protected'])]
   public function with_parameter($name) {
     $this->assertNodes(
-      [['function' => ['a', [[[$name, false, null, false, null, null]], null], []]]],
+      [['function' => ['a', [[[$name, false, null, false, null, null, []]], null], []]]],
       $this->parse('function a($'.$name.') { }')
     );
   }
@@ -31,7 +31,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_reference_parameter() {
     $this->assertNodes(
-      [['function' => ['a', [[['param', true, null, false, null, null]], null], []]]],
+      [['function' => ['a', [[['param', true, null, false, null, null, []]], null], []]]],
       $this->parse('function a(&$param) { }')
     );
   }
@@ -39,7 +39,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function dangling_comma_in_parameter_lists() {
     $this->assertNodes(
-      [['function' => ['a', [[['param', false, null, false, null, null]], null], []]]],
+      [['function' => ['a', [[['param', false, null, false, null, null, []]], null], []]]],
       $this->parse('function a($param, ) { }')
     );
   }
@@ -47,7 +47,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_typed_parameter() {
     $this->assertNodes(
-      [['function' => ['a', [[['param', false, new Type('string'), false, null, null]], null], []]]],
+      [['function' => ['a', [[['param', false, new Type('string'), false, null, null, []]], null], []]]],
       $this->parse('function a(string $param) { }')
     );
   }
@@ -55,7 +55,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_nullable_typed_parameter() {
     $this->assertNodes(
-      [['function' => ['a', [[['param', false, new Type('?string'), false, null, null]], null], []]]],
+      [['function' => ['a', [[['param', false, new Type('?string'), false, null, null, []]], null], []]]],
       $this->parse('function a(?string $param) { }')
     );
   }
@@ -63,7 +63,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_variadic_parameter() {
     $this->assertNodes(
-      [['function' => ['a', [[['param', false, null, true, null, null]], null], []]]],
+      [['function' => ['a', [[['param', false, null, true, null, null, []]], null], []]]],
       $this->parse('function a(... $param) { }')
     );
   }
@@ -71,7 +71,7 @@ class FunctionsTest extends ParseTest {
   #[@test]
   public function with_optional_parameter() {
     $this->assertNodes(
-      [['function' => ['a', [[['param', false, null, false, null, ['null' => 'null']]], null], []]]],
+      [['function' => ['a', [[['param', false, null, false, null, ['null' => 'null'], []]], null], []]]],
       $this->parse('function a($param= null) { }')
     );
   }

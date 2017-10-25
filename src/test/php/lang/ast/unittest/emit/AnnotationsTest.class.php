@@ -64,13 +64,13 @@ class AnnotationsTest extends EmittingTest {
 
   #[@test]
   public function param() {
-    $t= $this->type('class <T> { <<$param: test>> public function fixture($param) { } }');
+    $t= $this->type('class <T> { public function fixture(<<test>> $param) { } }');
     $this->assertEquals(['test' => null], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
   }
 
   #[@test]
   public function params() {
-    $t= $this->type('class <T> { <<$a: inject(["name" => "a"]), $b: inject>> public function fixture($a, $b) { } }');
+    $t= $this->type('class <T> { public function fixture(<<inject(["name" => "a"])>> $a, <<inject>> $b) { } }');
     $m=$t->getMethod('fixture');
     $this->assertEquals(
       [['inject' => ['name' => 'a']], ['inject' => null]],

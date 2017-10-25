@@ -384,7 +384,7 @@ abstract class Emitter {
   protected function emitProperty($node) {
     $this->meta[0][self::PROPERTY][$node->value[0]]= [
       DETAIL_RETURNS     => $node->value[3] ? $node->value[3]->name() : 'var',
-      DETAIL_ANNOTATIONS => $node->value[4] ? $node->value[4]['member'] : [],
+      DETAIL_ANNOTATIONS => $node->value[4] ? $node->value[4] : [],
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
     ];
@@ -401,8 +401,8 @@ abstract class Emitter {
   protected function emitMethod($node) {
     $meta= [
       DETAIL_RETURNS     => $node->value[2][1] ? $node->value[2][1]->name() : 'var',
-      DETAIL_ANNOTATIONS => isset($node->value[3]['member']) ? $node->value[3]['member'] : [],
-      DETAIL_TARGET_ANNO => isset($node->value[3]['param']) ? $node->value[3]['param'] : [],
+      DETAIL_ANNOTATIONS => isset($node->value[3]) ? $node->value[3] : [],
+      DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
     ];
 
@@ -418,6 +418,7 @@ abstract class Emitter {
           DETAIL_ARGUMENTS   => []
         ];
       }
+      $meta[DETAIL_TARGET_ANNO][$param[0]]= $param[6];
       $meta[DETAIL_ARGUMENTS][]= $param[2] ? $param[2]->name() : 'var';
     }
     $this->out->write($declare);

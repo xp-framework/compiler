@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* **Heads up:** Implemented syntax for parameter annotations as stated 
+  in issue #1 - alongside the parameter; no longer in its "targeted" form
+  `$param: inject` as in https://github.com/xp-framework/rfc/issues/218
+  (@thekid)
 * Added support for keywords as methods in PHP 5.6 - @thekid
 * Implemented xp-framework/rfc#326: Cast and nullable types - @thekid
 * Added support for casting value and array types - @thekid
