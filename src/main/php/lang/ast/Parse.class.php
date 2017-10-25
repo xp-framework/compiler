@@ -996,7 +996,7 @@ class Parse {
         }
 
         $member->value= [$name, $modifiers, $signature, $annotations, $statements];
-        $body[]= $member;
+        $body[$name.'()']= $member;
         $modifiers= [];
         $annotations= null;
       } else if ('const' === $this->token->symbol->id) {
@@ -1012,7 +1012,7 @@ class Parse {
           $this->token= $this->expect('=');
 
           $member->value= [$name, $modifiers, $this->expression(0)];
-          $body[]= $member;
+          $body[$name]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
           }
@@ -1035,7 +1035,7 @@ class Parse {
             $member->value= [$name, $modifiers, null, $type, $annotations];
           }
 
-          $body[]= $member;
+          $body['$'.$name]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
           }

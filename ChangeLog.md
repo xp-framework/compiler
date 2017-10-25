@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Indexed type members by name; implementing feature suggested in #10 
+  (@thekid)
 * **Heads up:** Implemented syntax for parameter annotations as stated 
   in issue #1 - alongside the parameter; no longer in its "targeted" form
   `$param: inject` as in https://github.com/xp-framework/rfc/issues/218

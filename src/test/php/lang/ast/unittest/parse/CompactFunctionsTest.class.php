@@ -15,7 +15,7 @@ class CompactFunctionsTest extends ParseTest {
     $block= [['==>' => ['true' => 'true']]];
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        ['function' => ['a', ['public'], [[], null], null, $block]]
+        'a()' => ['function' => ['a', ['public'], [[], null], null, $block]]
       ], []]]],
       $this->parse('class A { public function a() ==> true; }')
     );
