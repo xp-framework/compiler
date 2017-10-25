@@ -466,9 +466,13 @@ abstract class Emitter {
 
   protected function emitOffset($node) {
     $this->emit($node->value[0]);
-    $this->out->write('[');
-    $this->emit($node->value[1]);
-    $this->out->write(']');
+    if (null === $node->value[1]) {
+      $this->out->write('[]');
+    } else {
+      $this->out->write('[');
+      $this->emit($node->value[1]);
+      $this->out->write(']');
+    }
   }
 
   protected function emitAssignment($node) {
