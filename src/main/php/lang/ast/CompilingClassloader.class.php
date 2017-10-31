@@ -155,7 +155,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
     } catch (Error $e) {
       throw new ClassFormatException('Syntax error', $e);
     } finally {
-      $file->close();
+      $file->isOpen() && $file->close();
     }
   }
 
