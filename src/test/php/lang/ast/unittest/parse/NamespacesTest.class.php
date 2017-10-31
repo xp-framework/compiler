@@ -14,11 +14,14 @@ class NamespacesTest extends ParseTest {
 
   #[@test]
   public function use_statement() {
-    $this->assertNodes([['use' => 'use']], $this->parse('use lang\ast\Parse;'));
+    $this->assertNodes([['use' => ['lang\ast\Parse']]], $this->parse('use lang\ast\Parse;'));
   }
 
   #[@test]
   public function grouped_use_statement() {
-    $this->assertNodes([['use' => 'use']], $this->parse('use lang\ast\{Parse, Emitter};'));
+    $this->assertNodes(
+      [['use' => ['lang\ast\Parse', 'lang\ast\Emitter']]],
+      $this->parse('use lang\ast\{Parse, Emitter};')
+    );
   }
 }

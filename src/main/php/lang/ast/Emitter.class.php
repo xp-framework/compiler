@@ -193,7 +193,7 @@ abstract class Emitter {
   }
 
   protected function emitImport($node) {
-    // NOOP
+    $this->out->write('use '.implode(',', $node->value).';');
   }
 
   protected function emitAnnotation($node) {

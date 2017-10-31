@@ -33,6 +33,14 @@ class ScopeTest extends \unittest\TestCase {
   }
 
   #[@test]
+  public function resolve_relative_in_package() {
+    $s= new Scope();
+    $s->package('test');
+
+    $this->assertEquals('\\test\\ast\\Parse', $s->resolve('ast\\Parse'));
+  }
+
+  #[@test]
   public function resolve_imported_in_package() {
     $s= new Scope();
     $s->package('test');

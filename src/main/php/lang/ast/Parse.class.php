@@ -402,19 +402,23 @@ class Parse {
       $this->token= $this->advance();
 
       if ('{' === $this->token->symbol->id) {
+        $types= [];
         while ('}' !== $this->token->symbol->id) {
           $this->token= $this->advance();
-          $class= $this->token->value;
-          $this->scope->import($import.$class);
+          $class= $import.$this->token->value;
+          $types[]= $class;
+          $this->scope->import($class);
           $this->token= $this->advance();
         }
         $this->token= $this->advance();
       } else {
+        $types= [$import];
         $this->scope->import($import);
       }
 
       $this->token= $this->expect(';');
       $node->arity= 'import';
+      $node->value= $types;
       return $node;
     });
 

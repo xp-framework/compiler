@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.1.2 / 2017-10-31
+
+* Fixed issue #15: Interop with xp-forge/partial broken - @thekid
+
 ## 1.1.1 / 2017-10-31
 
 * Fixed map initialization with keys consisting of complex expressions
