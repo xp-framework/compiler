@@ -375,6 +375,10 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
+  protected function emitUse($node) {
+    $this->out->write('use '.$node->value.';');
+  }
+
   protected function emitConst($node) {
     $this->out->write(implode(' ', $node->value[1]).' const '.$node->value[0].'=');
     $this->emit($node->value[2]);
