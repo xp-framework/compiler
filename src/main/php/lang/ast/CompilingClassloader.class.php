@@ -119,16 +119,27 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @throws lang.ClassLoadingException
    */
   public function loadClass0($class) {
-    if (isset(\xp::$cl[$class])) return literal($class);
+    $name= strtr($class, '.', '\\');
+    if (isset(\xp::$cl[$class])) return $name;
 
+    \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
+    \xp::$cll++;
     try {
       eval('?>'.$this->loadClassBytes($class));
     } catch (\Throwable $e) {
+      unset(\xp::$cl[$class]);
+      \xp::$cll--;
       throw new ClassFormatException('Compiler error', $e);
     }
+    \xp::$cll--;
 
-    \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
-    return literal($class);
+    method_exists($name, '__static') && \xp::$cli[]= [$name, '__static'];
+    if (0 === \xp::$cll) {
+      $invocations= \xp::$cli;
+      \xp::$cli= [];
+      foreach ($invocations as $inv) $inv($name);
+    }
+    return $name;
   }
 
   /**

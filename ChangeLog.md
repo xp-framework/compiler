@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #16: Enums broken - @thekid
+
 ## 1.1.2 / 2017-10-31
 
 * Fixed issue #15: Interop with xp-forge/partial broken - @thekid

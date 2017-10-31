@@ -70,4 +70,17 @@ class MembersTest extends EmittingTest {
 
     $this->assertEquals('Test', $r);
   }
+
+  #[@test]
+  public function enum_members() {
+    $r= $this->run('class <T> extends \lang\Enum {
+      public static $MON, $TUE, $WED, $THU, $FRI, $SAT, $SUN;
+
+      public function run() {
+        return self::$MON->name();
+      }
+    }');
+
+    $this->assertEquals('MON', $r);
+  }
 }
