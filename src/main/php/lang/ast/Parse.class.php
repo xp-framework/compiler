@@ -219,16 +219,15 @@ class Parse {
     });
 
     $this->prefix('[', function($node) {
-      $i= 0;
       $values= [];
       while (']' !== $this->token->symbol->id) {
         $expr= $this->expression(0);
 
         if ('=>' === $this->token->symbol->id) {
           $this->token= $this->advance();
-          $values[$expr->value]= $this->expression(0);
+          $values[]= [$expr, $this->expression(0)];
         } else {
-          $values[$i++]= $expr;
+          $values[]= [null, $expr];
         }
 
         if (']' === $this->token->symbol->id) break;

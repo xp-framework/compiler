@@ -254,9 +254,12 @@ abstract class Emitter {
     }
 
     $this->out->write('[');
-    foreach ($node->value as $key => $value) {
-      $this->out->write($key.'=>');
-      $this->emit($value);
+    foreach ($node->value as $pair) {
+      if ($pair[0]) {
+        $this->emit($pair[0]);
+        $this->out->write('=>');
+      }
+      $this->emit($pair[1]);
       $this->out->write(',');
     }
     $this->out->write(']');

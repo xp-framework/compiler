@@ -54,21 +54,33 @@ class LiteralsTest extends ParseTest {
 
   #[@test]
   public function int_array() {
-    $this->assertNodes([['[' => [['(literal)' => '1'], ['(literal)' => '2']]]], $this->parse('[1, 2];'));
+    $this->assertNodes(
+      [['[' => [[null, ['(literal)' => '1']], [null, ['(literal)' => '2']]]]],
+      $this->parse('[1, 2];')
+    );
   }
 
   #[@test]
   public function key_value_map() {
-    $this->assertNodes([['[' => ['"key"' => ['(literal)' => '"value"']]]], $this->parse('["key" => "value"];'));
+    $this->assertNodes(
+      [['[' => [[['(literal)' => '"key"'], ['(literal)' => '"value"']]]]],
+      $this->parse('["key" => "value"];')
+    );
   }
 
   #[@test]
   public function dangling_comma_in_array() {
-    $this->assertNodes([['[' => [['(literal)' => '1']]]], $this->parse('[1, ];'));
+    $this->assertNodes(
+      [['[' => [[null, ['(literal)' => '1']]]]],
+      $this->parse('[1, ];')
+    );
   }
 
   #[@test]
   public function dangling_comma_in_key_value_map() {
-    $this->assertNodes([['[' => ['"key"' => ['(literal)' => '"value"']]]], $this->parse('["key" => "value", ];'));
+    $this->assertNodes(
+      [['[' => [[['(literal)' => '"key"'], ['(literal)' => '"value"']]]]],
+      $this->parse('["key" => "value", ];')
+    );
   }
 }

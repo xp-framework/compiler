@@ -48,4 +48,28 @@ class ArraysTest extends EmittingTest {
 
     $this->assertEquals([1, 2], $r);
   }
+
+  #[@test]
+  public function init_with_variable() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $KEY= "key";
+        return [$KEY => "value"];
+      }
+    }');
+
+    $this->assertEquals(['key' => 'value'], $r);
+  }
+
+  #[@test]
+  public function init_with_member_variable() {
+    $r= $this->run('class <T> {
+      private static $KEY= "key";
+      public function run() {
+        return [self::$KEY => "value"];
+      }
+    }');
+
+    $this->assertEquals(['key' => 'value'], $r);
+  }
 }

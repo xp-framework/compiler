@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.1.1 / 2017-10-31
+
+* Fixed map initialization with keys consisting of complex expressions
+  (@thekid)
+
 ## 1.1.0 / 2017-10-31
 
 * Implemented trait usage, including aliasing via `as`. See issue #14
