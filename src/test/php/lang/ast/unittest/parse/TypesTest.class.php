@@ -85,16 +85,24 @@ class TypesTest extends ParseTest {
   #[@test]
   public function class_with_trait() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['use' => '\\B']], []]]],
+      [['class' => ['\\A', [], null, [], [['use' => [['\\B'], []]]], []]]],
       $this->parse('class A { use B; }')
     );
   }
 
   #[@test]
-  public function class_with_traits() {
+  public function class_with_multiple_traits() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['use' => '\\B'], ['use' => '\\C']], []]]],
+      [['class' => ['\\A', [], null, [], [['use' => [['\\B'], []]], ['use' => [['\\C'], []]]], []]]],
       $this->parse('class A { use B; use C; }')
+    );
+  }
+
+  #[@test]
+  public function class_with_comma_separated_traits() {
+    $this->assertNodes(
+      [['class' => ['\\A', [], null, [], [['use' => [['\\B', '\\C'], []]]], []]]],
+      $this->parse('class A { use B, C; }')
     );
   }
 

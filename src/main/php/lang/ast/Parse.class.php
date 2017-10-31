@@ -963,11 +963,44 @@ class Parse {
       } else if ('use' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
         $member->arity= 'use';
+
         $this->token= $this->advance();
-        $member->value= $this->scope->resolve($this->token->value);
+        $types= [];
+        do {
+          $types[]= $this->scope->resolve($this->token->value);
+          $this->token= $this->advance();
+          if (',' === $this->token->value) {
+            $this->token= $this->advance();
+            continue;
+          } else {
+            break;
+          }
+        } while ($this->token->value);
+
+        $aliases= [];
+        if ('{' === $this->token->value) {
+          $this->token= $this->advance();
+          while ('}' !== $this->token->value) {
+            $method= $this->token->value;
+            $this->token= $this->advance();
+            if ('::' === $this->token->value) {
+              $this->token= $this->advance();
+              $method= $this->scope->resolve($method).'::'.$this->token->value;
+              $this->token= $this->advance();
+            }
+            $this->token= $this->expect('as');
+            $alias= $this->token->value;
+            $this->token= $this->advance();
+            $this->token= $this->expect(';');
+            $aliases[$method]= $alias;
+          }
+          $this->token= $this->expect('}');
+        } else {
+          $this->token= $this->expect(';');
+        }
+
+        $member->value= [$types, $aliases];
         $body[]= $member;
-        $this->token= $this->advance();
-        $this->token= $this->expect(';');
       } else if ('function' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
         $member->arity= 'method';

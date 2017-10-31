@@ -376,7 +376,16 @@ abstract class Emitter {
   }
 
   protected function emitUse($node) {
-    $this->out->write('use '.$node->value.';');
+    $this->out->write('use '.implode(',', $node->value[0]));
+    if ($node->value[1]) {
+      $this->out->write('{');
+      foreach ($node->value[1] as $reference => $alias) {
+        $this->out->write($reference.' as '.$alias.';');
+      }
+      $this->out->write('}');
+    } else {
+      $this->out->write(';');
+    }
   }
 
   protected function emitConst($node) {
