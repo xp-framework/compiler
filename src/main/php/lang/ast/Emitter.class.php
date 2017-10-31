@@ -193,7 +193,9 @@ abstract class Emitter {
   }
 
   protected function emitImport($node) {
-    $this->out->write('use '.implode(',', $node->value).';');
+    foreach ($node->value as $type => $alias) {
+      $this->out->write('use '.$type.($alias ? ' as '.$alias : '').';');
+    }
   }
 
   protected function emitAnnotation($node) {
