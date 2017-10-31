@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.1.0 / 2017-10-31
+
+* Implemented trait usage, including aliasing via `as`. See issue #14
+  (@thekid)
+
 ## 1.0.0 / 2017-10-25
 
 * Indexed type members by name; implementing feature suggested in #10 
