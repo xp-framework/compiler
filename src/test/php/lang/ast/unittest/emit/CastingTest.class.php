@@ -99,4 +99,28 @@ class CastingTest extends EmittingTest {
       null
     ));
   }
+
+  #[@test]
+  public function cast_braced() {
+    $this->assertEquals(['test'], $this->run(
+      'class <T> {
+        public function run($value) {
+          return (array<string>)($value);
+        }
+      }',
+      ['test']
+    ));
+  }
+
+  #[@test]
+  public function cast_to_function_type_and_invoke() {
+    $this->assertEquals($this->getName(), $this->run(
+      'class <T> {
+        public function run($value) {
+          return ((function(): string)($value))();
+        }
+      }',
+      [$this, 'getName']
+    ));
+  }
 }

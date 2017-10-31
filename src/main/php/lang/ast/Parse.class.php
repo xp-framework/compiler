@@ -168,38 +168,42 @@ class Parse {
     //
     // - An arrow function `($a) ==> $a + 1`
     // - An expression surrounded by parentheses `($a ?? $b)->invoke()`;
-    // - A cast `(int)$a`
+    // - A cast `(int)$a` or `(int)($a / 2)`.
     //
     // Resolve by looking ahead after the closing ")"
     $this->prefix('(', function($node) {
-      static $keywords= [
-        'new'      => true,
-        'clone'    => true,
-        'yield'    => true,
-        'function' => true,
+      static $types= [
+        '<'        => true,
+        '>'        => true,
+        ','        => true,
+        '?'        => true,
+        ':'        => true
       ];
 
       $skipped= [$node, $this->token];
+      $cast= true;
       $level= 1;
       while ($level > 0 && null !== $this->token->value) {
         if ('(' === $this->token->symbol->id) {
           $level++;
         } else if (')' === $this->token->symbol->id) {
           $level--;
+        } else if ('name' !== $this->token->arity && !isset($types[$this->token->value])) {
+          $cast= false;
         }
         $this->token= $this->advance();
         $skipped[]= $this->token;
       }
       $this->queue= array_merge($skipped, $this->queue);
 
-      if (':' ===  $this->token->value || '==>' === $this->token->value) {
+      if (':' === $this->token->value || '==>' === $this->token->value) {
         $node->arity= 'lambda';
 
         $this->token= $this->advance();
         $signature= $this->signature();
         $this->token= $this->advance();
         $node->value= [$signature, $this->expression(0)];
-      } else if ('?' === $skipped[1]->value || 'name' === $skipped[1]->arity && !isset($keywords[$skipped[1]->value])) {
+      } else if ($cast && '(' === $this->token->value || 'operator' !== $this->token->arity) {
         $node->arity= 'cast';
 
         $this->token= $this->advance();

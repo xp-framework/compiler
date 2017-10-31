@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.2.1 / 2017-10-31
+
+* Changed ambiguity resolution between casts, braced expressions and
+  lambda to be far more robust
+  (@thekid)
+
 ## 1.2.0 / 2017-10-31
 
 * Added support for import aliases (`use Type as Alias`) - @thekid

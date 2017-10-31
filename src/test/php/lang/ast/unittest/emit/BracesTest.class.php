@@ -66,4 +66,42 @@ class BracesTest extends EmittingTest {
 
     $this->assertEquals('test', $r);
   }
+
+  #[@test]
+  public function braced_expression_not_confused_with_cast() {
+    $r= $this->run('class <T> {
+      const WIDTH = 640;
+
+      public function run() {
+        return (self::WIDTH / 2);
+      }
+    }');
+
+    $this->assertEquals(320, $r);
+  }
+
+  #[@test]
+  public function global_constant_in_braces_not_confused_with_cast() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return (__LINE__)."test";
+      }
+    }');
+
+    $this->assertEquals('3test', $r);
+  }
+
+  #[@test]
+  public function invoke_on_braced_null_coalesce() {
+    $r= $this->run('class <T> {
+      public function __invoke() { return "OK"; }
+      public function fail() { return function() { return "FAIL"; }; }
+
+      public function run() {
+        return ($this ?? $this->fail())();
+      }
+    }');
+
+    $this->assertEquals('OK', $r);
+  }
 }
