@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.2.0 / 2017-10-31
+
 * Added support for import aliases (`use Type as Alias`) - @thekid
 * Fixed issue #16: Enums broken - @thekid
 
