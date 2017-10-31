@@ -45,10 +45,11 @@ class Scope {
    * Adds an import
    *
    * @param  string $name
+   * @param  string $alias
    * @return void
    */
-  public function import($name) {
-    $this->imports[substr($name, strrpos($name,  '\\') + 1)]= '\\'.$name;
+  public function import($name, $alias= null) {
+    $this->imports[$alias ?: substr($name, strrpos($name,  '\\') + 1)]= '\\'.$name;
   }
 
   /**

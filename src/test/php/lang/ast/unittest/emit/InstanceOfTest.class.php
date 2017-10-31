@@ -45,4 +45,15 @@ class InstanceOfTest extends EmittingTest {
 
     $this->assertTrue($r);
   }
+
+  #[@test]
+  public function instanceof_aliased_type() {
+    $r= $this->run('use util\Date as D; class <T> {
+      public function run() {
+        return new D() instanceof D;
+      }
+    }');
+
+    $this->assertTrue($r);
+  }
 }
