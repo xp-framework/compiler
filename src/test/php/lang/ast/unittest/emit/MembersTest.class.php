@@ -53,4 +53,21 @@ class MembersTest extends EmittingTest {
 
     $this->assertEquals('Test', $r);
   }
+
+  #[@test]
+  public function static_initializer_run() {
+    $r= $this->run('class <T> {
+      private static $MEMBER;
+
+      static function __static() {
+        self::$MEMBER= "Test";
+      }
+
+      public function run() {
+        return self::$MEMBER;
+      }
+    }');
+
+    $this->assertEquals('Test', $r);
+  }
 }
