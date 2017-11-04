@@ -4,7 +4,7 @@ use text\StringTokenizer;
 use lang\ast\Parse;
 use lang\ast\Node;
 use lang\ast\Tokens;
-use lang\ast\nodes\Kind;
+use lang\ast\nodes\Value;
 
 abstract class ParseTest extends \unittest\TestCase {
 
@@ -17,7 +17,7 @@ abstract class ParseTest extends \unittest\TestCase {
   private function value($arg) {
     if ($arg instanceof Node) {
       return [$arg->symbol->id => $this->value($arg->value)];
-    } else if ($arg instanceof Kind) {
+    } else if ($arg instanceof Value) {
       $r= [];
       foreach ((array)$arg as $key => $value) {
         $r[]= $this->value($value);

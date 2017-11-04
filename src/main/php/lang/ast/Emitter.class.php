@@ -4,7 +4,7 @@ use lang\reflect\Package;
 use lang\IllegalArgumentException;
 use io\streams\MemoryOutputStream;
 use io\streams\StringWriter;
-use lang\ast\nodes\Kind;
+use lang\ast\nodes\Value;
 
 abstract class Emitter {
   const PROPERTY = 0;
@@ -119,7 +119,7 @@ abstract class Emitter {
           yield $result;
         }
       }
-    } else if ($arg instanceof Kind) {  // TODO: Move recursion into Kind subclasses
+    } else if ($arg instanceof Value) {  // TODO: Move recursion into Kind subclasses
       foreach ((array)$arg as $node) {
         foreach ($this->search($node, $arity) as $result) {
           yield $result;
@@ -700,7 +700,7 @@ abstract class Emitter {
   }
 
   protected function emitNew($kind) {
-    if ($kind->type instanceof Kind) {
+    if ($kind->type instanceof Value) {
       $this->out->write('new class(');
       $this->arguments($kind->arguments);
       $this->out->write(')');

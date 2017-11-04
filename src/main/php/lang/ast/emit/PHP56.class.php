@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\Kind;
+use lang\ast\nodes\Value;
 
 /**
  * PHP 5.6 syntax
@@ -172,7 +172,7 @@ class PHP56 extends \lang\ast\Emitter {
   }
 
   protected function emitNew($kind) {
-    if ($kind->type instanceof Kind) {
+    if ($kind->type instanceof Value) {
       $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
       $definition= $kind->type;
       $this->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
