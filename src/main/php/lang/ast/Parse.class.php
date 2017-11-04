@@ -2,6 +2,7 @@
 
 class Parse {
   private $tokens, $token, $scope;
+  private $comment= null;
   private $symbols= [];
   private $queue= [];
 
@@ -733,9 +734,10 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= [$type, [], $parents, $body, $this->scope->annotations];
+      $node->value= [$type, [], $parents, $body, $this->scope->annotations, $this->comment];
       $node->arity= 'interface';
       $this->scope->annotations= [];
+      $this->comment= null;
       return $node;
     });
 
@@ -747,9 +749,10 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= [$type, [], $body, $this->scope->annotations];
+      $node->value= [$type, [], $body, $this->scope->annotations, $this->comment];
       $node->arity= 'trait';
       $this->scope->annotations= [];
+      $this->comment= null;
       return $node;
     });
   }
@@ -916,6 +919,9 @@ class Parse {
   }
 
   private function clazz($name, $modifiers= []) {
+    $comment= $this->comment;
+    $this->comment= null;
+
     $parent= null;
     if ('extends' === $this->token->value) {
       $this->token= $this->advance();
@@ -943,7 +949,7 @@ class Parse {
     $body= $this->body();
     $this->token= $this->expect('}');
 
-    $return= [$name, $modifiers, $parent, $implements, $body, $this->scope->annotations];
+    $return= [$name, $modifiers, $parent, $implements, $body, $this->scope->annotations, $comment];
     $this->scope->annotations= [];
     return $return;
   }
@@ -1049,10 +1055,11 @@ class Parse {
           $this->token= $this->expect('{, ; or ==>');
         }
 
-        $member->value= [$name, $modifiers, $signature, $annotations, $statements];
+        $member->value= [$name, $modifiers, $signature, $annotations, $statements, $this->comment];
         $body[$name.'()']= $member;
         $modifiers= [];
         $annotations= null;
+        $this->comment= null;
       } else if ('const' === $this->token->symbol->id) {
         $n= new Node($this->token->symbol);
         $n->arity= 'const';
@@ -1084,9 +1091,9 @@ class Parse {
 
           if ('=' === $this->token->symbol->id) {
             $this->token= $this->expect('=');
-            $member->value= [$name, $modifiers, $this->expression(0), $type, $annotations];
+            $member->value= [$name, $modifiers, $this->expression(0), $type, $annotations, $this->comment];
           } else {
-            $member->value= [$name, $modifiers, null, $type, $annotations];
+            $member->value= [$name, $modifiers, null, $type, $annotations, $this->comment];
           }
 
           $body['$'.$name]= $member;
@@ -1096,6 +1103,7 @@ class Parse {
         }
         $modifiers= [];
         $annotations= null;
+        $this->comment= null;
         $type= null;
         $this->token= $this->expect(';');
       } else if ('<<' === $this->token->symbol->id) {
@@ -1272,7 +1280,7 @@ class Parse {
   private function advance() {
     if ($this->queue) return array_shift($this->queue);
 
-    if ($this->tokens->valid()) {
+    while ($this->tokens->valid()) {
       $type= $this->tokens->key();
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
@@ -1286,17 +1294,20 @@ class Parse {
       } else if ('variable' === $type) {
         $node= new Node(clone $this->symbol('(variable)'));
         $type= 'variable';
+      } else if ('comment' === $type) {
+        $this->comment= $value;
+        continue;
       } else {
         throw new Error('Unexpected token '.$value.' on line '.$line);
       }
+
       $node->arity= $type;
       $node->value= $value;
       $node->line= $line;
       // \util\cmd\Console::writeLine('-> ', $node);
       return $node;
-    } else {
-      return new Node($this->symbol('(end)'));
     }
+    return new Node($this->symbol('(end)'));
   }
 
   public function execute() {

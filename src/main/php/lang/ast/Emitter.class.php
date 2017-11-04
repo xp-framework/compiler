@@ -322,6 +322,7 @@ abstract class Emitter {
 
   protected function emitClass($node) {
     array_unshift($this->meta, []);
+
     $this->out->write(implode(' ', $node->value[1]).' class '.$this->declaration($node->value[0]));
     $node->value[2] && $this->out->write(' extends '.$node->value[2]);
     $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
@@ -330,15 +331,16 @@ abstract class Emitter {
       $this->emit($member);
     }
 
-    $this->emitMeta($node);
-    $this->out->write('} '.$node->value[0].'::__init();');
+    $this->out->write('static function __init() {');
+    $this->emitMeta($node->value[0], $node->value[5], $node->value[6]);
+    $this->out->write('}} '.$node->value[0].'::__init();');
   }
 
-  protected function emitMeta($node) {
-    $this->out->write('static function __init() { \xp::$meta[\''.$this->name($node->value[0]).'\']= [');
+  protected function emitMeta($name, $annotations, $comment) {
+    $this->out->write('\xp::$meta[\''.$this->name($name).'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
-    $this->annotations($node->value[5]);
-    $this->out->write(']],');
+    $this->annotations($annotations);
+    $this->out->write('], DETAIL_COMMENT => \''.$comment.'\'],');
 
     foreach (array_shift($this->meta) as $type => $lookup) {
       $this->out->write($type.' => [');
@@ -352,14 +354,17 @@ abstract class Emitter {
           $this->out->write('],');
         }
         $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
+        $this->out->write(', DETAIL_COMMENT => \''.$meta[DETAIL_COMMENT].'\'');
         $this->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
       }
       $this->out->write('],');
     }
-    $this->out->write(']; }');
+    $this->out->write('];');
   }
 
   protected function emitInterface($node) {
+    array_unshift($this->meta, []);
+
     $this->out->write('interface '.$this->declaration($node->value[0]));
     $node->value[2] && $this->out->write(' extends '.implode(', ', $node->value[2]));
     $this->out->write('{');
@@ -368,16 +373,23 @@ abstract class Emitter {
       $this->out->write("\n");
     }
     $this->out->write('}');
+
+    $this->emitMeta($node->value[0], $node->value[4], $node->value[5]);
   }
 
   protected function emitTrait($node) {
+    array_unshift($this->meta, []);
+
     $this->out->write('trait '.$this->declaration($node->value[0]));
     $this->out->write('{');
     foreach ($node->value[2] as $member) {
       $this->emit($member);
       $this->out->write("\n");
     }
-    $this->out->write('}');
+
+    $this->out->write('static function __init() {');
+    $this->emitMeta($node->value[0], $node->value[3], $node->value[4]);
+    $this->out->write('}} '.$node->value[0].'::__init();');
   }
 
   protected function emitUse($node) {
@@ -403,6 +415,7 @@ abstract class Emitter {
     $this->meta[0][self::PROPERTY][$node->value[0]]= [
       DETAIL_RETURNS     => $node->value[3] ? $node->value[3]->name() : 'var',
       DETAIL_ANNOTATIONS => $node->value[4] ? $node->value[4] : [],
+      DETAIL_COMMENT     => $node->value[5],
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
     ];
@@ -420,6 +433,7 @@ abstract class Emitter {
     $meta= [
       DETAIL_RETURNS     => $node->value[2][1] ? $node->value[2][1]->name() : 'var',
       DETAIL_ANNOTATIONS => isset($node->value[3]) ? $node->value[3] : [],
+      DETAIL_COMMENT     => $node->value[5],
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
     ];
@@ -432,6 +446,7 @@ abstract class Emitter {
         $this->meta[0][self::PROPERTY][$param[0]]= [
           DETAIL_RETURNS     => $param[2] ? $param[2]->name() : 'var',
           DETAIL_ANNOTATIONS => [],
+          DETAIL_COMMENT     => null,
           DETAIL_TARGET_ANNO => [],
           DETAIL_ARGUMENTS   => []
         ];

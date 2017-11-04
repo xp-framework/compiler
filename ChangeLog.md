@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed isse #17: Comments missing from generated code - @thekid
+
 ## 1.3.0 / 2017-11-04
 
 * Made it possible to use `<?hh` as opening tag, too. This way, we are
