@@ -230,7 +230,8 @@ class PHP56 extends \lang\ast\Emitter {
       $this->out->write('return self::__callStatic0($name, ...$args); }');
     }
 
-    $this->emitMeta($node);
-    $this->out->write('} '.$node->value[0].'::__init();');
+    $this->out->write('static function __init() {');
+    $this->emitMeta($node->value[0], $node->value[5], $node->value[6]);
+    $this->out->write('}} '.$node->value[0].'::__init();');
   }
 }
