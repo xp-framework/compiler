@@ -31,24 +31,24 @@ class PHP70 extends \lang\ast\Emitter {
     $this->out->write('}');
   }
 
-  protected function emitAssignment($kind) {
-    if ('array' === $kind->variable->arity) {
+  protected function emitAssignment($assignment) {
+    if ('array' === $assignment->variable->arity) {
       $this->out->write('list(');
-      foreach ($kind->variable->value as $pair) {
+      foreach ($assignment->variable->value as $pair) {
         $this->emit($pair[1]);
         $this->out->write(',');
       }
       $this->out->write(')');
-      $this->out->write($kind->operator);
-      $this->emit($kind->expression);
+      $this->out->write($assignment->operator);
+      $this->emit($assignment->expression);
     } else {
-      parent::emitAssignment($kind);
+      parent::emitAssignment($assignment);
     }
   }
 
-  protected function emitConst($kind) {
-    $this->out->write('const '.$kind->name.'=');
-    $this->emit($kind->expression);
+  protected function emitConst($const) {
+    $this->out->write('const '.$const->name.'=');
+    $this->emit($const->expression);
     $this->out->write(';');
   }
 }

@@ -104,58 +104,58 @@ class PHP56 extends \lang\ast\Emitter {
     $this->out->write('}');
   }
 
-  protected function emitConst($kind) {
-    $this->out->write('const '.$kind->name.'=');
-    $this->emit($kind->expression);
+  protected function emitConst($const) {
+    $this->out->write('const '.$const->name.'=');
+    $this->emit($const->expression);
     $this->out->write(';');
   }
 
-  protected function emitAssignment($kind) {
-    if ('array' === $kind->variable->arity) {
+  protected function emitAssignment($assignment) {
+    if ('array' === $assignment->variable->arity) {
       $this->out->write('list(');
-      foreach ($kind->variable->value as $pair) {
+      foreach ($assignment->variable->value as $pair) {
         $this->emit($pair[1]);
         $this->out->write(',');
       }
       $this->out->write(')');
-      $this->out->write($kind->operator);
-      $this->emit($kind->expression);
+      $this->out->write($assignment->operator);
+      $this->emit($assignment->expression);
     } else {
-      parent::emitAssignment($kind);
+      parent::emitAssignment($assignment);
     }
   }
 
-  protected function emitBinary($kind) {
-    if ('??' === $kind->operator) {
+  protected function emitBinary($binary) {
+    if ('??' === $binary->operator) {
       $this->out->write('isset(');
-      $this->emit($kind->left);
+      $this->emit($binary->left);
       $this->out->write(') ?');
-      $this->emit($kind->left);
+      $this->emit($binary->left);
       $this->out->write(' : ');
-      $this->emit($kind->right);
-    } else if ('<=>' === $kind->operator) {
+      $this->emit($binary->right);
+    } else if ('<=>' === $binary->operator) {
       $l= $this->temp();
       $r= $this->temp();
       $this->out->write('('.$l.'= ');
-      $this->emit($kind->left);
+      $this->emit($binary->left);
       $this->out->write(') < ('.$r.'=');
-      $this->emit($kind->right);
+      $this->emit($binary->right);
       $this->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
-      parent::emitBinary($kind);
+      parent::emitBinary($binary);
     }
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitInvoke($kind) {
-    $expr= $kind->expression;
+  protected function emitInvoke($invoke) {
+    $expr= $invoke->expression;
     if ('braced' === $expr->arity) {
       $t= $this->temp();
       $this->out->write('(('.$t.'=');
       $this->emit($expr->value);
       $this->out->write(') ? '.$t);
       $this->out->write('(');
-      $this->arguments($kind->arguments);
+      $this->arguments($invoke->arguments);
       $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
     } else if (
       'scope' === $expr->arity &&
@@ -164,17 +164,17 @@ class PHP56 extends \lang\ast\Emitter {
     ) {
       $this->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
       $this->out->write('(');
-      $this->arguments($kind->arguments);
+      $this->arguments($invoke->arguments);
       $this->out->write(')');
     } else {
-      parent::emitInvoke($kind);
+      parent::emitInvoke($invoke);
     }
   }
 
-  protected function emitNew($kind) {
-    if ($kind->type instanceof Value) {
+  protected function emitNew($new) {
+    if ($new->type instanceof Value) {
       $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
-      $definition= $kind->type;
+      $definition= $new->type;
       $this->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
       $this->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
       $this->out->write(', "use" => []');
@@ -186,38 +186,38 @@ class PHP56 extends \lang\ast\Emitter {
         }
       })));
       $this->out->write('}\')->newInstance(');
-      $this->arguments($kind->arguments);
+      $this->arguments($new->arguments);
       $this->out->write(')');
     } else {
-      parent::emitNew($kind);
+      parent::emitNew($new);
     }
   }
 
-  protected function emitFrom($kind) {
+  protected function emitFrom($from) {
     $this->out->write('foreach (');
-    $this->emit($kind);
+    $this->emit($from);
     $this->out->write(' as $key => $val) yield $key => $val;');
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitMethod($kind) {
-    if (isset(self::$keywords[strtolower($kind->name)])) {
-      $this->call[in_array('static', $kind->modifiers)][]= $kind->name;
-      $kind->name= '__'.$kind->name;
-    } else if ('__call' === $kind->name || '__callStatic' === $kind->name) {
-      $kind->name.= '0';
+  protected function emitMethod($method) {
+    if (isset(self::$keywords[strtolower($method->name)])) {
+      $this->call[in_array('static', $method->modifiers)][]= $method->name;
+      $method->name= '__'.$method->name;
+    } else if ('__call' === $method->name || '__callStatic' === $method->name) {
+      $method->name.= '0';
     }
-    parent::emitMethod($kind);
+    parent::emitMethod($method);
   }
 
-  protected function emitClass($kind) {
+  protected function emitClass($class) {
     $this->call= [false => [], true => []];
     array_unshift($this->meta, []);
-    $this->out->write(implode(' ', $kind->modifiers).' class '.$this->declaration($kind->name));
-    $kind->parent && $this->out->write(' extends '.$kind->parent);
-    $kind->implements && $this->out->write(' implements '.implode(', ', $kind->implements));
+    $this->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
+    $class->parent && $this->out->write(' extends '.$class->parent);
+    $class->implements && $this->out->write(' implements '.implode(', ', $class->implements));
     $this->out->write('{');
-    foreach ($kind->body as $member) {
+    foreach ($class->body as $member) {
       $this->emit($member);
     }
 
@@ -237,7 +237,7 @@ class PHP56 extends \lang\ast\Emitter {
     }
 
     $this->out->write('static function __init() {');
-    $this->emitMeta($kind->name, $kind->annotations, $kind->comment);
-    $this->out->write('}} '.$kind->name.'::__init();');
+    $this->emitMeta($class->name, $class->annotations, $class->comment);
+    $this->out->write('}} '.$class->name.'::__init();');
   }
 }
