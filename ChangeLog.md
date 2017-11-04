@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.4.0 / 2017-11-04
+
+* Merged PR #18: Allow using unpack operator inside array literals
+  (@thekid)
+* Added option to specify target version to `xp compile` - @thekid
 * Fixed isse #17: Comments missing from generated code - @thekid
 
 ## 1.3.0 / 2017-11-04
