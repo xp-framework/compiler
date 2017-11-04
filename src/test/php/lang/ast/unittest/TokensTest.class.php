@@ -91,6 +91,11 @@ class TokensTest extends \unittest\TestCase {
   }
 
   #[@test]
+  public function regular_comment() {
+    $this->assertTokens([], new Tokens(new StringTokenizer('// Comment')));
+  }
+
+  #[@test]
   public function apidoc_comment() {
     $this->assertTokens([['comment' => 'Test']], new Tokens(new StringTokenizer('/** Test */')));
   }
