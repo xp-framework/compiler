@@ -295,9 +295,7 @@ class Parse {
 
     $this->prefix('...', function($node) {
       $node->arity= 'unpack';
-      $node->value= $this->token;
-
-      $this->token= $this->advance();
+      $node->value= $this->expression(0);
       return $node;
     });
 
