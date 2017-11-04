@@ -6,6 +6,7 @@ use lang\ClassLoader;
 use lang\ClassNotFoundException;
 use lang\ClassFormatException;
 use lang\ClassLinkageException;
+use lang\ClassLoadingException;
 use lang\ElementNotFoundException;
 use lang\IllegalStateException;
 use text\StreamTokenizer;
@@ -126,6 +127,10 @@ class CompilingClassLoader implements \lang\IClassLoader {
     \xp::$cll++;
     try {
       eval('?>'.$this->loadClassBytes($class));
+    } catch (ClassLoadingException $e) {
+      unset(\xp::$cl[$class]);
+      \xp::$cll--;
+      throw $e;
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
       \xp::$cll--;
@@ -164,7 +169,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
 
       return $declaration->getBytes();
     } catch (Error $e) {
-      throw new ClassFormatException('Syntax error', $e);
+      throw new ClassFormatException('Syntax error in '.$file->getURI(), $e);
     } finally {
       $file->isOpen() && $file->close();
     }
