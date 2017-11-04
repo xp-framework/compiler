@@ -24,6 +24,11 @@ use util\profiling\Timer;
  *   $ echo "<?php ..." | xp compile -
  *   ```
  *
+ * - Target PHP 5.6 (default target is current PHP version)
+ *   ```sh
+ *   $ xp compile -t 5.6 HelloWorld.php HelloWorld.class.php
+ *   ```
+ *
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
 class CompileRunner {
@@ -35,9 +40,18 @@ class CompileRunner {
       return 2;
     }
 
-    $in= '-' === $args[0] ? new ConsoleInputStream(STDIN) : new FileInputStream($args[0]);
-    $out= !isset($args[1]) ? new ConsoleOutputStream(STDOUT) : new FileOutputStream($args[1]);
-    $emit= Emitter::forRuntime(PHP_VERSION);
+    $target= PHP_VERSION;
+    for ($i= 0; $i < sizeof($args); $i++) {
+      if ('-t' === $args[$i]) {
+        $target= $args[++$i];
+      } else {
+        break;
+      }
+    }
+
+    $in= '-' === $args[$i] ? new ConsoleInputStream(STDIN) : new FileInputStream($args[$i]);
+    $out= !isset($args[$i + 1]) ? new ConsoleOutputStream(STDOUT) : new FileOutputStream($args[$i + 1]);
+    $emit= Emitter::forRuntime($target);
 
     $t= (new Timer())->start();
     try {
