@@ -279,7 +279,7 @@ abstract class Emitter {
             $t= $this->temp();
             $this->out->write('],('.$t.'=');
             $this->emit($pair[1]->value);
-            $this->out->write(') instanceof \Generator ? iterator_to_array('.$t.') : '.$t.',[');
+            $this->out->write(') instanceof \Traversable ? iterator_to_array('.$t.') : '.$t.',[');
           }
         } else {
           $this->emit($pair[1]);

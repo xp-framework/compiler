@@ -56,11 +56,25 @@ class ArgumentUnpackingTest extends EmittingTest {
   }
 
   #[@test]
-  public function from_iterable() {
+  public function from_generator() {
     $r= $this->run('class <T> {
       private function items() {
         yield 1;
         yield 2;
+      }
+
+      public function run() {
+        return [...$this->items()];
+      }
+    }');
+    $this->assertEquals([1, 2], $r);
+  }
+
+  #[@test]
+  public function from_iterator() {
+    $r= $this->run('class <T> {
+      private function items() {
+        return new \ArrayIterator([1, 2]);
       }
 
       public function run() {
