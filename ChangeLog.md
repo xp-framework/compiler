@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.3.0 / 2017-11-04
+
+* Made it possible to use `<?hh` as opening tag, too. This way, we are
+  able to parse Hack language files.
+  (@thekid)
+
 ## 1.2.1 / 2017-10-31
 
 * Changed ambiguity resolution between casts, braced expressions and

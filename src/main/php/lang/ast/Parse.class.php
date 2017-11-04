@@ -384,20 +384,22 @@ class Parse {
       return $node;
     });
 
-    $this->stmt('<?php', function($node) {
+    $this->stmt('<?', function($node) {
       $node->arity= 'start';
+      $node->value= $this->token->value;
+
+      $this->token= $this->advance();
       return $node;
     });
 
     $this->stmt('namespace', function($node) {
-      $package= $this->token->value;
+      $node->arity= 'package';
+      $node->value= $this->token->value;
+
       $this->token= $this->advance();
       $this->token= $this->expect(';');
 
-      $this->scope->package($package);
-
-      $node->arity= 'package';
-      $node->value= $package;
+      $this->scope->package($node->value);
       return $node;
     });
 
