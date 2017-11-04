@@ -271,9 +271,16 @@ abstract class Emitter {
           $this->out->write('=>');
         }
         if ('unpack' === $pair[1]->arity) {
-          $this->out->write('],');
-          $this->emit($pair[1]->value);
-          $this->out->write(',[');
+          if ('array' === $pair[1]->value->arity) {
+            $this->out->write('],');
+            $this->emit($pair[1]->value);
+            $this->out->write(',[');
+          } else {
+            $t= $this->temp();
+            $this->out->write('],('.$t.'=');
+            $this->emit($pair[1]->value);
+            $this->out->write(') instanceof \Generator ? iterator_to_array('.$t.') : '.$t.',[');
+          }
         } else {
           $this->emit($pair[1]);
           $this->out->write(',');

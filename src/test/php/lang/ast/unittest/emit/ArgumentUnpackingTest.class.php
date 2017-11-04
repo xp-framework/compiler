@@ -54,4 +54,19 @@ class ArgumentUnpackingTest extends EmittingTest {
     }');
     $this->assertEquals(['color' => 'red', 'type' => 'car', 'year' => 2002], $r);
   }
+
+  #[@test]
+  public function from_iterable() {
+    $r= $this->run('class <T> {
+      private function items() {
+        yield 1;
+        yield 2;
+      }
+
+      public function run() {
+        return [...$this->items()];
+      }
+    }');
+    $this->assertEquals([1, 2], $r);
+  }
 }
