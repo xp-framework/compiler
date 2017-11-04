@@ -55,8 +55,8 @@ class Parse {
 
     $this->symbol('(end)');
     $this->symbol('(name)');
-    $this->symbol('(literal)')->nud= function($node) { return $node; };    
-    $this->symbol('(variable)')->nud= function($node) { return $node; };    
+    $this->symbol('(literal)');
+    $this->symbol('(variable)');
 
     $this->constant('true', 'true');
     $this->constant('false', 'false');
