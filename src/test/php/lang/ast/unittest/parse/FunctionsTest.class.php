@@ -86,7 +86,7 @@ class FunctionsTest extends ParseTest {
 
   #[@test]
   public function default_closure() {
-    $block= ['+' => [['(variable)' => 'a'], ['(literal)' => '1']]];
+    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
     $this->assertNodes(
       [['function' => [[[], null], null, [['return' => $block]]]]],
       $this->parse('function() { return $a + 1; };')
@@ -95,7 +95,7 @@ class FunctionsTest extends ParseTest {
 
   #[@test]
   public function default_closure_with_use_by_value() {
-    $block= ['+' => [['(variable)' => 'a'], ['(literal)' => '1']]];
+    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
     $this->assertNodes(
       [['function' => [[[], null], ['$a', '$b'], [['return' => $block]]]]],
       $this->parse('function() use($a, $b) { return $a + 1; };')
@@ -104,7 +104,7 @@ class FunctionsTest extends ParseTest {
 
   #[@test]
   public function default_closure_with_use_by_reference() {
-    $block= ['+' => [['(variable)' => 'a'], ['(literal)' => '1']]];
+    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
     $this->assertNodes(
       [['function' => [[[], null], ['$a', '&$b'], [['return' => $block]]]]],
       $this->parse('function() use($a, &$b) { return $a + 1; };')

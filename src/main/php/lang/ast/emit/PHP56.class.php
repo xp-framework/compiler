@@ -91,53 +91,53 @@ class PHP56 extends \lang\ast\Emitter {
   }
 
   protected function catches($catch) {
-    $last= array_pop($catch[0]);
+    $last= array_pop($catch->types);
     $label= sprintf('c%u', crc32($last));
-    foreach ($catch[0] as $type) {
-      $this->out->write('catch('.$type.' $'.$catch[1].') { goto '.$label.'; }');
+    foreach ($catch->types as $type) {
+      $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
     }
 
-    $this->out->write('catch('.$last.' $'.$catch[1].') { '.$label.':');
-    $this->emit($catch[2]);
+    $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
+    $this->emit($catch->body);
     $this->out->write('}');
   }
 
   protected function emitConst($node) {
-    $this->out->write('const '.$node->value[0].'=');
-    $this->emit($node->value[2]);
+    $this->out->write('const '.$node->value->name.'=');
+    $this->emit($node->value->expression);
     $this->out->write(';');
   }
 
   protected function emitAssignment($node) {
-    if ('array' === $node->value[0]->arity) {
+    if ('array' === $node->value->variable->arity) {
       $this->out->write('list(');
-      foreach ($node->value[0]->value as $expr) {
-        $this->emit($expr[1]);
+      foreach ($node->value->variable->value as $pair) {
+        $this->emit($pair[1]);
         $this->out->write(',');
       }
       $this->out->write(')');
       $this->out->write($node->symbol->id);
-      $this->emit($node->value[1]);
+      $this->emit($node->value->expression);
     } else {
       parent::emitAssignment($node);
     }
   }
 
   protected function emitBinary($node) {
-    if ('??' === $node->symbol->id) {
+    if ('??' === $node->value->operator) {
       $this->out->write('isset(');
-      $this->emit($node->value[0]);
+      $this->emit($node->value->left);
       $this->out->write(') ?');
-      $this->emit($node->value[0]);
+      $this->emit($node->value->left);
       $this->out->write(' : ');
-      $this->emit($node->value[1]);
-    } else if ('<=>' === $node->symbol->id) {
+      $this->emit($node->value->right);
+    } else if ('<=>' === $node->value->operator) {
       $l= $this->temp();
       $r= $this->temp();
       $this->out->write('('.$l.'= ');
-      $this->emit($node->value[0]);
+      $this->emit($node->value->left);
       $this->out->write(') < ('.$r.'=');
-      $this->emit($node->value[1]);
+      $this->emit($node->value->right);
       $this->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
       parent::emitBinary($node);
@@ -146,19 +146,23 @@ class PHP56 extends \lang\ast\Emitter {
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitInvoke($node) {
-    $expr= $node->value[0];
+    $expr= $node->value->expression;
     if ('braced' === $expr->arity) {
       $t= $this->temp();
       $this->out->write('(('.$t.'=');
       $this->emit($expr->value);
       $this->out->write(') ? '.$t);
       $this->out->write('(');
-      $this->arguments($node->value[1]);
+      $this->arguments($node->value->arguments);
       $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
-    } else if ('scope' === $expr->arity && 'name' === $expr->value[1]->arity && isset(self::$keywords[strtolower($expr->value[1]->value)])) {
-      $this->out->write($expr->value[0].'::{\''.$expr->value[1]->value.'\'}');
+    } else if (
+      'scope' === $expr->arity &&
+      'name' === $expr->value->expression->arity &&
+      isset(self::$keywords[strtolower($expr->value->expression->value)])
+    ) {
+      $this->out->write($expr->value->type.'::{\''.$expr->value->expression->value.'\'}');
       $this->out->write('(');
-      $this->arguments($node->value[1]);
+      $this->arguments($node->value->arguments);
       $this->out->write(')');
     } else {
       parent::emitInvoke($node);
@@ -166,21 +170,21 @@ class PHP56 extends \lang\ast\Emitter {
   }
 
   protected function emitNew($node) {
-    if (null === $node->value[0]) {
+    if (null === $node->value->name) {
       $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5($node->hashCode()).'", ["kind" => "class"');
-      $definition= $node->value[2];
-      $this->out->write(', "extends" => '.($definition[2] ? '[\''.$definition[2].'\']' : 'null'));
-      $this->out->write(', "implements" => '.($definition[3] ? '[\''.implode('\', \'', $definition[3]).'\']' : 'null'));
+      $definition= $node->value->type;
+      $this->out->write(', "extends" => '.($definition->extends ? '[\''.$definition->extends.'\']' : 'null'));
+      $this->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
       $this->out->write(', "use" => []');
       $this->out->write('], \'{');
       $this->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
-        foreach ($definition[4] as $member) {
+        foreach ($definition->body as $member) {
           $this->emit($member);
           $this->out->write("\n");
         }
       })));
       $this->out->write('}\')->newInstance(');
-      $this->arguments($definition[1]);
+      $this->arguments($definition->arguments);
       $this->out->write(')');
     } else {
       parent::emitNew($node);
@@ -195,11 +199,11 @@ class PHP56 extends \lang\ast\Emitter {
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitMethod($node) {
-    if (isset(self::$keywords[strtolower($node->value[0])])) {
-      $this->call[in_array('static', $node->value[1])][]= $node->value[0];
-      $node->value[0]= '__'.$node->value[0];
-    } else if ('__call' === $node->value[0] || '__callStatic' === $node->value[0]) {
-      $node->value[0].= '0';
+    if (isset(self::$keywords[strtolower($node->value->name)])) {
+      $this->call[in_array('static', $node->value->modifiers)][]= $node->value->name;
+      $node->name= '__'.$node->name;
+    } else if ('__call' === $node->name || '__callStatic' === $node->name) {
+      $node->name.= '0';
     }
     parent::emitMethod($node);
   }
@@ -207,11 +211,11 @@ class PHP56 extends \lang\ast\Emitter {
   protected function emitClass($node) {
     $this->call= [false => [], true => []];
     array_unshift($this->meta, []);
-    $this->out->write(implode(' ', $node->value[1]).' class '.$this->declaration($node->value[0]));
-    $node->value[2] && $this->out->write(' extends '.$node->value[2]);
-    $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
+    $this->out->write(implode(' ', $node->value->name).' class '.$this->declaration($node->value->name));
+    $node->value->extends && $this->out->write(' extends '.$node->value->extends);
+    $node->value->implements && $this->out->write(' implements '.implode(', ', $node->value->implements));
     $this->out->write('{');
-    foreach ($node->value[4] as $member) {
+    foreach ($node->value->body as $member) {
       $this->emit($member);
     }
 
@@ -231,7 +235,7 @@ class PHP56 extends \lang\ast\Emitter {
     }
 
     $this->out->write('static function __init() {');
-    $this->emitMeta($node->value[0], $node->value[5], $node->value[6]);
-    $this->out->write('}} '.$node->value[0].'::__init();');
+    $this->emitMeta($node->value->name, $node->value->annotations, $node->value->comment);
+    $this->out->write('}} '.$node->value->name.'::__init();');
   }
 }
