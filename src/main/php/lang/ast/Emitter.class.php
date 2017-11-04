@@ -255,16 +255,50 @@ abstract class Emitter {
       return;
     }
 
-    $this->out->write('[');
+    $unpack= false;
     foreach ($node->value as $pair) {
-      if ($pair[0]) {
-        $this->emit($pair[0]);
-        $this->out->write('=>');
+      if ('unpack' === $pair[1]->arity) {
+        $unpack= true;
+        break;
       }
-      $this->emit($pair[1]);
-      $this->out->write(',');
     }
-    $this->out->write(']');
+
+    if ($unpack) {
+      $this->out->write('array_merge([');
+      foreach ($node->value as $pair) {
+        if ($pair[0]) {
+          $this->emit($pair[0]);
+          $this->out->write('=>');
+        }
+        if ('unpack' === $pair[1]->arity) {
+          if ('array' === $pair[1]->value->arity) {
+            $this->out->write('],');
+            $this->emit($pair[1]->value);
+            $this->out->write(',[');
+          } else {
+            $t= $this->temp();
+            $this->out->write('],('.$t.'=');
+            $this->emit($pair[1]->value);
+            $this->out->write(') instanceof \Traversable ? iterator_to_array('.$t.') : '.$t.',[');
+          }
+        } else {
+          $this->emit($pair[1]);
+          $this->out->write(',');
+        }
+      }
+      $this->out->write('])');
+    } else {
+      $this->out->write('[');
+      foreach ($node->value as $pair) {
+        if ($pair[0]) {
+          $this->emit($pair[0]);
+          $this->out->write('=>');
+        }
+        $this->emit($pair[1]);
+        $this->out->write(',');
+      }
+      $this->out->write(']');
+    }
   }
 
   // [$name, $signature, $statements]
