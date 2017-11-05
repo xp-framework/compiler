@@ -92,7 +92,7 @@ class PHP56 extends \lang\ast\Emitter {
     return null;
   }
 
-  protected function catches($catch) {
+  protected function emitCatch($catch) {
     $last= array_pop($catch->types);
     $label= sprintf('c%u', crc32($last));
     foreach ($catch->types as $type) {

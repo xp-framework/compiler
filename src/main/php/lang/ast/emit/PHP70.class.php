@@ -19,7 +19,7 @@ class PHP70 extends \lang\ast\Emitter {
     'iterable' => 71
   ];
 
-  protected function catches($catch) {
+  protected function emitCatch($catch) {
     $last= array_pop($catch->types);
     $label= sprintf('c%u', crc32($last));
     foreach ($catch->types as $type) {

@@ -142,12 +142,6 @@ abstract class Emitter {
     return $this->type($name);
   }
 
-  protected function catches($catch) {
-    $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
-    $this->emit($catch->body);
-    $this->out->write('}');
-  }
-
   protected function param($param) {
     if ($param[2] && $t= $this->paramType($param[2]->literal())) {
       $this->out->write($t.' ');
@@ -588,13 +582,19 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
+  protected function emitCatch($catch) {
+    $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+    $this->emit($catch->body);
+    $this->out->write('}');
+  }
+
   protected function emitTry($try) {
     $this->out->write('try {');
     $this->emit($try->body);
     $this->out->write('}');
     if (isset($try->catches)) {
       foreach ($try->catches as $catch) {
-        $this->catches($catch);
+        $this->emitCatch($catch);
       }
     }
     if (isset($try->finally)) {
