@@ -156,6 +156,18 @@ abstract class Emitter {
     }
   }
 
+  protected function emitImportConst($import) {
+    foreach ($import as $type => $alias) {
+      $this->out->write('use const '.$type.($alias ? ' as '.$alias : '').';');
+    }
+  }
+
+  protected function emitImportFunction($import) {
+    foreach ($import as $type => $alias) {
+      $this->out->write('use function '.$type.($alias ? ' as '.$alias : '').';');
+    }
+  }
+
   protected function emitAnnotation($annotations) {
     // NOOP
   }

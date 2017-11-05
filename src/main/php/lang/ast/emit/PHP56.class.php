@@ -8,7 +8,7 @@ use lang\ast\nodes\Value;
  * @see  https://wiki.php.net/rfc/pow-operator
  * @see  https://wiki.php.net/rfc/variadics
  * @see  https://wiki.php.net/rfc/argument_unpacking
- * @see  https://wiki.php.net/rfc/use_function - Not yet implemented
+ * @see  https://wiki.php.net/rfc/use_function
  */
 class PHP56 extends \lang\ast\Emitter {
   protected $unsupported= [

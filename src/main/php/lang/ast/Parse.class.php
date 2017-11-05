@@ -439,6 +439,16 @@ class Parse {
     });
 
     $this->stmt('use', function($node) {
+      if ('function' === $this->token->value) {
+        $node->kind= 'importfunction';
+        $this->token= $this->advance();
+      } else if ('const' === $this->token->value) {
+        $node->kind= 'importconst';
+        $this->token= $this->advance();
+      } else {
+        $node->kind= 'import';
+      }
+
       $import= $this->token->value;
       $this->token= $this->advance();
 
@@ -470,7 +480,6 @@ class Parse {
       }
 
       $this->token= $this->expect(';');
-      $node->kind= 'import';
       $node->value= $types;
       return $node;
     });
