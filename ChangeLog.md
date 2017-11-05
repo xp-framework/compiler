@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 * Fixed issue #21: Comments are not escaped - @thekid
 * Project [AST API](https://github.com/xp-framework/compiler/projects/1):
+  - Split `new` for static and anonymous types
+  - Simplified parsing and emitting loops and if/else constructs
+  - Renamend `Node::$arity` to `Node::$kind`
   - Merged PR #20: Refactor signature
   - Merged PR #19: Refactor value arrays to specialized types
   (@thekid)
