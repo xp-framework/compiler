@@ -360,7 +360,7 @@ abstract class Emitter {
     $this->out->write('\xp::$meta[\''.$this->name($name).'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->emitAnnotations($annotations);
-    $this->out->write('], DETAIL_COMMENT => \''.$comment.'\'],');
+    $this->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');
 
     foreach (array_shift($this->meta) as $type => $lookup) {
       $this->out->write($type.' => [');
@@ -374,7 +374,7 @@ abstract class Emitter {
           $this->out->write('],');
         }
         $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
-        $this->out->write(', DETAIL_COMMENT => \''.$meta[DETAIL_COMMENT].'\'');
+        $this->out->write(', DETAIL_COMMENT => \''.str_replace("'", "\\'", $meta[DETAIL_COMMENT]).'\'');
         $this->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
       }
       $this->out->write('],');

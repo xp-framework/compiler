@@ -32,4 +32,11 @@ class CommentsTest extends EmittingTest {
 
     $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
   }
+
+  #[@test]
+  public function comments_are_escaped() {
+    $t= $this->type("/** Timm's test */ class <T> { }");
+    $this->assertEquals("Timm's test", $t->getComment());
+  }
+
 }

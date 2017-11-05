@@ -295,7 +295,6 @@ class Parse {
       $arguments= $this->arguments();
       $this->token= $this->expect(')');
 
-      // Anonymous classes
       if ('variable' === $type->kind) {
         $node->value= new NewValue('$'.$type->value, $arguments);
         $node->kind= 'new';

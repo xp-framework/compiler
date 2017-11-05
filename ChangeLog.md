@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #21: Comments are not escaped - @thekid
 * Project [AST API](https://github.com/xp-framework/compiler/projects/1):
   - Merged PR #20: Refactor signature
   - Merged PR #19: Refactor value arrays to specialized types
