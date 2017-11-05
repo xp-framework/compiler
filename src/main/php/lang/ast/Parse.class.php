@@ -706,16 +706,17 @@ class Parse {
 
     $this->stmt('<<', function($node) {
       do {
-        $annotation= [$this->token->value];
+        $name= $this->token->value;
         $this->token= $this->advance();
 
         if ('(' === $this->token->symbol->id) {
           $this->token= $this->expect('(');
-          $annotation[]= $this->expression(0);
+          $this->scope->annotations[$name]= $this->expression(0);
           $this->token= $this->expect(')');
+        } else {
+          $this->scope->annotations[$name]= null;
         }
 
-        $this->scope->annotations[]= $annotation;
         if (',' === $this->token->symbol->id) {
           continue;
         } else if ('>>' === $this->token->symbol->id) {
@@ -870,17 +871,17 @@ class Parse {
         do {
           $this->token= $this->advance();
 
-          $annotation= [$this->token->value];
+          $name= $this->token->value;
           $this->token= $this->advance();
 
-          // Parameterized annotation
           if ('(' === $this->token->symbol->id) {
             $this->token= $this->expect('(');
-            $annotation[]= $this->expression(0);
+            $annotations[$name]= $this->expression(0);
             $this->token= $this->expect(')');
+          } else {
+            $annotations[$name]= null;
           }
 
-          $annotations[]= $annotation;
           if (',' === $this->token->symbol->id) {
             continue;
           } else if ('>>' === $this->token->symbol->id) {
@@ -1150,17 +1151,17 @@ class Parse {
         do {
           $this->token= $this->advance();
 
-          $annotation= [$this->token->value];
+          $name= $this->token->value;
           $this->token= $this->advance();
 
-          // Parameterized annotation
           if ('(' === $this->token->symbol->id) {
             $this->token= $this->expect('(');
-            $annotation[]= $this->expression(0);
+            $annotations[$name]= $this->expression(0);
             $this->token= $this->expect(')');
+          } else {
+            $annotations[$name]= null;
           }
 
-          $annotations[]= $annotation;
           if (',' === $this->token->symbol->id) {
             continue;
           } else if ('>>' === $this->token->symbol->id) {

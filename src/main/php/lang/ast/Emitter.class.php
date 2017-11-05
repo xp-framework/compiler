@@ -14,6 +14,7 @@ abstract class Emitter {
   protected $line= 1;
   protected $meta= [];
   protected $unsupported= [];
+  protected $transformations= [];
 
   /**
    * Selects the correct emitter for a given runtime version
@@ -38,6 +39,11 @@ abstract class Emitter {
   public function __construct($out) {
     $this->out= $out;
     $this->id= 0;
+  }
+
+  public function transform($kind, $function) {
+    $this->transformations[$kind]= $function;
+    return $this;
   }
 
   /**
@@ -357,10 +363,10 @@ abstract class Emitter {
   }
 
   protected function emitAnnotations($annotations) {
-    foreach ($annotations as $annotation) {
-      $this->out->write("'".$annotation[0]."' => ");
-      if (isset($annotation[1])) {
-        $this->emit($annotation[1]);
+    foreach ($annotations as $name => $annotation) {
+      $this->out->write("'".$name."' => ");
+      if ($annotation) {
+        $this->emit($annotation);
         $this->out->write(',');
       } else {
         $this->out->write('null,');
@@ -752,12 +758,20 @@ abstract class Emitter {
         $this->out->write("\n");
         $this->line++;
       }
+
+      if (isset($this->transformations[$arg->kind])) {
+        $arg= $this->transformations[$arg->kind]($arg);
+      }
       $this->{'emit'.$arg->kind}($arg->value);
     } else {
       foreach ($arg as $node) {
         while ($node->line > $this->line) {
           $this->out->write("\n");
           $this->line++;
+        }
+
+        if (isset($this->transformations[$node->kind])) {
+          $node= $this->transformations[$node->kind]($node);
         }
         $this->{'emit'.$node->kind}($node->value);
         isset($node->symbol->std) || $this->out->write(';');
