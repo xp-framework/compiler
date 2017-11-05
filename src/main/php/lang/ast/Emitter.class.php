@@ -304,9 +304,9 @@ abstract class Emitter {
 
   protected function emitFunction($function) {
     $this->out->write('function '.$function->name.'('); 
-    $this->params($function->signature[0]);
+    $this->params($function->signature->parameters);
     $this->out->write(')');
-    if ($t= $this->returnType($function->signature[1])) {
+    if ($t= $this->returnType($function->signature->returns)) {
       $this->out->write(':'.$t);
     }
     $this->out->write('{');
@@ -316,9 +316,9 @@ abstract class Emitter {
 
   protected function emitClosure($closure) {
     $this->out->write('function('); 
-    $this->params($closure->signature[0]);
+    $this->params($closure->signature->parameters);
     $this->out->write(')');
-    if ($closure->signature[1] && $t= $this->returnType($closure->signature[1]->literal())) {
+    if ($closure->signature->returns && $t= $this->returnType($closure->signature->returns->literal())) {
       $this->out->write(':'.$t);
     }
     if ($closure->use) {
@@ -331,9 +331,9 @@ abstract class Emitter {
 
   protected function emitLambda($lambda) {
     $this->out->write('function('); 
-    $this->params($lambda->signature[0]);
+    $this->params($lambda->signature->parameters);
     $this->out->write(')');
-    if ($lambda->signature[1] && $t= $this->returnType($lambda->signature[1]->literal())) {
+    if ($lambda->signature->returns && $t= $this->returnType($lambda->signature->returns->literal())) {
       $this->out->write(':'.$t);
     }
 
@@ -342,7 +342,7 @@ abstract class Emitter {
       $capture[$var->value]= true;
     }
     unset($capture['this']);
-    foreach ($lambda->signature[0] as $param) {
+    foreach ($lambda->signature->parameters as $param) {
       unset($capture[$param[0]]);
     }
     $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
@@ -462,7 +462,7 @@ abstract class Emitter {
 
   protected function emitMethod($method) {
     $meta= [
-      DETAIL_RETURNS     => $method->signature[1] ? $method->signature[1]->name() : 'var',
+      DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
       DETAIL_COMMENT     => $method->comment,
       DETAIL_TARGET_ANNO => [],
@@ -470,7 +470,7 @@ abstract class Emitter {
     ];
 
     $declare= $promote= $params= '';
-    foreach ($method->signature[0] as $param) {
+    foreach ($method->signature->parameters as $param) {
       if (isset($param[4])) {
         $declare.= $param[4].' $'.$param[0].';';
         $promote.= '$this->'.$param[0].'= $'.$param[0].';';
@@ -487,9 +487,9 @@ abstract class Emitter {
     }
     $this->out->write($declare);
     $this->out->write(implode(' ', $method->modifiers).' function '.$method->name.'(');
-    $this->params($method->signature[0]);
+    $this->params($method->signature->parameters);
     $this->out->write(')');
-    if ($method->signature[1] && $t= $this->returnType($method->signature[1]->literal())) {
+    if ($method->signature->returns && $t= $this->returnType($method->signature->returns->literal())) {
       $this->out->write(':'.$t);
     }
     if (null === $method->body) {
