@@ -178,6 +178,10 @@ abstract class Emitter {
     // NOOP
   }
 
+  protected function emitCode($code) {
+    $this->out->write($code);
+  }
+
   protected function emitLiteral($literal) {
     $this->out->write($literal);
   }
@@ -753,7 +757,7 @@ abstract class Emitter {
   }
 
   public function emit($arg) {
-    if ($arg instanceof Node) {
+    if ($arg instanceof Element) {
       while ($arg->line > $this->line) {
         $this->out->write("\n");
         $this->line++;

@@ -2,7 +2,7 @@
 
 use util\Objects;
 
-class Node implements \lang\Value {
+class Node implements Element, \lang\Value {
   public $symbol;
   public $value= null, $kind= null, $line= null;
 
