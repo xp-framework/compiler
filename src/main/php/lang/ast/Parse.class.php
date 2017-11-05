@@ -95,14 +95,14 @@ class Parse {
     $this->infixr('>>', 70);
 
     $this->infix('instanceof', 60, function($node, $left) {
-      if ('name' === $this->token->arity) {
+      if ('name' === $this->token->kind) {
         $node->value= new InstanceOfValue($left, $this->scope->resolve($this->token->value));
         $this->token= $this->advance();
       } else {
         $node->value= new InstanceOfValue($left, $this->expression(0));
       }
 
-      $node->arity= 'instanceof';
+      $node->kind= 'instanceof';
       return $node;
     });
 
@@ -115,14 +115,14 @@ class Parse {
       }
 
       $node->value= new InstanceValue($left, $expr);
-      $node->arity= 'instance';
+      $node->kind= 'instance';
       $this->token= $this->advance();
       return $node;
     });
 
     $this->infix('::', 80, function($node, $left) {
       $node->value= new ScopeValue($this->scope->resolve($left->value), $this->token);
-      $node->arity= 'scope';
+      $node->kind= 'scope';
       $this->token= $this->advance();
       return $node;
     });
@@ -130,7 +130,7 @@ class Parse {
     $this->infix('==>', 80, function($node, $left) {
       $signature= new Signature([new Parameter($left->value, false, null, false, false, null, null)], null);
       $node->value= new LambdaValue($signature, $this->expression(0));
-      $node->arity= 'lambda';
+      $node->kind= 'lambda';
       return $node;
     });
 
@@ -138,7 +138,7 @@ class Parse {
       $arguments= $this->arguments();
       $this->token= $this->expect(')');
       $node->value= new InvokeValue($left, $arguments);
-      $node->arity= 'invoke';
+      $node->kind= 'invoke';
       return $node;
     });
 
@@ -151,7 +151,7 @@ class Parse {
       $this->token= $this->expect(']');
 
       $node->value= new OffsetValue($left, $expr);
-      $node->arity= 'offset';
+      $node->kind= 'offset';
       return $node;
     });
 
@@ -160,7 +160,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= new OffsetValue($left, $expr);
-      $node->arity= 'offset';
+      $node->kind= 'offset';
       return $node;
     });
 
@@ -169,7 +169,7 @@ class Parse {
       $this->token= $this->expect(':');
       $else= $this->expression(0);
       $node->value= new TernaryValue($left, $when, $else);
-      $node->arity= 'ternary';
+      $node->kind= 'ternary';
       return $node;
     });
 
@@ -223,7 +223,7 @@ class Parse {
           $level++;
         } else if (')' === $this->token->symbol->id) {
           $level--;
-        } else if ('name' !== $this->token->arity && !isset($types[$this->token->value])) {
+        } else if ('name' !== $this->token->kind && !isset($types[$this->token->value])) {
           $cast= false;
         }
         $this->token= $this->advance();
@@ -232,14 +232,14 @@ class Parse {
       $this->queue= array_merge($skipped, $this->queue);
 
       if (':' === $this->token->value || '==>' === $this->token->value) {
-        $node->arity= 'lambda';
+        $node->kind= 'lambda';
 
         $this->token= $this->advance();
         $signature= $this->signature();
         $this->token= $this->advance();
         $node->value= new LambdaValue($signature, $this->expression(0));
-      } else if ($cast && '(' === $this->token->value || 'operator' !== $this->token->arity) {
-        $node->arity= 'cast';
+      } else if ($cast && '(' === $this->token->value || 'operator' !== $this->token->kind) {
+        $node->kind= 'cast';
 
         $this->token= $this->advance();
         $this->token= $this->expect('(');
@@ -247,7 +247,7 @@ class Parse {
         $this->token= $this->expect(')');
         $node->value= new CastValue($type, $this->expression(0));
       } else {
-        $node->arity= 'braced';
+        $node->kind= 'braced';
 
         $this->token= $this->advance();
         $this->token= $this->expect('(');
@@ -274,13 +274,13 @@ class Parse {
       }
 
       $this->token= $this->expect(']');
-      $node->arity= 'array';
+      $node->kind= 'array';
       $node->value= $values;
       return $node;
     });
 
     $this->prefix('{', function($node) {
-      $node->arity= 'block';
+      $node->kind= 'block';
       $node->value= $this->statements();
       $this->token= new Node($this->symbol(';'));
       return $node;
@@ -295,8 +295,8 @@ class Parse {
       $this->token= $this->expect(')');
 
       // Anonymous classes
-      $node->arity= 'new';
-      if ('variable' === $type->arity) {
+      $node->kind= 'new';
+      if ('variable' === $type->kind) {
         $node->value= new NewValue('$'.$type->value, $arguments);
       } else if ('class' === $type->value) {
         $node->value= new NewValue($this->clazz(null), $arguments);
@@ -308,14 +308,14 @@ class Parse {
 
     $this->prefix('yield', function($node) {
       if (';' === $this->token->symbol->id) {
-        $node->arity= 'yield';
+        $node->kind= 'yield';
         $node->value= new YieldValue(null, null);
       } else if ('from' === $this->token->value) {
         $this->token= $this->advance();
-        $node->arity= 'from';
+        $node->kind= 'from';
         $node->value= $this->expression(0);
       } else {
-        $node->arity= 'yield';
+        $node->kind= 'yield';
         $expr= $this->expression(0);
         if ('=>' === $this->token->symbol->id) {
           $this->token= $this->advance();
@@ -328,7 +328,7 @@ class Parse {
     });
 
     $this->prefix('...', function($node) {
-      $node->arity= 'unpack';
+      $node->kind= 'unpack';
       $node->value= $this->expression(0);
       return $node;
     });
@@ -338,7 +338,7 @@ class Parse {
       // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;
       // the latter explicitely becomes a statement by pushing a semicolon.
       if ('(' === $this->token->symbol->id) {
-        $node->arity= 'closure';
+        $node->kind= 'closure';
         $signature= $this->signature();
 
         if ('use' === $this->token->value) {
@@ -367,7 +367,7 @@ class Parse {
 
         $node->value= new ClosureValue($signature, $use, $statements);
       } else {
-        $node->arity= 'function';
+        $node->kind= 'function';
         $name= $this->token->value;
         $this->token= $this->advance();
         $signature= $this->signature();
@@ -376,7 +376,7 @@ class Parse {
           $n= new Node($this->token->symbol);
           $this->token= $this->advance();
           $n->value= $this->expression(0);
-          $n->arity= 'return';
+          $n->kind= 'return';
           $statements= [$n];
           $this->token= $this->expect(';');
         } else {                              // Regular function
@@ -394,8 +394,8 @@ class Parse {
     });
 
     $this->prefix('static', function($node) {
-      if ('variable' === $this->token->arity) {
-        $node->arity= 'static';
+      if ('variable' === $this->token->kind) {
+        $node->kind= 'static';
         $node->value= [];
         while (';' !== $this->token->symbol->id) {
           $variable= $this->token->value;
@@ -418,7 +418,7 @@ class Parse {
     });
 
     $this->stmt('<?', function($node) {
-      $node->arity= 'start';
+      $node->kind= 'start';
       $node->value= $this->token->value;
 
       $this->token= $this->advance();
@@ -426,7 +426,7 @@ class Parse {
     });
 
     $this->stmt('namespace', function($node) {
-      $node->arity= 'package';
+      $node->kind= 'package';
       $node->value= $this->token->value;
 
       $this->token= $this->advance();
@@ -468,7 +468,7 @@ class Parse {
       }
 
       $this->token= $this->expect(';');
-      $node->arity= 'import';
+      $node->kind= 'import';
       $node->value= $types;
       return $node;
     });
@@ -500,7 +500,7 @@ class Parse {
       }
 
       $node->value= new IfValue($condition, $when, $otherwise);
-      $node->arity= 'if';
+      $node->kind= 'if';
       return $node;
     });
 
@@ -528,7 +528,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= new SwitchValue($condition, $cases);
-      $node->arity= 'switch';
+      $node->kind= 'switch';
       return $node;
     });
 
@@ -541,7 +541,7 @@ class Parse {
         $this->token= $this->expect(';');
       }
 
-      $node->arity= 'break';
+      $node->kind= 'break';
       return $node;
     });
 
@@ -554,7 +554,7 @@ class Parse {
         $this->token= $this->expect(';');
       }
 
-      $node->arity= 'continue';
+      $node->kind= 'continue';
       return $node;
     });
 
@@ -568,7 +568,7 @@ class Parse {
       $this->token= $this->expect(';');
 
       $node->value= new DoValue($expression, $loop);
-      $node->arity= 'do';
+      $node->kind= 'do';
       return $node;
     });
 
@@ -579,7 +579,7 @@ class Parse {
       $loop= $this->statement();
 
       $node->value= new WhileValue($expression, $loop);
-      $node->arity= 'while';
+      $node->kind= 'while';
       return $node;
     });
 
@@ -595,7 +595,7 @@ class Parse {
       $stmt= $this->statement();
 
       $node->value= new ForValue($init, $cond, $loop, $stmt);
-      $node->arity= 'for';
+      $node->kind= 'for';
       return $node;
     });
 
@@ -619,13 +619,13 @@ class Parse {
 
       $loop= $this->statement();
       $node->value= new ForeachValue($expression, $key, $value, $loop);
-      $node->arity= 'foreach';
+      $node->kind= 'foreach';
       return $node;
     });
 
     $this->stmt('throw', function($node) {
       $node->value= $this->expression(0);
-      $node->arity= 'throw';
+      $node->kind= 'throw';
       $this->token= $this->expect(';');
       return $node;      
     });
@@ -641,7 +641,7 @@ class Parse {
         $this->token= $this->expect('(');
 
         $types= [];
-        while ('name' === $this->token->arity) {
+        while ('name' === $this->token->kind) {
           $types[]= $this->scope->resolve($this->token->value);
           $this->token= $this->advance();
           if ('|' !== $this->token->symbol->id) break;
@@ -667,7 +667,7 @@ class Parse {
       }
 
       $node->value= new TryValue($statements, $catches, $finally);
-      $node->arity= 'try';
+      $node->kind= 'try';
       return $node;      
     });
 
@@ -681,7 +681,7 @@ class Parse {
 
       $result= new Node($node->symbol);
       $result->value= $expr;
-      $result->arity= 'return';
+      $result->kind= 'return';
       return $result;
     });
 
@@ -691,7 +691,7 @@ class Parse {
       $this->token= $this->advance();
 
       $node->value= $this->clazz($type, ['abstract']);
-      $node->arity= 'class';
+      $node->kind= 'class';
       return $node;
     });
 
@@ -701,7 +701,7 @@ class Parse {
       $this->token= $this->advance();
 
       $node->value= $this->clazz($type, ['final']);
-      $node->arity= 'class';
+      $node->kind= 'class';
       return $node;
     });
 
@@ -727,7 +727,7 @@ class Parse {
       } while (true);
 
       $this->token= $this->expect('>>');
-      $node->arity= 'annotation';
+      $node->kind= 'annotation';
       return $node;
     });
 
@@ -736,7 +736,7 @@ class Parse {
       $this->token= $this->advance();
 
       $node->value= $this->clazz($type);
-      $node->arity= 'class';
+      $node->kind= 'class';
       return $node;
     });
 
@@ -765,7 +765,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= new InterfaceValue($type, [], $parents, $body, $this->scope->annotations, $this->comment);
-      $node->arity= 'interface';
+      $node->kind= 'interface';
       $this->scope->annotations= [];
       $this->comment= null;
       return $node;
@@ -780,7 +780,7 @@ class Parse {
       $this->token= $this->expect('}');
 
       $node->value= new TraitValue($type, [], $body, $this->scope->annotations, $this->comment);
-      $node->arity= 'trait';
+      $node->kind= 'trait';
       $this->scope->annotations= [];
       $this->comment= null;
       return $node;
@@ -826,7 +826,7 @@ class Parse {
       $this->token= $this->expect(')');
       $this->token= $this->expect(':');
       return new FunctionType($signature, $this->type(false));
-    } else if ('name' === $this->token->arity) {
+    } else if ('name' === $this->token->kind) {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
     } else if ($optional) {
@@ -893,7 +893,7 @@ class Parse {
         $this->token= $this->expect('>>');
       }
 
-      if ('name' === $this->token->arity && isset($promotion[$this->token->value])) {
+      if ('name' === $this->token->kind && isset($promotion[$this->token->value])) {
         $promote= $this->token->value;
         $this->token= $this->advance();
       } else {
@@ -1019,7 +1019,7 @@ class Parse {
         $this->token= $this->advance();
       } else if ('use' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
-        $member->arity= 'use';
+        $member->kind= 'use';
 
         $this->token= $this->advance();
         $types= [];
@@ -1060,7 +1060,7 @@ class Parse {
         $body[]= $member;
       } else if ('function' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
-        $member->arity= 'method';
+        $member->kind= 'method';
 
         $this->token= $this->advance();
         $name= $this->token->value;
@@ -1078,7 +1078,7 @@ class Parse {
           $n= new Node($this->token->symbol);
           $this->token= $this->advance();
           $n->value= $this->expression(0);
-          $n->arity= 'return';
+          $n->kind= 'return';
           $statements= [$n];
           $this->token= $this->expect(';');
         } else {
@@ -1092,7 +1092,7 @@ class Parse {
         $this->comment= null;
       } else if ('const' === $this->token->symbol->id) {
         $n= new Node($this->token->symbol);
-        $n->arity= 'const';
+        $n->kind= 'const';
         $this->token= $this->advance();
 
         while (';' !== $this->token->symbol->id) {
@@ -1110,9 +1110,9 @@ class Parse {
         }
         $this->token= $this->expect(';');
         $modifiers= [];
-      } else if ('variable' === $this->token->arity) {
+      } else if ('variable' === $this->token->kind) {
         $n= new Node($this->token->symbol);
-        $n->arity= 'property';
+        $n->kind= 'property';
 
         while (';' !== $this->token->symbol->id) {
           $member= clone $n;
@@ -1234,7 +1234,7 @@ class Parse {
   private function constant($id, $value) {
     $const= $this->symbol($id);
     $const->nud= function($node) use($value) {
-      $node->arity= 'literal';
+      $node->kind= 'literal';
       $node->value= $value;
       return $node;
     };
@@ -1251,7 +1251,7 @@ class Parse {
     $infix= $this->symbol($id, 10);
     $infix->led= function($node, $left) use($id) {
       $result= new Node($this->symbol($id));
-      $result->arity= 'assignment';
+      $result->kind= 'assignment';
       $result->value= new AssignmentValue($left, $id, $this->expression(9));
       return $result;
     };
@@ -1262,7 +1262,7 @@ class Parse {
     $infix= $this->symbol($id, $bp);
     $infix->led= $led ?: function($node, $left) use($id, $bp) {
       $node->value= new BinaryValue($left, $id, $this->expression($bp));
-      $node->arity= 'binary';
+      $node->kind= 'binary';
       return $node;
     };
     return $infix;
@@ -1272,7 +1272,7 @@ class Parse {
     $infix= $this->symbol($id, $bp);
     $infix->led= $led ?: function($node, $left) use($id, $bp) {
       $node->value= new BinaryValue($left, $id, $this->expression($bp - 1));
-      $node->arity= 'binary';
+      $node->kind= 'binary';
       return $node;
     };
     return $infix;
@@ -1282,7 +1282,7 @@ class Parse {
     $prefix= $this->symbol($id);
     $prefix->nud= $nud ?: function($node) use($id) {
       $node->value= new UnaryValue($this->expression(70), $id);
-      $node->arity= 'unary';
+      $node->kind= 'unary';
       return $node;
     };
     return $prefix;
@@ -1292,7 +1292,7 @@ class Parse {
     $suffix= $this->symbol($id, $bp);
     $suffix->led= $led ?: function($node, $left) use($id) {
       $node->value= new UnaryValue($left, $id);
-      $node->arity= 'unary';
+      $node->kind= 'unary';
       return $node;
     };
     return $suffix;
@@ -1331,7 +1331,7 @@ class Parse {
         throw new Error('Unexpected token '.$value.' on line '.$line);
       }
 
-      $node->arity= $type;
+      $node->kind= $type;
       $node->value= $value;
       $node->line= $line;
       // \util\cmd\Console::writeLine('-> ', $node);

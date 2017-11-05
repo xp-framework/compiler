@@ -104,30 +104,30 @@ abstract class Emitter {
   }
 
   /**
-   * Search a given scope recursively for nodes with a given arity
+   * Search a given scope recursively for nodes with a given kind
    *
    * @param  lang.ast.Node|lang.ast.Node[] $arg
-   * @param  string $arity
+   * @param  string $kind
    * @return iterable
    */
-  protected function search($arg, $arity) {
+  protected function search($arg, $kind) {
     if ($arg instanceof Node) {         // TODO: Do we need this?
-      if ($arg->arity === $arity) {
+      if ($arg->kind === $kind) {
         yield $arg;
       } else {
-        foreach ($this->search($arg->value, $arity) as $result) {
+        foreach ($this->search($arg->value, $kind) as $result) {
           yield $result;
         }
       }
     } else if ($arg instanceof Value) {  // TODO: Move recursion into Kind subclasses
       foreach ((array)$arg as $node) {
-        foreach ($this->search($node, $arity) as $result) {
+        foreach ($this->search($node, $kind) as $result) {
           yield $result;
         }
       }
     } else if (is_array($arg)) {
       foreach ($arg as $node) {
-        foreach ($this->search($node, $arity) as $result) {
+        foreach ($this->search($node, $kind) as $result) {
           yield $result;
         }
       }
@@ -215,7 +215,7 @@ abstract class Emitter {
 
     $unpack= false;
     foreach ($array as $pair) {
-      if ('unpack' === $pair[1]->arity) {
+      if ('unpack' === $pair[1]->kind) {
         $unpack= true;
         break;
       }
@@ -228,8 +228,8 @@ abstract class Emitter {
           $this->emit($pair[0]);
           $this->out->write('=>');
         }
-        if ('unpack' === $pair[1]->arity) {
-          if ('array' === $pair[1]->value->arity) {
+        if ('unpack' === $pair[1]->kind) {
+          if ('array' === $pair[1]->value->kind) {
             $this->out->write('],');
             $this->emit($pair[1]->value);
             $this->out->write(',[');
@@ -605,7 +605,7 @@ abstract class Emitter {
     }
     $this->emit($foreach->value);
     $this->out->write(')');
-    if ('block' === $foreach->body->arity) {
+    if ('block' === $foreach->body->kind) {
       $this->out->write('{');
       $this->emit($foreach->body->value);
       $this->out->write('}');
@@ -623,7 +623,7 @@ abstract class Emitter {
     $this->out->write(';');
     $this->emitArguments($for->loop);
     $this->out->write(')');
-    if ('block' === $for->body->arity) {
+    if ('block' === $for->body->kind) {
       $this->out->write('{');
       $this->emit($for->body->value);
       $this->out->write('}');
@@ -635,7 +635,7 @@ abstract class Emitter {
 
   protected function emitDo($do) {
     $this->out->write('do');
-    if ('block' === $do->body->arity) {
+    if ('block' === $do->body->kind) {
       $this->out->write('{');
       $this->emit($do->body->value);
       $this->out->write('}');
@@ -652,7 +652,7 @@ abstract class Emitter {
     $this->out->write('while (');
     $this->emit($while->expression);
     $this->out->write(')');
-    if ('block' === $while->body->arity) {
+    if ('block' === $while->body->kind) {
       $this->out->write('{');
       $this->emit($while->body->value);
       $this->out->write('}');
@@ -727,7 +727,7 @@ abstract class Emitter {
   }
 
   protected function emitInstance($instance) {
-    if ('new' === $instance->expression->arity) {
+    if ('new' === $instance->expression->kind) {
       $this->out->write('(');
       $this->emit($instance->expression);
       $this->out->write(')->');
@@ -765,14 +765,14 @@ abstract class Emitter {
         $this->out->write("\n");
         $this->line++;
       }
-      $this->{'emit'.$arg->arity}($arg->value);
+      $this->{'emit'.$arg->kind}($arg->value);
     } else {
       foreach ($arg as $node) {
         while ($node->line > $this->line) {
           $this->out->write("\n");
           $this->line++;
         }
-        $this->{'emit'.$node->arity}($node->value);
+        $this->{'emit'.$node->kind}($node->value);
         isset($node->symbol->std) || $this->out->write(';');
       }
     }

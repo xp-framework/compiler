@@ -32,7 +32,7 @@ class PHP70 extends \lang\ast\Emitter {
   }
 
   protected function emitAssignment($assignment) {
-    if ('array' === $assignment->variable->arity) {
+    if ('array' === $assignment->variable->kind) {
       $this->out->write('list(');
       foreach ($assignment->variable->value as $pair) {
         $this->emit($pair[1]);

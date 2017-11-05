@@ -4,7 +4,7 @@ use util\Objects;
 
 class Node implements \lang\Value {
   public $symbol;
-  public $value= null, $arity= null, $line= null;
+  public $value= null, $kind= null, $line= null;
 
   public function __construct(Symbol $symbol) {
     $this->symbol= $symbol;
@@ -29,11 +29,11 @@ class Node implements \lang\Value {
   }
 
   public function hashCode() {
-    return $this->symbol->hashCode().$this->arity.Objects::hashOf($this->value);
+    return $this->symbol->hashCode().$this->kind.Objects::hashOf($this->value);
   }
 
   public function toString() {
-    return nameof($this).'(arity= '.$this->arity.', value= '.Objects::stringOf($this->value).')';
+    return nameof($this).'(kind= '.$this->kind.', value= '.Objects::stringOf($this->value).')';
   }
 
   public function compareTo($that) {

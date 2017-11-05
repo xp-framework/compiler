@@ -111,7 +111,7 @@ class PHP56 extends \lang\ast\Emitter {
   }
 
   protected function emitAssignment($assignment) {
-    if ('array' === $assignment->variable->arity) {
+    if ('array' === $assignment->variable->kind) {
       $this->out->write('list(');
       foreach ($assignment->variable->value as $pair) {
         $this->emit($pair[1]);
@@ -149,7 +149,7 @@ class PHP56 extends \lang\ast\Emitter {
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitInvoke($invoke) {
     $expr= $invoke->expression;
-    if ('braced' === $expr->arity) {
+    if ('braced' === $expr->kind) {
       $t= $this->temp();
       $this->out->write('(('.$t.'=');
       $this->emit($expr->value);
@@ -158,8 +158,8 @@ class PHP56 extends \lang\ast\Emitter {
       $this->emitArguments($invoke->arguments);
       $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
     } else if (
-      'scope' === $expr->arity &&
-      'name' === $expr->value->member->arity &&
+      'scope' === $expr->kind &&
+      'name' === $expr->value->member->kind &&
       isset(self::$keywords[strtolower($expr->value->member->value)])
     ) {
       $this->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
