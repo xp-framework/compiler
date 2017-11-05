@@ -155,7 +155,7 @@ class PHP56 extends \lang\ast\Emitter {
       $this->emit($expr->value);
       $this->out->write(') ? '.$t);
       $this->out->write('(');
-      $this->arguments($invoke->arguments);
+      $this->emitArguments($invoke->arguments);
       $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
     } else if (
       'scope' === $expr->arity &&
@@ -164,7 +164,7 @@ class PHP56 extends \lang\ast\Emitter {
     ) {
       $this->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
       $this->out->write('(');
-      $this->arguments($invoke->arguments);
+      $this->emitArguments($invoke->arguments);
       $this->out->write(')');
     } else {
       parent::emitInvoke($invoke);
@@ -186,7 +186,7 @@ class PHP56 extends \lang\ast\Emitter {
         }
       })));
       $this->out->write('}\')->newInstance(');
-      $this->arguments($new->arguments);
+      $this->emitArguments($new->arguments);
       $this->out->write(')');
     } else {
       parent::emitNew($new);

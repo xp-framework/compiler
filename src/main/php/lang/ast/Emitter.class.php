@@ -142,14 +142,6 @@ abstract class Emitter {
     return $this->type($name);
   }
 
-  protected function arguments($list) {
-    $s= sizeof($list) - 1;
-    foreach ($list as $i => $argument) {
-      $this->emit($argument);
-      if ($i < $s) $this->out->write(', ');
-    }
-  }
-
   private function annotations($list) {
     foreach ($list as $annotation) {
       $this->out->write("'".$annotation[0]."' => ");
@@ -625,11 +617,11 @@ abstract class Emitter {
 
   protected function emitFor($for) {
     $this->out->write('for (');
-    $this->arguments($for->initialization);
+    $this->emitArguments($for->initialization);
     $this->out->write(';');
-    $this->arguments($for->condition);
+    $this->emitArguments($for->condition);
     $this->out->write(';');
-    $this->arguments($for->loop);
+    $this->emitArguments($for->loop);
     $this->out->write(')');
     if ('block' === $for->body->arity) {
       $this->out->write('{');
@@ -692,10 +684,18 @@ abstract class Emitter {
     }
   }
 
+  protected function emitArguments($arguments) {
+    $s= sizeof($arguments) - 1;
+    foreach ($arguments as $i => $argument) {
+      $this->emit($argument);
+      if ($i < $s) $this->out->write(', ');
+    }
+  }
+
   protected function emitNew($new) {
     if ($new->type instanceof Value) {
       $this->out->write('new class(');
-      $this->arguments($new->arguments);
+      $this->emitArguments($new->arguments);
       $this->out->write(')');
 
       $definition= $new->type;
@@ -709,7 +709,7 @@ abstract class Emitter {
       $this->out->write('}');
     } else {
       $this->out->write('new '.$new->type.'(');
-      $this->arguments($new->arguments);
+      $this->emitArguments($new->arguments);
       $this->out->write(')');
     }
   }
@@ -717,7 +717,7 @@ abstract class Emitter {
   protected function emitInvoke($invoke) {
     $this->emit($invoke->expression);
     $this->out->write('(');
-    $this->arguments($invoke->arguments);
+    $this->emitArguments($invoke->arguments);
     $this->out->write(')');
   }
 
