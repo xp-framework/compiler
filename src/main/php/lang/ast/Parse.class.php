@@ -8,7 +8,7 @@ use lang\ast\nodes\CastValue;
 use lang\ast\nodes\FunctionValue;
 use lang\ast\nodes\ClosureValue;
 use lang\ast\nodes\LambdaValue;
-use lang\ast\nodes\MethodValue;
+use lang\ast\nodes\Method;
 use lang\ast\nodes\ConstValue;
 use lang\ast\nodes\PropertyValue;
 use lang\ast\nodes\NewValue;
@@ -1096,7 +1096,7 @@ class Parse {
           $this->token= $this->expect('{, ; or ==>');
         }
 
-        $member->value= new MethodValue($name, $modifiers, $signature, $annotations, $statements, $this->comment);
+        $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $this->comment);
         $body[$name.'()']= $member;
         $modifiers= [];
         $annotations= null;
