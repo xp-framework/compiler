@@ -9,7 +9,7 @@ use lang\ast\nodes\FunctionValue;
 use lang\ast\nodes\ClosureValue;
 use lang\ast\nodes\LambdaValue;
 use lang\ast\nodes\Method;
-use lang\ast\nodes\ConstValue;
+use lang\ast\nodes\Constant;
 use lang\ast\nodes\Property;
 use lang\ast\nodes\NewValue;
 use lang\ast\nodes\NewClassValue;
@@ -1113,7 +1113,7 @@ class Parse {
           $this->token= $this->advance();
           $this->token= $this->expect('=');
 
-          $member->value= new ConstValue($name, $modifiers, $this->expression(0));
+          $member->value= new Constant($modifiers, $name, $this->expression(0));
           $body[$name]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
