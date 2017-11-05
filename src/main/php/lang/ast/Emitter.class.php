@@ -604,15 +604,9 @@ abstract class Emitter {
       $this->out->write(' => ');
     }
     $this->emit($foreach->value);
-    $this->out->write(')');
-    if ('block' === $foreach->body->kind) {
-      $this->out->write('{');
-      $this->emit($foreach->body->value);
-      $this->out->write('}');
-    } else {
-      $this->emit($foreach->body);
-      $this->out->write(';');
-    }
+    $this->out->write(') {');
+    $this->emit($foreach->body);
+    $this->out->write('}');
   }
 
   protected function emitFor($for) {
@@ -622,28 +616,16 @@ abstract class Emitter {
     $this->emitArguments($for->condition);
     $this->out->write(';');
     $this->emitArguments($for->loop);
-    $this->out->write(')');
-    if ('block' === $for->body->kind) {
-      $this->out->write('{');
-      $this->emit($for->body->value);
-      $this->out->write('}');
-    } else {
-      $this->emit($for->body);
-      $this->out->write(';');
-    }
+    $this->out->write(') {');
+    $this->emit($for->body);
+    $this->out->write('}');
   }
 
   protected function emitDo($do) {
     $this->out->write('do');
-    if ('block' === $do->body->kind) {
-      $this->out->write('{');
-      $this->emit($do->body->value);
-      $this->out->write('}');
-    } else {
-      $this->emit($do->body);
-      $this->out->write(';');
-    }
-    $this->out->write('while (');
+    $this->out->write('{');
+    $this->emit($do->body);
+    $this->out->write('} while (');
     $this->emit($do->expression);
     $this->out->write(');');
   }
@@ -651,15 +633,9 @@ abstract class Emitter {
   protected function emitWhile($while) {
     $this->out->write('while (');
     $this->emit($while->expression);
-    $this->out->write(')');
-    if ('block' === $while->body->kind) {
-      $this->out->write('{');
-      $this->emit($while->body->value);
-      $this->out->write('}');
-    } else {
-      $this->emit($while->body);
-      $this->out->write(';');
-    }
+    $this->out->write(') {');
+    $this->emit($while->body);
+    $this->out->write('}');
   }
 
   protected function emitBreak($break) {

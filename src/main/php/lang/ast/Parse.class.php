@@ -478,23 +478,11 @@ class Parse {
       $condition= $this->expression(0);
       $this->token= $this->expect(')');
 
-      if ('{'  === $this->token->symbol->id) {
-        $this->token= $this->expect('{');
-        $when= $this->statements();
-        $this->token= $this->expect('}');
-      } else {
-        $when= [$this->statement()];
-      }
+      $when= $this->block();
 
       if ('else' === $this->token->symbol->id) {
-        $this->token= $this->advance('else');
-        if ('{'  === $this->token->symbol->id) {
-          $this->token= $this->expect('{');
-          $otherwise= $this->statements();
-          $this->token= $this->expect('}');
-        } else {
-          $otherwise= [$this->statement()];
-        }
+        $this->token= $this->advance();
+        $otherwise= $this->block();
       } else {
         $otherwise= null;
       }
@@ -559,7 +547,7 @@ class Parse {
     });
 
     $this->stmt('do', function($node) {
-      $loop= $this->statement();
+      $block= $this->block();
 
       $this->token= $this->expect('while');
       $this->token= $this->expect('(');
@@ -567,7 +555,7 @@ class Parse {
       $this->token= $this->expect(')');
       $this->token= $this->expect(';');
 
-      $node->value= new DoValue($expression, $loop);
+      $node->value= new DoValue($expression, $block);
       $node->kind= 'do';
       return $node;
     });
@@ -576,9 +564,9 @@ class Parse {
       $this->token= $this->expect('(');
       $expression= $this->expression(0);
       $this->token= $this->expect(')');
-      $loop= $this->statement();
+      $block= $this->block();
 
-      $node->value= new WhileValue($expression, $loop);
+      $node->value= new WhileValue($expression, $block);
       $node->kind= 'while';
       return $node;
     });
@@ -592,9 +580,9 @@ class Parse {
       $loop= $this->arguments(')');
       $this->token= $this->advance(')');
 
-      $stmt= $this->statement();
+      $block= $this->block();
 
-      $node->value= new ForValue($init, $cond, $loop, $stmt);
+      $node->value= new ForValue($init, $cond, $loop, $block);
       $node->kind= 'for';
       return $node;
     });
@@ -617,8 +605,8 @@ class Parse {
 
       $this->token= $this->expect(')');
 
-      $loop= $this->statement();
-      $node->value= new ForeachValue($expression, $key, $value, $loop);
+      $block= $this->block();
+      $node->value= new ForeachValue($expression, $key, $value, $block);
       $node->kind= 'foreach';
       return $node;
     });
@@ -946,6 +934,17 @@ class Parse {
     }
 
     return new Signature($parameters, $return);
+  }
+
+   private function block() {
+    if ('{'  === $this->token->symbol->id) {
+      $this->token= $this->expect('{');
+      $block= $this->statements();
+      $this->token= $this->expect('}');
+    } else {
+      $block= [$this->statement()];
+    }
+    return $block;
   }
 
   private function clazz($name, $modifiers= []) {
