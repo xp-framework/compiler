@@ -1022,7 +1022,7 @@ class Parse {
 
     $body= [];
     $modifiers= [];
-    $annotations= null;
+    $annotations= [];
     $type= null;
     while ('}' !== $this->token->symbol->id) {
       if (isset($modifier[$this->token->symbol->id])) {
@@ -1099,7 +1099,7 @@ class Parse {
         $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $this->comment);
         $body[$name.'()']= $member;
         $modifiers= [];
-        $annotations= null;
+        $annotations= [];
         $this->comment= null;
       } else if ('const' === $this->token->symbol->id) {
         $n= new Node($this->token->symbol);
@@ -1143,7 +1143,7 @@ class Parse {
           }
         }
         $modifiers= [];
-        $annotations= null;
+        $annotations= [];
         $this->comment= null;
         $type= null;
         $this->token= $this->expect(';');

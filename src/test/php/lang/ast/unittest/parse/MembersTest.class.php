@@ -7,7 +7,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_instance_property() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], ['$a' => ['(variable)' => ['a', ['private'], null, null, null, null]]], [], null]]],
+      [['class' => ['\\A', [], null, [], ['$a' => ['(variable)' => ['a', ['private'], null, null, [], null]]], [], null]]],
       $this->parse('class A { private $a; }')
     );
   }
@@ -16,8 +16,8 @@ class MembersTest extends ParseTest {
   public function private_instance_properties() {
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        '$a' => ['(variable)' => ['a', ['private'], null, null, null, null]],
-        '$b' => ['(variable)' => ['b', ['private'], null, null, null, null]],
+        '$a' => ['(variable)' => ['a', ['private'], null, null, [], null]],
+        '$b' => ['(variable)' => ['b', ['private'], null, null, [], null]],
       ], [], null]]],
       $this->parse('class A { private $a, $b; }')
     );
@@ -27,7 +27,7 @@ class MembersTest extends ParseTest {
   public function private_instance_method() {
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['private'], [[], null], null, [], null]]
+        'a()' => ['function' => ['a', ['private'], [[], null], [], [], null]]
       ], [], null]]],
       $this->parse('class A { private function a() { } }')
     );
@@ -37,7 +37,7 @@ class MembersTest extends ParseTest {
   public function private_static_method() {
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['private', 'static'], [[], null], null, [], null]]
+        'a()' => ['function' => ['a', ['private', 'static'], [[], null], [], [], null]]
       ], [], null]]],
       $this->parse('class A { private static function a() { } }')
     );
@@ -74,7 +74,7 @@ class MembersTest extends ParseTest {
   public function method_with_return_type() {
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['public'], [[], new Type('void')], null, [], null]]
+        'a()' => ['function' => ['a', ['public'], [[], new Type('void')], [], [], null]]
       ], [], null]]],
       $this->parse('class A { public function a(): void { } }')
     );
