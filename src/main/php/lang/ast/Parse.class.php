@@ -10,7 +10,7 @@ use lang\ast\nodes\ClosureValue;
 use lang\ast\nodes\LambdaValue;
 use lang\ast\nodes\Method;
 use lang\ast\nodes\ConstValue;
-use lang\ast\nodes\PropertyValue;
+use lang\ast\nodes\Property;
 use lang\ast\nodes\NewValue;
 use lang\ast\nodes\NewClassValue;
 use lang\ast\nodes\AssignmentValue;
@@ -1132,9 +1132,9 @@ class Parse {
 
           if ('=' === $this->token->symbol->id) {
             $this->token= $this->expect('=');
-            $member->value= new PropertyValue($name, $modifiers, $this->expression(0), $type, $annotations, $this->comment);
+            $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $this->comment);
           } else {
-            $member->value= new PropertyValue($name, $modifiers, null, $type, $annotations, $this->comment);
+            $member->value= new Property($modifiers, $name, $type, null, $annotations, $this->comment);
           }
 
           $body['$'.$name]= $member;
