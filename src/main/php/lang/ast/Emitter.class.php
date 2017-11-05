@@ -599,8 +599,8 @@ abstract class Emitter {
     $this->out->write('foreach (');
     $this->emit($foreach->expression);
     $this->out->write(' as ');
-    if ($foreach->ley) {
-      $this->emit($foreach->ley);
+    if ($foreach->key) {
+      $this->emit($foreach->key);
       $this->out->write(' => ');
     }
     $this->emit($foreach->value);
