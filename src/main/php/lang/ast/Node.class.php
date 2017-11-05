@@ -33,15 +33,7 @@ class Node implements \lang\Value {
   }
 
   public function toString() {
-    $result= nameof($this).'(symbol= `'.$this->symbol->id.'`, arity= '.$this->arity;
-    if ($this->value instanceof self) {
-      return $result.")@{\n  ".str_replace("\n", "\n  ", $this->value->toString())."\n}";
-    } else if (is_array($this->value)) {
-      $list= implode("\n", array_map([Objects::class, 'stringOf'], $this->value));
-      return $result.")@{\n  ".str_replace("\n", "\n  ", $list)."\n}";
-    } else {
-      return $result.', value= '.Objects::stringOf($this->value).')';
-    }
+    return nameof($this).'(arity= '.$this->arity.', value= '.Objects::stringOf($this->value).')';
   }
 
   public function compareTo($that) {
