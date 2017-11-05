@@ -31,6 +31,8 @@ use lang\ast\nodes\SwitchValue;
 use lang\ast\nodes\CaseValue;
 use lang\ast\nodes\TryValue;
 use lang\ast\nodes\CatchValue;
+use lang\ast\nodes\Signature;
+use lang\ast\nodes\Parameter;
 
 class Parse {
   private $tokens, $token, $scope;
@@ -126,7 +128,7 @@ class Parse {
     });
 
     $this->infix('==>', 80, function($node, $left) {
-      $signature= [[[$left->value, false, null, false, false, null]], null];
+      $signature= new Signature([new Parameter($left->value, false, null, false, false, null, null)], null);
       $node->value= new LambdaValue($signature, $this->expression(0));
       $node->arity= 'lambda';
       return $node;
@@ -922,7 +924,7 @@ class Parse {
         $this->token= $this->advance();
         $default= $this->expression(0);
       }
-      $parameters[]= [$name, $byref, $type, $variadic, $promote, $default, $annotations];
+      $parameters[]= new Parameter($name, $byref, $type, $variadic, $promote, $default, $annotations);
 
       if (')' === $this->token->symbol->id) break;
       $this->token= $this->expect(',');
@@ -943,7 +945,7 @@ class Parse {
       $return= null;
     }
 
-    return [$parameters, $return];
+    return new Signature($parameters, $return);
   }
 
   private function clazz($name, $modifiers= []) {
