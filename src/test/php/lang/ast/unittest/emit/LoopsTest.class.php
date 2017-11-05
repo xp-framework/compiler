@@ -33,6 +33,19 @@ class LoopsTest extends EmittingTest {
   }
 
   #[@test]
+  public function foreach_with_single_expression() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $result= "";
+        foreach ([1, 2, 3] as $number) $result.= ",".$number;
+        return substr($result, 1);
+      }
+    }');
+
+    $this->assertEquals('1,2,3', $r);
+  }
+
+  #[@test]
   public function for_loop() {
     $r= $this->run('class <T> {
       public function run() {
