@@ -1,8 +1,8 @@
 <?php namespace lang\ast;
 
-use lang\ast\nodes\ClassValue;
-use lang\ast\nodes\InterfaceValue;
-use lang\ast\nodes\TraitValue;
+use lang\ast\nodes\ClassType;
+use lang\ast\nodes\InterfaceType;
+use lang\ast\nodes\TraitType;
 use lang\ast\nodes\UseValue;
 use lang\ast\nodes\CastValue;
 use lang\ast\nodes\FunctionValue;
@@ -764,7 +764,7 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= new InterfaceValue($type, [], $parents, $body, $this->scope->annotations, $this->comment);
+      $node->value= new InterfaceType([], $type, $parents, $body, $this->scope->annotations, $this->comment);
       $node->kind= 'interface';
       $this->scope->annotations= [];
       $this->comment= null;
@@ -779,7 +779,7 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= new TraitValue($type, [], $body, $this->scope->annotations, $this->comment);
+      $node->value= new TraitType([], $type, $body, $this->scope->annotations, $this->comment);
       $node->kind= 'trait';
       $this->scope->annotations= [];
       $this->comment= null;
@@ -990,7 +990,7 @@ class Parse {
     $body= $this->body();
     $this->token= $this->expect('}');
 
-    $return= new ClassValue($name, $modifiers, $parent, $implements, $body, $this->scope->annotations, $comment);
+    $return= new ClassType($modifiers, $name, $parent, $implements, $body, $this->scope->annotations, $comment);
     $this->scope->annotations= [];
     return $return;
   }
