@@ -764,9 +764,12 @@ abstract class Emitter {
       }
 
       if (isset($this->transformations[$arg->kind])) {
-        $arg= $this->transformations[$arg->kind]($arg);
+        foreach ($this->transformations[$arg->kind]($arg) as $n) {
+          $this->{'emit'.$n->kind}($n->value);
+        }
+      } else {
+        $this->{'emit'.$arg->kind}($arg->value);
       }
-      $this->{'emit'.$arg->kind}($arg->value);
     } else {
       foreach ($arg as $node) {
         while ($node->line > $this->line) {
@@ -775,10 +778,13 @@ abstract class Emitter {
         }
 
         if (isset($this->transformations[$node->kind])) {
-          $node= $this->transformations[$node->kind]($node);
+          foreach ($this->transformations[$node->kind]($node) as $n) {
+            $this->{'emit'.$n->kind}($n->value);
+          }
+        } else {
+          $this->{'emit'.$node->kind}($node->value);
+          isset($node->symbol->std) || $this->out->write(';');
         }
-        $this->{'emit'.$node->kind}($node->value);
-        isset($node->symbol->std) || $this->out->write(';');
       }
     }
   }
