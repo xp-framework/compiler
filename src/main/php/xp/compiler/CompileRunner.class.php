@@ -10,6 +10,7 @@ use lang\ast\Error;
 use lang\ast\Emitter;
 use util\cmd\Console;
 use util\profiling\Timer;
+use lang\ast\transform\Transformations;
 
 /**
  * Compiles future PHP to today's PHP.
@@ -57,6 +58,9 @@ class CompileRunner {
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)));
       $emitter= $emit->newInstance($out);
+      foreach (Transformations::registered() as $kind => $function) {
+        $emitter->transform($kind, $function);
+      }
       $emitter->emit($parse->execute());
 
       Console::$err->writeLinef(
