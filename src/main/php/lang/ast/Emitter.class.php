@@ -758,9 +758,9 @@ abstract class Emitter {
 
   public function emit($arg) {
     if ($arg instanceof Element) {
-      while ($arg->line > $this->line) {
-        $this->out->write("\n");
-        $this->line++;
+      if ($arg->line > $this->line) {
+        $this->out->write(str_repeat("\n", $arg->line - $this->line));
+        $this->line= $arg->line;
       }
 
       if (isset($this->transformations[$arg->kind])) {
@@ -772,9 +772,9 @@ abstract class Emitter {
       }
     } else {
       foreach ($arg as $node) {
-        while ($node->line > $this->line) {
-          $this->out->write("\n");
-          $this->line++;
+        if ($node->line > $this->line) {
+          $this->out->write(str_repeat("\n", $node->line - $this->line));
+          $this->line= $node->line;
         }
 
         if (isset($this->transformations[$node->kind])) {
