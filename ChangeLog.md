@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Project [AST API](https://github.com/xp-framework/compiler/projects/1):
+  - Merged PR #19: Refactor value arrays to specialized types
+  (@thekid)
+
 ## 1.4.0 / 2017-11-04
 
 * Merged PR #18: Allow using unpack operator inside array literals
