@@ -128,7 +128,7 @@ class Parse {
     });
 
     $this->infix('==>', 80, function($node, $left) {
-      $signature= new Signature([[$left->value, false, null, false, false, null]], null);
+      $signature= new Signature([new Parameter($left->value, false, null, false, false, null, null)], null);
       $node->value= new LambdaValue($signature, $this->expression(0));
       $node->arity= 'lambda';
       return $node;
@@ -924,7 +924,7 @@ class Parse {
         $this->token= $this->advance();
         $default= $this->expression(0);
       }
-      $parameters[]= [$name, $byref, $type, $variadic, $promote, $default, $annotations];
+      $parameters[]= new Parameter($name, $byref, $type, $variadic, $promote, $default, $annotations);
 
       if (')' === $this->token->symbol->id) break;
       $this->token= $this->expect(',');

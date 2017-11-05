@@ -143,17 +143,17 @@ abstract class Emitter {
   }
 
   protected function param($param) {
-    if ($param[2] && $t= $this->paramType($param[2]->literal())) {
+    if ($param->type && $t= $this->paramType($param->type->literal())) {
       $this->out->write($t.' ');
     }
-    if ($param[3]) {
-      $this->out->write('... $'.$param[0]);
+    if ($param->variadic) {
+      $this->out->write('... $'.$param->name);
     } else {
-      $this->out->write(($param[1] ? '&' : '').'$'.$param[0]);
+      $this->out->write(($param->reference ? '&' : '').'$'.$param->name);
     }
-    if ($param[5]) {
+    if ($param->default) {
       $this->out->write('=');
-      $this->emit($param[5]);
+      $this->emit($param->default);
     }
   }
 
@@ -343,7 +343,7 @@ abstract class Emitter {
     }
     unset($capture['this']);
     foreach ($lambda->signature->parameters as $param) {
-      unset($capture[$param[0]]);
+      unset($capture[$param->name]);
     }
     $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
 
@@ -471,19 +471,19 @@ abstract class Emitter {
 
     $declare= $promote= $params= '';
     foreach ($method->signature->parameters as $param) {
-      if (isset($param[4])) {
-        $declare.= $param[4].' $'.$param[0].';';
-        $promote.= '$this->'.$param[0].'= $'.$param[0].';';
-        $this->meta[0][self::PROPERTY][$param[0]]= [
-          DETAIL_RETURNS     => $param[2] ? $param[2]->name() : 'var',
+      if (isset($param->promote)) {
+        $declare.= $param->promote.' $'.$param->name.';';
+        $promote.= '$this->'.$param->name.'= $'.$param->name.';';
+        $this->meta[0][self::PROPERTY][$param->name]= [
+          DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
           DETAIL_ANNOTATIONS => [],
           DETAIL_COMMENT     => null,
           DETAIL_TARGET_ANNO => [],
           DETAIL_ARGUMENTS   => []
         ];
       }
-      $meta[DETAIL_TARGET_ANNO][$param[0]]= $param[6];
-      $meta[DETAIL_ARGUMENTS][]= $param[2] ? $param[2]->name() : 'var';
+      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
+      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
     }
     $this->out->write($declare);
     $this->out->write(implode(' ', $method->modifiers).' function '.$method->name.'(');
