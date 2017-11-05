@@ -171,26 +171,22 @@ class PHP56 extends \lang\ast\Emitter {
     }
   }
 
-  protected function emitNew($new) {
-    if ($new->type instanceof Value) {
-      $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
-      $definition= $new->type;
-      $this->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
-      $this->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
-      $this->out->write(', "use" => []');
-      $this->out->write('], \'{');
-      $this->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
-        foreach ($definition->body as $member) {
-          $this->emit($member);
-          $this->out->write("\n");
-        }
-      })));
-      $this->out->write('}\')->newInstance(');
-      $this->emitArguments($new->arguments);
-      $this->out->write(')');
-    } else {
-      parent::emitNew($new);
-    }
+  protected function emitNewClass($new) {
+    $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
+    $definition= $new->definition;
+    $this->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
+    $this->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
+    $this->out->write(', "use" => []');
+    $this->out->write('], \'{');
+    $this->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
+      foreach ($definition->body as $member) {
+        $this->emit($member);
+        $this->out->write("\n");
+      }
+    })));
+    $this->out->write('}\')->newInstance(');
+    $this->emitArguments($new->arguments);
+    $this->out->write(')');
   }
 
   protected function emitFrom($from) {

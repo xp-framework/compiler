@@ -669,25 +669,24 @@ abstract class Emitter {
   }
 
   protected function emitNew($new) {
-    if ($new->type instanceof Value) {
-      $this->out->write('new class(');
-      $this->emitArguments($new->arguments);
-      $this->out->write(')');
+    $this->out->write('new '.$new->type.'(');
+    $this->emitArguments($new->arguments);
+    $this->out->write(')');
+  }
 
-      $definition= $new->type;
-      $definition->parent && $this->out->write(' extends '.$definition->parent);
-      $definition->implements && $this->out->write(' implements '.implode(', ', $definition->implements));
-      $this->out->write('{');
-      foreach ($definition->body as $member) {
-        $this->emit($member);
-        $this->out->write("\n");
-      }
-      $this->out->write('}');
-    } else {
-      $this->out->write('new '.$new->type.'(');
-      $this->emitArguments($new->arguments);
-      $this->out->write(')');
+  protected function emitNewClass($new) {
+    $this->out->write('new class(');
+    $this->emitArguments($new->arguments);
+    $this->out->write(')');
+
+    $new->definition->parent && $this->out->write(' extends '.$new->definition->parent);
+    $new->definition->implements && $this->out->write(' implements '.implode(', ', $new->definition->implements));
+    $this->out->write('{');
+    foreach ($new->definition->body as $member) {
+      $this->emit($member);
+      $this->out->write("\n");
     }
+    $this->out->write('}');
   }
 
   protected function emitInvoke($invoke) {

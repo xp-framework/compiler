@@ -12,6 +12,7 @@ use lang\ast\nodes\MethodValue;
 use lang\ast\nodes\ConstValue;
 use lang\ast\nodes\PropertyValue;
 use lang\ast\nodes\NewValue;
+use lang\ast\nodes\NewClassValue;
 use lang\ast\nodes\AssignmentValue;
 use lang\ast\nodes\BinaryValue;
 use lang\ast\nodes\UnaryValue;
@@ -295,13 +296,15 @@ class Parse {
       $this->token= $this->expect(')');
 
       // Anonymous classes
-      $node->kind= 'new';
       if ('variable' === $type->kind) {
         $node->value= new NewValue('$'.$type->value, $arguments);
+        $node->kind= 'new';
       } else if ('class' === $type->value) {
-        $node->value= new NewValue($this->clazz(null), $arguments);
+        $node->value= new NewClassValue($this->clazz(null), $arguments);
+        $node->kind= 'newclass';
       } else {
         $node->value= new NewValue($this->scope->resolve($type->value), $arguments);
+        $node->kind= 'new';
       }
       return $node;
     });
