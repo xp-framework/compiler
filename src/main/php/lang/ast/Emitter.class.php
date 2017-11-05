@@ -142,18 +142,6 @@ abstract class Emitter {
     return $this->type($name);
   }
 
-  private function annotations($list) {
-    foreach ($list as $annotation) {
-      $this->out->write("'".$annotation[0]."' => ");
-      if (isset($annotation[1])) {
-        $this->emit($annotation[1]);
-        $this->out->write(',');
-      } else {
-        $this->out->write('null,');
-      }
-    }
-  }
-
   protected function emitStart($start) {
     $this->out->write('<?php ');
   }
@@ -356,21 +344,33 @@ abstract class Emitter {
     $this->out->write('}} '.$class->name.'::__init();');
   }
 
+  protected function emitAnnotations($annotations) {
+    foreach ($annotations as $annotation) {
+      $this->out->write("'".$annotation[0]."' => ");
+      if (isset($annotation[1])) {
+        $this->emit($annotation[1]);
+        $this->out->write(',');
+      } else {
+        $this->out->write('null,');
+      }
+    }
+  }
+
   protected function emitMeta($name, $annotations, $comment) {
     $this->out->write('\xp::$meta[\''.$this->name($name).'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
-    $this->annotations($annotations);
+    $this->emitAnnotations($annotations);
     $this->out->write('], DETAIL_COMMENT => \''.$comment.'\'],');
 
     foreach (array_shift($this->meta) as $type => $lookup) {
       $this->out->write($type.' => [');
       foreach ($lookup as $key => $meta) {
         $this->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
-        $this->annotations($meta[DETAIL_ANNOTATIONS]);
+        $this->emitAnnotations($meta[DETAIL_ANNOTATIONS]);
         $this->out->write('], DETAIL_TARGET_ANNO => [');
         foreach ($meta[DETAIL_TARGET_ANNO] as $target => $annotations) {
           $this->out->write("'$".$target."' => [");
-          $this->annotations($annotations);
+          $this->emitAnnotations($annotations);
           $this->out->write('],');
         }
         $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
