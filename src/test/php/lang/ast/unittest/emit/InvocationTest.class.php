@@ -72,4 +72,17 @@ class InvocationTest extends EmittingTest {
       }'
     ));
   }
+
+  #[@test]
+  public function global_function() {
+    $this->assertEquals('function', $this->run(
+      'function fixture() { return "function"; }
+      class <T> {
+
+        public function run() {
+          return fixture();
+        }
+      }'
+    ));
+  }
 }

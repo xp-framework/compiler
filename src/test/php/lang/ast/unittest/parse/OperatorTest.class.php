@@ -10,7 +10,7 @@ class OperatorTest extends ParseTest {
   #])]
   public function binary($operator) {
     $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], ['(variable)' => 'b']]]],
+      [[$operator => [['(variable)' => 'a'], $operator, ['(variable)' => 'b']]]],
       $this->parse('$a '.$operator.' $b;')
     );
   }
@@ -30,7 +30,7 @@ class OperatorTest extends ParseTest {
   #])]
   public function comparison($operator) {
     $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], ['(variable)' => 'b']]]],
+      [[$operator => [['(variable)' => 'a'], $operator, ['(variable)' => 'b']]]],
       $this->parse('$a '.$operator.' $b;')
     );
   }
@@ -38,7 +38,7 @@ class OperatorTest extends ParseTest {
   #[@test, @values(['++', '--'])]
   public function suffix($operator) {
     $this->assertNodes(
-      [[$operator => ['(variable)' => 'a']]],
+      [[$operator => [['(variable)' => 'a'], $operator]]],
       $this->parse('$a'.$operator.';')
     );
   }
@@ -46,7 +46,7 @@ class OperatorTest extends ParseTest {
   #[@test, @values(['!', '~', '-', '+', '++', '--'])]
   public function prefix($operator) {
     $this->assertNodes(
-      [[$operator => ['(variable)' => 'a']]],
+      [[$operator => [['(variable)' => 'a'], $operator]]],
       $this->parse(''.$operator.'$a;')
     );
   }
@@ -59,7 +59,7 @@ class OperatorTest extends ParseTest {
   #])]
   public function assignment($operator) {
     $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], ['(variable)' => 'b']]]],
+      [[$operator => [['(variable)' => 'a'], $operator, ['(variable)' => 'b']]]],
       $this->parse('$a '.$operator.' $b;')
     );
   }
@@ -67,7 +67,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function assignment_to_offset() {
     $this->assertNodes(
-      [['=' => [['[' => [['(variable)' => 'a'], ['(literal)' => '0']]], ['(literal)' => '1']]]],
+      [['=' => [['[' => [['(variable)' => 'a'], ['(literal)' => '0']]], '=', ['(literal)' => '1']]]],
       $this->parse('$a[0]= 1;')
     );
   }
@@ -75,7 +75,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function destructuring_assignment() {
     $this->assertNodes(
-      [['=' => [['[' => [[null, ['(variable)' => 'a']], [null, ['(variable)' => 'b']]]], ['(' => [['result' => 'result'], []]]]]],
+      [['=' => [['[' => [[null, ['(variable)' => 'a']], [null, ['(variable)' => 'b']]]], '=', ['(' => [['result' => 'result'], []]]]]],
       $this->parse('[$a, $b]= result();')
     );
   }
@@ -83,7 +83,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function comparison_to_assignment() {
     $this->assertNodes(
-      [['===' => [['(literal)' => '1'], ['(' => ['=' => [['(variable)' => 'a'], ['(literal)' => '1']]]]]]],
+      [['===' => [['(literal)' => '1'], '===', ['(' => ['=' => [['(variable)' => 'a'], '=', ['(literal)' => '1']]]]]]],
       $this->parse('1 === ($a= 1);')
     );
   }
@@ -91,7 +91,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function append_array() {
     $this->assertNodes(
-      [['=' => [['[' => [['(variable)' => 'a'], null]], ['(literal)' => '1']]]],
+      [['=' => [['[' => [['(variable)' => 'a'], null]], '=', ['(literal)' => '1']]]],
       $this->parse('$a[]= 1;')
     );
   }
@@ -99,7 +99,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function clone_expression() {
     $this->assertNodes(
-      [['clone' => ['(variable)' => 'a']]],
+      [['clone' => [['(variable)' => 'a'], 'clone']]],
       $this->parse('clone $a;')
     );
   }
@@ -107,7 +107,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function error_suppression() {
     $this->assertNodes(
-      [['@' => ['(variable)' => 'a']]],
+      [['@' => [['(variable)' => 'a'], '@']]],
       $this->parse('@$a;')
     );
   }
@@ -115,7 +115,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function reference() {
     $this->assertNodes(
-      [['&' => ['(variable)' => 'a']]],
+      [['&' => [['(variable)' => 'a'], '&']]],
       $this->parse('&$a;')
     );
   }
@@ -139,7 +139,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function new_anonymous_extends() {
     $this->assertNodes(
-      [['new' => [null, [], [null, [], '\\T', [], [], [], null]]]],
+      [['new' => [[null, [], '\\T', [], [], [], null], []]]],
       $this->parse('new class() extends T { };')
     );
   }
@@ -147,7 +147,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function new_anonymous_implements() {
     $this->assertNodes(
-      [['new' => [null, [], [null, [], null, ['\\A', '\\B'], [], [], null]]]],
+      [['new' => [[null, [], null, ['\\A', '\\B'], [], [], null], []]]],
       $this->parse('new class() implements A, B { };')
     );
   }
@@ -157,6 +157,7 @@ class OperatorTest extends ParseTest {
     $this->assertNodes(
       [['.' => [
         ['->' => [['(variable)' => 'this'], ['a' => 'a']]],
+        '.',
         ['(literal)' => '"test"']
       ]]],
       $this->parse('$this->a."test";')
@@ -168,6 +169,7 @@ class OperatorTest extends ParseTest {
     $this->assertNodes(
       [['.' => [
         ['::' => ['self', ['class' => 'class']]],
+        '.',
         ['(literal)' => '"test"']
       ]]],
       $this->parse('self::class."test";')

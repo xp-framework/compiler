@@ -1,5 +1,7 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\nodes\Value;
+
 /**
  * PHP 5.6 syntax
  *
@@ -90,128 +92,132 @@ class PHP56 extends \lang\ast\Emitter {
     return null;
   }
 
-  protected function catches($catch) {
-    $last= array_pop($catch[0]);
+  protected function emitCatch($catch) {
+    $last= array_pop($catch->types);
     $label= sprintf('c%u', crc32($last));
-    foreach ($catch[0] as $type) {
-      $this->out->write('catch('.$type.' $'.$catch[1].') { goto '.$label.'; }');
+    foreach ($catch->types as $type) {
+      $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
     }
 
-    $this->out->write('catch('.$last.' $'.$catch[1].') { '.$label.':');
-    $this->emit($catch[2]);
+    $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
+    $this->emit($catch->body);
     $this->out->write('}');
   }
 
-  protected function emitConst($node) {
-    $this->out->write('const '.$node->value[0].'=');
-    $this->emit($node->value[2]);
+  protected function emitConst($const) {
+    $this->out->write('const '.$const->name.'=');
+    $this->emit($const->expression);
     $this->out->write(';');
   }
 
-  protected function emitAssignment($node) {
-    if ('array' === $node->value[0]->arity) {
+  protected function emitAssignment($assignment) {
+    if ('array' === $assignment->variable->arity) {
       $this->out->write('list(');
-      foreach ($node->value[0]->value as $expr) {
-        $this->emit($expr[1]);
+      foreach ($assignment->variable->value as $pair) {
+        $this->emit($pair[1]);
         $this->out->write(',');
       }
       $this->out->write(')');
-      $this->out->write($node->symbol->id);
-      $this->emit($node->value[1]);
+      $this->out->write($assignment->operator);
+      $this->emit($assignment->expression);
     } else {
-      parent::emitAssignment($node);
+      parent::emitAssignment($assignment);
     }
   }
 
-  protected function emitBinary($node) {
-    if ('??' === $node->symbol->id) {
+  protected function emitBinary($binary) {
+    if ('??' === $binary->operator) {
       $this->out->write('isset(');
-      $this->emit($node->value[0]);
+      $this->emit($binary->left);
       $this->out->write(') ?');
-      $this->emit($node->value[0]);
+      $this->emit($binary->left);
       $this->out->write(' : ');
-      $this->emit($node->value[1]);
-    } else if ('<=>' === $node->symbol->id) {
+      $this->emit($binary->right);
+    } else if ('<=>' === $binary->operator) {
       $l= $this->temp();
       $r= $this->temp();
       $this->out->write('('.$l.'= ');
-      $this->emit($node->value[0]);
+      $this->emit($binary->left);
       $this->out->write(') < ('.$r.'=');
-      $this->emit($node->value[1]);
+      $this->emit($binary->right);
       $this->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
-      parent::emitBinary($node);
+      parent::emitBinary($binary);
     }
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitInvoke($node) {
-    $expr= $node->value[0];
+  protected function emitInvoke($invoke) {
+    $expr= $invoke->expression;
     if ('braced' === $expr->arity) {
       $t= $this->temp();
       $this->out->write('(('.$t.'=');
       $this->emit($expr->value);
       $this->out->write(') ? '.$t);
       $this->out->write('(');
-      $this->arguments($node->value[1]);
+      $this->arguments($invoke->arguments);
       $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
-    } else if ('scope' === $expr->arity && 'name' === $expr->value[1]->arity && isset(self::$keywords[strtolower($expr->value[1]->value)])) {
-      $this->out->write($expr->value[0].'::{\''.$expr->value[1]->value.'\'}');
+    } else if (
+      'scope' === $expr->arity &&
+      'name' === $expr->value->member->arity &&
+      isset(self::$keywords[strtolower($expr->value->member->value)])
+    ) {
+      $this->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
       $this->out->write('(');
-      $this->arguments($node->value[1]);
+      $this->arguments($invoke->arguments);
       $this->out->write(')');
     } else {
-      parent::emitInvoke($node);
+      parent::emitInvoke($invoke);
     }
   }
 
-  protected function emitNew($node) {
-    if (null === $node->value[0]) {
-      $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5($node->hashCode()).'", ["kind" => "class"');
-      $definition= $node->value[2];
-      $this->out->write(', "extends" => '.($definition[2] ? '[\''.$definition[2].'\']' : 'null'));
-      $this->out->write(', "implements" => '.($definition[3] ? '[\''.implode('\', \'', $definition[3]).'\']' : 'null'));
+  protected function emitNew($new) {
+    if ($new->type instanceof Value) {
+      $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
+      $definition= $new->type;
+      $this->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
+      $this->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
       $this->out->write(', "use" => []');
       $this->out->write('], \'{');
       $this->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
-        foreach ($definition[4] as $member) {
+        foreach ($definition->body as $member) {
           $this->emit($member);
           $this->out->write("\n");
         }
       })));
       $this->out->write('}\')->newInstance(');
-      $this->arguments($definition[1]);
+      $this->arguments($new->arguments);
       $this->out->write(')');
     } else {
-      parent::emitNew($node);
+      parent::emitNew($new);
     }
   }
 
-  protected function emitFrom($node) {
+  protected function emitFrom($from) {
     $this->out->write('foreach (');
-    $this->emit($node->value);
+    $this->emit($from);
     $this->out->write(' as $key => $val) yield $key => $val;');
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitMethod($node) {
-    if (isset(self::$keywords[strtolower($node->value[0])])) {
-      $this->call[in_array('static', $node->value[1])][]= $node->value[0];
-      $node->value[0]= '__'.$node->value[0];
-    } else if ('__call' === $node->value[0] || '__callStatic' === $node->value[0]) {
-      $node->value[0].= '0';
+  protected function emitMethod($method) {
+    if (isset(self::$keywords[strtolower($method->name)])) {
+      $this->call[in_array('static', $method->modifiers)][]= $method->name;
+      $method->name= '__'.$method->name;
+    } else if ('__call' === $method->name || '__callStatic' === $method->name) {
+      $method->name.= '0';
     }
-    parent::emitMethod($node);
+    parent::emitMethod($method);
   }
 
-  protected function emitClass($node) {
+  protected function emitClass($class) {
     $this->call= [false => [], true => []];
     array_unshift($this->meta, []);
-    $this->out->write(implode(' ', $node->value[1]).' class '.$this->declaration($node->value[0]));
-    $node->value[2] && $this->out->write(' extends '.$node->value[2]);
-    $node->value[3] && $this->out->write(' implements '.implode(', ', $node->value[3]));
+    $this->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
+    $class->parent && $this->out->write(' extends '.$class->parent);
+    $class->implements && $this->out->write(' implements '.implode(', ', $class->implements));
     $this->out->write('{');
-    foreach ($node->value[4] as $member) {
+    foreach ($class->body as $member) {
       $this->emit($member);
     }
 
@@ -231,7 +237,7 @@ class PHP56 extends \lang\ast\Emitter {
     }
 
     $this->out->write('static function __init() {');
-    $this->emitMeta($node->value[0], $node->value[5], $node->value[6]);
-    $this->out->write('}} '.$node->value[0].'::__init();');
+    $this->emitMeta($class->name, $class->annotations, $class->comment);
+    $this->out->write('}} '.$class->name.'::__init();');
   }
 }

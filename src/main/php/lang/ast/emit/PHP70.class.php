@@ -19,36 +19,36 @@ class PHP70 extends \lang\ast\Emitter {
     'iterable' => 71
   ];
 
-  protected function catches($catch) {
-    $last= array_pop($catch[0]);
+  protected function emitCatch($catch) {
+    $last= array_pop($catch->types);
     $label= sprintf('c%u', crc32($last));
-    foreach ($catch[0] as $type) {
-      $this->out->write('catch('.$type.' $'.$catch[1].') { goto '.$label.'; }');
+    foreach ($catch->types as $type) {
+      $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
     }
 
-    $this->out->write('catch('.$last.' $'.$catch[1].') { '.$label.':');
-    $this->emit($catch[2]);
+    $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
+    $this->emit($catch->body);
     $this->out->write('}');
   }
 
-  protected function emitAssignment($node) {
-    if ('array' === $node->value[0]->arity) {
+  protected function emitAssignment($assignment) {
+    if ('array' === $assignment->variable->arity) {
       $this->out->write('list(');
-      foreach ($node->value[0]->value as $expr) {
-        $this->emit($expr[1]);
+      foreach ($assignment->variable->value as $pair) {
+        $this->emit($pair[1]);
         $this->out->write(',');
       }
       $this->out->write(')');
-      $this->out->write($node->symbol->id);
-      $this->emit($node->value[1]);
+      $this->out->write($assignment->operator);
+      $this->emit($assignment->expression);
     } else {
-      parent::emitAssignment($node);
+      parent::emitAssignment($assignment);
     }
   }
 
-  protected function emitConst($node) {
-    $this->out->write('const '.$node->value[0].'=');
-    $this->emit($node->value[2]);
+  protected function emitConst($const) {
+    $this->out->write('const '.$const->name.'=');
+    $this->emit($const->expression);
     $this->out->write(';');
   }
 }
