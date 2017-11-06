@@ -178,6 +178,10 @@ abstract class Emitter {
     // NOOP
   }
 
+  protected function emitCode($code) {
+    $this->out->write($code);
+  }
+
   protected function emitLiteral($literal) {
     $this->out->write($literal);
   }
@@ -753,28 +757,34 @@ abstract class Emitter {
   }
 
   public function emit($arg) {
-    if ($arg instanceof Node) {
-      while ($arg->line > $this->line) {
-        $this->out->write("\n");
-        $this->line++;
+    if ($arg instanceof Element) {
+      if ($arg->line > $this->line) {
+        $this->out->write(str_repeat("\n", $arg->line - $this->line));
+        $this->line= $arg->line;
       }
 
       if (isset($this->transformations[$arg->kind])) {
-        $arg= $this->transformations[$arg->kind]($arg);
+        foreach ($this->transformations[$arg->kind]($arg) as $n) {
+          $this->{'emit'.$n->kind}($n->value);
+        }
+      } else {
+        $this->{'emit'.$arg->kind}($arg->value);
       }
-      $this->{'emit'.$arg->kind}($arg->value);
     } else {
       foreach ($arg as $node) {
-        while ($node->line > $this->line) {
-          $this->out->write("\n");
-          $this->line++;
+        if ($node->line > $this->line) {
+          $this->out->write(str_repeat("\n", $node->line - $this->line));
+          $this->line= $node->line;
         }
 
         if (isset($this->transformations[$node->kind])) {
-          $node= $this->transformations[$node->kind]($node);
+          foreach ($this->transformations[$node->kind]($node) as $n) {
+            $this->{'emit'.$n->kind}($n->value);
+          }
+        } else {
+          $this->{'emit'.$node->kind}($node->value);
+          isset($node->symbol->std) || $this->out->write(';');
         }
-        $this->{'emit'.$node->kind}($node->value);
-        isset($node->symbol->std) || $this->out->write(';');
       }
     }
   }

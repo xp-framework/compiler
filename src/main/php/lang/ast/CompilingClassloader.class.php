@@ -11,6 +11,7 @@ use lang\ElementNotFoundException;
 use lang\IllegalStateException;
 use text\StreamTokenizer;
 use io\streams\MemoryOutputStream;
+use lang\ast\transform\Transformations;
 
 class CompilingClassLoader implements \lang\IClassLoader {
   private static $instance= [];
@@ -165,6 +166,9 @@ class CompilingClassLoader implements \lang\IClassLoader {
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($file->in())));
       $emitter= $this->emit->newInstance($declaration);
+      foreach (Transformations::registered() as $kind => $function) {
+        $emitter->transform($kind, $function);
+      }
       $emitter->emit($parse->execute());
 
       return $declaration->getBytes();
