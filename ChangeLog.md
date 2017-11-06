@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.1 / 2017-11-06
+
+* Fixed issue #24: Comments contain stars - @thekid
+
 ## 2.0.0 / 2017-11-06
 
 * Implemented `use function` and `use const` - @thekid

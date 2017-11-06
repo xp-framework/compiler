@@ -64,8 +64,24 @@ class LineNumberTest extends \unittest\TestCase {
   #[@test]
   public function multi_line_apidoc_comment() {
     $this->assertPositions(
-      [["COMMENT\n" => 1], ['HERE' => 3]],
+      [["LINE1\nLINE2" => 1], ['HERE' => 3]],
+      new Tokens(new StringTokenizer("/** LINE1\nLINE2 */\nHERE"))
+    );
+  }
+
+  #[@test]
+  public function multi_line_apidoc_comment_is_trimmed() {
+    $this->assertPositions(
+      [['COMMENT' => 1], ['HERE' => 3]],
       new Tokens(new StringTokenizer("/** COMMENT\n */\nHERE"))
+    );
+  }
+
+  #[@test]
+  public function multi_line_apidoc_comment_leading_stars_removed() {
+    $this->assertPositions(
+      [["LINE1\nLINE2" => 1], ['HERE' => 3]],
+      new Tokens(new StringTokenizer("/** LINE1\n * LINE2 */\nHERE"))
     );
   }
 
