@@ -12,7 +12,7 @@ XP Compiler ChangeLog
   - Index annotations by name
   - Split `new` for static and anonymous types
   - Simplified parsing and emitting loops and if/else constructs
-  - Renamend `Node::$arity` to `Node::$kind`
+  - Renamed `Node::$arity` to `Node::$kind`
   - Merged PR #20: Refactor signature
   - Merged PR #19: Refactor value arrays to specialized types
   (@thekid)
