@@ -6,6 +6,7 @@ XP Compiler ChangeLog
 * Implemented `use function` and `use const` - @thekid
 * Fixed issue #21: Comments are not escaped - @thekid
 * Project [AST API](https://github.com/xp-framework/compiler/projects/1):
+  - Merged PR #22: Extract AST (to https://github.com/xp-framework/ast)
   - Index annotations by name
   - Split `new` for static and anonymous types
   - Simplified parsing and emitting loops and if/else constructs
