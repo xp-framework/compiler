@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.0 / 2017-11-06
+
 * Implemented `use function` and `use const` - @thekid
 * Fixed issue #21: Comments are not escaped - @thekid
 * Project [AST API](https://github.com/xp-framework/compiler/projects/1):
