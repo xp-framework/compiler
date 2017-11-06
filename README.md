@@ -94,3 +94,4 @@ Notes:
 See also:
 
 * [XP RFC #0299: Make XP compiler the TypeScript of PHP](https://github.com/xp-framework/rfc/issues/299)
+* [XP RFC #0327: Compile-time metaprogramming](https://github.com/xp-framework/rfc/issues/327)
