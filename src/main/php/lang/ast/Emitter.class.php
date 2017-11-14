@@ -554,7 +554,7 @@ abstract class Emitter {
 
   protected function emitReturn($return) {
     $this->out->write('return ');
-    $this->emit($return);
+    $return && $this->emit($return);
     $this->out->write(';');
   }
 

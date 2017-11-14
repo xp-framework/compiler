@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.2 / 2017-11-14
+
+* Fixed issue #25: Warnings for `return;` - @thekid
+
 ## 2.0.1 / 2017-11-06
 
 * Fixed issue #24: Comments contain stars - @thekid
