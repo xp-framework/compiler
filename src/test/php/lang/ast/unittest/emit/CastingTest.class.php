@@ -123,4 +123,16 @@ class CastingTest extends EmittingTest {
       [$this, 'getName']
     ));
   }
+
+  #[@test]
+  public function object_cast_on_literal() {
+    $this->assertEquals((object)['key' => 'value'], $this->run(
+      'class <T> {
+        public function run($value) {
+          return (object)["key" => "value"];
+        }
+      }',
+      ['test']
+    ));
+  }
 }

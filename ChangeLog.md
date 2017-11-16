@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed cast on array and map literals, e.g. `(object)['key' => 'value']`
+  (@thekid)
+
 ## 2.0.2 / 2017-11-14
 
 * Fixed issue #25: Warnings for `return;` - @thekid
