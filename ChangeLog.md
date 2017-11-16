@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.3 / 2017-11-16
+
 * Fixed cast on array and map literals, e.g. `(object)['key' => 'value']`
   (@thekid)
 
