@@ -3,9 +3,14 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 2.0.3 / 2017-11-19
+## 2.0.4 / 2017-11-19
 
 * Fixed issue #27: Class not found - @thekid
+
+## 2.0.3 / 2017-11-16
+
+* Fixed cast on array and map literals, e.g. `(object)['key' => 'value']`
+  (@thekid)
 
 ## 2.0.2 / 2017-11-14
 

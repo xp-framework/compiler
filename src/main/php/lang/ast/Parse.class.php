@@ -239,7 +239,7 @@ class Parse {
         $signature= $this->signature();
         $this->token= $this->advance();
         $node->value= new LambdaExpression($signature, $this->expression(0));
-      } else if ($cast && '(' === $this->token->value || 'operator' !== $this->token->kind) {
+      } else if ($cast && ('operator' !== $this->token->kind || '(' === $this->token->value || '[' === $this->token->value)) {
         $node->kind= 'cast';
 
         $this->token= $this->advance();

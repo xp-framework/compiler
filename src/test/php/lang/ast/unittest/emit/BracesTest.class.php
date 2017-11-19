@@ -80,15 +80,19 @@ class BracesTest extends EmittingTest {
     $this->assertEquals(320, $r);
   }
 
-  #[@test]
-  public function global_constant_in_braces_not_confused_with_cast() {
+  #[@test, @values(map= [
+  #  '(__LINE__)."test"' => '3test',
+  #  '(__LINE__) + 1'    => 4,
+  #  '(__LINE__) - 1'    => 2,
+  #])]
+  public function global_constant_in_braces_not_confused_with_cast($input, $expected) {
     $r= $this->run('class <T> {
       public function run() {
-        return (__LINE__)."test";
+        return '.$input.';
       }
     }');
 
-    $this->assertEquals('3test', $r);
+    $this->assertEquals($expected, $r);
   }
 
   #[@test]
