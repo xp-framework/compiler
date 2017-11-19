@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.3 / 2017-11-19
+
+* Fixed issue #27: Class not found - @thekid
+
 ## 2.0.2 / 2017-11-14
 
 * Fixed issue #25: Warnings for `return;` - @thekid

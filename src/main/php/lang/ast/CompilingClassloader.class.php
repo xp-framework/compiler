@@ -15,7 +15,6 @@ use lang\ast\transform\Transformations;
 
 class CompilingClassLoader implements \lang\IClassLoader {
   private static $instance= [];
-  private $loaders= null;
   private $version, $emit;
 
   public function __construct($version) {
@@ -31,9 +30,8 @@ class CompilingClassLoader implements \lang\IClassLoader {
    */
   protected function locateSource($class) {
     if (!isset($this->source[$class])) {
-      $this->loaders= $this->loaders ?: ClassLoader::getDefault()->getLoaders();
       $uri= strtr($class, '.', '/').'.php';
-      foreach ($this->loaders as $loader) {
+      foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
         if ($loader instanceof self) continue;
         if ($loader->providesResource($uri)) return $this->source[$class]= $loader;
       }
@@ -89,9 +87,8 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return string[]
    */
   public function packageContents($package) {
-    $this->loaders= $this->loaders ?: ClassLoader::getDefault()->getLoaders();
     $r= [];
-    foreach ($this->loaders as $loader) {
+    foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
       if ($loader instanceof self) continue;
       foreach ($loader->packageContents($package) as $content) {
         if ('.php' === substr($content, $p= strpos($content, '.'))) {
