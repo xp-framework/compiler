@@ -85,6 +85,14 @@ class FunctionsTest extends ParseTest {
   }
 
   #[@test]
+  public function with_nullable_return() {
+    $this->assertNodes(
+      [['function' => ['a', [[], new Type('?string')], []]]],
+      $this->parse('function a(): ?string { }')
+    );
+  }
+
+  #[@test]
   public function default_closure() {
     $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
     $this->assertNodes(
@@ -108,6 +116,24 @@ class FunctionsTest extends ParseTest {
     $this->assertNodes(
       [['function' => [[[], null], ['$a', '&$b'], [['return' => $block]]]]],
       $this->parse('function() use($a, &$b) { return $a + 1; };')
+    );
+  }
+
+  #[@test]
+  public function default_closure_with_return_type() {
+    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
+    $this->assertNodes(
+      [['function' => [[[], new Type('int')], null, [['return' => $block]]]]],
+      $this->parse('function(): int { return $a + 1; };')
+    );
+  }
+
+  #[@test]
+  public function default_closure_with_nullable_return_type() {
+    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
+    $this->assertNodes(
+      [['function' => [[[], new Type('?int')], null, [['return' => $block]]]]],
+      $this->parse('function(): ?int { return $a + 1; };')
     );
   }
 
