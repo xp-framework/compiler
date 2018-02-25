@@ -743,6 +743,8 @@ class Parse {
     $this->stmt('interface', function($node) {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
+      $comment= $this->comment;
+      $this->comment= null;
 
       $parents= [];
       if ('extends' === $this->token->value) {
@@ -764,25 +766,25 @@ class Parse {
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= new InterfaceDeclaration([], $type, $parents, $body, $this->scope->annotations, $this->comment);
+      $node->value= new InterfaceDeclaration([], $type, $parents, $body, $this->scope->annotations, $comment);
       $node->kind= 'interface';
       $this->scope->annotations= [];
-      $this->comment= null;
       return $node;
     });
 
     $this->stmt('trait', function($node) {
       $type= $this->scope->resolve($this->token->value);
       $this->token= $this->advance();
+      $comment= $this->comment;
+      $this->comment= null;
 
       $this->token= $this->expect('{');
       $body= $this->body();
       $this->token= $this->expect('}');
 
-      $node->value= new TraitDeclaration([], $type, $body, $this->scope->annotations, $this->comment);
+      $node->value= new TraitDeclaration([], $type, $body, $this->scope->annotations, $comment);
       $node->kind= 'trait';
       $this->scope->annotations= [];
-      $this->comment= null;
       return $node;
     });
   }
@@ -1072,6 +1074,8 @@ class Parse {
       } else if ('function' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
         $member->kind= 'method';
+        $comment= $this->comment;
+        $this->comment= null;
 
         $this->token= $this->advance();
         $name= $this->token->value;
@@ -1096,11 +1100,10 @@ class Parse {
           $this->token= $this->expect('{, ; or ==>');
         }
 
-        $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $this->comment);
+        $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
         $body[$name.'()']= $member;
         $modifiers= [];
         $annotations= [];
-        $this->comment= null;
       } else if ('const' === $this->token->symbol->id) {
         $n= new Node($this->token->symbol);
         $n->kind= 'const';
@@ -1124,6 +1127,8 @@ class Parse {
       } else if ('variable' === $this->token->kind) {
         $n= new Node($this->token->symbol);
         $n->kind= 'property';
+        $comment= $this->comment;
+        $this->comment= null;
 
         while (';' !== $this->token->symbol->id) {
           $member= clone $n;
@@ -1132,9 +1137,9 @@ class Parse {
 
           if ('=' === $this->token->symbol->id) {
             $this->token= $this->expect('=');
-            $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $this->comment);
+            $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
           } else {
-            $member->value= new Property($modifiers, $name, $type, null, $annotations, $this->comment);
+            $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
           }
 
           $body['$'.$name]= $member;
@@ -1144,7 +1149,6 @@ class Parse {
         }
         $modifiers= [];
         $annotations= [];
-        $this->comment= null;
         $type= null;
         $this->token= $this->expect(';');
       } else if ('<<' === $this->token->symbol->id) {

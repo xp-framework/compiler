@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.5 / 2018-02-25
+
+* Fixed apidoc comments for methods, traits and interfaces - @thekid
+
 ## 2.0.4 / 2017-11-19
 
 * Fixed issue #27: Class not found - @thekid

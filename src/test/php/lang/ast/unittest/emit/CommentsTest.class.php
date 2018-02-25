@@ -39,4 +39,46 @@ class CommentsTest extends EmittingTest {
     $this->assertEquals("Timm's test", $t->getComment());
   }
 
+  #[@test]
+  public function only_last_comment_is_considered() {
+    $t= $this->type('class <T> {
+
+      /** Not the right comment */
+
+      /** Test */
+      public function fixture() {
+        // NOOP
+      }
+    }');
+
+    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+  }
+
+  #[@test]
+  public function next_comment_is_not_considered() {
+    $t= $this->type('class <T> {
+
+      /** Test */
+      public function fixture() {
+        // NOOP
+      }
+
+      /** Not the right comment */
+    }');
+
+    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+  }
+
+  #[@test]
+  public function inline_apidoc_comment_is_not_considered() {
+    $t= $this->type('class <T> {
+
+      /** Test */
+      public function fixture() {
+        /** Not the right comment */
+      }
+    }');
+
+    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+  }
 }
