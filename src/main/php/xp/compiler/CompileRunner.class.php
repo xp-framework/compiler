@@ -40,16 +40,16 @@ class CompileRunner {
    *
    * @param  string $arg
    * @param  string $base
-   * @return iterable
+   * @return xp.compiler.Input
    * @throws lang.IllegalArgumentException
    */
   private static function input($arg, $base) {
     if ('-' === $arg) {
-      return ['(standard input)' => Console::$in->getStream()];
+      return new FromStream(Console::$in->getStream(), '(standard input)');
     } else if (is_file($arg)) {
-      return new SourceFile($arg, $base ?: '.');
+      return new FromFile($arg, $base ?: '.');
     } else if (is_dir($arg)) {
-      return new SourceFilesIn($arg, $base ?: $arg);
+      return new FromFilesIn($arg, $base ?: $arg);
     } else {
       throw new IllegalArgumentException('Expecting either - for standard input, a file or a folder as input');
     }

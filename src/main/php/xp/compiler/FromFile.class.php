@@ -5,7 +5,7 @@ use io\Folder;
 use io\Path;
 
 /** A single source file */
-class SourceFile implements Input {
+class FromFile implements Input {
   private $file, $base;
 
   /**

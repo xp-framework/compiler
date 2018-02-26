@@ -3,7 +3,7 @@
 use io\Folder;
 
 /** Source files inside a given folder */
-class SourceFilesIn implements Input {
+class FromFilesIn implements Input {
   private $folder, $base;
 
   /**
