@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.1.0 / ????-??-??
+
+* Merged PR #30: Implement compiling to directory. The command line
+  `xp compile src/main/php dist/` will compile all source files inside
+  the `src/main/php` directory to `dist`.
+  (@thekid)
+
 ## 2.0.5 / 2018-02-25
 
 * Fixed apidoc comments for methods, traits and interfaces - @thekid
