@@ -64,8 +64,8 @@ class CompileRunner {
     }
 
     $target= PHP_VERSION;
-    $cwd= getcwd();
-    $bases= [new Path($cwd)];
+    $cwd= new Path(getcwd());
+    $bases= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
@@ -75,6 +75,7 @@ class CompileRunner {
         break;
       }
     }
+    $bases[]= $cwd;
 
     $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
     $emit= Emitter::forRuntime($target);
