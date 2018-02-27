@@ -1,6 +1,6 @@
 <?php namespace xp\compiler;
 
-class ToStream implements Output {
+class ToStream extends Output {
   private $stream;
 
   /** @param io.streams.OutputStream $stream */

@@ -35,22 +35,6 @@ use util\profiling\Timer;
  */
 class CompileRunner {
 
-  /**
-   * Returns output from the command line argument
-   *
-   * @param  string $arg
-   * @return xp.compiler.Output
-   */
-  private static function output($arg) {
-    if ('-' === $arg) {
-      return new ToStream(Console::$out->getStream());
-    } else if (strstr($arg, '.php')) {
-      return new ToFile($arg);
-    } else {
-      return new ToFolder($arg);
-    }
-  }
-
   /** @return int */
   public static function main(array $args) {
     if (empty($args)) {
@@ -73,7 +57,7 @@ class CompileRunner {
     $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
     $emit= Emitter::forRuntime($target);
     $input= Input::newInstance($args[$i], $base);
-    $output= self::output($out);
+    $output= Output::newInstance($out);
 
     $t= new Timer();
     $total= $errors= 0;

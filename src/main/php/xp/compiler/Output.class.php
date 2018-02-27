@@ -1,6 +1,24 @@
 <?php namespace xp\compiler;
 
-interface Output {
+use util\cmd\Console;
+
+abstract class Output {
+
+  /**
+   * Returns output from the command line argument
+   *
+   * @param  string $arg
+   * @return self
+   */
+  public static function newInstance($arg) {
+    if ('-' === $arg) {
+      return new ToStream(Console::$out->getStream());
+    } else if (strstr($arg, '.php')) {
+      return new ToFile($arg);
+    } else {
+      return new ToFolder($arg);
+    }
+  }
 
   /**
    * Returns the target for a given input 
@@ -8,6 +26,6 @@ interface Output {
    * @param  string $name
    * @return io.streams.OutputStream
    */
-  public function target($name);
+  public abstract function target($name);
 
 }

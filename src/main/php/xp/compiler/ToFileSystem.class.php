@@ -2,7 +2,7 @@
 
 use io\Folder;
 
-abstract class ToFileSystem implements Output {
+abstract class ToFileSystem extends Output {
 
   /**
    * Ensures a given path exists, creating it if necessary
