@@ -5,7 +5,6 @@ use lang\ast\Error;
 use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\transform\Transformations;
-use lang\IllegalArgumentException;
 use lang\Runtime;
 use text\StreamTokenizer;
 use util\cmd\Console;
