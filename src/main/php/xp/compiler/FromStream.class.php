@@ -1,5 +1,7 @@
 <?php namespace xp\compiler;
 
+use io\Path;
+
 /** Streamed input */
 class FromStream extends Input {
   private $stream, $name;
@@ -17,6 +19,6 @@ class FromStream extends Input {
 
   /** @return iterable */
   public function getIterator() {
-    yield $this->name => $this->stream;
+    yield new Path($this->name) => $this->stream;
   }
 }

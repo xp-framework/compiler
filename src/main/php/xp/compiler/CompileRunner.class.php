@@ -42,7 +42,8 @@ class CompileRunner {
     }
 
     $target= PHP_VERSION;
-    $base= null;
+    $cwd= getcwd();
+    $base= $cwd;
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
@@ -55,24 +56,24 @@ class CompileRunner {
 
     $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
     $emit= Emitter::forRuntime($target);
-    $input= Input::newInstance($args[$i], $base);
+    $input= Input::newInstance($args[$i]);
     $output= Output::newInstance($out);
 
     $t= new Timer();
     $total= $errors= 0;
     $time= 0.0;
-    foreach ($input as $name => $in) {
+    foreach ($input as $path => $in) {
       $t->start();
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)));
-        $emitter= $emit->newInstance($output->target($name));
+        $emitter= $emit->newInstance($output->target($path->relativeTo($base)));
         foreach (Transformations::registered() as $kind => $function) {
           $emitter->transform($kind, $function);
         }
         $emitter->emit($parse->execute());
 
         $t->stop();
-        Console::$err->writeLinef('> %s (%.3f seconds)', $name, $t->elapsedTime());
+        Console::$err->writeLinef('> %s (%.3f seconds)', $path->relativeTo($cwd)->toString('/'), $t->elapsedTime());
       } catch (Error $e) {
         $t->stop();
         Console::$err->writeLinef('! %s: %s', $name, $e->toString());
