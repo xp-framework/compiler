@@ -9,6 +9,7 @@ use lang\Runtime;
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
+use io\Path;
 
 /**
  * Compiles future PHP to today's PHP.
@@ -21,18 +22,39 @@ use util\profiling\Timer;
  *   ```sh
  *   $ echo "<?php ..." | xp compile -
  *   ```
- * - Compile all files inside `src/main/php` to the `dist` folder.
+ * - Compile all files inside `src` to the `dist` folder.
  *   ```sh
- *   $ xp compile src/main/php dist/
+ *   $ xp compile -b src/main/php -b src/test/php src/ dist/
  *   ```
  * - Target PHP 5.6 (default target is current PHP version)
  *   ```sh
  *   $ xp compile -t 5.6 HelloWorld.php HelloWorld.class.php
  *   ```
+ * 
+ * The `-b` option provides bases to be stripped from the compiled
+ * files' names. In the above example, `src/main/php/Test.php` will
+ * end up in `dist/Test.class.php` (not in `dist/src/main/php/`...)
  *
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
 class CompileRunner {
+
+  /**
+   * Strip bases from path
+   *
+   * @param  io.Path $path
+   * @param  io.Path[] $bases
+   * @return io.Path
+   */
+  private static function strip($path, $bases) {
+    foreach ($bases as $base) {
+      $l= strlen($base);
+      if (0 === strncmp($path, $base, $l)) {
+        $path= substr($path, $l);
+      }
+    }
+    return new Path($path);
+  }
 
   /** @return int */
   public static function main(array $args) {
@@ -43,12 +65,12 @@ class CompileRunner {
 
     $target= PHP_VERSION;
     $cwd= getcwd();
-    $base= $cwd;
+    $bases= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
       } else if ('-b' === $args[$i]) {
-        $base= $args[++$i];
+        $bases[]= Path::real($args[++$i], $cwd);
       } else {
         break;
       }
@@ -66,7 +88,7 @@ class CompileRunner {
       $t->start();
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)));
-        $emitter= $emit->newInstance($output->target($path->relativeTo($base)));
+        $emitter= $emit->newInstance($output->target(self::strip($path, $bases)));
         foreach (Transformations::registered() as $kind => $function) {
           $emitter->transform($kind, $function);
         }
