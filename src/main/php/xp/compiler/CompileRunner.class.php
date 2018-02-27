@@ -65,7 +65,7 @@ class CompileRunner {
 
     $target= PHP_VERSION;
     $cwd= getcwd();
-    $bases= [];
+    $bases= [new Path($cwd)];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
