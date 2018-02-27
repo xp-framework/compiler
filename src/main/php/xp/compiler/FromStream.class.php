@@ -1,7 +1,7 @@
 <?php namespace xp\compiler;
 
 /** Streamed input */
-class FromStream implements Input {
+class FromStream extends Input {
   private $stream, $name;
 
   /**
