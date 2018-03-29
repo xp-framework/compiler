@@ -4,6 +4,8 @@ use lang\Type;
 use lang\Value;
 use lang\XPClass;
 use lang\Primitive;
+use lang\ArrayType;
+use lang\MapType;
 
 class ParameterTest extends EmittingTest {
 
@@ -68,6 +70,16 @@ class ParameterTest extends EmittingTest {
   #[@test]
   public function nullable_string_type() {
     $this->assertEquals(Primitive::$STRING, $this->param('?string $param')->getType());
+  }
+
+  #[@test]
+  public function array_typed() {
+    $this->assertEquals(new ArrayType(Primitive::$INT), $this->param('array<int> $param')->getType());
+  }
+
+  #[@test]
+  public function map_typed() {
+    $this->assertEquals(new MapType(Primitive::$INT), $this->param('array<string, int> $param')->getType());
   }
 
   #[@test]
