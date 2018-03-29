@@ -20,15 +20,17 @@ abstract class Emitter {
    * Selects the correct emitter for a given runtime version
    *
    * @param  string $version E.g. PHP_VERSION
+   * @param  string $engine Either PHP or HHVM, omit to detect
    * @return self
    * @throws lang.IllegalArgumentException
    */
-  public static function forRuntime($version) {
+  public static function forRuntime($version, $engine= null) {
     sscanf($version, '%d.%d', $major, $minor);
     $p= Package::forName('lang.ast.emit');
+    $engine || $engine= defined('HHVM_VERSION') ? 'HHVM' : 'PHP';
 
     do {
-      $impl= 'PHP'.$major.$minor;
+      $impl= $engine.$major.$minor;
       if ($p->providesClass($impl)) return $p->loadClass($impl);
     } while ($minor-- > 0);
 
