@@ -16,7 +16,8 @@ class PHP70 extends \lang\ast\Emitter {
   protected $unsupported= [
     'object'   => 72,
     'void'     => 71,
-    'iterable' => 71
+    'iterable' => 71,
+    'mixed'    => null,
   ];
 
   protected function emitCatch($catch) {

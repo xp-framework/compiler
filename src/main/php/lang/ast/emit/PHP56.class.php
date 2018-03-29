@@ -18,7 +18,8 @@ class PHP56 extends \lang\ast\Emitter {
     'string'   => 70,
     'int'      => 70,
     'bool'     => 70,
-    'float'    => 70
+    'float'    => 70,
+    'mixed'    => null,
   ];
   private $call= [];
   private static $keywords= [

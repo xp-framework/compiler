@@ -46,6 +46,7 @@ The following table gives an overview of the current implementation status. The 
 | Feature                                                                                     | PHP 5.6  | PHP 7.0  | PHP 7.1  | PHP 7.2  | PHP 7.3  |
 | ------------------------------------------------------------------------------------------- | -------- | -------- | -------- | -------- | -------- |
 | **Future** - these might or might not be part of PHP next                                   |          |          |          |          |          |
+| • [Mixed type](https://wiki.php.net/rfc/reserve_even_more_types_in_php_7)                   | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 | • [Union types](https://github.com/xp-framework/compiler/wiki/Type-system#type-unions)      | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 | • [XP Compact functions](https://github.com/xp-framework/rfc/issues/241)                    | ✔      | ✔       | ✔      | ✔       | ✔       |
 | • [Property types](https://wiki.php.net/rfc/property_type_hints)                            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |

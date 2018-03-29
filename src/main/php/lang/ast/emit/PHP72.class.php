@@ -6,5 +6,7 @@
  * @see  https://wiki.php.net/rfc/object-typehint
  */
 class PHP72 extends \lang\ast\Emitter {
-
+  protected $unsupported= [
+    'mixed'    => null,
+  ];
 }

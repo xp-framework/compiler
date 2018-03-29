@@ -20,6 +20,7 @@ class Scope {
     'self'     => true,
     'static'   => true,
     'parent'   => true,
+    'mixed'    => true
   ];
 
   public $parent;

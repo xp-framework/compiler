@@ -12,7 +12,7 @@
  */
 class PHP71 extends \lang\ast\Emitter {
   protected $unsupported= [
-    'object'   => 72
+    'object'   => 72,
+    'mixed'    => null,
   ];
-
 }

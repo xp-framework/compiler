@@ -33,4 +33,13 @@ class ArrayTypesTest extends EmittingTest {
 
     $this->assertEquals('[:int[]]', $t->getField('test')->getType()->getName());
   }
+
+  #[@test]
+  public function var_map_type() {
+    $t= $this->type('class <T> {
+      private array<string, mixed> $test;
+    }');
+
+    $this->assertEquals('[:var]', $t->getField('test')->getType()->getName());
+  }
 }

@@ -10,8 +10,9 @@ class HHVM320 extends Emitter {
   protected $unsupported= [
     'object'   => 72,
     'void'     => 71,
-    'iterable' => 71
-  ];
+    'iterable' => 71,
+    'mixed'    => null,
+   ];
 
   protected function emitParameter($parameter) {
     if ($parameter->variadic) {

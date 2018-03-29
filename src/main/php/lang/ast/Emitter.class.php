@@ -75,16 +75,6 @@ abstract class Emitter {
   }
 
   /**
-   * Returns the qualified name for use with the XP type system
-   *
-   * @param  string $name E.g. `\lang\ast\Parse`
-   * @return string In the above example, `lang.ast.Parse`.
-   */
-  protected function name($name) {
-    return '\\' === $name{0} ? strtr(substr($name, 1), '\\', '.') : $name;
-  }
-
-  /**
    * Returns the simple name for use in a declaration
    *
    * @param  string $name E.g. `\lang\ast\Parse`
@@ -379,7 +369,7 @@ abstract class Emitter {
   }
 
   protected function emitMeta($name, $annotations, $comment) {
-    $this->out->write('\xp::$meta[\''.$this->name($name).'\']= [');
+    $this->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
     $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->emitAnnotations($annotations);
     $this->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');

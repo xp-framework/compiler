@@ -6,6 +6,7 @@ XP Compiler ChangeLog
 
 ## 2.1.0 / ????-??-??
 
+* Implemented support for `mixed` type, see issue #28 - @thekid
 * Fixed issue #32: Test suite failure on HHVM 3.25 - @thekid
 * Allowed trailing commas in grouped use lists as implemented in
   https://wiki.php.net/rfc/list-syntax-trailing-commas
