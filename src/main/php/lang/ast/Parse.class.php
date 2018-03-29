@@ -452,11 +452,12 @@ class Parse {
       $import= $this->token->value;
       $this->token= $this->advance();
 
-      if ('{' === $this->token->symbol->id) {
+      if ('{' === $this->token->value) {
         $types= [];
-        while ('}' !== $this->token->symbol->id) {
-          $this->token= $this->advance();
+        $this->token= $this->advance();
+        while ('}' !== $this->token->value) {
           $class= $import.$this->token->value;
+
           $this->token= $this->advance();
           if ('as' === $this->token->value) {
             $this->token= $this->advance();
@@ -466,6 +467,14 @@ class Parse {
           } else {
             $types[$class]= null;
             $this->scope->import($class);
+          }
+
+          if (',' === $this->token->value) {
+            $this->token= $this->advance();
+          } else if ('}' === $this->token->value) {
+            break;
+          } else {
+            $this->expect(', or }');
           }
         }
         $this->token= $this->advance();

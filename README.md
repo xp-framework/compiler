@@ -58,9 +58,10 @@ The following table gives an overview of the current implementation status. The 
 | • [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔     | ✔       |
 |                                                                                             |          |          |          |          |          |
 | **[PHP 7.3](https://wiki.php.net/rfc#php_73)**                                              |          |          |          |          |          |
-| • [Trailing commas in funtion calls](https://wiki.php.net/rfc/trailing-comma-function-calls)| ✔      | ✔       | ✔      | ✔       | *native* |
+| • [Trailing commas in funtion calls](https://wiki.php.net/rfc/trailing-comma-function-calls)| ✔        | ✔        | ✔        | ✔        | *native* |
 |                                                                                             |          |          |          |          |          |
 | **[PHP 7.2](https://wiki.php.net/rfc#php_72)**                                              |          |          |          |          |          |
+| • [Trailing commas in grouped namepaces](https://wiki.php.net/rfc/list-syntax-trailing-commas) | ✔     | ✔      | ✔       | *native*  | *native* |
 | • [Object type](https://wiki.php.net/rfc/object-typehint)                                   | ✔(1)   | ✔(1)   | ✔(1)    | *native*  | *native* |
 |                                                                                             |          |          |          |          |          |
 | **[PHP 7.1](https://wiki.php.net/rfc#php_71)**                                              |          |          |          |          |          |

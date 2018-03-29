@@ -6,6 +6,9 @@ XP Compiler ChangeLog
 
 ## 2.1.0 / ????-??-??
 
+* Allowed trailing commas in grouped use lists as implemented in
+  https://wiki.php.net/rfc/list-syntax-trailing-commas
+  (@thekid)
 * Fixed nullable value types being emitted incorrectly - @thekid
 * Merged PR #30: Implement compiling to directory. The command line
   `xp compile src/main/php dist/` will compile all source files inside
