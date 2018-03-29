@@ -3,8 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+
 ## 2.1.0 / ????-??-??
 
+* Fixed nullable value types being emitted incorrectly - @thekid
 * Merged PR #30: Implement compiling to directory. The command line
   `xp compile src/main/php dist/` will compile all source files inside
   the `src/main/php` directory to `dist`.

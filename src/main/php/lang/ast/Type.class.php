@@ -1,5 +1,10 @@
 <?php namespace lang\ast;
 
+/**
+ * Represents a type
+ *
+ * @test  xp://lang.ast.unittest.TypeTest
+ */
 class Type implements \lang\Value {
   public $literal;
 
@@ -10,7 +15,10 @@ class Type implements \lang\Value {
   public function literal() { return $this->literal; }
 
   /** @return string */
-  public function name() { return strtr(ltrim($this->literal, '\\'), '\\', '.'); }
+  public function name() {
+    $name= strtr(ltrim($this->literal, '?\\'), '\\', '.');
+    return '?' === $this->literal{0} ? '?'.$name : $name;
+  }
 
   /** @return string */
   public function toString() { return nameof($this).'('.$this->name().')'; }
