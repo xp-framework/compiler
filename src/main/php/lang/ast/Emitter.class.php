@@ -17,24 +17,22 @@ abstract class Emitter {
   protected $transformations= [];
 
   /**
-   * Selects the correct emitter for a given runtime version
+   * Selects the correct emitter for a given runtime
    *
-   * @param  string $version E.g. PHP_VERSION
-   * @param  string $engine Either PHP or HHVM, omit to detect
+   * @param  string $runtime E.g. "PHP.".PHP_VERSION
    * @return self
    * @throws lang.IllegalArgumentException
    */
-  public static function forRuntime($version, $engine= null) {
-    sscanf($version, '%d.%d', $major, $minor);
+  public static function forRuntime($runtime) {
+    sscanf($runtime, '%[^.].%d.%d', $engine, $major, $minor);
     $p= Package::forName('lang.ast.emit');
-    $engine || $engine= defined('HHVM_VERSION') ? 'HHVM' : 'PHP';
 
     do {
       $impl= $engine.$major.$minor;
       if ($p->providesClass($impl)) return $p->loadClass($impl);
     } while ($minor-- > 0);
 
-    throw new IllegalArgumentException('XP Compiler does not support PHP '.$version.' yet');
+    throw new IllegalArgumentException('XP Compiler does not support '.$runtime.' yet');
   }
 
   /** @param io.streams.Writer */

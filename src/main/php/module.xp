@@ -9,6 +9,7 @@ module xp-framework/compiler {
 
   /** @return void */
   public function initialize() {
-    ClassLoader::registerLoader(CompilingClassloader::instanceFor(PHP_VERSION));
+    $runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    ClassLoader::registerLoader(CompilingClassloader::instanceFor($runtime));
   }
 }

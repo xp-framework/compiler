@@ -28,7 +28,7 @@ use io\Path;
  *   ```
  * - Target PHP 5.6 (default target is current PHP version)
  *   ```sh
- *   $ xp compile -t 5.6 HelloWorld.php HelloWorld.class.php
+ *   $ xp compile -t PHP.5.6 HelloWorld.php HelloWorld.class.php
  *   ```
  * 
  * The `-b` option provides bases to be stripped from the compiled
@@ -63,7 +63,7 @@ class CompileRunner {
       return 2;
     }
 
-    $target= PHP_VERSION;
+    $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     $cwd= new Path(getcwd());
     $bases= [];
     for ($i= 0; $i < sizeof($args); $i++) {
@@ -86,6 +86,8 @@ class CompileRunner {
     $total= $errors= 0;
     $time= 0.0;
     foreach ($input as $path => $in) {
+      $name= $path->exists() ? $path->relativeTo($cwd)->toString('/') : (string)$path;
+
       $t->start();
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)));
@@ -96,7 +98,7 @@ class CompileRunner {
         $emitter->emit($parse->execute());
 
         $t->stop();
-        Console::$err->writeLinef('> %s (%.3f seconds)', $path->relativeTo($cwd)->toString('/'), $t->elapsedTime());
+        Console::$err->writeLinef('> %s (%.3f seconds)', $name, $t->elapsedTime());
       } catch (Error $e) {
         $t->stop();
         Console::$err->writeLinef('! %s: %s', $name, $e->toString());

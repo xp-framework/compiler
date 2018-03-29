@@ -6,7 +6,7 @@ use lang\ast\Emitter;
  * HHVM syntax. Like PHP 7.0, but does not allow variadic parameters with
  * types.
  */
-class HHVM extends Emitter {
+class HHVM312 extends Emitter {
   protected $unsupported= [
     'object'   => 72,
     'void'     => 71,
