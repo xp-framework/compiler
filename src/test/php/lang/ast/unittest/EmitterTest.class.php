@@ -14,6 +14,7 @@ class EmitterTest extends \unittest\TestCase {
 
   #[@test]
   public function can_create() {
-    Emitter::forRuntime(PHP_VERSION)->newInstance(new StringWriter($this->out));
+    $runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    Emitter::forRuntime($runtime)->newInstance(new StringWriter($this->out));
   }
 }
