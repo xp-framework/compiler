@@ -78,7 +78,7 @@ class CompileRunner {
     $bases[]= $cwd;
 
     $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
-    $emit= Emitter::forRuntime($target);
+    $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? '7.0' : $target);
     $input= Input::newInstance($args[$i]);
     $output= Output::newInstance($out);
 
