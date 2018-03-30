@@ -1021,6 +1021,14 @@ class Parse {
     return $arguments;
   }
 
+  /**
+   * Type body
+   *
+   * - `use [traits]`
+   * - `[modifiers] int $t = 5`
+   * - `[modifiers] const int T = 5`
+   * - `[modifiers] function t(): int { }`
+   */
   private function body() {
     static $modifier= [
       'private'   => true,
@@ -1118,14 +1126,28 @@ class Parse {
         $n->kind= 'const';
         $this->token= $this->advance();
 
+        $type= null;
         while (';' !== $this->token->symbol->id) {
           $member= clone $n;
-          $name= $this->token->value;
-
+          $first= $this->token;
           $this->token= $this->advance();
-          $this->token= $this->expect('=');
 
-          $member->value= new Constant($modifiers, $name, $this->expression(0));
+          // Untyped `const T = 5` vs. typed `const int T = 5`
+          if ('=' === $this->token->value) {
+            $name= $first->value;
+          } else {
+            $this->queue[]= $first;
+            $this->queue[]= $this->token;
+            $this->token= $first;
+
+            $type= $this->type(false);
+            $this->token= $this->advance();
+            $name= $this->token->value;
+            $this->token= $this->advance();
+          }
+
+          $this->token= $this->expect('=');
+          $member->value= new Constant($modifiers, $name, $type, $this->expression(0));
           $body[$name]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
@@ -1141,8 +1163,15 @@ class Parse {
 
         while (';' !== $this->token->symbol->id) {
           $member= clone $n;
-          $name= $this->token->value;
-          $this->token= $this->advance();
+
+          // Untyped `$a` vs. typed `int $a`
+          if ('variable' === $this->token->kind) {
+            $name= $this->token->value;
+            $this->token= $this->advance();
+          } else {
+            $type= $this->type(false);
+            $name= $this->token->value;
+          }
 
           if ('=' === $this->token->symbol->id) {
             $this->token= $this->expect('=');

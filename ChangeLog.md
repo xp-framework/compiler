@@ -3,8 +3,15 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.2.0 / 2018-03-30
 
-## 2.1.0 / ????-??-??
+* Fixed typed properties inside comma-separated listing, for example:
+  `private string $a, int $b`
+  (@thekid)
+* Implemented support for typed class constants `const int T = 5`
+  (@thekid)
+
+## 2.1.0 / 2018-03-29
 
 * Implemented support for `mixed` type, see issue #28 - @thekid
 * Fixed issue #32: Test suite failure on HHVM 3.25 - @thekid

@@ -46,7 +46,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function class_constant() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], ['T' => ['const' => ['T', [], ['(literal)' => '1']]]], [], null]]],
+      [['class' => ['\\A', [], null, [], ['T' => ['const' => ['T', [], ['(literal)' => '1'], null]]], [], null]]],
       $this->parse('class A { const T = 1; }')
     );
   }
@@ -55,8 +55,8 @@ class MembersTest extends ParseTest {
   public function class_constants() {
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        'T' => ['const' => ['T', [], ['(literal)' => '1']]],
-        'S' => ['const' => ['S', [], ['(literal)' => '2']]]
+        'T' => ['const' => ['T', [], ['(literal)' => '1'], null]],
+        'S' => ['const' => ['S', [], ['(literal)' => '2'], null]]
       ], [], null]]],
       $this->parse('class A { const T = 1, S = 2; }')
     );
@@ -65,7 +65,7 @@ class MembersTest extends ParseTest {
   #[@test]
   public function private_class_constant() {
     $this->assertNodes(
-      [['class' => ['\\A', [], null, [], ['T' => ['const' => ['T', ['private'], ['(literal)' => '1']]]], [], null]]],
+      [['class' => ['\\A', [], null, [], ['T' => ['const' => ['T', ['private'], ['(literal)' => '1'], null]]], [], null]]],
       $this->parse('class A { private const T = 1; }')
     );
   }
@@ -155,6 +155,50 @@ class MembersTest extends ParseTest {
     $this->assertNodes(
       [['(' => [['::' => ['\\A', ['member' => 'member']]], [['(literal)' => '1']]]]],
       $this->parse('A::member(1);')
+    );
+  }
+
+  #[@test]
+  public function typed_property() {
+    $decl= ['$a' => ['(variable)' => ['a', ['private'], null, new Type('string'), [], null]]];
+    $this->assertNodes(
+      [['class' => ['\\A', [], null, [], $decl, [], null]]],
+      $this->parse('class A { private string $a; }')
+    );
+  }
+
+  #[@test]
+  public function typed_properties() {
+    $decl= [
+      '$a' => ['(variable)' => ['a', ['private'], null, new Type('string'), [], null]],
+      '$b' => ['(variable)' => ['b', ['private'], null, new Type('string'), [], null]],
+      '$c' => ['(variable)' => ['c', ['private'], null, new Type('int'), [], null]],
+    ];
+    $this->assertNodes(
+      [['class' => ['\\A', [], null, [], $decl, [], null]]],
+      $this->parse('class A { private string $a, $b, int $c; }')
+    );
+  }
+
+  #[@test]
+  public function typed_constant() {
+    $decl= ['T' => ['const' => ['T', [], ['(literal)' => '1'], new Type('int')]]];
+    $this->assertNodes(
+      [['class' => ['\\A', [], null, [], $decl, [], null]]],
+      $this->parse('class A { const int T = 1; }')
+    );
+  }
+
+  #[@test]
+  public function typed_constants() {
+    $decl= [
+      'T' => ['const' => ['T', [], ['(literal)' => '1'], new Type('int')]],
+      'S' => ['const' => ['S', [], ['(literal)' => '2'], new Type('int')]],
+      'I' => ['const' => ['I', [], ['(literal)' => '"i"'], new Type('string')]],
+    ];
+    $this->assertNodes(
+      [['class' => ['\\A', [], null, [], $decl, [], null]]],
+      $this->parse('class A { const int T = 1, S = 2, string I = "i"; }')
     );
   }
 }
