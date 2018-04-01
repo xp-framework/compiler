@@ -89,4 +89,18 @@ class UsingTest extends EmittingTest {
     }');
     $this->assertFalse($r);
   }
+
+  #[@test]
+  public function variable_undefined_after_using_even_if_previously_defined() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run() {
+        $x= new Handle();
+        using ($x) {
+          // NOOP
+        }
+        return isset($x);
+      }
+    }');
+    $this->assertFalse($r);
+  }
 }

@@ -747,8 +747,13 @@ abstract class Emitter {
   }
 
   protected function emitUsing($using) {
-    foreach ($using->arguments as $variable => $expression) {
-      $this->out->write('$'.$variable.'=');
+    $variables= [];
+    foreach ($using->arguments as $expression) {
+      switch ($expression->kind) {
+        case 'variable': $variables[]= $expression->value; break;
+        case 'assignment': $variables[]= $expression->value->variable->value; break;
+        default: $temp= $this->temp(); $variables[]= $temp; $this->out->write($temp.'=');
+      }
       $this->emit($expression);
       $this->out->write(';');
     }
@@ -757,7 +762,7 @@ abstract class Emitter {
     $this->emit($using->body);
 
     $this->out->write('} finally {');
-    foreach ($using->arguments as $variable => $expression) {
+    foreach ($variables as $variable) {
       $this->out->write('if ($'.$variable.' instanceof \lang\Closeable) { $'.$variable.'->close(); }');
       $this->out->write('else if ($'.$variable.' instanceof \IDisposable) { $'.$variable.'->__dispose(); }');
       $this->out->write('unset($'.$variable.');');

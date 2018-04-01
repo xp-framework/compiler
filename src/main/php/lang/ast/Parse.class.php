@@ -800,14 +800,7 @@ class Parse {
 
     $this->stmt('using', function($node) {
       $this->token= $this->expect('(');
-      $arguments= [];
-      do {
-        $argument= $this->token->value;
-        $this->token= $this->advance('=');
-        $this->token= $this->expect('=');
-
-        $arguments[$argument]= $this->expression(0);
-      } while (0);
+      $arguments= $this->arguments();
       $this->token= $this->expect(')');
 
       $this->token= $this->expect('{');
