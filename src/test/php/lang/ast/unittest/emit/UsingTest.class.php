@@ -13,14 +13,30 @@ class UsingTest extends EmittingTest {
       public function run() {
         Handle::$called= [];
 
-        using ($x= new Handle()) {
+        using ($x= new Handle(1)) {
           $x->read();
         }
 
         return Handle::$called;
       }
     }');
-    $this->assertEquals(['read', '__dispose'], $r);
+    $this->assertEquals(['read@1', '__dispose@1'], $r);
+  }
+
+  #[@test]
+  public function dispose_called_for_all() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run() {
+        Handle::$called= [];
+
+        using ($x= new Handle(1), new Handle(2)) {
+          $x->read();
+        }
+
+        return Handle::$called;
+      }
+    }');
+    $this->assertEquals(['read@1', '__dispose@1', '__dispose@2'], $r);
   }
 
   #[@test]
@@ -30,7 +46,7 @@ class UsingTest extends EmittingTest {
         Handle::$called= [];
 
         try {
-          using ($x= new Handle()) {
+          using ($x= new Handle(1)) {
             $x->read(-1);
           }
         } catch (IllegalArgumentException $expected) {
@@ -40,7 +56,7 @@ class UsingTest extends EmittingTest {
         throw new IllegalStateException("No exception caught");
       }
     }');
-    $this->assertEquals(['read', '__dispose'], $r);
+    $this->assertEquals(['read@1', '__dispose@1'], $r);
   }
 
   #[@test]
@@ -63,7 +79,7 @@ class UsingTest extends EmittingTest {
   public function can_return_from_inside_using() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       private function read() {
-        using ($x= new Handle()) {
+        using ($x= new Handle(1)) {
           return $x->read();
         }
       }
@@ -74,14 +90,14 @@ class UsingTest extends EmittingTest {
         return ["called" => Handle::$called, "returned" => $returned];
       }
     }');
-    $this->assertEquals(['called' => ['read', '__dispose'], 'returned' => 'test'], $r);
+    $this->assertEquals(['called' => ['read@1', '__dispose@1'], 'returned' => 'test'], $r);
   }
 
   #[@test]
   public function variable_undefined_after_using() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
-        using ($x= new Handle()) {
+        using ($x= new Handle(1)) {
           // NOOP
         }
         return isset($x);
@@ -94,7 +110,7 @@ class UsingTest extends EmittingTest {
   public function variable_undefined_after_using_even_if_previously_defined() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
-        $x= new Handle();
+        $x= new Handle(1);
         using ($x) {
           // NOOP
         }
