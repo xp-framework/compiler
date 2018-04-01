@@ -746,6 +746,23 @@ abstract class Emitter {
     $this->emit($from);
   }
 
+  protected function emitUsing($using) {
+    foreach ($using->arguments as $variable => $expression) {
+      $this->out->write('$'.$variable.'=');
+      $this->emit($expression);
+      $this->out->write(';');
+    }
+
+    $this->out->write('try {');
+    $this->emit($using->body);
+
+    $this->out->write('} finally {');
+    foreach ($using->arguments as $variable => $expression) {
+      $this->out->write('$'.$variable.'->__dispose();');
+    }
+    $this->out->write('}');
+  }
+
   public function emit($arg) {
     if ($arg instanceof Element) {
       if ($arg->line > $this->line) {
