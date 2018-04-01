@@ -58,4 +58,22 @@ class UsingTest extends EmittingTest {
     }');
     $this->assertFalse($r);
   }
+
+  #[@test]
+  public function can_return_from_inside_using() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      private function read() {
+        using ($x= new Handle()) {
+          return $x->read();
+        }
+      }
+
+      public function run() {
+        Handle::$called= [];
+        $returned= $this->read();
+        return ["called" => Handle::$called, "returned" => $returned];
+      }
+    }');
+    $this->assertEquals(['called' => ['read', '__dispose'], 'returned' => 'test'], $r);
+  }
 }
