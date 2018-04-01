@@ -42,4 +42,20 @@ class UsingTest extends EmittingTest {
     }');
     $this->assertEquals(['read', '__dispose'], $r);
   }
+
+  #[@test]
+  public function supports_closeables() {
+    $r= $this->run('use lang\ast\unittest\emit\FileInput; class <T> {
+      public function run() {
+        FileInput::$open= false;
+
+        using ($f= new FileInput(__FILE__)) {
+          $f->read();
+        }
+
+        return FileInput::$open;
+      }
+    }');
+    $this->assertFalse($r);
+  }
 }

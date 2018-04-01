@@ -758,7 +758,8 @@ abstract class Emitter {
 
     $this->out->write('} finally {');
     foreach ($using->arguments as $variable => $expression) {
-      $this->out->write('$'.$variable.'->__dispose();');
+      $this->out->write('if ($'.$variable.' instanceof \lang\Closeable) { $'.$variable.'->close(); }');
+      $this->out->write('else if ($'.$variable.' instanceof \IDisposable) { $'.$variable.'->__dispose(); }');
     }
     $this->out->write('}');
   }
