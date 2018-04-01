@@ -3,6 +3,7 @@
 use lang\Closeable;
 use lang\IllegalArgumentException;
 
+/** Used by `UsingTest` */
 class FileInput implements Closeable {
   public static $open= false;
 

@@ -2,6 +2,7 @@
 
 use lang\IllegalArgumentException;
 
+/** Used by `UsingTest` */
 class Handle implements \IDisposable {
   public static $called= [];
   private $id;
