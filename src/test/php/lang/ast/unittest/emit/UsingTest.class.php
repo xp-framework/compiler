@@ -76,4 +76,17 @@ class UsingTest extends EmittingTest {
     }');
     $this->assertEquals(['called' => ['read', '__dispose'], 'returned' => 'test'], $r);
   }
+
+  #[@test]
+  public function variable_undefined_after_using() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run() {
+        using ($x= new Handle()) {
+          // NOOP
+        }
+        return isset($x);
+      }
+    }');
+    $this->assertFalse($r);
+  }
 }
