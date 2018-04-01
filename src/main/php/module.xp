@@ -11,5 +11,9 @@ module xp-framework/compiler {
   public function initialize() {
     $runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     ClassLoader::registerLoader(CompilingClassloader::instanceFor($runtime));
+
+    if (!class_exists(\IDisposable::class)) {
+      eval('interface IDisposable { public function __dispose(); }');
+    }
   }
 }
