@@ -34,6 +34,7 @@ use lang\ast\nodes\TryStatement;
 use lang\ast\nodes\CatchStatement;
 use lang\ast\nodes\Signature;
 use lang\ast\nodes\Parameter;
+use lang\ast\nodes\UsingStatement;
 
 class Parse {
   private $tokens, $token, $scope;
@@ -794,6 +795,27 @@ class Parse {
       $node->value= new TraitDeclaration([], $type, $body, $this->scope->annotations, $comment);
       $node->kind= 'trait';
       $this->scope->annotations= [];
+      return $node;
+    });
+
+    $this->stmt('using', function($node) {
+      $this->token= $this->expect('(');
+      $arguments= [];
+      do {
+        $argument= $this->token->value;
+        $this->token= $this->advance('=');
+        $this->token= $this->expect('=');
+
+        $arguments[$argument]= $this->expression(0);
+      } while (0);
+      $this->token= $this->expect(')');
+
+      $this->token= $this->expect('{');
+      $statements= $this->statements();
+      $this->token= $this->expect('}');
+
+      $node->value= new UsingStatement($arguments, $statements);
+      $node->kind= 'using';
       return $node;
     });
   }
