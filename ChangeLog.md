@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.3.0 / 2018-04-02
+
+* Merged PR #33: Using statement - @thekid
+
 ## 2.2.0 / 2018-03-30
 
 * Fixed typed properties inside comma-separated listing, for example:

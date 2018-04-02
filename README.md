@@ -52,7 +52,7 @@ The following table gives an overview of the current implementation status. The 
 | • [Property types](https://wiki.php.net/rfc/property_type_hints)                            | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 |                                                                                             |          |          |          |          |          |
 | **[Hack](https://docs.hhvm.com/hack/)**                                                     |          |          |          |          |          |
-| • [Using statement / Disposables](https://docs.hhvm.com/hack/disposables/introduction)      | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
+| • [Using statement / Disposables](https://docs.hhvm.com/hack/disposables/introduction)      | ✔      | ✔       | ✔      | ✔       | ✔       |
 | • [Function types](https://github.com/xp-framework/compiler/wiki/Type-system#functions)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 | • [Array and map types](https://github.com/xp-framework/compiler/wiki/Type-system#arrays)   | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 | • [Lambdas / arrow functions](https://github.com/xp-framework/compiler/wiki/Arrow-functions)| ✔      | ✔       | ✔      | ✔       | ✔       |
