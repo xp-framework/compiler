@@ -13,7 +13,7 @@ Compiles future PHP to today's PHP.
 
 Usage
 -----
-After adding the compiler to your project via `composer xp-framework/compiler` classes will be passed through the compiler during autoloading. Code inside files with a *.class.php* ending is considered already compiled; files need to renamed `T.class.php` => `T.php` in order to be picked up.
+After adding the compiler to your project via `composer require xp-framework/compiler` classes will be passed through the compiler during autoloading. Code inside files with a *.class.php* ending is considered already compiled; files need to renamed `T.class.php` => `T.php` in order to be picked up.
 
 Example
 -------
