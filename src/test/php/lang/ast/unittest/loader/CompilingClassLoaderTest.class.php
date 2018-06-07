@@ -3,11 +3,10 @@
 use unittest\TestCase;
 use lang\ast\CompilingClassLoader;
 use lang\ClassFormatException;
-use lang\DynamicClassLoader;
 use lang\ClassLoader;
 use io\File;
-use io\streams\Streams;
-use io\streams\MemoryInputStream;
+use io\FileUtil;
+use lang\Environment;
 
 class CompilingClassLoaderTest extends TestCase {
   private static $runtime;
@@ -29,11 +28,9 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test]
   public function load_class_with_syntax_errors() {
-    $fd= Streams::readableFd(new MemoryInputStream("<?php\n<Syntax error in line 2>"));
-    $cl= ClassLoader::registerLoader(@newinstance(DynamicClassLoader::class, [], [
-      'providesResource'    => function($file) { return 'Errors.php' === $file; },
-      'getResourceAsStream' => function($file) use($fd) { return new File($fd); }
-    ]));
+    $f= new File(Environment::tempDir(), 'Errors.php');
+    FileUtil::setContents($f, "<?php\n<Syntax error in line 2>");
+    $cl= ClassLoader::registerPath($f->getPath());
 
     $loader= new CompilingClassLoader(self::$runtime);
     try {
@@ -43,6 +40,7 @@ class CompilingClassLoaderTest extends TestCase {
       $this->assertEquals('Syntax error in Errors.php, line 2: Expected ";", have "Syntax"', $expected->getMessage());
     } finally {
       ClassLoader::removeLoader($cl);
+      $f->unlink();
     }
   }
 }
