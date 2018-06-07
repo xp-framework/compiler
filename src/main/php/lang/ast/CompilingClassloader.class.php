@@ -158,10 +158,11 @@ class CompilingClassLoader implements \lang\IClassLoader {
     }
 
     $declaration= new MemoryOutputStream();
-    $file= $source->getResourceAsStream(strtr($class, '.', '/').'.php');
+    $file= strtr($class, '.', '/').'.php';
+    $in= $source->getResourceAsStream($file)->in();
 
     try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($file->in())));
+      $parse= new Parse(new Tokens(new StreamTokenizer($in)));
       $emitter= $this->emit->newInstance($declaration);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);
@@ -170,9 +171,9 @@ class CompilingClassLoader implements \lang\IClassLoader {
 
       return $declaration->getBytes();
     } catch (Error $e) {
-      throw new ClassFormatException('Syntax error in '.$file->getURI(), $e);
+      throw new ClassFormatException('Syntax error in '.$file.', line '.$e->getLine().': '.$e->getMessage(), $e);
     } finally {
-      $file->isOpen() && $file->close();
+      $in->close();
     }
   }
 

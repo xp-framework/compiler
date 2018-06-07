@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Improved error message: Include file name (w/o full path) and line
+  number in exceptions raised from class loading.
+  (@thekid)
+
 ## 2.3.0 / 2018-04-02
 
 * Merged PR #33: Using statement - @thekid

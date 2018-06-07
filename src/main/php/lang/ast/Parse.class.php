@@ -1369,7 +1369,7 @@ class Parse {
 
   private function expect($id) {
     if ($id !== $this->token->symbol->id) {
-      throw new Error('Expected `'.$id.'`, have `'.$this->token->symbol->id.'` on line '.$this->token->line);
+      throw new Error('Expected `'.$id.'`, have `'.$this->token->symbol->id.'`', $this->token->line);
     }
 
     return $this->advance();
@@ -1399,7 +1399,7 @@ class Parse {
         $this->comment= $value;
         continue;
       } else {
-        throw new Error('Unexpected token '.$value.' on line '.$line);
+        throw new Error('Unexpected token '.$value, $line);
       }
 
       $node->value= $value;
