@@ -132,7 +132,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
       \xp::$cll--;
-      throw new ClassFormatException('Compiler error', $e);
+      throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
     }
     \xp::$cll--;
 

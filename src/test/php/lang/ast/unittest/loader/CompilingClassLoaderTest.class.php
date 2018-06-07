@@ -6,6 +6,7 @@ use lang\ClassFormatException;
 use lang\DynamicClassLoader;
 use lang\ClassLoader;
 use io\File;
+use io\streams\Streams;
 use io\streams\MemoryInputStream;
 
 class CompilingClassLoaderTest extends TestCase {
@@ -28,15 +29,10 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test]
   public function load_class_with_syntax_errors() {
+    $fd= Streams::readableFd(new MemoryInputStream("<?php\n<Syntax error in line 2>"));
     $cl= ClassLoader::registerLoader(@newinstance(DynamicClassLoader::class, [], [
-      'providesResource'    => function($file) {
-        return 'Errors.php' === $file;
-      },
-      'getResourceAsStream' => function($file) {
-        return newinstance(File::class, ['.'], [
-          'in' => function() { return new MemoryInputStream("<?php\n<Syntax error in line 2>"); }
-        ]);
-      }
+      'providesResource'    => function($file) { return 'Errors.php' === $file; },
+      'getResourceAsStream' => function($file) use($fd) { return new File($fd); }
     ]));
 
     $loader= new CompilingClassLoader(self::$runtime);
