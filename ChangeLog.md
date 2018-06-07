@@ -3,7 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Improved error message: Include file name (w/o full path) and line
+* Added context to various parse errors. Now messages read something
+  like `Expected ",", have "(end)"" in parameter list`.
+  (@thekid)
+* Improved error messages: Include file name (w/o full path) and line
   number in exceptions raised from class loading.
   (@thekid)
 

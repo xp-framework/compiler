@@ -44,7 +44,7 @@ class CompilingClassLoaderTest extends TestCase {
       $loader->loadClass('Errors');
       $this->fail('No exception raised', null, ClassFormatException::class);
     } catch (ClassFormatException $expected) {
-      $this->assertEquals('Syntax error in Errors.php, line 2: Expected `;`, have `Syntax`', $expected->getMessage());
+      $this->assertEquals('Syntax error in Errors.php, line 2: Expected ";", have "Syntax"', $expected->getMessage());
     } finally {
       ClassLoader::removeLoader($cl);
     }

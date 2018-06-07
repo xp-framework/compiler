@@ -22,11 +22,57 @@ class ErrorsTest extends ParseTest {
 
   #[@test]
   public function missing_semicolon() {
-    $this->assertError('Expected `;`, have `(variable)`', $this->parse('$a= 1 $b= 1;'));
+    $this->assertError(
+      'Expected ";", have "(variable)"',
+      $this->parse('$a= 1 $b= 1;')
+    );
   }
 
   #[@test]
-  public function illegal_token() {
-    $this->assertError('Expected `) or ,`, have `(end)`', $this->parse('call('));
+  public function unclosed_brace_in_arguments() {
+    $this->assertError(
+      'Expected ") or ,", have "(end)" in argument list',
+      $this->parse('call(')
+    );
+  }
+
+  #[@test]
+  public function unclosed_brace_in_parameters() {
+    $this->assertError(
+      'Expected ",", have "(end)" in parameter list',
+      $this->parse('function($a')
+    );
+  }
+
+  #[@test]
+  public function unclosed_type() {
+    $this->assertError(
+      'Expected "a type, modifier, property, annotation, method or }", have "-" in type body',
+      $this->parse('class T { -')
+    );
+  }
+
+  #[@test]
+  public function missing_comma_in_implements() {
+    $this->assertError(
+      'Expected ", or {", have "B" in interfaces list',
+      $this->parse('class A implements I B')
+    );
+  }
+
+  #[@test]
+  public function missing_comma_in_interface_parents() {
+    $this->assertError(
+      'Expected ", or {", have "B" in interface parents',
+      $this->parse('interface I extends A B')
+    );
+  }
+
+  #[@test]
+  public function unclosed_annotation() {
+    $this->assertError(
+      'Expected ", or >>", have "(end)" in annotation',
+      $this->parse('<<annotation')
+    );
   }
 }
