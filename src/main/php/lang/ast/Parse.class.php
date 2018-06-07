@@ -1378,20 +1378,23 @@ class Parse {
   private function advance() {
     if ($this->queue) return array_shift($this->queue);
 
+    $line= 1;
     while ($this->tokens->valid()) {
       $type= $this->tokens->key();
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
         $node= new Node($this->symbol($value) ?: clone $this->symbol('(name)'));
+        $node->kind= $type;
       } else if ('operator' === $type) {
         $node= new Node($this->symbol($value));
+        $node->kind= $type;
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {
         $node= new Node(clone $this->symbol('(literal)'));
-        $type= 'literal';
+        $node->kind= 'literal';
       } else if ('variable' === $type) {
         $node= new Node(clone $this->symbol('(variable)'));
-        $type= 'variable';
+        $node->kind= 'variable';
       } else if ('comment' === $type) {
         $this->comment= $value;
         continue;
@@ -1399,13 +1402,14 @@ class Parse {
         throw new Error('Unexpected token '.$value.' on line '.$line);
       }
 
-      $node->kind= $type;
       $node->value= $value;
       $node->line= $line;
-      // \util\cmd\Console::writeLine('-> ', $node);
       return $node;
     }
-    return new Node($this->symbol('(end)'));
+
+    $node= new Node($this->symbol('(end)'));
+    $node->line= $line;
+    return $node;
   }
 
   public function execute() {
