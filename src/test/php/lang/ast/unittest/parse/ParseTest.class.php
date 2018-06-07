@@ -41,7 +41,7 @@ abstract class ParseTest extends \unittest\TestCase {
    * @return iterable
    */
   protected function parse($code) {
-    return (new Parse(new Tokens(new StringTokenizer($code))))->execute();
+    return (new Parse(new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
   }
 
   /**

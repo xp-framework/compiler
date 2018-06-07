@@ -26,7 +26,7 @@ abstract class EmittingTest extends \unittest\TestCase {
   protected function type($code) {
     $name= 'T'.(self::$id++);
 
-    $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))));
+    $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
     $out= new MemoryOutputStream();
     $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
     $emit->emit($parse->execute());

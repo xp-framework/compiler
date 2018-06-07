@@ -37,18 +37,24 @@ use lang\ast\nodes\Parameter;
 use lang\ast\nodes\UsingStatement;
 
 class Parse {
-  private $tokens, $token, $scope;
+  private $tokens, $file, $token, $scope;
   private $comment= null;
   private $symbols= [];
   private $queue= [];
 
-  public function __construct($tokens, $scope= null) {
+  /**
+   * Creates a new parse instance
+   *
+   * @param  lang.ast.Tokens $tokens
+   * @param  string $file
+   * @param  lang.ast.Scope $scope
+   */
+  public function __construct($tokens, $file= null, $scope= null) {
     $this->tokens= $tokens->getIterator();
     $this->scope= $scope ?: new Scope(null);
-    $this->setup();
-  }
+    $this->file= $file;
 
-  private function setup() {
+    // Setup parse rules
     $this->symbol(':');
     $this->symbol(';');
     $this->symbol(',');
@@ -1369,7 +1375,7 @@ class Parse {
 
   private function expect($id) {
     if ($id !== $this->token->symbol->id) {
-      throw new Error('Expected `'.$id.'`, have `'.$this->token->symbol->id.'`', $this->token->line);
+      throw new Error('Expected `'.$id.'`, have `'.$this->token->symbol->id.'`', $this->file, $this->token->line);
     }
 
     return $this->advance();
@@ -1399,7 +1405,7 @@ class Parse {
         $this->comment= $value;
         continue;
       } else {
-        throw new Error('Unexpected token '.$value, $line);
+        throw new Error('Unexpected token '.$value, $this->file, $line);
       }
 
       $node->value= $value;

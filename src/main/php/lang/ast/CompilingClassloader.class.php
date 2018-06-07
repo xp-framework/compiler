@@ -162,7 +162,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
     $in= $source->getResourceAsStream($file)->in();
 
     try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)));
+      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
       $emitter= $this->emit->newInstance($declaration);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);
@@ -171,7 +171,8 @@ class CompilingClassLoader implements \lang\IClassLoader {
 
       return $declaration->getBytes();
     } catch (Error $e) {
-      throw new ClassFormatException('Syntax error in '.$file.', line '.$e->getLine().': '.$e->getMessage(), $e);
+      $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
+      throw new ClassFormatException($message, $e);
     } finally {
       $in->close();
     }
