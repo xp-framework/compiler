@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.4.0 / 2018-06-08
+
 * Added context to various parse errors. Now messages read something
   like `Expected ",", have "(end)"" in parameter list`.
   (@thekid)
