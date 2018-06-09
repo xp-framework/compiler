@@ -20,6 +20,7 @@ use lang\ast\nodes\TernaryExpression;
 use lang\ast\nodes\OffsetExpression;
 use lang\ast\nodes\InstanceOfExpression;
 use lang\ast\nodes\InstanceExpression;
+use lang\ast\nodes\NullSafeInstanceExpression;
 use lang\ast\nodes\ScopeExpression;
 use lang\ast\nodes\InvokeExpression;
 use lang\ast\nodes\YieldExpression;
@@ -124,6 +125,20 @@ class Parse {
 
       $node->value= new InstanceExpression($left, $expr);
       $node->kind= 'instance';
+      $this->token= $this->advance();
+      return $node;
+    });
+
+    $this->infix('?->', 80, function($node, $left) {
+      if ('{' === $this->token->value) {
+        $this->token= $this->expect('{');
+        $expr= $this->expression(0);
+      } else {
+        $expr= $this->token;
+      }
+
+      $node->value= new InstanceExpression($left, $expr);
+      $node->kind= 'nullsafeinstance';
       $this->token= $this->advance();
       return $node;
     });
