@@ -57,7 +57,7 @@ The following table gives an overview of the current implementation status. The 
 | • [Function types](https://github.com/xp-framework/compiler/wiki/Type-system#functions)     | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 | • [Array and map types](https://github.com/xp-framework/compiler/wiki/Type-system#arrays)   | ✔(1)   | ✔(1)    | ✔(1)   | ✔(1)    | ✔(1)    |
 | • [Lambdas / arrow functions](https://github.com/xp-framework/compiler/wiki/Arrow-functions)| ✔      | ✔       | ✔      | ✔       | ✔       |
-| • [Attributes](https://docs.hhvm.com/hack/attributes/introduction) (as XP annotations)      | ✔      | ✔       | ✔      | ✔       | ✔       |
+| • [Attributes](https://github.com/xp-framework/compiler/wiki/Annotations)                   | ✔      | ✔       | ✔      | ✔       | ✔       |
 | • [Constructor argument promotion](https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion) | ✔ | ✔ | ✔ | ✔     | ✔       |
 |                                                                                             |          |          |          |          |          |
 | **[PHP 7.3](https://wiki.php.net/rfc#php_73)**                                              |          |          |          |          |          |
