@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.5.0 / 2018-06-09
+
+* Implemented feature request #9: Support null-safe instance operator
+  (@thekid)
+
 ## 2.4.0 / 2018-06-08
 
 * Added context to various parse errors. Now messages read something
