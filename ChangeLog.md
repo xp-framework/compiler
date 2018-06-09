@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.5.1 / 2018-06-10
+
 * Ensured line number is always present for type members. Previously,
   this was 0, leading to output formatting errors
   (@thekid)
