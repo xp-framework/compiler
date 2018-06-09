@@ -709,10 +709,9 @@ class Parse {
       }
       $this->token= $this->expect(';');
 
-      $result= new Node($node->symbol);
-      $result->value= $expr;
-      $result->kind= 'return';
-      return $result;
+      $node->value= $expr;
+      $node->kind= 'return';
+      return $node;
     });
 
     $this->stmt('abstract', function($node) {
