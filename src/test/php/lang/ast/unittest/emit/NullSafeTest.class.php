@@ -65,28 +65,22 @@ class NullSafeTest extends EmittingTest {
 
   #[@test]
   public function chained_method_call() {
-    $r= $this->run('class <T> {
-      public static $invoked= [];
-
-      public function run() {
-        $object= new class() {
-          public function method() {
-            <T>::$invoked[]= "outer";
-            var_dump("outer");
-            return new class() {
-              public function method() {
-                var_dump("inner");
-                <T>::$invoked[]= "inner";
-                return null;
-              }
-            };
-          }
-        };
-
-        $return= $object?->method()?->method()?->method();
-        return [$return, self::$invoked];
+    $r= $this->run('
+      class <T>Invocation {
+        public static $invoked= [];
+        public function __construct(private $name, private $chained) { }
+        public function chained() { self::$invoked[]= $this->name; return $this->chained; }
       }
-    }');
+
+      class <T> {
+        public function run() {
+          $invokation= new <T>Invocation("outer", new <T>Invocation("inner", null));
+          $return= $invokation?->chained()?->chained()?->chained();
+          return [$return, <T>Invocation::$invoked];
+        }
+      }
+
+      ');
 
     $this->assertEquals([null, ['outer', 'inner']], $r);
   }
