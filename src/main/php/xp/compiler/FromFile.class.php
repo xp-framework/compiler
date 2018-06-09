@@ -12,7 +12,7 @@ class FromFile extends Input {
    *
    * @param string|io.File $file
    */
-  public function __construct($file, $base) {
+  public function __construct($file) {
     $this->file= $file instanceof File ? $file : new File($file);
   }
 
