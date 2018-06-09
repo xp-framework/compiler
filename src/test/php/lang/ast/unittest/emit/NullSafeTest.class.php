@@ -72,8 +72,13 @@ class NullSafeTest extends EmittingTest {
         $object= new class() {
           public function method() {
             <T>::$invoked[]= "outer";
+            var_dump("outer");
             return new class() {
-              public function method() { <T>::$invoked[]= "inner"; return null; }
+              public function method() {
+                var_dump("inner");
+                <T>::$invoked[]= "inner";
+                return null;
+              }
             };
           }
         };
