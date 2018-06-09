@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest;
 
-use text\StringTokenizer;
-use lang\ast\Tokens;
 use lang\FormatException;
+use lang\ast\Tokens;
+use text\StringTokenizer;
 
 class TokensTest extends \unittest\TestCase {
 

@@ -1,7 +1,7 @@
 <?php namespace lang\ast;
 
-use text\Tokenizer;
 use lang\FormatException;
+use text\Tokenizer;
 
 class Tokens implements \IteratorAggregate {
   const DELIMITERS = " |&^?!.:;,@%~=<>(){}[]#+-*/'\$\"\r\n\t";

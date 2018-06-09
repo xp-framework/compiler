@@ -1,10 +1,10 @@
 <?php namespace lang\ast;
 
-use lang\reflect\Package;
-use lang\IllegalArgumentException;
 use io\streams\MemoryOutputStream;
 use io\streams\StringWriter;
+use lang\IllegalArgumentException;
 use lang\ast\nodes\Value;
+use lang\reflect\Package;
 
 abstract class Emitter {
   const PROPERTY = 0;

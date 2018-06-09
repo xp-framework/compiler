@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest;
 
-use text\StringTokenizer;
 use lang\ast\Tokens;
+use text\StringTokenizer;
 
 class LineNumberTest extends \unittest\TestCase {
 

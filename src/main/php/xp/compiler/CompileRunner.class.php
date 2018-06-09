@@ -1,15 +1,15 @@
 <?php namespace xp\compiler;
 
+use io\Path;
+use lang\Runtime;
 use lang\ast\Emitter;
 use lang\ast\Error;
 use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\transform\Transformations;
-use lang\Runtime;
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
-use io\Path;
 
 /**
  * Compiles future PHP to today's PHP.
