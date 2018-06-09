@@ -66,21 +66,20 @@ class NullSafeTest extends EmittingTest {
   #[@test]
   public function chained_method_call() {
     $r= $this->run('class <T> {
+      public static $invoked= [];
+
       public function run() {
         $object= new class() {
-          public $invoked= [];
           public function method() {
-            $this->invoked[]= "outer";
-            return new class($this->invoked) {
-              private $invoked;
-              public function __construct(&$invoked) { $this->invoked= &$invoked; }
-              public function method() { $this->invoked[]= "inner"; return null; }
+            <T>::$invoked[]= "outer";
+            return new class() {
+              public function method() { <T>::$invoked[]= "inner"; return null; }
             };
           }
         };
 
         $return= $object?->method()?->method()?->method();
-        return [$return, $object->invoked];
+        return [$return, self::$invoked];
       }
     }');
 

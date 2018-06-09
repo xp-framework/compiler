@@ -731,7 +731,6 @@ abstract class Emitter {
     $this->emit($instance->expression);
     $this->out->write(') ? null : '.$t.'->');
     $this->emit($instance->member);
-    $this->out->write('');
   }
 
   protected function emitUnpack($unpack) {
