@@ -1126,6 +1126,7 @@ class Parse {
       } else if ('function' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
         $member->kind= 'method';
+        $member->line= $this->token->line;
         $comment= $this->comment;
         $this->comment= null;
 
@@ -1164,6 +1165,7 @@ class Parse {
         $type= null;
         while (';' !== $this->token->symbol->id) {
           $member= clone $n;
+          $member->line= $this->token->line;
           $first= $this->token;
           $this->token= $this->advance();
 
@@ -1198,6 +1200,7 @@ class Parse {
 
         while (';' !== $this->token->symbol->id) {
           $member= clone $n;
+          $member->line= $this->token->line;
 
           // Untyped `$a` vs. typed `int $a`
           if ('variable' === $this->token->kind) {
