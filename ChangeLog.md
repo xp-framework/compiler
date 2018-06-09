@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Ensured line number is always present for type members. Previously,
+  this was 0, leading to output formatting errors
+  (@thekid)
+* Made some minor performance improvements by reusing nodes in two
+  cases - return statements and assignments
+  (@thekid)
+
 ## 2.5.0 / 2018-06-09
 
 * Implemented feature request #9: Support null-safe instance operator

@@ -400,6 +400,7 @@ class Parse {
           $n= new Node($this->token->symbol);
           $this->token= $this->advance();
           $n->value= $this->expression(0);
+          $n->line= $this->token->line;
           $n->kind= 'return';
           $statements= [$n];
           $this->token= $this->expect(';');
@@ -1085,6 +1086,7 @@ class Parse {
       } else if ('use' === $this->token->symbol->id) {
         $member= new Node($this->token->symbol);
         $member->kind= 'use';
+        $member->line= $this->token->line;
 
         $this->token= $this->advance();
         $types= [];
@@ -1144,6 +1146,7 @@ class Parse {
           $this->token= $this->expect(';');
         } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
           $n= new Node($this->token->symbol);
+          $n->line= $this->token->line;
           $this->token= $this->advance();
           $n->value= $this->expression(0);
           $n->kind= 'return';
@@ -1341,10 +1344,9 @@ class Parse {
   private function assignment($id) {
     $infix= $this->symbol($id, 10);
     $infix->led= function($node, $left) use($id) {
-      $result= new Node($this->symbol($id));
-      $result->kind= 'assignment';
-      $result->value= new Assignment($left, $id, $this->expression(9));
-      return $result;
+      $node->kind= 'assignment';
+      $node->value= new Assignment($left, $id, $this->expression(9));
+      return $node;
     };
     return $infix;
   }
