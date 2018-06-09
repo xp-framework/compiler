@@ -1,17 +1,17 @@
 <?php namespace lang\ast;
 
-use lang\XPClass;
-use lang\reflect\Package;
-use lang\ClassLoader;
-use lang\ClassNotFoundException;
+use io\streams\MemoryOutputStream;
 use lang\ClassFormatException;
 use lang\ClassLinkageException;
+use lang\ClassLoader;
 use lang\ClassLoadingException;
+use lang\ClassNotFoundException;
 use lang\ElementNotFoundException;
 use lang\IllegalStateException;
-use text\StreamTokenizer;
-use io\streams\MemoryOutputStream;
+use lang\XPClass;
 use lang\ast\transform\Transformations;
+use lang\reflect\Package;
+use text\StreamTokenizer;
 
 class CompilingClassLoader implements \lang\IClassLoader {
   private static $instance= [];
