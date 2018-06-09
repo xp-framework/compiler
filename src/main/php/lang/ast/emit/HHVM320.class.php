@@ -62,12 +62,23 @@ class HHVM320 extends Emitter {
     $this->out->write(';');
   }
 
-  protected function emitNullSafeInstance($instance) {
-    $t= $this->temp();
-    $this->out->write('(null === ('.$t.'= ');
-    $this->emit($instance->expression);
-    $this->out->write(') ? null : '.$t.'->');
-    $this->emit($instance->member);
+  protected function emitInvoke($invoke) {
+    if ('nullsafeinstance' === $invoke->expression->kind) {
+      $t= $this->temp();
+      $this->out->write('(null === ('.$t.'= ');
+      $this->emit($invoke->expression->value->expression);
+      $this->out->write(') ? null : '.$t.'->');
+      $this->emit($invoke->expression->value->member);
+    } else {
+      $this->emit($invoke->expression);
+    }
+
+    $this->out->write('(');
+    $this->emitArguments($invoke->arguments);
     $this->out->write(')');
+
+    if ('nullsafeinstance' === $invoke->expression->kind) {
+      $this->out->write(')');
+    }
   }
 }

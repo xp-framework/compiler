@@ -727,11 +727,10 @@ abstract class Emitter {
 
   protected function emitNullSafeInstance($instance) {
     $t= $this->temp();
-    $this->out->write('(null === ('.$t.'= ');
+    $this->out->write('null === ('.$t.'= ');
     $this->emit($instance->expression);
     $this->out->write(') ? null : '.$t.'->');
     $this->emit($instance->member);
-    $this->out->write(')');
   }
 
   protected function emitUnpack($unpack) {
