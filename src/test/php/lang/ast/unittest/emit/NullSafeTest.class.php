@@ -79,8 +79,7 @@ class NullSafeTest extends EmittingTest {
           return [$return, <T>Invocation::$invoked];
         }
       }
-
-      ');
+    ');
 
     $this->assertEquals([null, ['outer', 'inner']], $r);
   }
