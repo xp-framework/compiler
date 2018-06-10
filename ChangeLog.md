@@ -3,6 +3,14 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Dropped confusing way of compiling multiple sources using `-b` to
+  strip bases. New way is to pass multiple directories directly, e.g.
+  `$ xp compile -o dist src/main/php/ src/test/php`
+  (@thekid)
+* Fixed compiling to a directory when the source path was not inside
+  the current directory.
+  (@thekid)
+
 ## 2.5.1 / 2018-06-10
 
 * Ensured line number is always present for type members. Previously,

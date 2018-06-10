@@ -8,13 +8,15 @@ abstract class Input implements \IteratorAggregate {
   /**
    * Returns input from the command line argument
    *
-   * @param  string $arg
+   * @param  string|string[] $arg
    * @return self
    * @throws lang.IllegalArgumentException
    */
   public static function newInstance($arg) {
     if ('-' === $arg) {
       return new FromStream(Console::$in->getStream(), '-');
+    } else if (is_array($arg)) {
+      return new FromInputs($arg);
     } else if (is_file($arg)) {
       return new FromFile($arg);
     } else if (is_dir($arg)) {

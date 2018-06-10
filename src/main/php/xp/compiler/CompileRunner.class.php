@@ -22,19 +22,18 @@ use util\profiling\Timer;
  *   ```sh
  *   $ echo "<?php ..." | xp compile -
  *   ```
- * - Compile all files inside `src/main/php` to the `dist` folder.
+ * - Compile `src/main/php` and `src/test/php` to the `dist` folder.
  *   ```sh
- *   $ xp compile src/main/php/ dist/
+ *   $ xp compile -o dist src/main/php/ src/test/php
  *   ```
  * - Target PHP 5.6 (default target is current PHP version)
  *   ```sh
  *   $ xp compile -t PHP.5.6 HelloWorld.php HelloWorld.class.php
  *   ```
- * 
- * The `-b` option provides bases to be stripped from the compiled
- * files' names. In the above example, `src/main/php/Test.php` will
- * end up in `dist/Test.class.php` (not in `dist/src/main/php/`...)
  *
+ * By using the *-o* option, you can pass multiple input sources
+ * following it.
+ * 
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
 class CompileRunner {
@@ -47,19 +46,23 @@ class CompileRunner {
     }
 
     $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
-    $cwd= new Path(getcwd());
+    $in= $out= '-';
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
+      } else if ('-o' === $args[$i]) {
+        $out= $args[++$i];
+        $in= array_slice($args, $i + 1);
+        break;
       } else {
+        $in= $args[$i];
+        $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
         break;
       }
     }
-    $bases[]= $cwd;
 
-    $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
     $emit= Emitter::forRuntime($target);
-    $input= Input::newInstance($args[$i]);
+    $input= Input::newInstance($in);
     $output= Output::newInstance($out);
 
     $t= new Timer();
