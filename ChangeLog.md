@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.6.1 / 2018-06-10
+
+* Fixed issue #41: String parsing of escapes broken - @thekid
+
 ## 2.6.0 / 2018-06-10
 
 * Implemented support unicode escape sequences in PHP 5.6, see #38

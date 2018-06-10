@@ -48,21 +48,19 @@ class Tokens implements \IteratorAggregate {
         yield 'variable' => [$this->source->nextToken(), $line];
       } else if ('"' === $token || "'" === $token) {
         $string= $token;
+        $end= '\\'.$token;
         do {
-          // Empty string, e.g. "" or ''
-          if ($token === ($t= $this->source->nextToken($token))) break;
-
-          $string.= $t;
-          $l= strlen($string);
-          if ($l > 0 && '\\' === $string{$l - 1} && !($l > 1 && '\\' === $string{$l - 2})) {
-            $string.= $this->source->nextToken($token);
-            continue;
-          }
-          if ($token !== $this->source->nextToken($token)) {
+          $t= $this->source->nextToken($end);
+          if (null === $t) {
             throw new FormatException('Unclosed string literal starting at line '.$line);
+          } else if ('\\' === $t) {
+            $string.= $t.$this->source->nextToken($end);
+          } else if ($token === $t) {
+            break;
+          } else {
+            $string.= $t;
           }
-          break;
-        } while ($this->source->hasMoreTokens());
+        } while (true);
 
         yield 'string' => [$string.$token, $line];
         $line+= substr_count($string, "\n");
