@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented support unicode escape sequences in PHP 5.6, see #38
+  (@thekid)
 * Fixed issue #39: Syntax error for parameters called "function" 
   (@thekid)
 * Dropped confusing way of compiling multiple sources using `-b` to
