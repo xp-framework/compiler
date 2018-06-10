@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #39: Syntax error for parameters called "function" 
+  (@thekid)
 * Dropped confusing way of compiling multiple sources using `-b` to
   strip bases. New way is to pass multiple directories directly, e.g.
   `$ xp compile -o dist src/main/php/ src/test/php`

@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\FunctionType;
 use lang\ast\Type;
 
 class FunctionsTest extends ParseTest {
@@ -73,6 +74,22 @@ class FunctionsTest extends ParseTest {
     $this->assertNodes(
       [['function' => ['a', [[['param', false, null, false, null, ['null' => 'null'], []]], null], []]]],
       $this->parse('function a($param= null) { }')
+    );
+  }
+
+  #[@test]
+  public function with_parameter_named_function() {
+    $this->assertNodes(
+      [['function' => ['a', [[['function', false, null, false, null, null, []]], null], []]]],
+      $this->parse('function a($function) { }')
+    );
+  }
+
+  #[@test]
+  public function with_typed_parameter_named_function() {
+    $this->assertNodes(
+      [['function' => ['a', [[['function', false, new FunctionType([], new Type('void')), false, null, null, []]], null], []]]],
+      $this->parse('function a((function(): void) $function) { }')
     );
   }
 

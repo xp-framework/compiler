@@ -856,7 +856,7 @@ class Parse {
       $type= $this->type(false);
       $this->token= $this->advance();
       return $type;
-    } else if ('function' === $this->token->value) {
+    } else if ('name' === $this->token->kind && 'function' === $this->token->value) {
       $this->token= $this->advance();
       $this->token= $this->expect('(');
       $signature= [];
