@@ -6,7 +6,7 @@ use text\Tokenizer;
 class Tokens implements \IteratorAggregate {
   const DELIMITERS = " |&^?!.:;,@%~=<>(){}[]#+-*/'\$\"\r\n\t";
 
-  private $operators= [
+  private static $operators= [
     '<' => ['<=', '<<', '<>', '<?', '<=>', '<<='],
     '>' => ['>=', '>>', '>>='],
     '=' => ['=>', '==', '==>', '==='],
@@ -25,6 +25,7 @@ class Tokens implements \IteratorAggregate {
     ':' => ['::'],
     "\303" => ["\303\227"]
   ]; 
+
   private $source;
 
   /**
@@ -102,9 +103,9 @@ class Tokens implements \IteratorAggregate {
           $this->source->pushBack($next);
         }
 
-        if (isset($this->operators[$token])) {
+        if (isset(self::$operators[$token])) {
           $combined= $token;
-          foreach ($this->operators[$token] as $operator) {
+          foreach (self::$operators[$token] as $operator) {
             while (strlen($combined) < strlen($operator) && $this->source->hasMoreTokens()) {
               $combined.= $this->source->nextToken();
             }
