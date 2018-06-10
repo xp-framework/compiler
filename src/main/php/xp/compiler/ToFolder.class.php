@@ -18,7 +18,11 @@ class ToFolder extends ToFileSystem {
    * @return io.streams.OutputStream
    */
   public function target($name) {
-    $f= new File($this->folder, str_replace('.php', \xp::CLASS_FILE_EXT, $name));
+    if ('-' === $name) {
+      $f= new File($this->folder, 'out'.\xp::CLASS_FILE_EXT);
+    } else {
+      $f= new File($this->folder, str_replace('.php', \xp::CLASS_FILE_EXT, $name));
+    }
     $this->ensure($f->path);
     return $f->out();
   }

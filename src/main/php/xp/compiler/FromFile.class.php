@@ -18,6 +18,6 @@ class FromFile extends Input {
 
   /** @return iterable */
   public function getIterator() {
-    yield new Path($this->file->getURI()) => $this->file->in();
+    yield new Path($this->file->getFileName()) => $this->file->in();
   }
 }

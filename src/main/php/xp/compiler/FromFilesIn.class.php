@@ -28,7 +28,7 @@ class FromFilesIn extends Input {
           yield $path => $stream;
         }
       } else if (0 === substr_compare($name, '.php', -4)) {
-        yield $entry => $entry->asFile()->in();
+        yield $entry->relativeTo($this->folder) => $entry->asFile()->in();
       }
     }
   }

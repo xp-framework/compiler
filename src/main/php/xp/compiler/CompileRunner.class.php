@@ -22,9 +22,9 @@ use util\profiling\Timer;
  *   ```sh
  *   $ echo "<?php ..." | xp compile -
  *   ```
- * - Compile all files inside `src` to the `dist` folder.
+ * - Compile all files inside `src/main/php` to the `dist` folder.
  *   ```sh
- *   $ xp compile -b src/main/php -b src/test/php src/ dist/
+ *   $ xp compile src/main/php/ dist/
  *   ```
  * - Target PHP 5.6 (default target is current PHP version)
  *   ```sh
@@ -39,23 +39,6 @@ use util\profiling\Timer;
  */
 class CompileRunner {
 
-  /**
-   * Strip bases from path
-   *
-   * @param  io.Path $path
-   * @param  io.Path[] $bases
-   * @return io.Path
-   */
-  private static function strip($path, $bases) {
-    foreach ($bases as $base) {
-      $l= strlen($base);
-      if (0 === strncmp($path, $base, $l)) {
-        $path= substr($path, $l);
-      }
-    }
-    return new Path($path);
-  }
-
   /** @return int */
   public static function main(array $args) {
     if (empty($args)) {
@@ -65,12 +48,9 @@ class CompileRunner {
 
     $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     $cwd= new Path(getcwd());
-    $bases= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
-      } else if ('-b' === $args[$i]) {
-        $bases[]= Path::real($args[++$i], $cwd);
       } else {
         break;
       }
@@ -86,22 +66,20 @@ class CompileRunner {
     $total= $errors= 0;
     $time= 0.0;
     foreach ($input as $path => $in) {
-      $name= $path->exists() ? $path->relativeTo($cwd)->toString('/') : (string)$path;
-
       $t->start();
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)));
-        $emitter= $emit->newInstance($output->target(self::strip($path, $bases)));
+        $emitter= $emit->newInstance($output->target((string)$path));
         foreach (Transformations::registered() as $kind => $function) {
           $emitter->transform($kind, $function);
         }
         $emitter->emit($parse->execute());
 
         $t->stop();
-        Console::$err->writeLinef('> %s (%.3f seconds)', $name, $t->elapsedTime());
+        Console::$err->writeLinef('> %s (%.3f seconds)', $path->toString('/'), $t->elapsedTime());
       } catch (Error $e) {
         $t->stop();
-        Console::$err->writeLinef('! %s: %s', $name, $e->toString());
+        Console::$err->writeLinef('! %s %s at line %d', $path->toString('/'), $e->getMessage(), $e->getLine());
         $errors++;
       } finally {
         $total++;
