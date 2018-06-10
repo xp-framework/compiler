@@ -97,7 +97,7 @@ class PHP56 extends \lang\ast\Emitter {
     if ('"' === $literal{0}) {
       $this->out->write(preg_replace_callback(
         '/\\\\u\{([0-9a-f]+)\}/i',
-        function($matches) { return html_entity_decode('&#'.hexdec($matches[1]).';'); },
+        function($matches) { return html_entity_decode('&#'.hexdec($matches[1]).';', ENT_HTML5, \xp::ENCODING); },
         $literal
       ));
     } else {
