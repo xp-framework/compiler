@@ -555,7 +555,7 @@ class Parse {
         } else {
           $cases[sizeof($cases) - 1]->body[]= $this->statement();
         }
-      };
+      }
       $this->token= $this->expect('}');
 
       $node->value= new SwitchStatement($condition, $cases);
