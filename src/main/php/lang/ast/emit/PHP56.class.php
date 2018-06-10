@@ -93,6 +93,18 @@ class PHP56 extends \lang\ast\Emitter {
     return null;
   }
 
+  protected function emitLiteral($literal) {
+    if ('"' === $literal{0}) {
+      $this->out->write(preg_replace_callback(
+        '/\\\\u\{([0-9a-f]+)\}/i',
+        function($matches) { return html_entity_decode('&#'.hexdec($matches[1]).';'); },
+        $literal
+      ));
+    } else {
+      $this->out->write($literal);
+    }
+  }
+
   protected function emitCatch($catch) {
     $last= array_pop($catch->types);
     $label= sprintf('c%u', crc32($last));
