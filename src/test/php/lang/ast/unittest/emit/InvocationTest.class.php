@@ -65,7 +65,7 @@ class InvocationTest extends EmittingTest {
     $this->assertEquals('static', $this->run(
       'class <T> {
 
-        public function staticMethod() { return "static"; }
+        public static function staticMethod() { return "static"; }
 
         public function run() {
           $method= "staticMethod";
