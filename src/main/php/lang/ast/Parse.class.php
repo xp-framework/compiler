@@ -119,12 +119,13 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->expect('{');
         $expr= $this->expression(0);
+        $node->kind= 'dynamicinstance';
       } else {
         $expr= $this->token;
+        $node->kind= 'instance';
       }
 
       $node->value= new InstanceExpression($left, $expr);
-      $node->kind= 'instance';
       $this->token= $this->advance();
       return $node;
     });

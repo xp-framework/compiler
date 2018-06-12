@@ -111,10 +111,21 @@ class MembersTest extends ParseTest {
   }
 
   #[@test]
-  public function dynamic_instance_property_access() {
+  public function dynamic_instance_property_access_via_variable() {
     $this->assertNodes(
       [['->' => [['(variable)' => 'a'], ['(variable)' => 'member']]]],
       $this->parse('$a->{$member};')
+    );
+  }
+
+  #[@test]
+  public function dynamic_instance_property_access_via_expression() {
+    $this->assertNodes(
+      [['->' => [['(variable)' => 'a'], ['(' => [
+        ['->' => [['(variable)' => 'field'], ['get' => 'get']]],
+        [['(variable)' => 'instance']]
+      ]]]]],
+      $this->parse('$a->{$field->get($instance)};')
     );
   }
 

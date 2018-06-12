@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue with dynamic instance references not being emitted
+  correctly, e.g. `$value->{$field->get()};`.
+  (@thekid)
+
 ## 2.6.1 / 2018-06-10
 
 * Fixed issue #41: String parsing of escapes broken - @thekid

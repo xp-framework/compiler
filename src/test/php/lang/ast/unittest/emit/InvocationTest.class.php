@@ -17,7 +17,7 @@ class InvocationTest extends EmittingTest {
   }
 
   #[@test]
-  public function instance_method_dynamic() {
+  public function instance_method_dynamic_variable() {
     $this->assertEquals('instance', $this->run(
       'class <T> {
 
@@ -26,6 +26,21 @@ class InvocationTest extends EmittingTest {
         public function run() {
           $method= "instanceMethod";
           return $this->{$method}();
+        }
+      }'
+    ));
+  }
+
+  #[@test]
+  public function instance_method_dynamic_expression() {
+    $this->assertEquals('instance', $this->run(
+      'class <T> {
+
+        public function instanceMethod() { return "instance"; }
+
+        public function run() {
+          $method= () ==> "instanceMethod";
+          return $this->{$method()}();
         }
       }'
     ));
