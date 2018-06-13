@@ -722,20 +722,14 @@ abstract class Emitter {
       $this->emit($instance->expression);
       $this->out->write('->');
     }
-    $this->emit($instance->member);
-  }
 
-  protected function emitDynamicInstance($instance) {
-    if ('new' === $instance->expression->kind) {
-      $this->out->write('(');
-      $this->emit($instance->expression);
-      $this->out->write(')->{');
+    if ('name' === $instance->member->kind) {
+      $this->emit($instance->member);
     } else {
-      $this->emit($instance->expression);
-      $this->out->write('->{');
+      $this->out->write('{');
+      $this->emit($instance->member);
+      $this->out->write('}');
     }
-    $this->emit($instance->member);
-    $this->out->write('}');
   }
 
   protected function emitNullSafeInstance($instance) {
