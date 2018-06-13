@@ -724,7 +724,7 @@ abstract class Emitter {
     }
 
     if ('name' === $instance->member->kind) {
-      $this->emit($instance->member);
+      $this->out->write($instance->member->value);
     } else {
       $this->out->write('{');
       $this->emit($instance->member);
