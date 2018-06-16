@@ -24,15 +24,18 @@ use util\profiling\Timer;
  *   ```
  * - Compile `src/main/php` and `src/test/php` to the `dist` folder.
  *   ```sh
- *   $ xp compile -o dist src/main/php/ src/test/php
+ *   $ xp compile -o dist src/main/php/ src/test/php/
+ *   ```
+ * - Compile `src/main/php`, do not write output
+ *   ```sh
+ *   $ xp compile -n src/main/php/
  *   ```
  * - Target PHP 5.6 (default target is current PHP version)
  *   ```sh
  *   $ xp compile -t PHP.5.6 HelloWorld.php HelloWorld.class.php
  *   ```
  *
- * By using the *-o* option, you can pass multiple input sources
- * following it.
+ * The *-o* and *-n* options accept multiple input sources following them.
  * 
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
@@ -52,6 +55,10 @@ class CompileRunner {
         $target= $args[++$i];
       } else if ('-o' === $args[$i]) {
         $out= $args[++$i];
+        $in= array_slice($args, $i + 1);
+        break;
+      } else if ('-n' === $args[$i]) {
+        $out= null;
         $in= array_slice($args, $i + 1);
         break;
       } else {
