@@ -677,22 +677,28 @@ class Parse {
       $catches= [];
       while ('catch'  === $this->token->value) {
         $this->token= $this->advance();
-        $this->token= $this->expect('(');
 
-        $types= [];
-        while ('name' === $this->token->kind) {
-          $types[]= $this->scope->resolve($this->token->value);
+        if ('(' === $this->token->value) {
+          $this->token= $this->expect('(');
+
+          $types= [];
+          while ('name' === $this->token->kind) {
+            $types[]= $this->scope->resolve($this->token->value);
+            $this->token= $this->advance();
+            if ('|' !== $this->token->value) break;
+            $this->token= $this->advance();
+          }
+
+          $variable= $this->token->value;
           $this->token= $this->advance();
-          if ('|' !== $this->token->value) break;
-          $this->token= $this->advance();
+          $this->token= $this->expect(')');
+        } else {
+          $variable= null;
+          $types= [];
         }
 
-        $variable= $this->token;
-        $this->token= $this->advance();
-        $this->token= $this->expect(')');
-
         $this->token= $this->expect('{');
-        $catches[]= new CatchStatement($types, $variable->value, $this->statements());
+        $catches[]= new CatchStatement($types, $variable, $this->statements());
         $this->token= $this->expect('}');
       }
 

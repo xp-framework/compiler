@@ -48,4 +48,19 @@ class ExceptionsTest extends EmittingTest {
 
     $this->assertEquals(IllegalArgumentException::class, $t->newInstance()->run());
   }
+
+  #[@test]
+  public function catch_without_variable() {
+    $t= $this->type('class <T> {
+      public function run() {
+        try {
+          throw new \\lang\\IllegalArgumentException("test");
+        } catch {
+          return false;
+        }
+      }
+    }');
+
+    $this->assertFalse($t->newInstance()->run());
+  }
 }
