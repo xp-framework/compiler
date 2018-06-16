@@ -1447,7 +1447,7 @@ class Parse {
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
-        $node= new Node(self::symbol($value) ?: self::symbol('(name)'));
+        $node= new Node(self::symbol($value));
         $node->kind= $type;
       } else if ('operator' === $type) {
         $node= new Node(self::symbol($value));
