@@ -23,7 +23,7 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function missing_semicolon() {
     $this->assertError(
-      'Missing semicolon before (variable)',
+      'Missing semicolon after assignment statement',
       $this->parse('$a= 1 $b= 1;')
     );
   }

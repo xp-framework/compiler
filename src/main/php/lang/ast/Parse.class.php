@@ -1335,7 +1335,7 @@ class Parse {
     $expr= $this->expression(0);
 
     if (';' !== $this->token->symbol->id) {
-      $this->raise('Missing semicolon before '.$this->token->symbol->id);
+      $this->raise('Missing semicolon after '.$expr->kind.' statement', null, $expr->line);
     } else {
       $this->token= $this->advance();
     }
@@ -1431,11 +1431,12 @@ class Parse {
    *
    * @param  string $error
    * @param  string $context
+   * @param  int $line
    * @return void
    */
-  private function raise($message, $context= null) {
+  private function raise($message, $context= null, $line= null) {
     $context && $message.= ' in '.$context;
-    $this->errors[]= new Error($message, $this->file, $this->token->line);
+    $this->errors[]= new Error($message, $this->file, $line ?: $this->token->line);
   }
 
   /**
