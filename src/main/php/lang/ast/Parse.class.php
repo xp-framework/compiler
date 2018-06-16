@@ -38,10 +38,29 @@ use lang\ast\nodes\WhileLoop;
 use lang\ast\nodes\YieldExpression;
 
 class Parse {
+  private static $symbols= [];
+
   private $tokens, $file, $token, $scope;
   private $comment= null;
-  private $symbols= [];
   private $queue= [];
+
+  static function __static() {
+    self::symbol(':');
+    self::symbol(';');
+    self::symbol(',');
+    self::symbol(')');
+    self::symbol(']');
+    self::symbol('}');
+    self::symbol('else');
+    self::symbol('(end)');
+    self::symbol('(name)');
+    self::symbol('(literal)');
+    self::symbol('(variable)');
+
+    self::constant('true', 'true');
+    self::constant('false', 'false');
+    self::constant('null', 'null');
+  }
 
   /**
    * Creates a new parse instance
@@ -56,23 +75,6 @@ class Parse {
     $this->file= $file;
 
     // Setup parse rules
-    $this->symbol(':');
-    $this->symbol(';');
-    $this->symbol(',');
-    $this->symbol(')');
-    $this->symbol(']');
-    $this->symbol('}');
-    $this->symbol('else');
-
-    $this->symbol('(end)');
-    $this->symbol('(name)');
-    $this->symbol('(literal)');
-    $this->symbol('(variable)');
-
-    $this->constant('true', 'true');
-    $this->constant('false', 'false');
-    $this->constant('null', 'null');
-
     $this->infixr('??', 30);
     $this->infixr('?:', 30);
     $this->infixr('&&', 30);
@@ -305,7 +307,7 @@ class Parse {
     $this->prefix('{', function($node) {
       $node->kind= 'block';
       $node->value= $this->statements();
-      $this->token= new Node($this->symbol(';'));
+      $this->token= new Node(self::symbol(';'));
       return $node;
     });
 
@@ -411,7 +413,7 @@ class Parse {
         }
 
         $this->queue= [$this->token];
-        $this->token= new Node($this->symbol(';'));
+        $this->token= new Node(self::symbol(';'));
         $node->value= new FunctionDeclaration($name, $signature, $statements);
       }
 
@@ -892,7 +894,7 @@ class Parse {
         } else if ('>' === $this->token->symbol->id) {
           break;
         } else if ('>>' === $this->token->symbol->id) {
-          $this->queue[]= $this->token= new Node($this->symbol('>'));
+          $this->queue[]= $this->token= new Node(self::symbol('>'));
           break;
         }
       } while (true);
@@ -1323,10 +1325,12 @@ class Parse {
     return $expr;
   }
 
+
+
   // {{ setup
-  private function symbol($id, $lbp= 0) {
-    if (isset($this->symbols[$id])) {
-      $symbol= $this->symbols[$id];
+  private static function symbol($id, $lbp= 0) {
+    if (isset(self::$symbols[$id])) {
+      $symbol= self::$symbols[$id];
       if ($lbp > $symbol->lbp) {
         $symbol->lbp= $lbp;
       }
@@ -1334,13 +1338,13 @@ class Parse {
       $symbol= new Symbol();
       $symbol->id= $id;
       $symbol->lbp= $lbp;
-      $this->symbols[$id]= $symbol;
+      self::$symbols[$id]= $symbol;
     }
     return $symbol;
   }
 
-  private function constant($id, $value) {
-    $const= $this->symbol($id);
+  private static function constant($id, $value) {
+    $const= self::symbol($id);
     $const->nud= function($node) use($value) {
       $node->kind= 'literal';
       $node->value= $value;
@@ -1350,13 +1354,13 @@ class Parse {
   }
 
   private function stmt($id, $func) {
-    $stmt= $this->symbol($id);
+    $stmt= self::symbol($id);
     $stmt->std= $func;
     return $stmt;
   }
 
   private function assignment($id) {
-    $infix= $this->symbol($id, 10);
+    $infix= self::symbol($id, 10);
     $infix->led= function($node, $left) use($id) {
       $node->kind= 'assignment';
       $node->value= new Assignment($left, $id, $this->expression(9));
@@ -1366,7 +1370,7 @@ class Parse {
   }
 
   private function infix($id, $bp, $led= null) {
-    $infix= $this->symbol($id, $bp);
+    $infix= self::symbol($id, $bp);
     $infix->led= $led ?: function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expression($bp));
       $node->kind= 'binary';
@@ -1376,7 +1380,7 @@ class Parse {
   }
 
   private function infixr($id, $bp, $led= null) {
-    $infix= $this->symbol($id, $bp);
+    $infix= self::symbol($id, $bp);
     $infix->led= $led ?: function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expression($bp - 1));
       $node->kind= 'binary';
@@ -1386,7 +1390,7 @@ class Parse {
   }
 
   private function prefix($id, $nud= null) {
-    $prefix= $this->symbol($id);
+    $prefix= self::symbol($id);
     $prefix->nud= $nud ?: function($node) use($id) {
       $node->value= new UnaryExpression($this->expression(70), $id);
       $node->kind= 'unary';
@@ -1396,7 +1400,7 @@ class Parse {
   }
 
   private function suffix($id, $bp, $led= null) {
-    $suffix= $this->symbol($id, $bp);
+    $suffix= self::symbol($id, $bp);
     $suffix->led= $led ?: function($node, $left) use($id) {
       $node->value= new UnaryExpression($left, $id);
       $node->kind= 'unary';
@@ -1443,16 +1447,16 @@ class Parse {
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
-        $node= new Node($this->symbol($value) ?: clone $this->symbol('(name)'));
+        $node= new Node(self::symbol($value) ?: self::symbol('(name)'));
         $node->kind= $type;
       } else if ('operator' === $type) {
-        $node= new Node($this->symbol($value));
+        $node= new Node(self::symbol($value));
         $node->kind= $type;
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {
-        $node= new Node(clone $this->symbol('(literal)'));
+        $node= new Node(self::symbol('(literal)'));
         $node->kind= 'literal';
       } else if ('variable' === $type) {
-        $node= new Node(clone $this->symbol('(variable)'));
+        $node= new Node(self::symbol('(variable)'));
         $node->kind= 'variable';
       } else if ('comment' === $type) {
         $this->comment= $value;
@@ -1466,7 +1470,7 @@ class Parse {
       return $node;
     }
 
-    $node= new Node($this->symbol('(end)'));
+    $node= new Node(self::symbol('(end)'));
     $node->line= $line;
     return $node;
   }
