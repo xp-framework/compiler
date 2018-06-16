@@ -1134,6 +1134,11 @@ class Parse {
 
         $this->token= $this->advance();
         $name= $this->token->value;
+        $lookup= $name.'()';
+        if (isset($body[$lookup])) {
+          $this->raise('Cannot redeclare method '.$lookup);
+        }
+
         $this->token= $this->advance();
         $signature= $this->signature();
 
@@ -1157,7 +1162,7 @@ class Parse {
         }
 
         $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
-        $body[$name.'()']= $member;
+        $body[$lookup]= $member;
         $modifiers= [];
         $annotations= [];
       } else if ('const' === $this->token->symbol->id) {
@@ -1186,6 +1191,10 @@ class Parse {
             $this->token= $this->advance();
           }
 
+          if (isset($body[$name])) {
+            $this->raise('Cannot redeclare constant '.$name);
+          }
+
           $this->token= $this->expect('=');
           $member->value= new Constant($modifiers, $name, $type, $this->expression(0));
           $body[$name]= $member;
@@ -1208,12 +1217,17 @@ class Parse {
           // Untyped `$a` vs. typed `int $a`
           if ('variable' === $this->token->kind) {
             $name= $this->token->value;
-            $this->token= $this->advance();
           } else {
             $type= $this->type(false);
             $name= $this->token->value;
           }
 
+          $lookup= '$'.$name;
+          if (isset($body[$lookup])) {
+            $this->raise('Cannot redeclare property '.$lookup);
+          }
+
+          $this->token= $this->advance();
           if ('=' === $this->token->symbol->id) {
             $this->token= $this->expect('=');
             $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
@@ -1221,7 +1235,7 @@ class Parse {
             $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
           }
 
-          $body['$'.$name]= $member;
+          $body[$lookup]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
           }
@@ -1392,6 +1406,25 @@ class Parse {
   }
   // }}}
 
+  /**
+   * Raise an error
+   *
+   * @param  string $error
+   * @param  string $context
+   * @return void
+   */
+  private function raise($message, $context= null) {
+    $context && $message.= ' in '.$context;
+    throw new Error($message, $this->file, $this->token->line);
+  }
+
+  /**
+   * Expect a given token, raise an error if another is encountered
+   *
+   * @param  string $id
+   * @param  string $context
+   * @return var
+   */
   private function expect($id, $context= null) {
     if ($id !== $this->token->symbol->id) {
       $message= sprintf('Expected "%s", have "%s"%s', $id, $this->token->symbol->id, $context ? ' in '.$context : '');

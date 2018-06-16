@@ -179,6 +179,15 @@ class MembersTest extends ParseTest {
   }
 
   #[@test]
+  public function typed_property_with_value() {
+    $decl= ['$a' => ['(variable)' => ['a', ['private'], ['(literal)' => '"test"'], new Type('string'), [], null]]];
+    $this->assertNodes(
+      [['class' => ['\\A', [], null, [], $decl, [], null]]],
+      $this->parse('class A { private string $a = "test"; }')
+    );
+  }
+
+  #[@test]
   public function typed_properties() {
     $decl= [
       '$a' => ['(variable)' => ['a', ['private'], null, new Type('string'), [], null]],

@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\Error;
+
 class TypesTest extends ParseTest {
 
   #[@test]
@@ -112,5 +114,20 @@ class TypesTest extends ParseTest {
       [['namespace' => 'test'], ['class' => ['\\test\\A', [], null, [], [], [], null]]],
       $this->parse('namespace test; class A { }')
     );
+  }
+
+  #[@test, @expect(class= Error::class, withMessage= 'Cannot redeclare method b()')]
+  public function cannot_redeclare_method() {
+    iterator_to_array($this->parse('class A { public function b() { } public function b() { }}'));
+  }
+
+  #[@test, @expect(class= Error::class, withMessage= 'Cannot redeclare property $b')]
+  public function cannot_redeclare_property() {
+    iterator_to_array($this->parse('class A { public $b; private $b; }'));
+  }
+
+  #[@test, @expect(class= Error::class, withMessage= 'Cannot redeclare constant B')]
+  public function cannot_redeclare_constant() {
+    iterator_to_array($this->parse('class A { const B = 1; const B = 3; }'));
   }
 }
