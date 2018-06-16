@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.8.0 / 2018-06-17
+
+* Merged PR #47: Allow empty catch type to catch all exceptions - @thekid
 * Merged PR #44: Implement `echo` statement - @thekid
 
 ## 2.7.0 / 2018-06-16
