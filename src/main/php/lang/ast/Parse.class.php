@@ -450,6 +450,12 @@ class Parse {
       return $node;
     });
 
+    $this->prefix('echo', function($node) {
+      $node->kind= 'echo';
+      $node->value= $this->arguments(';');
+      return $node;
+    });
+
     $this->stmt('namespace', function($node) {
       $node->kind= 'package';
       $node->value= $this->token->value;

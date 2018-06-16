@@ -180,6 +180,15 @@ abstract class Emitter {
     $this->out->write($name);
   }
 
+  protected function emitEcho($echo) {
+    $this->out->write('echo ');
+    $s= sizeof($echo) - 1;
+    foreach ($echo as $i => $expr) {
+      $this->emit($expr);
+      if ($i < $s) $this->out->write(',');
+    }
+  }
+
   protected function emitBlock($block) {
     $this->out->write('{');
     $this->emit($block);
