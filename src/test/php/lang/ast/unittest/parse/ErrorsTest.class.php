@@ -47,8 +47,8 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function unclosed_type() {
     $this->assertError(
-      'Expected "a type, modifier, property, annotation, method or }", have "-" in type body',
-      $this->parse('class T { -')
+      'Expected a type, modifier, property, annotation, method or "}", have "-"',
+      $this->parse('class T { - }')
     );
   }
 

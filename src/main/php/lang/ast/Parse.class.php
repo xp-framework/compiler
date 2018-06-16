@@ -1280,7 +1280,12 @@ class Parse {
       } else if ($type= $this->type()) {
         continue;
       } else {
-        $this->expect('a type, modifier, property, annotation, method or }', 'type body');
+        $this->raise(sprintf(
+          'Expected a type, modifier, property, annotation, method or "}", have "%s"',
+          $this->token->symbol->id
+        ));
+        $this->token= $this->advance();
+        if (null === $this->token->value) break;
       }
     }
     return $body;
@@ -1330,7 +1335,7 @@ class Parse {
     $expr= $this->expression(0);
 
     if (';' !== $this->token->symbol->id) {
-      $this->raise(sprintf('Missing semicolon before %s', $this->token->symbol->id));
+      $this->raise('Missing semicolon before '.$this->token->symbol->id);
     } else {
       $this->token= $this->advance();
     }
