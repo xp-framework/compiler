@@ -1304,7 +1304,7 @@ class Parse {
   }
 
   private function top() {
-    while ('(end)' !== $this->token->symbol->id) {
+    while (null !== $this->token->value) {
       if (null === ($statement= $this->statement())) break;
       yield $statement;
     }
