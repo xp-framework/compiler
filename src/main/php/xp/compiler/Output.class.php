@@ -11,7 +11,9 @@ abstract class Output {
    * @return self
    */
   public static function newInstance($arg) {
-    if ('-' === $arg) {
+    if (null === $arg) {
+      return new CompileOnly();
+    } else if ('-' === $arg) {
       return new ToStream(Console::$out->getStream());
     } else if (strstr($arg, '.php')) {
       return new ToFile($arg);
