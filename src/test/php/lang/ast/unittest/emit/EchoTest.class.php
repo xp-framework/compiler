@@ -2,6 +2,14 @@
 
 class EchoTest extends EmittingTest {
 
+  /**
+   * Runs statement and verifies a given expected value was echoed.
+   *
+   * @param  string $expected
+   * @param  string $statement
+   * @return void
+   * @throws unittest.AssertionFailedError
+   */
   private function assertEchoes($expected, $statement) {
     ob_start();
     try {
