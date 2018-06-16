@@ -1328,7 +1328,14 @@ class Parse {
     }
 
     $expr= $this->expression(0);
-    $this->token= $this->expect(';');
+
+    if (';' !== $this->token->symbol->id) {
+      $message= sprintf('Missing semicolon before %s %s', $this->token->symbol->id, $this->token->value);
+      $this->errors[]= new Error($message, $this->file, $this->token->line);
+    } else {
+      $this->token= $this->advance();
+    }
+
     return $expr;
   }
 

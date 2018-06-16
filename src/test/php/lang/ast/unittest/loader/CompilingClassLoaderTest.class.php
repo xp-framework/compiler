@@ -1,12 +1,12 @@
 <?php namespace lang\ast\unittest\loader;
 
-use unittest\TestCase;
-use lang\ast\CompilingClassLoader;
-use lang\ClassFormatException;
-use lang\ClassLoader;
 use io\File;
 use io\FileUtil;
+use lang\ClassFormatException;
+use lang\ClassLoader;
 use lang\Environment;
+use lang\ast\CompilingClassLoader;
+use unittest\TestCase;
 
 class CompilingClassLoaderTest extends TestCase {
   private static $runtime;
@@ -29,7 +29,7 @@ class CompilingClassLoaderTest extends TestCase {
   #[@test]
   public function load_class_with_syntax_errors() {
     $f= new File(Environment::tempDir(), 'Errors.php');
-    FileUtil::setContents($f, "<?php\n<Syntax error in line 2>");
+    FileUtil::setContents($f, "<?php\nclass A");
     $cl= ClassLoader::registerPath($f->getPath());
 
     $loader= new CompilingClassLoader(self::$runtime);
@@ -37,7 +37,7 @@ class CompilingClassLoaderTest extends TestCase {
       $loader->loadClass('Errors');
       $this->fail('No exception raised', null, ClassFormatException::class);
     } catch (ClassFormatException $expected) {
-      $this->assertEquals('Syntax error in Errors.php, line 2: Expected ";", have "Syntax"', $expected->getMessage());
+      $this->assertEquals('Syntax error in Errors.php, line 1: Expected "{", have "(end)"', $expected->getMessage());
     } finally {
       ClassLoader::removeLoader($cl);
       $f->unlink();
