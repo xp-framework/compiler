@@ -83,4 +83,21 @@ class NullSafeTest extends EmittingTest {
 
     $this->assertEquals([null, ['outer', 'inner']], $r);
   }
+
+  #[@test]
+  public function dynamic_member_access_on_object() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $object= new class() {
+          public $member= true;
+        };
+        $member= new class() {
+          public function name() ==> "member";
+        };
+        return $object?->{$member->name()};
+      }
+    }');
+
+    $this->assertTrue($r);
+  }
 }
