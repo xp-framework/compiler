@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.7.0 / 2018-06-16
+
+* Merged PR #43: Add "-n" command line option to compile only - @thekid
+* Merged PR #42: Raise errors when members are redeclared - @thekid
+
 ## 2.6.2 / 2018-06-16
 
 * Fixed issue with dynamic instance references not being emitted
