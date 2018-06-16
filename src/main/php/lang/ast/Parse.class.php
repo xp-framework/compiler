@@ -1136,7 +1136,7 @@ class Parse {
         $name= $this->token->value;
         $lookup= $name.'()';
         if (isset($body[$lookup])) {
-          throw new Error('Cannot redeclare method '.$lookup, $this->file, $this->token->line);
+          $this->raise('Cannot redeclare method '.$lookup);
         }
 
         $this->token= $this->advance();
@@ -1192,7 +1192,7 @@ class Parse {
           }
 
           if (isset($body[$name])) {
-            throw new Error('Cannot redeclare constant '.$name, $this->file, $this->token->line);
+            $this->raise('Cannot redeclare constant '.$name);
           }
 
           $this->token= $this->expect('=');
@@ -1224,7 +1224,7 @@ class Parse {
 
           $lookup= '$'.$name;
           if (isset($body[$lookup])) {
-            throw new Error('Cannot redeclare property '.$lookup, $this->file, $this->token->line);
+            $this->raise('Cannot redeclare property '.$lookup);
           }
 
           $this->token= $this->advance();
@@ -1406,6 +1406,25 @@ class Parse {
   }
   // }}}
 
+  /**
+   * Raise an error
+   *
+   * @param  string $error
+   * @param  string $context
+   * @return void
+   */
+  private function raise($message, $context= null) {
+    $context && $message.= ' in '.$context;
+    throw new Error($message, $this->file, $this->token->line);
+  }
+
+  /**
+   * Expect a given token, raise an error if another is encountered
+   *
+   * @param  string $id
+   * @param  string $context
+   * @return var
+   */
   private function expect($id, $context= null) {
     if ($id !== $this->token->symbol->id) {
       $message= sprintf('Expected "%s", have "%s"%s', $id, $this->token->symbol->id, $context ? ' in '.$context : '');
