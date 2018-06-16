@@ -1134,6 +1134,11 @@ class Parse {
 
         $this->token= $this->advance();
         $name= $this->token->value;
+        $lookup= $name.'()';
+        if (isset($body[$lookup])) {
+          throw new Error('Cannot redeclare method '.$lookup, $this->file, $this->token->line);
+        }
+
         $this->token= $this->advance();
         $signature= $this->signature();
 
@@ -1157,7 +1162,7 @@ class Parse {
         }
 
         $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
-        $body[$name.'()']= $member;
+        $body[$lookup]= $member;
         $modifiers= [];
         $annotations= [];
       } else if ('const' === $this->token->symbol->id) {
@@ -1186,6 +1191,10 @@ class Parse {
             $this->token= $this->advance();
           }
 
+          if (isset($body[$name])) {
+            throw new Error('Cannot redeclare constant '.$name, $this->file, $this->token->line);
+          }
+
           $this->token= $this->expect('=');
           $member->value= new Constant($modifiers, $name, $type, $this->expression(0));
           $body[$name]= $member;
@@ -1208,12 +1217,17 @@ class Parse {
           // Untyped `$a` vs. typed `int $a`
           if ('variable' === $this->token->kind) {
             $name= $this->token->value;
-            $this->token= $this->advance();
           } else {
             $type= $this->type(false);
             $name= $this->token->value;
           }
 
+          $lookup= '$'.$name;
+          if (isset($body[$lookup])) {
+            throw new Error('Cannot redeclare property '.$lookup, $this->file, $this->token->line);
+          }
+
+          $this->token= $this->advance();
           if ('=' === $this->token->symbol->id) {
             $this->token= $this->expect('=');
             $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
@@ -1221,7 +1235,7 @@ class Parse {
             $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
           }
 
-          $body['$'.$name]= $member;
+          $body[$lookup]= $member;
           if (',' === $this->token->symbol->id) {
             $this->token= $this->expect(',');
           }
