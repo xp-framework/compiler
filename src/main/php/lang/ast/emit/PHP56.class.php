@@ -108,14 +108,14 @@ class PHP56 extends \lang\ast\Emitter {
   protected function emitCatch($catch) {
     $var= $catch->variable ? '$'.$catch->variable : $this->temp();
     if (empty($catch->types)) {
-      $this->out->write('catch(\\Exception $'.$var.') {');
+      $this->out->write('catch(\\Exception '.$var.') {');
     } else {
       $last= array_pop($catch->types);
       $label= sprintf('c%u', crc32($last));
       foreach ($catch->types as $type) {
-        $this->out->write('catch('.$type.' $'.$var.') { goto '.$label.'; }');
+        $this->out->write('catch('.$type.' '.$var.') { goto '.$label.'; }');
       }
-      $this->out->write('catch('.$last.' $'.$var.') { '.$label.':');
+      $this->out->write('catch('.$last.' '.$var.') { '.$label.':');
     }
 
     $this->emit($catch->body);
