@@ -3,7 +3,7 @@
 use io\Path;
 use lang\Runtime;
 use lang\ast\Emitter;
-use lang\ast\Error;
+use lang\ast\Errors;
 use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\transform\Transformations;
