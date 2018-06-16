@@ -1331,8 +1331,6 @@ class Parse {
     return $expr;
   }
 
-
-
   // {{ setup
   private static function symbol($id, $lbp= 0) {
     if (isset(self::$symbols[$id])) {
