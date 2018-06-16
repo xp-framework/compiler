@@ -689,8 +689,12 @@ class Parse {
             $this->token= $this->advance();
           }
 
-          $variable= $this->token->value;
-          $this->token= $this->advance();
+          if ('variable' === $this->token->kind) {
+            $variable= $this->token->value;
+            $this->token= $this->advance();
+          } else {
+            $variable= null;
+          }
           $this->token= $this->expect(')');
         } else {
           $variable= null;

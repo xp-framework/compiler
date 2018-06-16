@@ -55,6 +55,21 @@ class ExceptionsTest extends EmittingTest {
       public function run() {
         try {
           throw new \\lang\\IllegalArgumentException("test");
+        } catch (\\lang\\IllegalArgumentException) {
+          return true;
+        }
+      }
+    }');
+
+    $this->assertTrue($t->newInstance()->run());
+  }
+
+  #[@test]
+  public function anonymous_catch() {
+    $t= $this->type('class <T> {
+      public function run() {
+        try {
+          throw new \\lang\\IllegalArgumentException("test");
         } catch {
           return false;
         }
