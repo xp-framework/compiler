@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #44: Implement `echo` statement - @thekid
+
 ## 2.7.0 / 2018-06-16
 
 * Merged PR #43: Add "-n" command line option to compile only - @thekid
