@@ -43,6 +43,7 @@ class Parse {
   private $tokens, $file, $token, $scope;
   private $comment= null;
   private $queue= [];
+  private $errors= [];
 
   static function __static() {
     self::symbol(':');
@@ -1423,7 +1424,7 @@ class Parse {
    */
   private function raise($message, $context= null) {
     $context && $message.= ' in '.$context;
-    throw new Error($message, $this->file, $this->token->line);
+    $this->errors[]= new Error($message, $this->file, $this->token->line);
   }
 
   /**
@@ -1476,8 +1477,24 @@ class Parse {
     return $node;
   }
 
+  /**
+   * Parses given file, returning AST nodes.
+   *
+   * @return iterable
+   * @throws lang.ast.Errors
+   */
   public function execute() {
     $this->token= $this->advance();
-    return $this->top();
+    try {
+      foreach ($this->top() as $node) {
+        yield $node;
+      }
+    } catch (Error $e) {
+      $this->errors[]= $e;
+    }
+
+    if ($this->errors) {
+      throw new Errors($this->errors, $this->file);
+    }
   }
 }

@@ -76,9 +76,10 @@ class CompileRunner {
     $total= $errors= 0;
     $time= 0.0;
     foreach ($input as $path => $in) {
+      $file= $path->toString('/');
       $t->start();
       try {
-        $parse= new Parse(new Tokens(new StreamTokenizer($in)));
+        $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
         $emitter= $emit->newInstance($output->target((string)$path));
         foreach (Transformations::registered() as $kind => $function) {
           $emitter->transform($kind, $function);
@@ -86,10 +87,10 @@ class CompileRunner {
         $emitter->emit($parse->execute());
 
         $t->stop();
-        Console::$err->writeLinef('> %s (%.3f seconds)', $path->toString('/'), $t->elapsedTime());
-      } catch (Error $e) {
+        Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
+      } catch (Errors $e) {
         $t->stop();
-        Console::$err->writeLinef('! %s %s at line %d', $path->toString('/'), $e->getMessage(), $e->getLine());
+        Console::$err->writeLinef('! %s: %s ', $file, $e->diagnostics('  '));
         $errors++;
       } finally {
         $total++;

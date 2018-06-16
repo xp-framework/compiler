@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\Error;
+use lang\ast\Errors;
 
 class ErrorsTest extends ParseTest {
 
@@ -14,8 +14,8 @@ class ErrorsTest extends ParseTest {
   private function assertError($message, $parse) {
     try {
       iterator_to_array($parse);
-      $this->fail('No exception raised', null, Error::class);
-    } catch (Error $expected) {
+      $this->fail('No exception raised', null, Errors::class);
+    } catch (Errors $expected) {
       $this->assertEquals($message, $expected->getMessage());
     }
   }

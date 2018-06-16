@@ -170,7 +170,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
       $emitter->emit($parse->execute());
 
       return $declaration->getBytes();
-    } catch (Error $e) {
+    } catch (Errors $e) {
       $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
       throw new ClassFormatException($message);
     } finally {
