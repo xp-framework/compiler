@@ -817,19 +817,8 @@ abstract class Emitter {
       }
     } else {
       foreach ($arg as $node) {
-        if ($node->line > $this->line) {
-          $this->out->write(str_repeat("\n", $node->line - $this->line));
-          $this->line= $node->line;
-        }
-
-        if (isset($this->transformations[$node->kind])) {
-          foreach ($this->transformations[$node->kind]($node) as $n) {
-            $this->{'emit'.$n->kind}($n->value);
-          }
-        } else {
-          $this->{'emit'.$node->kind}($node->value);
-          isset($node->symbol->std) || $this->out->write(';');
-        }
+        $this->emit($node);
+        isset($node->symbol->std) || $this->out->write(';');
       }
     }
   }
