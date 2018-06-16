@@ -4,7 +4,8 @@ XP Compiler ChangeLog
 ## ?.?.? / ????-??-??
 
 * Fixed issue with dynamic instance references not being emitted
-  correctly, e.g. `$value->{$field->get()};`.
+  correctly, e.g. `$value->{$field->get()};`, see
+  http://php.net/manual/en/functions.variable-functions.php
   (@thekid)
 
 ## 2.6.1 / 2018-06-10
