@@ -589,7 +589,11 @@ abstract class Emitter {
   }
 
   protected function emitCatch($catch) {
-    $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+    if (empty($catch->types)) {
+      $this->out->write('catch(\\Throwable $'.$catch->variable.') {');
+    } else {
+      $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+    }
     $this->emit($catch->body);
     $this->out->write('}');
   }
