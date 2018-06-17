@@ -140,4 +140,18 @@ class LambdasTest extends EmittingTest {
 
     $this->assertEquals('IIFE', $r);
   }
+
+  #[@test]
+  public function with_braces() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return () ==> {
+          $a= 1;
+          return $a;
+        };
+      }
+    }');
+
+    $this->assertEquals(1, $r());
+  }
 }

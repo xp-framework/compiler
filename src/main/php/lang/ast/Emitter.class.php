@@ -331,7 +331,7 @@ abstract class Emitter {
   }
 
   protected function emitLambda($lambda) {
-    $this->out->write('function'); 
+    $this->out->write('@function');
     $this->emitSignature($lambda->signature);
 
     $capture= [];
@@ -344,9 +344,15 @@ abstract class Emitter {
     }
     $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
 
-    $this->out->write('{ return ');
-    $this->emit($lambda->body);
-    $this->out->write('; }');
+    if (is_array($lambda->body)) {
+      $this->out->write('{');
+      $this->emit($lambda->body);
+      $this->out->write('}');
+    } else {
+      $this->out->write('{ return ');
+      $this->emit($lambda->body);
+      $this->out->write('; }');
+    }
   }
 
   protected function emitClass($class) {

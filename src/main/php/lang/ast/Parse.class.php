@@ -154,7 +154,16 @@ class Parse {
 
     $this->infix('==>', 80, function($node, $left) {
       $signature= new Signature([new Parameter($left->value, null)], null);
-      $node->value= new LambdaExpression($signature, $this->expression(0));
+
+      if ('{' === $this->token->value) {
+        $this->token= $this->expect('{');
+        $statements= $this->statements();
+        $this->token= $this->expect('}');
+      } else {
+        $statements= $this->expression(0);
+      }
+
+      $node->value= new LambdaExpression($signature, $statements);
       $node->kind= 'lambda';
       return $node;
     });
@@ -262,7 +271,16 @@ class Parse {
         $this->token= $this->advance();
         $signature= $this->signature();
         $this->token= $this->advance();
-        $node->value= new LambdaExpression($signature, $this->expression(0));
+
+        if ('{' === $this->token->value) {
+          $this->token= $this->expect('{');
+          $statements= $this->statements();
+          $this->token= $this->expect('}');
+        } else {
+          $statements= $this->expression(0);
+        }
+
+        $node->value= new LambdaExpression($signature, $statements);
       } else if ($cast && ('operator' !== $this->token->kind || '(' === $this->token->value || '[' === $this->token->value)) {
         $node->kind= 'cast';
 
