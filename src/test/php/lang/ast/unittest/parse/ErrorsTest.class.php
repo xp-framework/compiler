@@ -55,7 +55,7 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function missing_comma_in_implements() {
     $this->assertError(
-      'Expected ", or {", have "B" in interfaces list',
+      'Expected ", or {", have "(name)" in interfaces list',
       $this->parse('class A implements I B')
     );
   }
@@ -63,7 +63,7 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function missing_comma_in_interface_parents() {
     $this->assertError(
-      'Expected ", or {", have "B" in interface parents',
+      'Expected ", or {", have "(name)" in interface parents',
       $this->parse('interface I extends A B')
     );
   }
