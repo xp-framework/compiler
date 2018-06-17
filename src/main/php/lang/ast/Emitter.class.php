@@ -15,6 +15,7 @@ abstract class Emitter {
   protected $meta= [];
   protected $unsupported= [];
   protected $transformations= [];
+  protected $locals= [];
 
   /**
    * Selects the correct emitter for a given runtime
@@ -293,6 +294,7 @@ abstract class Emitter {
       $this->out->write('=');
       $this->emit($parameter->default);
     }
+    $this->locals[0][$parameter->name]= true;
   }
 
   protected function emitSignature($signature) {
@@ -310,12 +312,16 @@ abstract class Emitter {
   }
 
   protected function emitFunction($function) {
+    array_unshift($this->locals, []);
+
     $this->out->write('function '.$function->name); 
     $this->emitSignature($function->signature);
 
     $this->out->write('{');
     $this->emit($function->body);
     $this->out->write('}');
+
+    array_shift($this->locals);
   }
 
   protected function emitClosure($closure) {
@@ -331,12 +337,14 @@ abstract class Emitter {
   }
 
   protected function emitLambda($lambda) {
-    $this->out->write('@function');
+    $this->out->write('function');
     $this->emitSignature($lambda->signature);
 
     $capture= [];
     foreach ($this->search($lambda->body, 'variable') as $var) {
-      $capture[$var->value]= true;
+      if (isset($this->locals[0][$var->value])) {
+        $capture[$var->value]= true;
+      }
     }
     unset($capture['this']);
     foreach ($lambda->signature->parameters as $param) {
@@ -476,6 +484,7 @@ abstract class Emitter {
   }
 
   protected function emitMethod($method) {
+    array_unshift($this->locals, []);
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
@@ -513,6 +522,7 @@ abstract class Emitter {
     }
 
     $this->meta[0][self::METHOD][$method->name]= $meta;
+    array_shift($this->locals);
   }
 
   protected function emitBraced($braced) {
@@ -552,6 +562,9 @@ abstract class Emitter {
   }
 
   protected function emitAssignment($assignment) {
+    if ('variable' === $assignment->variable->kind) {
+      $this->locals[0][$assignment->variable->value]= true;
+    }
     $this->emit($assignment->variable);
     $this->out->write($assignment->operator);
     $this->emit($assignment->expression);
