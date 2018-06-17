@@ -27,7 +27,7 @@ class HHVM320 extends Emitter {
       $this->out->write('=');
       $this->emit($parameter->default);
     }
-    $this->locals[0][$parameter->name]= true;
+    $this->locals[$parameter->name]= true;
   }
 
   protected function emitCatch($catch) {
