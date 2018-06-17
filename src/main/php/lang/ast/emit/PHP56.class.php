@@ -127,22 +127,6 @@ class PHP56 extends \lang\ast\Emitter {
     $this->out->write(';');
   }
 
-  protected function emitAssign($target) {
-    if ('variable' === $target->kind) {
-      $this->out->write('$'.$target->value);
-      $this->locals[$target->value]= true;
-    } else if ('array' === $target->kind) {
-      $this->out->write('list(');
-      foreach ($target->value as $pair) {
-        $this->emitAssign($pair[1]);
-        $this->out->write(',');
-      }
-      $this->out->write(')');
-    } else {
-      $this->emit($target);
-    }
-  }
-
   protected function emitBinary($binary) {
     if ('??' === $binary->operator) {
       $this->out->write('isset(');

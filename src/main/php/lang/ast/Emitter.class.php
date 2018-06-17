@@ -588,12 +588,12 @@ abstract class Emitter {
       $this->out->write('$'.$target->value);
       $this->locals[$target->value]= true;
     } else if ('array' === $target->kind) {
-      $this->out->write('[');
+      $this->out->write('list(');
       foreach ($target->value as $pair) {
         $this->emitAssign($pair[1]);
         $this->out->write(',');
       }
-      $this->out->write(']');
+      $this->out->write(')');
     } else {
       $this->emit($target);
     }
