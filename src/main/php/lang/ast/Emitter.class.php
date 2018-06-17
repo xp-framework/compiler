@@ -209,7 +209,6 @@ abstract class Emitter {
   }
 
   protected function emitVariable($variable) {
-    $this->locals[$variable]= true;
     $this->out->write('$'.$variable);
   }
 
@@ -565,8 +564,24 @@ abstract class Emitter {
     }
   }
 
+  protected function emitAssign($target) {
+    if ('variable' === $target->kind) {
+      $this->out->write('$'.$target->value);
+      $this->locals[$target->value]= true;
+    } else if ('array' === $target->kind) {
+      $this->out->write('[');
+      foreach ($target->value as $pair) {
+        $this->emitAssign($pair[1]);
+        $this->out->write(',');
+      }
+      $this->out->write(']');
+    } else {
+      $this->emit($target);
+    }
+  }
+
   protected function emitAssignment($assignment) {
-    $this->emit($assignment->variable);
+    $this->emitAssign($assignment->variable);
     $this->out->write($assignment->operator);
     $this->emit($assignment->expression);
   }

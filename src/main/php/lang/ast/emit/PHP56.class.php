@@ -127,18 +127,19 @@ class PHP56 extends \lang\ast\Emitter {
     $this->out->write(';');
   }
 
-  protected function emitAssignment($assignment) {
-    if ('array' === $assignment->variable->kind) {
+  protected function emitAssign($target) {
+    if ('variable' === $target->kind) {
+      $this->out->write('$'.$target->value);
+      $this->locals[$target->value]= true;
+    } else if ('array' === $target->kind) {
       $this->out->write('list(');
-      foreach ($assignment->variable->value as $pair) {
-        $this->emit($pair[1]);
+      foreach ($target->value as $pair) {
+        $this->emitAssign($pair[1]);
         $this->out->write(',');
       }
       $this->out->write(')');
-      $this->out->write($assignment->operator);
-      $this->emit($assignment->expression);
     } else {
-      parent::emitAssignment($assignment);
+      $this->emit($target);
     }
   }
 
