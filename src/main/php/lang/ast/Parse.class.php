@@ -1488,7 +1488,6 @@ class Parse {
         throw new Error('Unexpected token '.$value, $this->file, $line);
       }
 
-
       $node->value= $value;
       $node->line= $line;
       return $node;
