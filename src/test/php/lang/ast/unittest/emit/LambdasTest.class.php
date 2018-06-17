@@ -63,6 +63,18 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
+  public function captures_local_assigned_via_list() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [$addend]= [2];
+        return ($a) ==> $a + $addend;
+      }
+    }');
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
   public function captures_param() {
     $r= $this->run('class <T> {
       public function run($addend) {
