@@ -1454,7 +1454,12 @@ class Parse {
    */
   private function expect($id, $context= null) {
     if ($id !== $this->token->symbol->id) {
-      $message= sprintf('Expected "%s", have "%s"%s', $id, $this->token->symbol->id, $context ? ' in '.$context : '');
+      $message= sprintf(
+        'Expected "%s", have "%s"%s',
+        $id,
+        $this->token->value ?: $this->token->symbol->id,
+        $context ? ' in '.$context : ''
+      );
       throw new Error($message, $this->file, $this->token->line);
     }
 
