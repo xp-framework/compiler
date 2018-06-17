@@ -567,8 +567,10 @@ abstract class Emitter {
   protected function emitAssignment($assignment) {
     if ('variable' === $assignment->variable->kind) {
       $this->locals[$assignment->variable->value]= true;
+      $this->out->write('$'.$assignment->variable->value);
+    } else {
+      $this->emit($assignment->variable);
     }
-    $this->emit($assignment->variable);
     $this->out->write($assignment->operator);
     $this->emit($assignment->expression);
   }
