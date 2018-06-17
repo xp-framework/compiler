@@ -327,21 +327,26 @@ abstract class Emitter {
   }
 
   protected function emitClosure($closure) {
+    $this->stack[]= $this->locals;
+    $this->locals= [];
+
     $this->out->write('function'); 
     $this->emitSignature($closure->signature);
 
     if ($closure->use) {
       $this->out->write(' use('.implode(',', $closure->use).') ');
+      foreach ($closure->use as $name) {
+        $this->locals[substr($name, 1)]= true;
+      }
     }
     $this->out->write('{');
     $this->emit($closure->body);
     $this->out->write('}');
+
+    $this->locals= array_pop($this->stack);
   }
 
   protected function emitLambda($lambda) {
-    $this->out->write('function');
-    $this->emitSignature($lambda->signature);
-
     $capture= [];
     foreach ($this->search($lambda->body, 'variable') as $var) {
       if (isset($this->locals[$var->value])) {
@@ -349,10 +354,22 @@ abstract class Emitter {
       }
     }
     unset($capture['this']);
+
+    $this->stack[]= $this->locals;
+    $this->locals= [];
+
+    $this->out->write('function');
+    $this->emitSignature($lambda->signature);
     foreach ($lambda->signature->parameters as $param) {
       unset($capture[$param->name]);
     }
-    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+
+    if ($capture) {
+      $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+      foreach ($capture as $name => $_) {
+        $this->locals[$name]= true;
+      }
+    }
 
     if (is_array($lambda->body)) {
       $this->out->write('{');
@@ -363,6 +380,8 @@ abstract class Emitter {
       $this->emit($lambda->body);
       $this->out->write('; }');
     }
+
+    $this->locals= array_pop($this->stack);
   }
 
   protected function emitClass($class) {
@@ -487,7 +506,7 @@ abstract class Emitter {
 
   protected function emitMethod($method) {
     $this->stack[]= $this->locals;
-    $this->locals= [];
+    $this->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],

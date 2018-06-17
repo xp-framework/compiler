@@ -63,6 +63,34 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
+  public function captures_local_from_use_list() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $addend= 2;
+        $f= function() use($addend) {
+          return ($a) ==> $a + $addend;
+        };
+        return $f();
+      }
+    }');
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
+  public function captures_local_from_lambd() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $addend= 2;
+        $f= () ==> ($a) ==> $a + $addend;
+        return $f();
+      }
+    }');
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
   public function captures_local_assigned_via_list() {
     $r= $this->run('class <T> {
       public function run() {
