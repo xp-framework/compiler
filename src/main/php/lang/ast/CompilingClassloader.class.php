@@ -17,6 +17,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
   private static $instance= [];
   private $version, $emit;
 
+  /** Creates a new instances with a given PHP runtime */
   public function __construct($version) {
     $this->version= $version;
     $this->emit= Emitter::forRuntime($version);
