@@ -6,8 +6,8 @@ class ConditionalTest extends ParseTest {
   /** @return void */
   public function setUp() {
     $this->blocks= [
-      [['(' => [['action1' => 'action1'], []]]],
-      [['(' => [['action2' => 'action2'], []]]]
+      [['(' => [['(name)' => 'action1'], []]]],
+      [['(' => [['(name)' => 'action2'], []]]]
     ];
   }
 

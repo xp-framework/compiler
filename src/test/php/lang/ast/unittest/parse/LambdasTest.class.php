@@ -15,7 +15,7 @@ class LambdasTest extends ParseTest {
   public function short_closure_as_arg() {
     $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
     $this->assertNodes(
-      [['(' => [['exec' => 'exec'], [
+      [['(' => [['(name)' => 'exec'], [
         ['(' => [[[['a', false, null, false, null, null, []]], null], $block]]
       ]]]],
       $this->parse('exec(($a) ==> $a + 1);')

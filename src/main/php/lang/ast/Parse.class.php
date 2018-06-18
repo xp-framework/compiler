@@ -51,6 +51,8 @@ class Parse {
     self::symbol(')');
     self::symbol(']');
     self::symbol('}');
+    self::symbol('as');
+    self::symbol('const');
     self::symbol('else');
     self::symbol('(end)');
     self::symbol('(name)');
@@ -121,13 +123,14 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->expect('{');
         $expr= $this->expression(0);
+        $this->token= $this->expect('}');
       } else {
         $expr= $this->token;
+        $this->token= $this->advance();
       }
 
       $node->value= new InstanceExpression($left, $expr);
       $node->kind= 'instance';
-      $this->token= $this->advance();
       return $node;
     });
 
@@ -135,13 +138,14 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->expect('{');
         $expr= $this->expression(0);
+        $this->token= $this->expect('}');
       } else {
         $expr= $this->token;
+        $this->token= $this->advance();
       }
 
       $node->value= new InstanceExpression($left, $expr);
       $node->kind= 'nullsafeinstance';
-      $this->token= $this->advance();
       return $node;
     });
 
@@ -458,6 +462,21 @@ class Parse {
             $this->token= $this->expect(',');
           }
         }
+      }
+      return $node;
+    });
+
+    $this->prefix('goto', function($node) {
+      $node->kind= 'goto';
+      $node->value= $this->token->value;
+      $this->token= $this->advance();
+      return $node;
+    });
+
+    $this->prefix('(name)', function($node) {
+      if (':' === $this->token->value) {
+        $node->kind= 'label';
+        $this->token= new Node(self::symbol(';'));
       }
       return $node;
     });
@@ -1453,7 +1472,12 @@ class Parse {
    */
   private function expect($id, $context= null) {
     if ($id !== $this->token->symbol->id) {
-      $message= sprintf('Expected "%s", have "%s"%s', $id, $this->token->symbol->id, $context ? ' in '.$context : '');
+      $message= sprintf(
+        'Expected "%s", have "%s"%s',
+        $id,
+        $this->token->value ?: $this->token->symbol->id,
+        $context ? ' in '.$context : ''
+      );
       throw new Error($message, $this->file, $this->token->line);
     }
 
@@ -1468,7 +1492,10 @@ class Parse {
       $type= $this->tokens->key();
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
-      if ('name' === $type || 'operator' === $type) {
+      if ('name' === $type) {
+        $node= new Node(isset(self::$symbols[$value]) ? self::$symbols[$value] : self::symbol('(name)'));
+        $node->kind= $type;
+      } else if ('operator' === $type) {
         $node= new Node(self::symbol($value));
         $node->kind= $type;
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {

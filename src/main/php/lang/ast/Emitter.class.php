@@ -729,6 +729,14 @@ abstract class Emitter {
     $this->out->write(';');
   }
 
+  protected function emitLabel($label) {
+    $this->out->write($label.':');
+  }
+
+  protected function emitGoto($goto) {
+    $this->out->write('goto '.$goto);
+  }
+
   protected function emitInstanceOf($instanceof) {
     $this->emit($instanceof->expression);
     $this->out->write(' instanceof ');

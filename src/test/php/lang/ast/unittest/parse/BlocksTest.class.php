@@ -5,7 +5,7 @@ class BlocksTest extends ParseTest {
 
   /** @return void */
   public function setUp() {
-    $this->block= [['(' => [['block' => 'block'], []]]];
+    $this->block= [['(' => [['(name)' => 'block'], []]]];
   }
 
   #[@test]

@@ -75,7 +75,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function destructuring_assignment() {
     $this->assertNodes(
-      [['=' => [['[' => [[null, ['(variable)' => 'a']], [null, ['(variable)' => 'b']]]], '=', ['(' => [['result' => 'result'], []]]]]],
+      [['=' => [['[' => [[null, ['(variable)' => 'a']], [null, ['(variable)' => 'b']]]], '=', ['(' => [['(name)' => 'result'], []]]]]],
       $this->parse('[$a, $b]= result();')
     );
   }
@@ -156,7 +156,7 @@ class OperatorTest extends ParseTest {
   public function precedence_of_object_operator() {
     $this->assertNodes(
       [['.' => [
-        ['->' => [['(variable)' => 'this'], ['a' => 'a']]],
+        ['->' => [['(variable)' => 'this'], ['(name)' => 'a']]],
         '.',
         ['(literal)' => '"test"']
       ]]],
