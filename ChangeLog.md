@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.9.0 / 2018-06-19
+
+* Merged PR #52: Implement "goto" statement - @thekid
 * Merged PR #50: Allow arrow functions with blocks - @thekid
 
 ## 2.8.0 / 2018-06-17
