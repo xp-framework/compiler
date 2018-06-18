@@ -335,8 +335,8 @@ abstract class Emitter {
 
     if ($closure->use) {
       $this->out->write(' use('.implode(',', $closure->use).') ');
-      foreach ($closure->use as $name) {
-        $this->locals[substr($name, 1)]= true;
+      foreach ($closure->use as $variable) {
+        $this->locals[substr($variable, 1)]= true;
       }
     }
     $this->out->write('{');
