@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #50: Allow arrow functions with blocks - @thekid
+
 ## 2.8.0 / 2018-06-17
 
 * Merged PR #47: Allow empty catch type to catch all exceptions - @thekid
