@@ -36,21 +36,6 @@ class PHP70 extends \lang\ast\Emitter {
     $this->out->write('}');
   }
 
-  protected function emitAssignment($assignment) {
-    if ('array' === $assignment->variable->kind) {
-      $this->out->write('list(');
-      foreach ($assignment->variable->value as $pair) {
-        $this->emit($pair[1]);
-        $this->out->write(',');
-      }
-      $this->out->write(')');
-      $this->out->write($assignment->operator);
-      $this->emit($assignment->expression);
-    } else {
-      parent::emitAssignment($assignment);
-    }
-  }
-
   protected function emitConst($const) {
     $this->out->write('const '.$const->name.'=');
     $this->emit($const->expression);

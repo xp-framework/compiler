@@ -27,6 +27,7 @@ class HHVM320 extends Emitter {
       $this->out->write('=');
       $this->emit($parameter->default);
     }
+    $this->locals[$parameter->name]= true;
   }
 
   protected function emitCatch($catch) {
@@ -43,21 +44,6 @@ class HHVM320 extends Emitter {
 
     $this->emit($catch->body);
     $this->out->write('}');
-  }
-
-  protected function emitAssignment($assignment) {
-    if ('array' === $assignment->variable->kind) {
-      $this->out->write('list(');
-      foreach ($assignment->variable->value as $pair) {
-        $this->emit($pair[1]);
-        $this->out->write(',');
-      }
-      $this->out->write(')');
-      $this->out->write($assignment->operator);
-      $this->emit($assignment->expression);
-    } else {
-      parent::emitAssignment($assignment);
-    }
   }
 
   protected function emitConst($const) {

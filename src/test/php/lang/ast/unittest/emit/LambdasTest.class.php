@@ -63,6 +63,57 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
+  public function captures_local_from_use_list() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $addend= 2;
+        $f= function() use($addend) {
+          return ($a) ==> $a + $addend;
+        };
+        return $f();
+      }
+    }');
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
+  public function captures_local_from_lambd() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $addend= 2;
+        $f= () ==> ($a) ==> $a + $addend;
+        return $f();
+      }
+    }');
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
+  public function captures_local_assigned_via_list() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [$addend]= [2];
+        return ($a) ==> $a + $addend;
+      }
+    }');
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
+  public function captures_param() {
+    $r= $this->run('class <T> {
+      public function run($addend) {
+        return ($a) ==> $a + $addend;
+      }
+    }', 2);
+
+    $this->assertEquals(3, $r(1));
+  }
+
+  #[@test]
   public function captures_braced_local() {
     $r= $this->run('class <T> {
       public function run() {
@@ -139,5 +190,19 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals('IIFE', $r);
+  }
+
+  #[@test]
+  public function with_braces() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return () ==> {
+          $a= 1;
+          return $a;
+        };
+      }
+    }');
+
+    $this->assertEquals(1, $r());
   }
 }
