@@ -204,9 +204,9 @@ class Parse {
     });
 
     $this->infix('?', 80, function($node, $left) {
-      $when= $this->expression(0);
+      $when= $this->expressionWithThrows(0);
       $this->token= $this->expect(':');
-      $else= $this->expression(0);
+      $else= $this->expressionWithThrows(0);
       $node->value= new TernaryExpression($left, $when, $else);
       $node->kind= 'ternary';
       return $node;

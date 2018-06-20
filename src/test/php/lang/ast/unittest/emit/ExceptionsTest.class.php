@@ -70,6 +70,16 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_short_ternary() {
+    $t= $this->type('class <T> {
+      public function run($user) {
+        return $user ? new User($user) : throw new \\lang\\IllegalArgumentException("test");
+      }
+    }');
+    $t->newInstance()->run(null);
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda() {
     $t= $this->type('class <T> {
       public function run() {
