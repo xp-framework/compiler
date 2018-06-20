@@ -77,8 +77,9 @@ class Parse {
     $this->file= $file;
 
     // Setup parse rules
-    $this->infixr('??', 30);
-    $this->infixr('?:', 30);
+    $this->infixt('??', 30);
+    $this->infixt('?:', 30);
+
     $this->infixr('&&', 30);
     $this->infixr('||', 30);
 
@@ -163,6 +164,11 @@ class Parse {
         $this->token= $this->expect('{');
         $statements= $this->statements();
         $this->token= $this->expect('}');
+      } else if ('throw' === $this->token->value) {
+        $statements= new Node($this->token->symbol);
+        $statements->kind= 'throwexpression';
+        $this->token= $this->advance();
+        $statements->value= $this->expression(0);
       } else {
         $statements= $this->expression(0);
       }
@@ -280,6 +286,11 @@ class Parse {
           $this->token= $this->expect('{');
           $statements= $this->statements();
           $this->token= $this->expect('}');
+        } else if ('throw' === $this->token->value) {
+          $statements= new Node($this->token->symbol);
+          $statements->kind= 'throwexpression';
+          $this->token= $this->advance();
+          $statements->value= $this->expression(0);
         } else {
           $statements= $this->expression(0);
         }
@@ -423,7 +434,17 @@ class Parse {
         if ('==>' === $this->token->value) {  // Compact syntax, terminated with ';'
           $n= new Node($this->token->symbol);
           $this->token= $this->advance();
-          $n->value= $this->expression(0);
+
+          if ('throw' === $this->token->value) {
+            $expr= new Node($this->token->symbol);
+            $expr->kind= 'throwexpression';
+            $this->token= $this->advance();
+            $expr->value= $this->expression(0);
+          } else {
+            $expr= $this->expression(0);
+          }
+
+          $n->value= $expr;
           $n->line= $this->token->line;
           $n->kind= 'return';
           $statements= [$n];
@@ -1198,7 +1219,17 @@ class Parse {
           $n= new Node($this->token->symbol);
           $n->line= $this->token->line;
           $this->token= $this->advance();
-          $n->value= $this->expression(0);
+
+          if ('throw' === $this->token->value) {
+            $expr= new Node($this->token->symbol);
+            $expr->kind= 'throwexpression';
+            $this->token= $this->advance();
+            $expr->value= $this->expression(0);
+          } else {
+            $expr= $this->expression(0);
+          }
+
+          $n->value= $expr;
           $n->kind= 'return';
           $statements= [$n];
           $this->token= $this->expect(';');
@@ -1424,6 +1455,25 @@ class Parse {
     $infix= self::symbol($id, $bp);
     $infix->led= $led ?: function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expression($bp - 1));
+      $node->kind= 'binary';
+      return $node;
+    };
+    return $infix;
+  }
+
+  private function infixt($id, $bp) {
+    $infix= self::symbol($id, $bp);
+    $infix->led= function($node, $left) use($id, $bp) {
+      if ('throw' === $this->token->value) {
+        $expr= new Node($this->token->symbol);
+        $expr->kind= 'throwexpression';
+        $this->token= $this->advance();
+        $expr->value= $this->expression($bp - 1);
+      } else {
+        $expr= $this->expression($bp - 1);
+      }
+
+      $node->value= new BinaryExpression($left, $id, $expr);
       $node->kind= 'binary';
       return $node;
     };
