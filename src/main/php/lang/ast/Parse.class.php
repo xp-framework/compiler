@@ -77,8 +77,9 @@ class Parse {
     $this->file= $file;
 
     // Setup parse rules
-    $this->infixr('??', 30);
-    $this->infixr('?:', 30);
+    $this->infixt('??', 30);
+    $this->infixt('?:', 30);
+
     $this->infixr('&&', 30);
     $this->infixr('||', 30);
 
@@ -164,7 +165,7 @@ class Parse {
         $statements= $this->statements();
         $this->token= $this->expect('}');
       } else {
-        $statements= $this->expression(0);
+        $statements= $this->expressionWithThrows(0);
       }
 
       $node->value= new LambdaExpression($signature, $statements);
@@ -203,9 +204,9 @@ class Parse {
     });
 
     $this->infix('?', 80, function($node, $left) {
-      $when= $this->expression(0);
+      $when= $this->expressionWithThrows(0);
       $this->token= $this->expect(':');
-      $else= $this->expression(0);
+      $else= $this->expressionWithThrows(0);
       $node->value= new TernaryExpression($left, $when, $else);
       $node->kind= 'ternary';
       return $node;
@@ -281,7 +282,7 @@ class Parse {
           $statements= $this->statements();
           $this->token= $this->expect('}');
         } else {
-          $statements= $this->expression(0);
+          $statements= $this->expressionWithThrows(0);
         }
 
         $node->value= new LambdaExpression($signature, $statements);
@@ -423,7 +424,7 @@ class Parse {
         if ('==>' === $this->token->value) {  // Compact syntax, terminated with ';'
           $n= new Node($this->token->symbol);
           $this->token= $this->advance();
-          $n->value= $this->expression(0);
+          $n->value= $this->expressionWithThrows(0);
           $n->line= $this->token->line;
           $n->kind= 'return';
           $statements= [$n];
@@ -1045,10 +1046,22 @@ class Parse {
       $this->token= $this->expect('{');
       $block= $this->statements();
       $this->token= $this->expect('}');
+      return $block;
     } else {
-      $block= [$this->statement()];
+      return [$this->statement()];
     }
-    return $block;
+  }
+
+  private function expressionWithThrows($bp) {
+    if ('throw' === $this->token->value) {
+      $expr= new Node($this->token->symbol);
+      $expr->kind= 'throwexpression';
+      $this->token= $this->advance();
+      $expr->value= $this->expression($bp);
+      return $expr;
+    } else {
+      return $this->expression($bp);
+    }
   }
 
   private function clazz($name, $modifiers= []) {
@@ -1198,7 +1211,7 @@ class Parse {
           $n= new Node($this->token->symbol);
           $n->line= $this->token->line;
           $this->token= $this->advance();
-          $n->value= $this->expression(0);
+          $n->value= $this->expressionWithThrows(0);
           $n->kind= 'return';
           $statements= [$n];
           $this->token= $this->expect(';');
@@ -1424,6 +1437,16 @@ class Parse {
     $infix= self::symbol($id, $bp);
     $infix->led= $led ?: function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expression($bp - 1));
+      $node->kind= 'binary';
+      return $node;
+    };
+    return $infix;
+  }
+
+  private function infixt($id, $bp) {
+    $infix= self::symbol($id, $bp);
+    $infix->led= function($node, $left) use($id, $bp) {
+      $node->value= new BinaryExpression($left, $id, $this->expressionWithThrows($bp - 1));
       $node->kind= 'binary';
       return $node;
     };

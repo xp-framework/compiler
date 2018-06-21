@@ -674,6 +674,22 @@ abstract class Emitter {
     $this->out->write(';');
   }
 
+  protected function emitThrowExpression($throw) {
+    $capture= [];
+    foreach ($this->search($throw->value, 'variable') as $var) {
+      if (isset($this->locals[$var->value])) {
+        $capture[$var->value]= true;
+      }
+    }
+    unset($capture['this']);
+
+    $this->out->write('(function()');
+    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+    $this->out->write('{ throw ');
+    $this->emit($throw);
+    $this->out->write('; })()');
+  }
+
   protected function emitForeach($foreach) {
     $this->out->write('foreach (');
     $this->emit($foreach->expression);
