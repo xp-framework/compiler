@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.10.0 / 2018-06-21
+
+* Merged PR #53: Implement throw expressions - @thekid
+
 ## 2.9.0 / 2018-06-19
 
 * Merged PR #52: Implement "goto" statement - @thekid
