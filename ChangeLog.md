@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.10.1 / 2018-06-23
+
+* Fixed URI loading for CompilingClassLoader - this way, loading
+  classes via URIs works, and thus e.g. `xp test path/to/Test.php`.
+  (@thekid)
+
 ## 2.10.0 / 2018-06-21
 
 * Merged PR #53: Implement throw expressions - @thekid
