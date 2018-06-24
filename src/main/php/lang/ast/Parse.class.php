@@ -916,9 +916,9 @@ class Parse {
         } else if (')' === $this->token->value) {
           break;
         } else {
-          $this->expect(', or )', 'function type');
+          $this->token= $this->next(', or )', 'function type');
         }
-      } while (true);
+      } while (null !== $this->token->value);
       $this->token= $this->expect(')');
       $this->token= $this->expect(':');
       return new FunctionType($signature, $this->type(false));
@@ -983,9 +983,9 @@ class Parse {
           } else if ('>>' === $this->token->value) {
             break;
           } else {
-            $this->expect(', or >>', 'parameter annotation');
+            $this->token= $this->next(', or >>', 'parameter annotation');
           }
-        } while (true);
+        } while (null !== $this->token->value);
         $this->token= $this->expect('>>', 'parameter annotation');
       }
 
@@ -1325,9 +1325,9 @@ class Parse {
           } else if ('>>' === $this->token->value) {
             break;
           } else {
-            $this->expect(', or >>', 'annotations');
+            $this->token= $this->next(', or >>', 'annotations');
           }
-        } while (true);
+        } while (null !== $this->token->value);
         $this->token= $this->expect('>>');
       } else if ($type= $this->type()) {
         continue;
