@@ -5,7 +5,7 @@ class LoopsTest extends ParseTest {
 
   /** @return void */
   public function setUp() {
-    $this->block= ['(' => [['loop' => 'loop'], []]];
+    $this->block= ['(' => [['(name)' => 'loop'], []]];
   }
 
   #[@test]
@@ -124,11 +124,11 @@ class LoopsTest extends ParseTest {
     );
   }
 
-  #[@test, @ignore('Unsure how to implement')]
+  #[@test]
   public function goto_statement() {
     $this->assertNodes(
-      [['do' => [['(variable)' => 'continue'], $this->block]]],
-      $this->parse('label: loop(); goto loop;')
+      [['(name)' => 'start'], $this->block, ['goto' => 'start']],
+      $this->parse('start: loop(); goto start;')
     );
   }
 }

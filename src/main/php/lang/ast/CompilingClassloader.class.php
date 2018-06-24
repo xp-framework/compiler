@@ -7,16 +7,20 @@ use lang\ClassLoader;
 use lang\ClassLoadingException;
 use lang\ClassNotFoundException;
 use lang\ElementNotFoundException;
+use lang\IClassLoader;
 use lang\IllegalStateException;
 use lang\XPClass;
 use lang\ast\transform\Transformations;
 use lang\reflect\Package;
 use text\StreamTokenizer;
 
-class CompilingClassLoader implements \lang\IClassLoader {
+class CompilingClassLoader implements IClassLoader {
+  const EXTENSION = '.php';
+
   private static $instance= [];
   private $version, $emit;
 
+  /** Creates a new instances with a given PHP runtime */
   public function __construct($version) {
     $this->version= $version;
     $this->emit= Emitter::forRuntime($version);
@@ -26,11 +30,11 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * Locate a class' sourcecode
    *
    * @param  string $class
-   * @return xp.compiler.io.Source or NULL if nothing can be found
+   * @return lang.IClassLoader or NULL if nothing can be found
    */
   protected function locateSource($class) {
     if (!isset($this->source[$class])) {
-      $uri= strtr($class, '.', '/').'.php';
+      $uri= strtr($class, '.', '/').self::EXTENSION;
       foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
         if ($loader instanceof self) continue;
         if ($loader->providesResource($uri)) return $this->source[$class]= $loader;
@@ -47,6 +51,20 @@ class CompilingClassLoader implements \lang\IClassLoader {
    * @return bool
    */
   public function providesUri($uri) {
+    if (isset($this->source[$uri])) return true;
+    if (0 !== substr_compare($uri, self::EXTENSION, -4)) return false;
+    if (0 === substr_compare($uri, \xp::CLASS_FILE_EXT, -strlen(\xp::CLASS_FILE_EXT))) return false;
+
+    foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
+      if ($loader instanceof self) continue;
+
+      $l= strlen($loader->path);
+      if (0 === substr_compare($loader->path, $uri, 0, $l)) {
+        $this->source[$uri]= strtr(substr($uri, $l, -4), [DIRECTORY_SEPARATOR => '.']);
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -91,12 +109,29 @@ class CompilingClassLoader implements \lang\IClassLoader {
     foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
       if ($loader instanceof self) continue;
       foreach ($loader->packageContents($package) as $content) {
-        if ('.php' === substr($content, $p= strpos($content, '.'))) {
+        if (self::EXTENSION === substr($content, $p= strpos($content, '.'))) {
           $r[]= substr($content, 0, $p).\xp::CLASS_FILE_EXT;
         }
       }
     }
     return $r;
+  }
+
+  /**
+   * Find the class by a given URI
+   *
+   * @param   string uri
+   * @return  lang.XPClass
+   * @throws  lang.ClassNotFoundException in case the class can not be found
+   */
+  public function loadUri($uri) {
+    if (!$this->providesUri($uri)) {
+      throw new ClassNotFoundException('No such class at '.$uri);
+    }
+
+    $class= $this->loadClass($this->source[$uri]);
+    unset($this->source[$uri]);
+    return $class;
   }
 
   /**
@@ -158,7 +193,7 @@ class CompilingClassLoader implements \lang\IClassLoader {
     }
 
     $declaration= new MemoryOutputStream();
-    $file= strtr($class, '.', '/').'.php';
+    $file= strtr($class, '.', '/').self::EXTENSION;
     $in= $source->getResourceAsStream($file)->in();
 
     try {

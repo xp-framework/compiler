@@ -3,6 +3,26 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.10.1 / 2018-06-24
+
+* Fixed throw expressions with variables, e.g. `() ==> throw $e;`.
+  (@thekid)
+* Fixed URI loading for CompilingClassLoader - this way, loading
+  classes via URIs works, and thus e.g. `xp test path/to/Test.php`.
+  (@thekid)
+
+## 2.10.0 / 2018-06-21
+
+* Merged PR #53: Implement throw expressions - @thekid
+
+## 2.9.0 / 2018-06-19
+
+* Merged PR #52: Implement "goto" statement - @thekid
+* Merged PR #50: Allow arrow functions with blocks - @thekid
+
+## 2.8.0 / 2018-06-17
+
+* Merged PR #47: Allow empty catch type to catch all exceptions - @thekid
 * Merged PR #44: Implement `echo` statement - @thekid
 
 ## 2.7.0 / 2018-06-16

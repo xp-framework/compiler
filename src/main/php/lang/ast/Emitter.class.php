@@ -15,6 +15,8 @@ abstract class Emitter {
   protected $meta= [];
   protected $unsupported= [];
   protected $transformations= [];
+  protected $locals= [];
+  protected $stack= [];
 
   /**
    * Selects the correct emitter for a given runtime
@@ -293,6 +295,7 @@ abstract class Emitter {
       $this->out->write('=');
       $this->emit($parameter->default);
     }
+    $this->locals[$parameter->name]= true;
   }
 
   protected function emitSignature($signature) {
@@ -310,43 +313,75 @@ abstract class Emitter {
   }
 
   protected function emitFunction($function) {
+    $this->stack[]= $this->locals;
+    $this->locals= [];
+
     $this->out->write('function '.$function->name); 
     $this->emitSignature($function->signature);
 
     $this->out->write('{');
     $this->emit($function->body);
     $this->out->write('}');
+
+    $this->locals= array_pop($this->stack);
   }
 
   protected function emitClosure($closure) {
+    $this->stack[]= $this->locals;
+    $this->locals= [];
+
     $this->out->write('function'); 
     $this->emitSignature($closure->signature);
 
     if ($closure->use) {
       $this->out->write(' use('.implode(',', $closure->use).') ');
+      foreach ($closure->use as $variable) {
+        $this->locals[substr($variable, 1)]= true;
+      }
     }
     $this->out->write('{');
     $this->emit($closure->body);
     $this->out->write('}');
+
+    $this->locals= array_pop($this->stack);
   }
 
   protected function emitLambda($lambda) {
-    $this->out->write('function'); 
-    $this->emitSignature($lambda->signature);
-
     $capture= [];
     foreach ($this->search($lambda->body, 'variable') as $var) {
-      $capture[$var->value]= true;
+      if (isset($this->locals[$var->value])) {
+        $capture[$var->value]= true;
+      }
     }
     unset($capture['this']);
+
+    $this->stack[]= $this->locals;
+    $this->locals= [];
+
+    $this->out->write('function');
+    $this->emitSignature($lambda->signature);
     foreach ($lambda->signature->parameters as $param) {
       unset($capture[$param->name]);
     }
-    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
 
-    $this->out->write('{ return ');
-    $this->emit($lambda->body);
-    $this->out->write('; }');
+    if ($capture) {
+      $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+      foreach ($capture as $name => $_) {
+        $this->locals[$name]= true;
+      }
+    }
+
+    if (is_array($lambda->body)) {
+      $this->out->write('{');
+      $this->emit($lambda->body);
+      $this->out->write('}');
+    } else {
+      $this->out->write('{ return ');
+      $this->emit($lambda->body);
+      $this->out->write('; }');
+    }
+
+    $this->locals= array_pop($this->stack);
   }
 
   protected function emitClass($class) {
@@ -470,6 +505,8 @@ abstract class Emitter {
   }
 
   protected function emitMethod($method) {
+    $this->stack[]= $this->locals;
+    $this->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
@@ -507,6 +544,7 @@ abstract class Emitter {
     }
 
     $this->meta[0][self::METHOD][$method->name]= $meta;
+    $this->locals= array_pop($this->stack);
   }
 
   protected function emitBraced($braced) {
@@ -545,8 +583,24 @@ abstract class Emitter {
     }
   }
 
+  protected function emitAssign($target) {
+    if ('variable' === $target->kind) {
+      $this->out->write('$'.$target->value);
+      $this->locals[$target->value]= true;
+    } else if ('array' === $target->kind) {
+      $this->out->write('list(');
+      foreach ($target->value as $pair) {
+        $this->emitAssign($pair[1]);
+        $this->out->write(',');
+      }
+      $this->out->write(')');
+    } else {
+      $this->emit($target);
+    }
+  }
+
   protected function emitAssignment($assignment) {
-    $this->emit($assignment->variable);
+    $this->emitAssign($assignment->variable);
     $this->out->write($assignment->operator);
     $this->emit($assignment->expression);
   }
@@ -589,7 +643,11 @@ abstract class Emitter {
   }
 
   protected function emitCatch($catch) {
-    $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+    if (empty($catch->types)) {
+      $this->out->write('catch(\\Throwable $'.$catch->variable.') {');
+    } else {
+      $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+    }
     $this->emit($catch->body);
     $this->out->write('}');
   }
@@ -614,6 +672,22 @@ abstract class Emitter {
     $this->out->write('throw ');
     $this->emit($throw);
     $this->out->write(';');
+  }
+
+  protected function emitThrowExpression($throw) {
+    $capture= [];
+    foreach ($this->search($throw, 'variable') as $var) {
+      if (isset($this->locals[$var->value])) {
+        $capture[$var->value]= true;
+      }
+    }
+    unset($capture['this']);
+
+    $this->out->write('(function()');
+    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+    $this->out->write('{ throw ');
+    $this->emit($throw);
+    $this->out->write('; })()');
   }
 
   protected function emitForeach($foreach) {
@@ -669,6 +743,14 @@ abstract class Emitter {
     $this->out->write('continue ');
     $continue && $this->emit($continue);
     $this->out->write(';');
+  }
+
+  protected function emitLabel($label) {
+    $this->out->write($label.':');
+  }
+
+  protected function emitGoto($goto) {
+    $this->out->write('goto '.$goto);
   }
 
   protected function emitInstanceOf($instanceof) {

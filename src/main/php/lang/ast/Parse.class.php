@@ -52,6 +52,8 @@ class Parse {
     self::symbol(')');
     self::symbol(']');
     self::symbol('}');
+    self::symbol('as');
+    self::symbol('const');
     self::symbol('else');
     self::symbol('(end)');
     self::symbol('(name)');
@@ -76,8 +78,9 @@ class Parse {
     $this->file= $file;
 
     // Setup parse rules
-    $this->infixr('??', 30);
-    $this->infixr('?:', 30);
+    $this->infixt('??', 30);
+    $this->infixt('?:', 30);
+
     $this->infixr('&&', 30);
     $this->infixr('||', 30);
 
@@ -122,13 +125,14 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->expect('{');
         $expr= $this->expression(0);
+        $this->token= $this->expect('}');
       } else {
         $expr= $this->token;
+        $this->token= $this->advance();
       }
 
       $node->value= new InstanceExpression($left, $expr);
       $node->kind= 'instance';
-      $this->token= $this->advance();
       return $node;
     });
 
@@ -136,13 +140,14 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->expect('{');
         $expr= $this->expression(0);
+        $this->token= $this->expect('}');
       } else {
         $expr= $this->token;
+        $this->token= $this->advance();
       }
 
       $node->value= new InstanceExpression($left, $expr);
       $node->kind= 'nullsafeinstance';
-      $this->token= $this->advance();
       return $node;
     });
 
@@ -155,7 +160,16 @@ class Parse {
 
     $this->infix('==>', 80, function($node, $left) {
       $signature= new Signature([new Parameter($left->value, null)], null);
-      $node->value= new LambdaExpression($signature, $this->expression(0));
+
+      if ('{' === $this->token->value) {
+        $this->token= $this->expect('{');
+        $statements= $this->statements();
+        $this->token= $this->expect('}');
+      } else {
+        $statements= $this->expressionWithThrows(0);
+      }
+
+      $node->value= new LambdaExpression($signature, $statements);
       $node->kind= 'lambda';
       return $node;
     });
@@ -191,9 +205,9 @@ class Parse {
     });
 
     $this->infix('?', 80, function($node, $left) {
-      $when= $this->expression(0);
+      $when= $this->expressionWithThrows(0);
       $this->token= $this->expect(':');
-      $else= $this->expression(0);
+      $else= $this->expressionWithThrows(0);
       $node->value= new TernaryExpression($left, $when, $else);
       $node->kind= 'ternary';
       return $node;
@@ -263,7 +277,16 @@ class Parse {
         $this->token= $this->advance();
         $signature= $this->signature();
         $this->token= $this->advance();
-        $node->value= new LambdaExpression($signature, $this->expression(0));
+
+        if ('{' === $this->token->value) {
+          $this->token= $this->expect('{');
+          $statements= $this->statements();
+          $this->token= $this->expect('}');
+        } else {
+          $statements= $this->expressionWithThrows(0);
+        }
+
+        $node->value= new LambdaExpression($signature, $statements);
       } else if ($cast && ('operator' !== $this->token->kind || '(' === $this->token->value || '[' === $this->token->value)) {
         $node->kind= 'cast';
 
@@ -402,7 +425,7 @@ class Parse {
         if ('==>' === $this->token->value) {  // Compact syntax, terminated with ';'
           $n= new Node($this->token->symbol);
           $this->token= $this->advance();
-          $n->value= $this->expression(0);
+          $n->value= $this->expressionWithThrows(0);
           $n->line= $this->token->line;
           $n->kind= 'return';
           $statements= [$n];
@@ -441,6 +464,21 @@ class Parse {
             $this->token= $this->expect(',');
           }
         }
+      }
+      return $node;
+    });
+
+    $this->prefix('goto', function($node) {
+      $node->kind= 'goto';
+      $node->value= $this->token->value;
+      $this->token= $this->advance();
+      return $node;
+    });
+
+    $this->prefix('(name)', function($node) {
+      if (':' === $this->token->value) {
+        $node->kind= 'label';
+        $this->token= new Node(self::symbol(';'));
       }
       return $node;
     });
@@ -1009,10 +1047,22 @@ class Parse {
       $this->token= $this->expect('{');
       $block= $this->statements();
       $this->token= $this->expect('}');
+      return $block;
     } else {
-      $block= [$this->statement()];
+      return [$this->statement()];
     }
-    return $block;
+  }
+
+  private function expressionWithThrows($bp) {
+    if ('throw' === $this->token->value) {
+      $expr= new Node($this->token->symbol);
+      $expr->kind= 'throwexpression';
+      $this->token= $this->advance();
+      $expr->value= $this->expression($bp);
+      return $expr;
+    } else {
+      return $this->expression($bp);
+    }
   }
 
   private function clazz($name, $modifiers= []) {
@@ -1162,7 +1212,7 @@ class Parse {
           $n= new Node($this->token->symbol);
           $n->line= $this->token->line;
           $this->token= $this->advance();
-          $n->value= $this->expression(0);
+          $n->value= $this->expressionWithThrows(0);
           $n->kind= 'return';
           $statements= [$n];
           $this->token= $this->expect(';');
@@ -1405,6 +1455,16 @@ class Parse {
     return $infix;
   }
 
+  private function infixt($id, $bp) {
+    $infix= self::symbol($id, $bp);
+    $infix->led= function($node, $left) use($id, $bp) {
+      $node->value= new BinaryExpression($left, $id, $this->expressionWithThrows($bp - 1));
+      $node->kind= 'binary';
+      return $node;
+    };
+    return $infix;
+  }
+
   private function prefix($id, $nud= null) {
     $prefix= self::symbol($id);
     $prefix->nud= $nud ?: function($node) use($id) {
@@ -1448,7 +1508,12 @@ class Parse {
    */
   private function expect($id, $context= null) {
     if ($id !== $this->token->symbol->id) {
-      $message= sprintf('Expected "%s", have "%s"%s', $id, $this->token->symbol->id, $context ? ' in '.$context : '');
+      $message= sprintf(
+        'Expected "%s", have "%s"%s',
+        $id,
+        $this->token->value ?: $this->token->symbol->id,
+        $context ? ' in '.$context : ''
+      );
       throw new Error($message, $this->file, $this->token->line);
     }
 
@@ -1463,7 +1528,10 @@ class Parse {
       $type= $this->tokens->key();
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
-      if ('name' === $type || 'operator' === $type) {
+      if ('name' === $type) {
+        $node= new Node(isset(self::$symbols[$value]) ? self::$symbols[$value] : self::symbol('(name)'));
+        $node->kind= $type;
+      } else if ('operator' === $type) {
         $node= new Node(self::symbol($value));
         $node->kind= $type;
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {

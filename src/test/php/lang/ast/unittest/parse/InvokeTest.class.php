@@ -10,7 +10,7 @@ class InvokeTest extends ParseTest {
   #[@test]
   public function invoke_function() {
     $this->assertNodes(
-      [['(' => [['test' => 'test'], []]]],
+      [['(' => [['(name)' => 'test'], []]]],
       $this->parse('test();')
     );
   }
@@ -18,7 +18,7 @@ class InvokeTest extends ParseTest {
   #[@test]
   public function invoke_method() {
     $this->assertNodes(
-      [['(' => [['->' => [['(variable)' => 'this'], ['test' => 'test']]], []]]],
+      [['(' => [['->' => [['(variable)' => 'this'], ['(name)' => 'test']]], []]]],
       $this->parse('$this->test();')
     );
   }
@@ -26,7 +26,7 @@ class InvokeTest extends ParseTest {
   #[@test]
   public function invoke_function_with_argument() {
     $this->assertNodes(
-      [['(' => [['test' => 'test'], [['(literal)' => '1']]]]],
+      [['(' => [['(name)' => 'test'], [['(literal)' => '1']]]]],
       $this->parse('test(1);')
     );
   }
@@ -34,7 +34,7 @@ class InvokeTest extends ParseTest {
   #[@test]
   public function invoke_function_with_arguments() {
     $this->assertNodes(
-      [['(' => [['test' => 'test'], [['(literal)' => '1'], ['(literal)' => '2']]]]],
+      [['(' => [['(name)' => 'test'], [['(literal)' => '1'], ['(literal)' => '2']]]]],
       $this->parse('test(1, 2);')
     );
   }
@@ -42,7 +42,7 @@ class InvokeTest extends ParseTest {
   #[@test]
   public function invoke_function_with_dangling_comma() {
     $this->assertNodes(
-      [['(' => [['test' => 'test'], [['(literal)' => '1'], ['(literal)' => '2']]]]],
+      [['(' => [['(name)' => 'test'], [['(literal)' => '1'], ['(literal)' => '2']]]]],
       $this->parse('test(1, 2, );')
     );
   }

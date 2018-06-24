@@ -1,13 +1,13 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ast\Emitter;
 use io\streams\MemoryOutputStream;
 use io\streams\StringWriter;
 use lang\DynamicClassLoader;
-use text\StringTokenizer;
-use lang\ast\Parse;
+use lang\ast\Emitter;
 use lang\ast\Node;
+use lang\ast\Parse;
 use lang\ast\Tokens;
+use text\StringTokenizer;
 
 abstract class EmittingTest extends \unittest\TestCase {
   private static $cl;

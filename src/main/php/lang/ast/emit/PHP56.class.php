@@ -106,13 +106,17 @@ class PHP56 extends \lang\ast\Emitter {
   }
 
   protected function emitCatch($catch) {
-    $last= array_pop($catch->types);
-    $label= sprintf('c%u', crc32($last));
-    foreach ($catch->types as $type) {
-      $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
+    if (empty($catch->types)) {
+      $this->out->write('catch(\\Exception $'.$catch->variable.') {');
+    } else {
+      $last= array_pop($catch->types);
+      $label= sprintf('c%u', crc32($last));
+      foreach ($catch->types as $type) {
+        $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
+      }
+      $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
     }
 
-    $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
     $this->emit($catch->body);
     $this->out->write('}');
   }
@@ -121,21 +125,6 @@ class PHP56 extends \lang\ast\Emitter {
     $this->out->write('const '.$const->name.'=');
     $this->emit($const->expression);
     $this->out->write(';');
-  }
-
-  protected function emitAssignment($assignment) {
-    if ('array' === $assignment->variable->kind) {
-      $this->out->write('list(');
-      foreach ($assignment->variable->value as $pair) {
-        $this->emit($pair[1]);
-        $this->out->write(',');
-      }
-      $this->out->write(')');
-      $this->out->write($assignment->operator);
-      $this->emit($assignment->expression);
-    } else {
-      parent::emitAssignment($assignment);
-    }
   }
 
   protected function emitBinary($binary) {
@@ -182,6 +171,24 @@ class PHP56 extends \lang\ast\Emitter {
     } else {
       parent::emitInvoke($invoke);
     }
+  }
+
+  /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
+  protected function emitThrowExpression($throw) {
+    $capture= [];
+    foreach ($this->search($throw, 'variable') as $var) {
+      if (isset($this->locals[$var->value])) {
+        $capture[$var->value]= true;
+      }
+    }
+    unset($capture['this']);
+
+    $t= $this->temp();
+    $this->out->write('(('.$t.'=function()');
+    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+    $this->out->write('{ throw ');
+    $this->emit($throw);
+    $this->out->write('; }) ? '.$t.'() : null)');
   }
 
   protected function emitNewClass($new) {

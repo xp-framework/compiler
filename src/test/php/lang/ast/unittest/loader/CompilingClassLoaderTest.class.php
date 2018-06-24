@@ -15,6 +15,27 @@ class CompilingClassLoaderTest extends TestCase {
     self::$runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
   }
 
+  /**
+   * Loads a class from source
+   *
+   * @param  string $type
+   * @param  string $source
+   * @return lang.XPClass
+   */
+  private function load($type, $source) {
+    $f= new File(Environment::tempDir(), $type.'.php');
+    FileUtil::setContents($f, sprintf($source, 'ns'.uniqid()));
+    $cl= ClassLoader::registerPath($f->getPath());
+
+    $loader= new CompilingClassLoader(self::$runtime);
+    try {
+      return $loader->loadClass($type);
+    } finally {
+      ClassLoader::removeLoader($cl);
+      $f->unlink();
+    }
+  }
+
   #[@test]
   public function can_create() {
     new CompilingClassLoader(self::$runtime);
@@ -22,25 +43,14 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test]
   public function load_class() {
-    $loader= new CompilingClassLoader(self::$runtime);
-    $this->assertEquals('Tests', $loader->loadClass('lang.ast.unittest.loader.Tests')->getSimpleName());
+    $this->assertEquals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
   }
 
-  #[@test]
+  #[@test, @expect(
+  #  class= ClassFormatException::class,
+  #  withMessage= 'Syntax error in Errors.php, line 1: Expected "{", have "(end)"'
+  #)]
   public function load_class_with_syntax_errors() {
-    $f= new File(Environment::tempDir(), 'Errors.php');
-    FileUtil::setContents($f, "<?php\nclass A");
-    $cl= ClassLoader::registerPath($f->getPath());
-
-    $loader= new CompilingClassLoader(self::$runtime);
-    try {
-      $loader->loadClass('Errors');
-      $this->fail('No exception raised', null, ClassFormatException::class);
-    } catch (ClassFormatException $expected) {
-      $this->assertEquals('Syntax error in Errors.php, line 1: Expected "{", have "(end)"', $expected->getMessage());
-    } finally {
-      ClassLoader::removeLoader($cl);
-      $f->unlink();
-    }
+    $this->load('Errors', "<?php\nclass");
   }
 }
