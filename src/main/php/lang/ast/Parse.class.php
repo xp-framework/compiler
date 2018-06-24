@@ -790,7 +790,7 @@ class Parse {
         $this->token= $this->advance();
 
         if ('(' === $this->token->value) {
-          $this->token= $this->next('(');
+          $this->token= $this->advance();
           $this->scope->annotations[$name]= $this->expression(0);
           $this->token= $this->next(')');
         } else {
@@ -833,7 +833,7 @@ class Parse {
           $parents[]= $this->scope->resolve($this->token->value);
           $this->token= $this->advance();
           if (',' === $this->token->value) {
-            $this->token= $this->expect(',');
+            $this->token= $this->advance();
           } else if ('{' === $this->token->value) {
             break;
           } else {
@@ -1046,9 +1046,9 @@ class Parse {
 
    private function block() {
     if ('{'  === $this->token->value) {
-      $this->token= $this->expect('{');
+      $this->token= $this->advance();
       $block= $this->statements();
-      $this->token= $this->expect('}');
+      $this->token= $this->next('}');
       return $block;
     } else {
       return [$this->statement()];
@@ -1290,7 +1290,7 @@ class Parse {
 
           $this->token= $this->advance();
           if ('=' === $this->token->value) {
-            $this->token= $this->expect('=');
+            $this->token= $this->advance();
             $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
           } else {
             $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
@@ -1313,9 +1313,9 @@ class Parse {
           $this->token= $this->advance();
 
           if ('(' === $this->token->value) {
-            $this->token= $this->expect('(');
+            $this->token= $this->advance();
             $annotations[$name]= $this->expression(0);
-            $this->token= $this->expect(')');
+            $this->token= $this->next(')');
           } else {
             $annotations[$name]= null;
           }
