@@ -123,9 +123,9 @@ class Parse {
 
     $this->infix('->', 80, function($node, $left) {
       if ('{' === $this->token->value) {
-        $this->token= $this->expect('{');
+        $this->token= $this->advance();
         $expr= $this->expression(0);
-        $this->token= $this->expect('}');
+        $this->token= $this->anticipate('}');
       } else {
         $expr= $this->token;
         $this->token= $this->advance();
@@ -138,9 +138,9 @@ class Parse {
 
     $this->infix('?->', 80, function($node, $left) {
       if ('{' === $this->token->value) {
-        $this->token= $this->expect('{');
+        $this->token= $this->advance();
         $expr= $this->expression(0);
-        $this->token= $this->expect('}');
+        $this->token= $this->anticipate('}');
       } else {
         $expr= $this->token;
         $this->token= $this->advance();
@@ -162,9 +162,9 @@ class Parse {
       $signature= new Signature([new Parameter($left->value, null)], null);
 
       if ('{' === $this->token->value) {
-        $this->token= $this->expect('{');
+        $this->token= $this->advance();
         $statements= $this->statements();
-        $this->token= $this->expect('}');
+        $this->token= $this->anticipate('}');
       } else {
         $statements= $this->expressionWithThrows(0);
       }
@@ -185,10 +185,11 @@ class Parse {
     $this->infix('[', 80, function($node, $left) {
       if (']' === $this->token->value) {
         $expr= null;
+        $this->token= $this->advance();
       } else {
         $expr= $this->expression(0);
+        $this->token= $this->anticipate(']');
       }
-      $this->token= $this->expect(']');
 
       $node->value= new OffsetExpression($left, $expr);
       $node->kind= 'offset';
@@ -1497,6 +1498,26 @@ class Parse {
   private function raise($message, $context= null, $line= null) {
     $context && $message.= ' in '.$context;
     $this->errors[]= new Error($message, $this->file, $line ?: $this->token->line);
+  }
+
+  /**
+   * Expect a given token, raise an error if another is encountered
+   *
+   * @param  string $id
+   * @param  string $context
+   * @return var
+   */
+  private function anticipate($id, $context= null) {
+    if ($id === $this->token->symbol->id) return $this->advance();
+
+    $message= sprintf(
+      'Expected "%s", have "%s"%s',
+      $id,
+      $this->token->value ?: $this->token->symbol->id,
+      $context ? ' in '.$context : ''
+    );
+    $this->errors[]= new Error($message, $this->file, $this->token->line);
+    return $this->token;
   }
 
   /**

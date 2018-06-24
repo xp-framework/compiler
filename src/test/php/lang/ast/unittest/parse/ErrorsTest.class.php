@@ -75,4 +75,12 @@ class ErrorsTest extends ParseTest {
       $this->parse('<<annotation')
     );
   }
+
+  #[@test]
+  public function unclosed_offset() {
+    $this->assertError(
+      'Expected "]", have ";"',
+      $this->parse('$a[$s[0]= 5;')
+    );
+  }
 }
