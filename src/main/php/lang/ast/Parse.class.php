@@ -802,10 +802,9 @@ class Parse {
         } else if ('>>' === $this->token->value) {
           break;
         } else {
-          $this->next(', or >>', 'annotation');
-          break;
+          $this->token= $this->next(', or >>', 'annotation');
         }
-      } while (true);
+      } while (null !== $this->token->value);
 
       $this->token= $this->advance();
       $node->kind= 'annotation';
@@ -838,9 +837,9 @@ class Parse {
           } else if ('{' === $this->token->value) {
             break;
           } else {
-            $this->expect(', or {', 'interface parents');
+            $this->token= $this->next(', or {', 'interface parents');
           }
-        } while (true);
+        } while (null !== $this->token->value);
       }
 
       $this->token= $this->expect('{');
@@ -1090,9 +1089,9 @@ class Parse {
         } else if ('{' === $this->token->value) {
           break;
         } else {
-          $this->expect(', or {', 'interfaces list');
+          $this->token= $this->next(', or {', 'interfaces list');
         }
-      } while (true);
+      } while (null !== $this->token->value);
     }
 
     $this->token= $this->expect('{');
