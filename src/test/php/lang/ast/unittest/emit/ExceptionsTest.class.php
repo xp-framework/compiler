@@ -91,6 +91,17 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_lambda_throwing_variable() {
+    $t= $this->type('class <T> {
+      public function run($e) {
+        $f= () ==> throw $e;
+        $f();
+      }
+    }');
+    $t->newInstance()->run(new IllegalArgumentException('Test'));
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda_capturing_variable() {
     $t= $this->type('class <T> {
       public function run() {
@@ -99,6 +110,17 @@ class ExceptionsTest extends EmittingTest {
       }
     }');
     $t->newInstance()->run();
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_lambda_capturing_parameter() {
+    $t= $this->type('class <T> {
+      public function run($message) {
+        $f= () ==> throw new \\lang\\IllegalArgumentException($message);
+        $f();
+      }
+    }');
+    $t->newInstance()->run('Test');
   }
 
   #[@test, @expect(IllegalArgumentException::class)]

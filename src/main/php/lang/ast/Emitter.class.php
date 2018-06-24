@@ -676,7 +676,7 @@ abstract class Emitter {
 
   protected function emitThrowExpression($throw) {
     $capture= [];
-    foreach ($this->search($throw->value, 'variable') as $var) {
+    foreach ($this->search($throw, 'variable') as $var) {
       if (isset($this->locals[$var->value])) {
         $capture[$var->value]= true;
       }

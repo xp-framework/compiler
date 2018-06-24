@@ -5,6 +5,8 @@ XP Compiler ChangeLog
 
 ## 2.10.1 / 2018-06-24
 
+* Fixed throw expressions with variables, e.g. `() ==> throw $e;`.
+  (@thekid)
 * Fixed URI loading for CompilingClassLoader - this way, loading
   classes via URIs works, and thus e.g. `xp test path/to/Test.php`.
   (@thekid)
