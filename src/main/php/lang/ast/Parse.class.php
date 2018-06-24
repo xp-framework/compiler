@@ -329,13 +329,6 @@ class Parse {
       return $node;
     });
 
-    $this->prefix('{', function($node) {
-      $node->kind= 'block';
-      $node->value= $this->statements();
-      $this->token= new Node(self::symbol(';'));
-      return $node;
-    });
-
     $this->prefix('new', function($node) {
       $type= $this->token;
       $this->token= $this->advance();
@@ -488,6 +481,13 @@ class Parse {
       $node->kind= 'start';
       $node->value= $this->token->value;
 
+      $this->token= $this->advance();
+      return $node;
+    });
+
+    $this->stmt('{', function($node) {
+      $node->kind= 'block';
+      $node->value= $this->statements();
       $this->token= $this->advance();
       return $node;
     });
