@@ -319,11 +319,14 @@ class Parse {
           $values[]= [null, $expr];
         }
 
-        if (']' === $this->token->value) break;
-        $this->token= $this->expect(',', 'array literal');
+        if (']' === $this->token->value) {
+          break;
+        } else {
+          $this->token= $this->next(',', 'array literal');
+        }
       }
 
-      $this->token= $this->expect(']', 'array literal');
+      $this->token= $this->next(']', 'array literal');
       $node->kind= 'array';
       $node->value= $values;
       return $node;
@@ -1108,7 +1111,7 @@ class Parse {
     while ($end !== $this->token->value) {
       $arguments[]= $this->expression(0, false);    // Undefined arguments are OK
       if (',' === $this->token->value) {
-        $this->token= $this->expect(',');
+        $this->token= $this->advance();
       } else if ($end === $this->token->value) {
         break;
       } else {
@@ -1298,13 +1301,13 @@ class Parse {
 
           $body[$lookup]= $member;
           if (',' === $this->token->value) {
-            $this->token= $this->expect(',');
+            $this->token= $this->advance();
           }
         }
         $modifiers= [];
         $annotations= [];
         $type= null;
-        $this->token= $this->expect(';', 'field declaration');
+        $this->token= $this->next(';', 'field declaration');
       } else if ('<<' === $this->token->symbol->id) {
         do {
           $this->token= $this->advance();
@@ -1328,7 +1331,7 @@ class Parse {
             $this->token= $this->next(', or >>', 'annotations');
           }
         } while (null !== $this->token->value);
-        $this->token= $this->expect('>>');
+        $this->token= $this->advance();
       } else if ($type= $this->type()) {
         continue;
       } else {
