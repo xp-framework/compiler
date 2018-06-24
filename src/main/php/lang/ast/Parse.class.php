@@ -640,10 +640,10 @@ class Parse {
     $this->stmt('do', function($node) {
       $block= $this->block();
 
-      $this->token= $this->expect('while');
-      $this->token= $this->expect('(');
+      $this->token= $this->next('while');
+      $this->token= $this->next('(');
       $expression= $this->expression(0);
-      $this->token= $this->expect(')');
+      $this->token= $this->next(')');
       $this->token= $this->next(';');
 
       $node->value= new DoLoop($expression, $block);
@@ -652,9 +652,9 @@ class Parse {
     });
 
     $this->stmt('while', function($node) {
-      $this->token= $this->expect('(');
+      $this->token= $this->next('(');
       $expression= $this->expression(0);
-      $this->token= $this->expect(')');
+      $this->token= $this->next(')');
       $block= $this->block();
 
       $node->value= new WhileLoop($expression, $block);
@@ -663,13 +663,13 @@ class Parse {
     });
 
     $this->stmt('for', function($node) {
-      $this->token= $this->expect('(');
+      $this->token= $this->next('(');
       $init= $this->arguments(';');
-      $this->token= $this->advance(';');
+      $this->token= $this->next(';');
       $cond= $this->arguments(';');
-      $this->token= $this->advance(';');
+      $this->token= $this->next(';');
       $loop= $this->arguments(')');
-      $this->token= $this->advance(')');
+      $this->token= $this->next(')');
 
       $block= $this->block();
 
@@ -679,7 +679,7 @@ class Parse {
     });
 
     $this->stmt('foreach', function($node) {
-      $this->token= $this->expect('(');
+      $this->token= $this->next('(');
       $expression= $this->expression(0);
 
       $this->token= $this->advance('as');
@@ -694,7 +694,7 @@ class Parse {
         $value= $expr;
       }
 
-      $this->token= $this->expect(')');
+      $this->token= $this->next(')');
 
       $block= $this->block();
       $node->value= new ForeachLoop($expression, $key, $value, $block);
@@ -710,14 +710,14 @@ class Parse {
     });
 
     $this->stmt('try', function($node) {
-      $this->token= $this->expect('{');
+      $this->token= $this->next('{');
       $statements= $this->statements();
-      $this->token= $this->expect('}');
+      $this->token= $this->next('}');
 
       $catches= [];
       while ('catch'  === $this->token->value) {
         $this->token= $this->advance();
-        $this->token= $this->expect('(');
+        $this->token= $this->next('(');
 
         $types= [];
         while ('name' === $this->token->kind) {
@@ -729,18 +729,18 @@ class Parse {
 
         $variable= $this->token;
         $this->token= $this->advance();
-        $this->token= $this->expect(')');
+        $this->token= $this->next(')');
 
-        $this->token= $this->expect('{');
+        $this->token= $this->next('{');
         $catches[]= new CatchStatement($types, $variable->value, $this->statements());
-        $this->token= $this->expect('}');
+        $this->token= $this->next('}');
       }
 
       if ('finally' === $this->token->value) {
         $this->token= $this->advance();
-        $this->token= $this->expect('{');
+        $this->token= $this->next('{');
         $finally= $this->statements();
-        $this->token= $this->expect('}');
+        $this->token= $this->next('}');
       } else {
         $finally= null;
       }
@@ -790,9 +790,9 @@ class Parse {
         $this->token= $this->advance();
 
         if ('(' === $this->token->value) {
-          $this->token= $this->expect('(');
+          $this->token= $this->next('(');
           $this->scope->annotations[$name]= $this->expression(0);
-          $this->token= $this->expect(')');
+          $this->token= $this->next(')');
         } else {
           $this->scope->annotations[$name]= null;
         }
@@ -802,11 +802,12 @@ class Parse {
         } else if ('>>' === $this->token->value) {
           break;
         } else {
-          $this->expect(', or >>', 'annotation');
+          $this->next(', or >>', 'annotation');
+          break;
         }
       } while (true);
 
-      $this->token= $this->expect('>>', 'annotation');
+      $this->token= $this->advance();
       $node->kind= 'annotation';
       return $node;
     });
