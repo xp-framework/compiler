@@ -1521,9 +1521,10 @@ class Parse {
   }
 
   private function advance() {
+    static $line= 1;
+
     if ($this->queue) return array_shift($this->queue);
 
-    $line= 1;
     while ($this->tokens->valid()) {
       $type= $this->tokens->key();
       list($value, $line)= $this->tokens->current();
