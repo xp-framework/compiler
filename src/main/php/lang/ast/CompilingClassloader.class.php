@@ -59,7 +59,7 @@ class CompilingClassLoader implements IClassLoader {
 
       $l= strlen($loader->path);
       if (0 === substr_compare($loader->path, $uri, 0, $l)) {
-        $this->source[$uri]= substr($uri, $l, -4);
+        $this->source[$uri]= strtr(substr($uri, $l, -4), [DIRECTORY_SEPARATOR => '.']);
         return true;
       }
     }
