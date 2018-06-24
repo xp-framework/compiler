@@ -176,7 +176,7 @@ class PHP56 extends \lang\ast\Emitter {
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitThrowExpression($throw) {
     $capture= [];
-    foreach ($this->search($throw->value, 'variable') as $var) {
+    foreach ($this->search($throw, 'variable') as $var) {
       if (isset($this->locals[$var->value])) {
         $capture[$var->value]= true;
       }
