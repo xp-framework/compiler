@@ -430,7 +430,7 @@ class Parse {
           $n->line= $this->token->line;
           $n->kind= 'return';
           $statements= [$n];
-          $this->token= $this->expect(';');
+          $this->token= $this->next(';');
         } else {                              // Regular function
           $this->token= $this->expect('{');
           $statements= $this->statements();
@@ -462,7 +462,7 @@ class Parse {
 
           $node->value[$variable]= $initial;
           if (',' === $this->token->value) {
-            $this->token= $this->expect(',');
+            $this->token= $this->advance();
           }
         }
       }
@@ -604,7 +604,7 @@ class Parse {
           $cases[sizeof($cases) - 1]->body[]= $this->statement();
         }
       }
-      $this->token= $this->expect('}');
+      $this->token= $this->advance();
 
       $node->value= new SwitchStatement($condition, $cases);
       $node->kind= 'switch';
@@ -753,10 +753,11 @@ class Parse {
     $this->stmt('return', function($node) {
       if (';' === $this->token->value) {
         $expr= null;
+        $this->token= $this->advance();
       } else {
         $expr= $this->expression(0);
+        $this->token= $this->next(';');
       }
-      $this->token= $this->expect(';');
 
       $node->value= $expr;
       $node->kind= 'return';
