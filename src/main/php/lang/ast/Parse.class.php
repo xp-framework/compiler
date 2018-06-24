@@ -125,7 +125,7 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->advance();
         $expr= $this->expression(0);
-        $this->token= $this->anticipate('}');
+        $this->token= $this->next('}');
       } else {
         $expr= $this->token;
         $this->token= $this->advance();
@@ -140,7 +140,7 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->advance();
         $expr= $this->expression(0);
-        $this->token= $this->anticipate('}');
+        $this->token= $this->next('}');
       } else {
         $expr= $this->token;
         $this->token= $this->advance();
@@ -164,7 +164,7 @@ class Parse {
       if ('{' === $this->token->value) {
         $this->token= $this->advance();
         $statements= $this->statements();
-        $this->token= $this->anticipate('}');
+        $this->token= $this->next('}');
       } else {
         $statements= $this->expressionWithThrows(0);
       }
@@ -176,7 +176,7 @@ class Parse {
 
     $this->infix('(', 80, function($node, $left) {
       $arguments= $this->arguments();
-      $this->token= $this->expect(')');
+      $this->token= $this->next(')');
       $node->value= new InvokeExpression($left, $arguments);
       $node->kind= 'invoke';
       return $node;
@@ -188,7 +188,7 @@ class Parse {
         $this->token= $this->advance();
       } else {
         $expr= $this->expression(0);
-        $this->token= $this->anticipate(']');
+        $this->token= $this->next(']');
       }
 
       $node->value= new OffsetExpression($left, $expr);
@@ -198,7 +198,7 @@ class Parse {
 
     $this->infix('{', 80, function($node, $left) {
       $expr= $this->expression(0);
-      $this->token= $this->expect('}');
+      $this->token= $this->next('}');
 
       $node->value= new OffsetExpression($left, $expr);
       $node->kind= 'offset';
@@ -207,7 +207,7 @@ class Parse {
 
     $this->infix('?', 80, function($node, $left) {
       $when= $this->expressionWithThrows(0);
-      $this->token= $this->expect(':');
+      $this->token= $this->next(':');
       $else= $this->expressionWithThrows(0);
       $node->value= new TernaryExpression($left, $when, $else);
       $node->kind= 'ternary';
@@ -1507,7 +1507,7 @@ class Parse {
    * @param  string $context
    * @return var
    */
-  private function anticipate($id, $context= null) {
+  private function next($id, $context= null) {
     if ($id === $this->token->symbol->id) return $this->advance();
 
     $message= sprintf(
