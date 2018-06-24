@@ -280,9 +280,9 @@ class Parse {
         $this->token= $this->advance();
 
         if ('{' === $this->token->value) {
-          $this->token= $this->expect('{');
+          $this->token= $this->advance();
           $statements= $this->statements();
-          $this->token= $this->expect('}');
+          $this->token= $this->next('}');
         } else {
           $statements= $this->expressionWithThrows(0);
         }
@@ -454,7 +454,7 @@ class Parse {
           $this->token= $this->advance();
 
           if ('=' === $this->token->value) {
-            $this->token= $this->expect('=');
+            $this->token= $this->advance();
             $initial= $this->expression(0);
           } else {
             $initial= null;
@@ -559,7 +559,7 @@ class Parse {
         $this->scope->import($import);
       }
 
-      $this->token= $this->expect(';');
+      $this->token= $this->next(';');
       $node->value= $types;
       return $node;
     });
@@ -617,7 +617,7 @@ class Parse {
         $this->token= $this->advance();
       } else {
         $node->value= $this->expression(0);
-        $this->token= $this->expect(';');
+        $this->token= $this->next(';');
       }
 
       $node->kind= 'break';
@@ -630,7 +630,7 @@ class Parse {
         $this->token= $this->advance();
       } else {
         $node->value= $this->expression(0);
-        $this->token= $this->expect(';');
+        $this->token= $this->next(';');
       }
 
       $node->kind= 'continue';
@@ -644,7 +644,7 @@ class Parse {
       $this->token= $this->expect('(');
       $expression= $this->expression(0);
       $this->token= $this->expect(')');
-      $this->token= $this->expect(';');
+      $this->token= $this->next(';');
 
       $node->value= new DoLoop($expression, $block);
       $node->kind= 'do';
@@ -705,7 +705,7 @@ class Parse {
     $this->stmt('throw', function($node) {
       $node->value= $this->expression(0);
       $node->kind= 'throw';
-      $this->token= $this->expect(';');
+      $this->token= $this->next(';');
       return $node;      
     });
 
