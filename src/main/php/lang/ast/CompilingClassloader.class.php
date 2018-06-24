@@ -53,6 +53,7 @@ class CompilingClassLoader implements IClassLoader {
   public function providesUri($uri) {
     if (isset($this->source[$uri])) return true;
     if (0 !== substr_compare($uri, self::EXTENSION, -4)) return false;
+    if (0 === substr_compare($uri, \xp::CLASS_FILE_EXT, -strlen(\xp::CLASS_FILE_EXT))) return false;
 
     foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
       if ($loader instanceof self) continue;
