@@ -1,15 +1,15 @@
 <?php namespace lang\ast;
 
-use io\streams\MemoryOutputStream;
+use io\streams\OutputStream;
 use lang\ClassFormatException;
 use lang\ast\transform\Transformations;
 use text\StreamTokenizer;
 
-class Compiled {
+class Compiled implements OutputStream {
   public static $source= [];
   public static $emit;
 
-  private $compiled, $offset;
+  private $compiled= '', $offset= 0;
 
   /**
    * Opens path
@@ -23,25 +23,35 @@ class Compiled {
     $opened= substr($path, strpos($path, '://') + 3);
     $in= self::$source[$opened]->getResourceAsStream($opened)->in();
 
-    $declaration= new MemoryOutputStream();
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)), $opened);
-      $emitter= self::$emit->newInstance($declaration);
+      $emitter= self::$emit->newInstance($this);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);
       }
       $emitter->emit($parse->execute());
-
-      $this->compiled= $declaration->getBytes();
     } catch (Error $e) {
       $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
       throw new ClassFormatException($message);
     } finally {
       $in->close();
     }
-
-    $this->offset= 0;
     return true;
+  }
+
+  /** @param string $bytes */
+  public function write($bytes) {
+    $this->compiled.= $bytes;
+  }
+
+  /** @return void */
+  public function flush() {
+    // NOOP
+  }
+
+  /** @return void */
+  public function close() {
+    // NOOP
   }
 
   /**
