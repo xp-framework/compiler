@@ -67,7 +67,8 @@ class CompilingClassLoaderTest extends TestCase {
     }');
 
     $t->newInstance()->trigger();
-    $this->assertEquals(strtr($t->getName(), '.', '/').'.php', key(\xp::$errors));
+    $name= (defined('HHVM_VERSION') ? 'src://' : '').strtr($t->getName(), '.', '/').'.php';
+    $this->assertEquals($name, key(\xp::$errors));
     \xp::gc();
   }
 }
