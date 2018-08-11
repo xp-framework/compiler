@@ -1,18 +1,12 @@
 <?php namespace lang\ast;
 
-use io\streams\MemoryOutputStream;
 use lang\ClassFormatException;
-use lang\ClassLinkageException;
 use lang\ClassLoader;
 use lang\ClassLoadingException;
 use lang\ClassNotFoundException;
 use lang\ElementNotFoundException;
 use lang\IClassLoader;
-use lang\IllegalStateException;
 use lang\XPClass;
-use lang\ast\transform\Transformations;
-use lang\reflect\Package;
-use text\StreamTokenizer;
 
 class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
@@ -20,10 +14,14 @@ class CompilingClassLoader implements IClassLoader {
   private static $instance= [];
   private $version, $emit;
 
+  static function __static() {
+    stream_wrapper_register('src', Compiled::class);
+  }
+
   /** Creates a new instances with a given PHP runtime */
   public function __construct($version) {
     $this->version= $version;
-    $this->emit= Emitter::forRuntime($version);
+    Compiled::$emit= Emitter::forRuntime($version);
   }
 
   /**
@@ -156,20 +154,27 @@ class CompilingClassLoader implements IClassLoader {
     $name= strtr($class, '.', '\\');
     if (isset(\xp::$cl[$class])) return $name;
 
+    if (null === ($source= $this->locateSource($class))) {
+      throw new ClassNotFoundException($class);
+    }
+
+    $uri= strtr($class, '.', '/').self::EXTENSION;
+    Compiled::$source[$uri]= $source;
+
     \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
     \xp::$cll++;
     try {
-      eval('?>'.$this->loadClassBytes($class));
+      include('src://'.$uri);
     } catch (ClassLoadingException $e) {
       unset(\xp::$cl[$class]);
-      \xp::$cll--;
       throw $e;
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
-      \xp::$cll--;
       throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
+    } finally {
+      \xp::$cll--;
+      unset(Compiled::$source[$uri]);
     }
-    \xp::$cll--;
 
     method_exists($name, '__static') && \xp::$cli[]= [$name, '__static'];
     if (0 === \xp::$cll) {
@@ -178,39 +183,6 @@ class CompilingClassLoader implements IClassLoader {
       foreach ($invocations as $inv) $inv($name);
     }
     return $name;
-  }
-
-  /**
-   * Loads class bytes
-   *
-   * @param  string $class
-   * @return string
-   * @throws lang.ClassLoadingException
-   */
-  public function loadClassBytes($class) {
-    if (null === ($source= $this->locateSource($class))) {
-      throw new ClassNotFoundException($class);  
-    }
-
-    $declaration= new MemoryOutputStream();
-    $file= strtr($class, '.', '/').self::EXTENSION;
-    $in= $source->getResourceAsStream($file)->in();
-
-    try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
-      $emitter= $this->emit->newInstance($declaration);
-      foreach (Transformations::registered() as $kind => $function) {
-        $emitter->transform($kind, $function);
-      }
-      $emitter->emit($parse->execute());
-
-      return $declaration->getBytes();
-    } catch (Error $e) {
-      $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
-      throw new ClassFormatException($message);
-    } finally {
-      $in->close();
-    }
   }
 
   /**
