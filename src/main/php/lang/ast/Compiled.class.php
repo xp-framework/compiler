@@ -6,8 +6,7 @@ use lang\ast\transform\Transformations;
 use text\StreamTokenizer;
 
 class Compiled implements OutputStream {
-  public static $source= [];
-  public static $emit;
+  public static $source= [], $emit= [];
 
   private $compiled= '', $offset= 0;
 
@@ -20,12 +19,12 @@ class Compiled implements OutputStream {
    * @param  string $opened
    */
   public function stream_open($path, $mode, $options, &$opened) {
-    $opened= substr($path, strpos($path, '://') + 3);
+    list($version, $opened)= explode('://', $path);
     $in= self::$source[$opened]->getResourceAsStream($opened)->in();
 
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)), $opened);
-      $emitter= self::$emit->newInstance($this);
+      $emitter= self::$emit[$version]->newInstance($this);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);
       }

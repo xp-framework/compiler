@@ -31,7 +31,7 @@ class CompilingClassLoaderTest extends TestCase {
     FileUtil::setContents(new File($folder, $type.'.php'), sprintf($source, $namespace));
     $cl= ClassLoader::registerPath($folder->path);
 
-    $loader= new CompilingClassLoader(self::$runtime);
+    $loader= CompilingClassLoader::instanceFor(self::$runtime);
     try {
       return $loader->loadClass($namespace.'.'.$type);
     } finally {
@@ -42,7 +42,7 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test]
   public function can_create() {
-    new CompilingClassLoader(self::$runtime);
+    CompilingClassLoader::instanceFor(self::$runtime);
   }
 
   #[@test]
@@ -68,7 +68,7 @@ class CompilingClassLoaderTest extends TestCase {
 
     $t->newInstance()->trigger();
     $name= (defined('HHVM_VERSION') ? 'src://' : '').strtr($t->getName(), '.', '/').'.php';
-    $this->assertEquals($name, key(\xp::$errors));
+    $this->assertEquals($name, key(\xp::$errors),\xp::$errors);
     \xp::gc();
   }
 }

@@ -12,16 +12,14 @@ class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
   private static $instance= [];
-  private $version, $emit;
-
-  static function __static() {
-    stream_wrapper_register('src', Compiled::class);
-  }
+  private $version;
 
   /** Creates a new instances with a given PHP runtime */
-  public function __construct($version) {
-    $this->version= $version;
-    Compiled::$emit= Emitter::forRuntime($version);
+  private function __construct($emit) {
+    $this->version= $emit->getSimpleName();
+    Compiled::$emit[$this->version]= $emit;
+
+    stream_wrapper_register($this->version, Compiled::class);
   }
 
   /**
@@ -164,7 +162,7 @@ class CompilingClassLoader implements IClassLoader {
     \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
     \xp::$cll++;
     try {
-      include('src://'.$uri);
+      include($this->version.'://'.$uri);
     } catch (ClassLoadingException $e) {
       unset(\xp::$cl[$class]);
       throw $e;
@@ -223,10 +221,13 @@ class CompilingClassLoader implements IClassLoader {
    * @return  lang.IClassLoader
    */
   public static function instanceFor($version) {
-    if (!isset(self::$instance[$version])) {
-      self::$instance[$version]= new self($version);
+    $emit= Emitter::forRuntime($version);
+
+    $id= $emit->getName();
+    if (!isset(self::$instance[$id])) {
+      self::$instance[$id]= new self($emit);
     }
-    return self::$instance[$version];
+    return self::$instance[$id];
   }
 
   /**
