@@ -57,6 +57,12 @@ class Compiled {
   }
 
   /** @return [:var] */
+  public function url_stat($path) {
+    $opened= substr($path, strpos($path, '://') + 3);
+    return ['size' => self::$source[$opened]->getResourceAsStream($opened)->size()];
+  }
+
+  /** @return [:var] */
   public function stream_stat() {
     return ['size' => strlen($this->compiled)];
   }
@@ -68,6 +74,11 @@ class Compiled {
 
   /** @return void */
   public function stream_close() {
+    // NOOP
+  }
+
+  /** @return void */
+  public function stream_flush() {
     // NOOP
   }
 }
