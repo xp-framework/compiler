@@ -2,6 +2,7 @@
 
 use io\File;
 use io\FileUtil;
+use io\Folder;
 use lang\ClassFormatException;
 use lang\ClassLoader;
 use lang\Environment;
@@ -23,22 +24,25 @@ class CompilingClassLoaderTest extends TestCase {
    * @return lang.XPClass
    */
   private function load($type, $source) {
-    $f= new File(Environment::tempDir(), $type.'.php');
-    FileUtil::setContents($f, sprintf($source, 'ns'.uniqid()));
-    $cl= ClassLoader::registerPath($f->getPath());
+    $namespace= 'ns'.uniqid();
+    $folder= new Folder(Environment::tempDir(), $namespace);
+    $folder->exists() || $folder->create();
 
-    $loader= new CompilingClassLoader(self::$runtime);
+    FileUtil::setContents(new File($folder, $type.'.php'), sprintf($source, $namespace));
+    $cl= ClassLoader::registerPath($folder->path);
+
+    $loader= CompilingClassLoader::instanceFor(self::$runtime);
     try {
-      return $loader->loadClass($type);
+      return $loader->loadClass($namespace.'.'.$type);
     } finally {
       ClassLoader::removeLoader($cl);
-      $f->unlink();
+      $folder->unlink();
     }
   }
 
   #[@test]
   public function can_create() {
-    new CompilingClassLoader(self::$runtime);
+    CompilingClassLoader::instanceFor(self::$runtime);
   }
 
   #[@test]
@@ -48,9 +52,22 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test, @expect(
   #  class= ClassFormatException::class,
-  #  withMessage= 'Syntax error in Errors.php, line 2: Expected ";", have "Syntax"'
+  #  withMessage= '/Syntax error in .+Errors.php, line 2: Expected ";", have "Syntax"/'
   #)]
   public function load_class_with_syntax_errors() {
     $this->load('Errors', "<?php\n<Syntax error in line 2>");
+  }
+
+  #[@test]
+  public function triggered_errors_filename() {
+    $t= $this->load('Triggers', '<?php namespace %s; class Triggers { 
+      public function trigger() {
+        trigger_error("Test");
+      }
+    }');
+
+    $t->newInstance()->trigger();
+    $this->assertEquals(strtr($t->getName(), '.', '/').'.php', preg_replace('#^.+://#', '', key(\xp::$errors)));
+    \xp::gc();
   }
 }

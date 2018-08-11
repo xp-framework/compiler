@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\reflect\Modifiers;
 use lang\XPClass;
+use lang\reflect\Modifiers;
 
 class TypeDeclarationTest extends EmittingTest {
 
