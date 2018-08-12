@@ -135,4 +135,32 @@ class CastingTest extends EmittingTest {
       ['test']
     ));
   }
+
+  #[@test, @values([
+  #  [1, 1],
+  #  ['123', 123],
+  #  [null, null]
+  #])]
+  public function nullable_int($value, $expected) {
+    $this->assertEquals($expected, $this->run(
+      'class <T> {
+        public function run($value) {
+          return (?int)$value;
+        }
+      }',
+      $value
+    ));
+  }
+
+  #[@test, @values([new Handle(10), null])]
+  public function nullable_value($value) {
+    $this->assertEquals($value, $this->run(
+      'class <T> {
+        public function run($value) {
+          return (?\lang\ast\unittest\emit\Handle)$value;
+        }
+      }',
+      $value
+    ));
+  }
 }
