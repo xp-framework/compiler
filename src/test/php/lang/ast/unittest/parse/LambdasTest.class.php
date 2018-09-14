@@ -21,4 +21,13 @@ class LambdasTest extends ParseTest {
       $this->parse('exec(($a) ==> $a + 1);')
     );
   }
+
+  #[@test]
+  public function short_closure_with_braces() {
+    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
+    $this->assertNodes(
+      [['(' => [[[['a', false, null, false, null, null, []]], null], [['return' => $block]]]]],
+      $this->parse('($a) ==> { return $a + 1; };')
+    );
+  }
 }
