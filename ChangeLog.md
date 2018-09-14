@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.11.1 / 2018-09-14
+
+* Fixed #56: Resolved paths not absolute - @thekid
+
 ## 2.11.0 / 2018-08-11
 
 * Merged PR #54: Ensure filenames in errors reflect source files - @thekid
