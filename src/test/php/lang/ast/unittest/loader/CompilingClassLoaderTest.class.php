@@ -67,7 +67,10 @@ class CompilingClassLoaderTest extends TestCase {
     }');
 
     $t->newInstance()->trigger();
-    $this->assertEquals(strtr($t->getName(), '.', '/').'.php', preg_replace('#^.+://#', '', key(\xp::$errors)));
+    $this->assertNotEquals(false, strpos(
+      preg_replace('#^.+://#', '', key(\xp::$errors)),
+      strtr($t->getName(), '.', DIRECTORY_SEPARATOR).'.php'
+    ));
     \xp::gc();
   }
 }

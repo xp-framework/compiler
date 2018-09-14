@@ -19,23 +19,25 @@ class Compiled implements OutputStream {
    * @param  string $opened
    */
   public function stream_open($path, $mode, $options, &$opened) {
-    list($version, $opened)= explode('://', $path);
-    $in= self::$source[$opened]->getResourceAsStream($opened)->in();
+    list($version, $file)= explode('://', $path);
+    $stream= self::$source[$file]->getResourceAsStream($file);
+    $in= $stream->in();
 
     try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $opened);
+      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
       $emitter= self::$emit[$version]->newInstance($this);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);
       }
       $emitter->emit($parse->execute());
+      $opened= $stream->getURI();
+      return true;
     } catch (Error $e) {
       $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
       throw new ClassFormatException($message);
     } finally {
       $in->close();
     }
-    return true;
   }
 
   /** @param string $bytes */
