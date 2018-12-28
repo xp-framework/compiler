@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.12.0 / 2018-12-28
+
 * Added support for [PHP 7.3](http://php.net/archive/2018.php#id2018-12-06-1)
   (@thekid)
 
