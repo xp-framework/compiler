@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for [PHP 7.3](http://php.net/archive/2018.php#id2018-12-06-1)
+  (@thekid)
+
 ## 2.11.1 / 2018-09-14
 
 * Fixed #56: Resolved paths not absolute - @thekid
