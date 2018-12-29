@@ -3,6 +3,19 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.12.0 / 2018-12-28
+
+* Added support for [PHP 7.3](http://php.net/archive/2018.php#id2018-12-06-1)
+  (@thekid)
+
+## 2.11.1 / 2018-09-14
+
+* Fixed #56: Resolved paths not absolute - @thekid
+
+## 2.11.0 / 2018-08-11
+
+* Merged PR #54: Ensure filenames in errors reflect source files - @thekid
+
 ## 2.10.1 / 2018-06-24
 
 * Fixed throw expressions with variables, e.g. `() ==> throw $e;`.

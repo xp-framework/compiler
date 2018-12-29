@@ -49,6 +49,46 @@ class ExceptionsTest extends EmittingTest {
     $this->assertEquals(IllegalArgumentException::class, $t->newInstance()->run());
   }
 
+  #[@test]
+  public function finally_without_exception() {
+    $t= $this->type('class <T> {
+      public $closed= false;
+      public function run() {
+        try {
+          // Nothing
+        } finally {
+          $this->closed= true;
+        }
+      }
+    }');
+
+    $instance= $t->newInstance();
+    $instance->run();
+    $this->assertTrue($instance->closed);
+  }
+
+  #[@test]
+  public function finally_with_exception() {
+    $t= $this->type('class <T> {
+      public $closed= false;
+      public function run() {
+        try {
+          throw new \\lang\\IllegalArgumentException("test");
+        } finally {
+          $this->closed= true;
+        }
+      }
+    }');
+
+    $instance= $t->newInstance();
+    try {
+      $instance->run();
+      $this->fail('Expected exception not caught', null, IllegalArgumentException::class);
+    } catch (IllegalArgumentException $expected) {
+      $this->assertTrue($instance->closed);
+    }
+  }
+
   #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_null_coalesce() {
     $t= $this->type('class <T> {

@@ -1,29 +1,25 @@
 <?php namespace lang\ast;
 
-use io\streams\MemoryOutputStream;
 use lang\ClassFormatException;
-use lang\ClassLinkageException;
 use lang\ClassLoader;
 use lang\ClassLoadingException;
 use lang\ClassNotFoundException;
 use lang\ElementNotFoundException;
 use lang\IClassLoader;
-use lang\IllegalStateException;
 use lang\XPClass;
-use lang\ast\transform\Transformations;
-use lang\reflect\Package;
-use text\StreamTokenizer;
 
 class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
   private static $instance= [];
-  private $version, $emit;
+  private $version;
 
   /** Creates a new instances with a given PHP runtime */
-  public function __construct($version) {
-    $this->version= $version;
-    $this->emit= Emitter::forRuntime($version);
+  private function __construct($emit) {
+    $this->version= $emit->getSimpleName();
+    Compiled::$emit[$this->version]= $emit;
+
+    stream_wrapper_register($this->version, Compiled::class);
   }
 
   /**
@@ -156,20 +152,27 @@ class CompilingClassLoader implements IClassLoader {
     $name= strtr($class, '.', '\\');
     if (isset(\xp::$cl[$class])) return $name;
 
+    if (null === ($source= $this->locateSource($class))) {
+      throw new ClassNotFoundException($class);
+    }
+
+    $uri= strtr($class, '.', '/').self::EXTENSION;
+    Compiled::$source[$uri]= $source;
+
     \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
     \xp::$cll++;
     try {
-      eval('?>'.$this->loadClassBytes($class));
+      include($this->version.'://'.$uri);
     } catch (ClassLoadingException $e) {
       unset(\xp::$cl[$class]);
-      \xp::$cll--;
       throw $e;
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
-      \xp::$cll--;
       throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
+    } finally {
+      \xp::$cll--;
+      unset(Compiled::$source[$uri]);
     }
-    \xp::$cll--;
 
     method_exists($name, '__static') && \xp::$cli[]= [$name, '__static'];
     if (0 === \xp::$cll) {
@@ -251,10 +254,13 @@ class CompilingClassLoader implements IClassLoader {
    * @return  lang.IClassLoader
    */
   public static function instanceFor($version) {
-    if (!isset(self::$instance[$version])) {
-      self::$instance[$version]= new self($version);
+    $emit= Emitter::forRuntime($version);
+
+    $id= $emit->getName();
+    if (!isset(self::$instance[$id])) {
+      self::$instance[$id]= new self($emit);
     }
-    return self::$instance[$version];
+    return self::$instance[$id];
   }
 
   /**
@@ -263,7 +269,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return string
    */
   public function toString() {
-    return 'CompilingCL<'.$this->emit->getName().'>';
+    return 'CompilingCL<'.$this->version.'>';
   }
 
   /**
