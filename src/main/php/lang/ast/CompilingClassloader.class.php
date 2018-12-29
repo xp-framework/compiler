@@ -169,6 +169,9 @@ class CompilingClassLoader implements IClassLoader {
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
       throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
+    } catch (\Exception $e) {
+      unset(\xp::$cl[$class]);
+      throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
     } finally {
       \xp::$cll--;
       unset(Compiled::$source[$uri]);
