@@ -83,4 +83,28 @@ class MembersTest extends EmittingTest {
 
     $this->assertEquals('MON', $r);
   }
+
+  #[@test]
+  public function method_with_static() {
+    $r= $this->run('class <T> {
+      public function run() {
+        static $var= "Test";
+        return $var;
+      }
+    }');
+
+    $this->assertEquals('Test', $r);
+  }
+
+  #[@test]
+  public function method_with_static_without_initializer() {
+    $r= $this->run('class <T> {
+      public function run() {
+        static $var;
+        return $var;
+      }
+    }');
+
+    $this->assertNull($r);
+  }
 }
