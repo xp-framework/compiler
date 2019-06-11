@@ -247,7 +247,7 @@ abstract class Emitter {
         break;
       }
 
-      if ('forexpr' === $pair[1]->kind || 'foreachexpr' === $pair[1]->kind || 'ifexpr' === $pair[1]->kind) {
+      if ('for' === $pair[1]->kind || 'foreach' === $pair[1]->kind || 'if' === $pair[1]->kind) {
         $unpack= true;
         $capture= [];
         foreach ($this->search($pair[1]->value, 'variable') as $var) {
@@ -265,35 +265,9 @@ abstract class Emitter {
     if ($unpack) {
       $this->out->write('array_merge([');
       foreach ($array as $pair) {
-        if ('forexpr' === $pair[1]->kind) {
-          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' { for (');
-          $this->emitArguments($pair[1]->value->initialization);
-          $this->out->write(';');
-          $this->emitArguments($pair[1]->value->condition);
-          $this->out->write(';');
-          $this->emitArguments($pair[1]->value->loop);
-          $this->out->write(') ');
-          $this->emit($pair[1]->value->body);
-          $this->out->write(';}) ? '.$temp.'() : null),[');
-          continue;
-        } else if ('foreachexpr' === $pair[1]->kind) {
-          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' { foreach (');
-          $this->emit($pair[1]->value->expression);
-          $this->out->write(' as ');
-          if ($pair[1]->value->key) {
-            $this->emit($pair[1]->value->key);
-            $this->out->write(' => ');
-          }
-          $this->emit($pair[1]->value->value);
-          $this->out->write(') ');
-          $this->emit($pair[1]->value->body);
-          $this->out->write(';}) ? '.$temp.'() : null),[');
-          continue;
-        } else if ('ifexpr' === $pair[1]->kind) {
-          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' { if (');
-          $this->emit($pair[1]->value->expression);
-          $this->out->write(') ');
-          $this->emit($pair[1]->value->body);
+        if ('for' === $pair[1]->kind || 'foreach' === $pair[1]->kind || 'if' === $pair[1]->kind) {
+          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' {');
+          $this->emit($pair[1]);
           $this->out->write(';}) ? '.$temp.'() : null),[');
           continue;
         }

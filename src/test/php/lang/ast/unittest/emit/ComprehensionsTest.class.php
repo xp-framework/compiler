@@ -25,6 +25,28 @@ class ComprehensionsTest extends EmittingTest {
   }
 
   #[@test]
+  public function for_expression_with_if() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [for ($i= 1; $i < 4; $i++) if (0 === $i % 2) yield $i];
+      }
+    }');
+
+    $this->assertEquals([2], $r);
+  }
+
+  #[@test]
+  public function nested_for_expression() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [for ($i= 1; $i < 4; $i++) for ($j= 1; $j < 4; $j++) yield $i * $j];
+      }
+    }');
+
+    $this->assertEquals([1, 2, 3, 2, 4, 6, 3, 6, 9], $r);
+  }
+
+  #[@test]
   public function foreach_expression() {
     $r= $this->run('class <T> {
       public function run() {
