@@ -308,13 +308,67 @@ class Parse {
     $this->prefix('[', function($node) {
       $values= [];
       while (']' !== $this->token->value) {
-        $expr= $this->expression(0);
+        if ('for' === $this->token->value) {
+          $this->token= $this->advance('for');
+          $this->token= $this->expect('(');
+          $init= $this->arguments(';');
+          $this->token= $this->advance(';');
+          $cond= $this->arguments(';');
+          $this->token= $this->advance(';');
+          $loop= $this->arguments(')');
+          $this->token= $this->advance(')');
+          $this->token= $this->advance('yield');
+          $yielding= $this->yielding();
 
-        if ('=>' === $this->token->value) {
-          $this->token= $this->advance();
-          $values[]= [$expr, $this->expression(0)];
+          $for= clone $node;
+          $for->kind= 'forexpr';
+          $for->value= new ForLoop($init, $cond, $loop, $yielding);
+          $values[]= [null, $for];
+        } else if ('foreach' === $this->token->value) {
+          $this->token= $this->advance('foreach');
+          $this->token= $this->expect('(');
+          $iter= $this->expression(0);
+          $this->token= $this->advance('as');
+          $expr= $this->expression(0);
+
+          if ('=>' === $this->token->value) {
+            $this->token= $this->advance();
+            $key= $expr;
+            $value= $this->expression(0);
+          } else {
+            $key= null;
+            $value= $expr;
+          }
+
+          $this->token= $this->expect(')');
+          $this->token= $this->advance('yield');
+          $yielding= $this->yielding();
+
+          $for= clone $node;
+          $for->value= new ForeachLoop($iter, $key, $value, $yielding);
+          $for->kind= 'foreachexpr';
+          $values[]= [null, $for];
+        } else if ('if' === $this->token->value) {
+          $this->token= $this->advance('if');
+          $this->token= $this->expect('(');
+          $cond= $this->expression(0);
+          $this->token= $this->advance(')');
+          $this->token= $this->advance('yield');
+          $yielding= $this->yielding();
+
+          $if= clone $node;
+          $if->kind= 'ifexpr';
+          $if->value= new IfStatement($cond, $yielding, null);
+          $values[]= [null, $if];
         } else {
-          $values[]= [null, $expr];
+          $expr= $this->expression(0);
+
+          if ('=>' === $this->token->value) {
+            $this->token= $this->advance();
+            $values[]= [$expr, $this->expression(0)];
+          } else {
+            $values[]= [null, $expr];
+          }
         }
 
         if (']' === $this->token->value) break;
@@ -1352,6 +1406,20 @@ class Parse {
 
     return $left;
   }
+
+  private function yielding() {
+    $node= new Node($this->token->symbol);
+    $node->kind= 'yield';
+    $expr= $this->expression(0);
+    if ('=>' === $this->token->value) {
+      $this->token= $this->advance();
+      $node->value= new YieldExpression($expr, $this->expression(0));
+    } else {
+      $node->value= new YieldExpression(null, $expr);
+    }
+    return $node;
+  }
+
 
   private function top() {
     while (null !== $this->token->value) {

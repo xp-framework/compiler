@@ -236,10 +236,28 @@ abstract class Emitter {
       return;
     }
 
+    // As of PHP 7.4, we could use the spread operator inside arrays, see
+    // https://wiki.php.net/rfc/spread_operator_for_array. However, unpacking
+    // with string keys is not possible, and the `in_map_initialization` test
+    // in lang.ast.unittest.emit.ArgumentUnpackingTest fails!
     $unpack= false;
     foreach ($array as $pair) {
       if ('unpack' === $pair[1]->kind) {
         $unpack= true;
+        break;
+      }
+
+      if ('forexpr' === $pair[1]->kind || 'foreachexpr' === $pair[1]->kind || 'ifexpr' === $pair[1]->kind) {
+        $unpack= true;
+        $capture= [];
+        foreach ($this->search($pair[1]->value, 'variable') as $var) {
+          if (isset($this->locals[$var->value])) {
+            $capture[$var->value]= true;
+          }
+        }
+        unset($capture['this']);
+        $use= empty($capture) ? '' : 'use (&$'.implode(',&$', array_keys($capture)).')';
+        $temp= $this->temp();
         break;
       }
     }
@@ -247,6 +265,39 @@ abstract class Emitter {
     if ($unpack) {
       $this->out->write('array_merge([');
       foreach ($array as $pair) {
+        if ('forexpr' === $pair[1]->kind) {
+          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' { for (');
+          $this->emitArguments($pair[1]->value->initialization);
+          $this->out->write(';');
+          $this->emitArguments($pair[1]->value->condition);
+          $this->out->write(';');
+          $this->emitArguments($pair[1]->value->loop);
+          $this->out->write(') ');
+          $this->emit($pair[1]->value->body);
+          $this->out->write(';}) ? '.$temp.'() : null),[');
+          continue;
+        } else if ('foreachexpr' === $pair[1]->kind) {
+          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' { foreach (');
+          $this->emit($pair[1]->value->expression);
+          $this->out->write(' as ');
+          if ($pair[1]->value->key) {
+            $this->emit($pair[1]->value->key);
+            $this->out->write(' => ');
+          }
+          $this->emit($pair[1]->value->value);
+          $this->out->write(') ');
+          $this->emit($pair[1]->value->body);
+          $this->out->write(';}) ? '.$temp.'() : null),[');
+          continue;
+        } else if ('ifexpr' === $pair[1]->kind) {
+          $this->out->write('],iterator_to_array(('.$temp.'=function() '.$use.' { if (');
+          $this->emit($pair[1]->value->expression);
+          $this->out->write(') ');
+          $this->emit($pair[1]->value->body);
+          $this->out->write(';}) ? '.$temp.'() : null),[');
+          continue;
+        }
+
         if ($pair[0]) {
           $this->emit($pair[0]);
           $this->out->write('=>');
