@@ -104,4 +104,17 @@ class ComprehensionsTest extends EmittingTest {
 
     $this->assertEquals($expected, $r);
   }
+
+  #[@test]
+  public function find_common_numbers() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $la= [1, 2, 3, 4];
+        $lb= [2, 3, 4, 5];
+        return [foreach ($la as $a) foreach ($lb as $b) if ($a === $b) yield $a];
+      }
+    }');
+
+    $this->assertEquals([2, 3, 4], $r);
+  }
 }
