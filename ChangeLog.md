@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented numeric literal separator, e.g. `1_000_000_000` - see #61
+  (@thekid)
 * Implemented null-colaesce assignment operator `??=` - see #58
   (@thekid)
 * Implemented support PHP 7.4-style short closures with `fn` - see #60
