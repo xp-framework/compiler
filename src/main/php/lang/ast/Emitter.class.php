@@ -140,6 +140,10 @@ abstract class Emitter {
     return $this->type($name);
   }
 
+  protected function propertyType($type) {
+    return '';
+  }
+
   protected function emitStart($start) {
     $this->out->write('<?php ');
   }
@@ -496,7 +500,7 @@ abstract class Emitter {
       DETAIL_ARGUMENTS   => []
     ];
 
-    $this->out->write(implode(' ', $property->modifiers).' $'.$property->name);
+    $this->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
     if (isset($property->expression)) {
       $this->out->write('=');
       $this->emit($property->expression);

@@ -17,31 +17,16 @@ class PHP74 extends Emitter {
     'mixed'    => null,
   ];
 
-  protected function emitProperty($property) {
-    $this->meta[0][self::PROPERTY][$property->name]= [
-      DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
-      DETAIL_ANNOTATIONS => $property->annotations ? $property->annotations : [],
-      DETAIL_COMMENT     => $property->comment,
-      DETAIL_TARGET_ANNO => [],
-      DETAIL_ARGUMENTS   => []
-    ];
-
-    // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
-    if (null === $property->type || $property->type instanceof UnionType || $property->type instanceof FunctionType) {
-      $hint= '';
-    } else if ($property->type instanceof ArrayType || $property->type instanceof MapType) {
-      $hint= 'array';
-    } else if ($property->type instanceof Type && 'callable' !== $property->type->literal() && 'void' !== $property->type->literal()) {
-      $hint= $property->type->literal();
+  // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
+  protected function propertyType($type) {
+    if (null === $type || $type instanceof UnionType || $type instanceof FunctionType) {
+      return '';
+    } else if ($type instanceof ArrayType || $type instanceof MapType) {
+      return 'array';
+    } else if ($type instanceof Type && 'callable' !== $type->literal() && 'void' !== $type->literal()) {
+      return $type->literal();
     } else {
-      $hint= '';
+      return '';
     }
-
-    $this->out->write(implode(' ', $property->modifiers).' '.$hint.' $'.$property->name);
-    if (isset($property->expression)) {
-      $this->out->write('=');
-      $this->emit($property->expression);
-    }
-    $this->out->write(';');
   }
 }
