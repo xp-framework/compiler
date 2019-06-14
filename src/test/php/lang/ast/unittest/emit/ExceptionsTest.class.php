@@ -123,7 +123,7 @@ class ExceptionsTest extends EmittingTest {
   public function throw_expression_with_lambda() {
     $t= $this->type('class <T> {
       public function run() {
-        $f= () ==> throw new \\lang\\IllegalArgumentException("test");
+        $f= fn() => throw new \\lang\\IllegalArgumentException("test");
         $f();
       }
     }');
@@ -134,7 +134,7 @@ class ExceptionsTest extends EmittingTest {
   public function throw_expression_with_lambda_throwing_variable() {
     $t= $this->type('class <T> {
       public function run($e) {
-        $f= () ==> throw $e;
+        $f= fn() => throw $e;
         $f();
       }
     }');
@@ -145,7 +145,7 @@ class ExceptionsTest extends EmittingTest {
   public function throw_expression_with_lambda_capturing_variable() {
     $t= $this->type('class <T> {
       public function run() {
-        $f= $message ==> throw new \\lang\\IllegalArgumentException($message);
+        $f= fn($message) => throw new \\lang\\IllegalArgumentException($message);
         $f("test");
       }
     }');
@@ -156,7 +156,7 @@ class ExceptionsTest extends EmittingTest {
   public function throw_expression_with_lambda_capturing_parameter() {
     $t= $this->type('class <T> {
       public function run($message) {
-        $f= () ==> throw new \\lang\\IllegalArgumentException($message);
+        $f= fn() => throw new \\lang\\IllegalArgumentException($message);
         $f();
       }
     }');

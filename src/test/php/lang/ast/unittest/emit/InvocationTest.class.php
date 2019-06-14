@@ -39,7 +39,7 @@ class InvocationTest extends EmittingTest {
         public function instanceMethod() { return "instance"; }
 
         public function run() {
-          $method= () ==> "instanceMethod";
+          $method= fn() => "instanceMethod";
           return $this->{$method()}();
         }
       }'
