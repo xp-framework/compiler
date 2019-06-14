@@ -3,13 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Implemented numeric literal separator, e.g. `1_000_000_000` - see #61
-  (@thekid)
-* Implemented null-colaesce assignment operator `??=` - see #58
-  (@thekid)
-* Implemented support PHP 7.4-style short closures with `fn` - see #60
-  (@thekid)
-* Implemented support for emitting typed properties in PHP 7.4 - see #57
+* Added [support for PHP 7.4 features](https://github.com/xp-framework/compiler/projects/2)
+  - Implemented numeric literal separator, e.g. `1_000_000_000` - see #61
+  - Implemented null-colaesce assignment operator `??=` - see #58
+  - Implemented support PHP 7.4-style short closures with `fn` - see #60
+  - Implemented support for emitting typed properties in PHP 7.4 - see #57
   (@thekid)
 
 ## 2.12.0 / 2018-12-28
