@@ -133,7 +133,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('lang.Value', @typeof($r)->signature()[0]->getName());
+    $this->assertEquals('lang.Value', typeof($r)->signature()[0]->getName());
   }
 
   #[@test, @action(new RuntimeVersion('>=7.0'))]
@@ -144,7 +144,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('lang.Value', @typeof($r)->returns()->getName());
+    $this->assertEquals('lang.Value', typeof($r)->returns()->getName());
   }
 
   #[@test]
