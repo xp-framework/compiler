@@ -148,6 +148,21 @@ class PHP56 extends \lang\ast\Emitter {
     }
   }
 
+  protected function emitAssignment($assignment) {
+    if ('??=' === $assignment->operator) {
+      $this->out->write('isset(');
+      $this->emitAssign($assignment->variable);
+      $this->out->write(') ||');
+      $this->emit($assignment->variable);
+      $this->out->write('=');
+      $this->emit($assignment->expression);
+    } else {
+      $this->emitAssign($assignment->variable);
+      $this->out->write($assignment->operator);
+      $this->emit($assignment->expression);
+    }
+  }
+
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitInvoke($invoke) {
     $expr= $invoke->expression;
