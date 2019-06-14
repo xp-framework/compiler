@@ -237,6 +237,7 @@ class Parse {
     $this->assignment('**=');
     $this->assignment('>>=');
     $this->assignment('<<=');
+    $this->assignment('??=');
 
     // This is ambiguous:
     //

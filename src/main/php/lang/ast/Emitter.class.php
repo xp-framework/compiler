@@ -604,9 +604,17 @@ abstract class Emitter {
   }
 
   protected function emitAssignment($assignment) {
-    $this->emitAssign($assignment->variable);
-    $this->out->write($assignment->operator);
-    $this->emit($assignment->expression);
+    if ('??=' === $assignment->operator) {
+      $this->emitAssign($assignment->variable);
+      $this->out->write('=');
+      $this->emit($assignment->variable);
+      $this->out->write('??');
+      $this->emit($assignment->expression);
+    } else {
+      $this->emitAssign($assignment->variable);
+      $this->out->write($assignment->operator);
+      $this->emit($assignment->expression);
+    }
   }
 
   protected function emitReturn($return) {

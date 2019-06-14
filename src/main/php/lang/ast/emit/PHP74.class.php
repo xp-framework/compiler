@@ -10,6 +10,7 @@ use lang\ast\UnionType;
 /**
  * PHP 7.4 syntax
  *
+ * @see  https://wiki.php.net/rfc/null_coalesce_equal_operator
  * @see  https://wiki.php.net/rfc/typed_properties_v2
  */
 class PHP74 extends Emitter {
@@ -28,6 +29,12 @@ class PHP74 extends Emitter {
     } else {
       return '';
     }
+  }
+
+  protected function emitAssignment($assignment) {
+    $this->emitAssign($assignment->variable);
+    $this->out->write($assignment->operator);
+    $this->emit($assignment->expression);
   }
 
   protected function emitLambda($lambda) {
