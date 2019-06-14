@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented support PHP 7.4-style short closures with `fn` - see #60
+  (@thekid)
 * Implemented support for emitting typed properties in PHP 7.4 - see #57
   (@thekid)
 
