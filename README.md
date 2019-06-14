@@ -30,7 +30,7 @@ class HelloWorld {
   public const GREETING = 'Hello';
 
   public static function main(array<string> $args): void {
-    $greet= ($to, $from) ==> self::GREETING.' '.$to.' from '.$from;
+    $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
     $author= Type::forName(self::class)->getAnnotation('author');
 
     Console::writeLine($greet($args[0] ?? 'World', $author));
