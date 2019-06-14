@@ -53,12 +53,12 @@ class TokensTest extends \unittest\TestCase {
 
   #[@test, @values(['0', '1', '1_000_000_000'])]
   public function integer_literal($input) {
-    $this->assertTokens([['integer' => $input]], new Tokens(new StringTokenizer($input)));
+    $this->assertTokens([['integer' => str_replace('_', '', $input)]], new Tokens(new StringTokenizer($input)));
   }
 
   #[@test, @values(['0.0', '6.1', '.5', '107_925_284.88'])]
   public function float_literal($input) {
-    $this->assertTokens([['decimal' => $input]], new Tokens(new StringTokenizer($input)));
+    $this->assertTokens([['decimal' => str_replace('_', '', $input)]], new Tokens(new StringTokenizer($input)));
   }
 
   #[@test, @values([
