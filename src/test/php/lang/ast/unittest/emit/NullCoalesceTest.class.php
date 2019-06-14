@@ -1,8 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\actions\RuntimeVersion;
+
 class NullCoalesceTest extends EmittingTest {
 
-  #[@test]
+  #[@test, @action(new RuntimeVersion('>=7.0'))]
   public function on_null() {
     $r= $this->run('class <T> {
       public function run() {
