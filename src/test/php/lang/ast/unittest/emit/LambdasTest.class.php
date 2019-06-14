@@ -176,12 +176,12 @@ class LambdasTest extends EmittingTest {
       public function run() {
         return fn() => {
           $a= 1;
-          return $a;
+          return $a + 1;
         };
       }
     }');
 
-    $this->assertEquals(1, $r());
+    $this->assertEquals(2, $r());
   }
 
   #[@test]

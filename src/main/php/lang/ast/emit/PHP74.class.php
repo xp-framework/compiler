@@ -29,4 +29,13 @@ class PHP74 extends Emitter {
       return '';
     }
   }
+
+  protected function emitLambda($lambda) {
+    if (is_array($lambda->body)) return parent::emitLambda($lambda);
+
+    $this->out->write('fn');
+    $this->emitSignature($lambda->signature);
+    $this->out->write('=>');
+    $this->emit($lambda->body);
+  }
 }
