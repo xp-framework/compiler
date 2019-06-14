@@ -1201,6 +1201,36 @@ class Parse {
 
         $member->value= new UseExpression($types, $aliases);
         $body[]= $member;
+      } else if ('fn' === $this->token->value) {
+        $member= new Node($this->token->symbol);
+        $member->kind= 'method';
+        $member->line= $this->token->line;
+        $comment= $this->comment;
+        $this->comment= null;
+
+        $this->token= $this->advance();
+        $name= $this->token->value;
+        $lookup= $name.'()';
+        if (isset($body[$lookup])) {
+          $this->raise('Cannot redeclare method '.$lookup);
+        }
+
+        $this->token= $this->advance();
+        $signature= $this->signature();
+
+        $this->token= $this->expect('=>');
+
+        $n= new Node($this->token->symbol);
+        $n->line= $this->token->line;
+        $n->value= $this->expressionWithThrows(0);
+        $n->kind= 'return';
+        $statements= [$n];
+        $this->token= $this->expect(';');
+
+        $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
+        $body[$lookup]= $member;
+        $modifiers= [];
+        $annotations= [];
       } else if ('function' === $this->token->value) {
         $member= new Node($this->token->symbol);
         $member->kind= 'method';
