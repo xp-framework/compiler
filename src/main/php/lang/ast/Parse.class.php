@@ -382,6 +382,24 @@ class Parse {
       return $node;
     });
 
+    $this->prefix('fn', function($node) {
+      $signature= $this->signature();
+
+      $this->token= $this->expect('=>');
+
+      if ('{' === $this->token->value) {
+        $this->token= $this->expect('{');
+        $statements= $this->statements();
+        $this->token= $this->expect('}');
+      } else {
+        $statements= $this->expressionWithThrows(0);
+      }
+
+      $node->value= new LambdaExpression($signature, $statements);
+      $node->kind= 'lambda';
+      return $node;
+    });
+
     $this->prefix('function', function($node) {
 
       // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;

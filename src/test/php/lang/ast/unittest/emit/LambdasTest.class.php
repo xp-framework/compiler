@@ -9,6 +9,7 @@ use unittest\actions\RuntimeVersion;
  * capturing by reference is not supported. If you need to capture by
  * reference, use a full PHP closure.
  *
+ * @see  https://wiki.php.net/rfc/arrow_functions_v2
  * @see  https://docs.hhvm.com/hack/operators/lambda
  * @see  https://docs.hhvm.com/hack/lambdas/introduction
  * @see  https://wiki.php.net/rfc/arrow_functions (Under Discussion)
@@ -19,7 +20,7 @@ class LambdasTest extends EmittingTest {
   public function inc() {
     $r= $this->run('class <T> {
       public function run() {
-        return ($a) ==> $a + 1;
+        return fn($a) => $a + 1;
       }
     }');
 
@@ -30,7 +31,7 @@ class LambdasTest extends EmittingTest {
   public function add() {
     $r= $this->run('class <T> {
       public function run() {
-        return ($a, $b) ==> $a + $b;
+        return fn($a, $b) => $a + $b;
       }
     }');
 
@@ -43,7 +44,7 @@ class LambdasTest extends EmittingTest {
       private $addend= 2;
 
       public function run() {
-        return ($a) ==> $a + $this->addend;
+        return fn($a) => $a + $this->addend;
       }
     }');
 
@@ -55,7 +56,7 @@ class LambdasTest extends EmittingTest {
     $r= $this->run('class <T> {
       public function run() {
         $addend= 2;
-        return ($a) ==> $a + $addend;
+        return fn($a) => $a + $addend;
       }
     }');
 
@@ -68,7 +69,7 @@ class LambdasTest extends EmittingTest {
       public function run() {
         $addend= 2;
         $f= function() use($addend) {
-          return ($a) ==> $a + $addend;
+          return fn($a) => $a + $addend;
         };
         return $f();
       }
@@ -78,11 +79,11 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
-  public function captures_local_from_lambd() {
+  public function captures_local_from_lambda() {
     $r= $this->run('class <T> {
       public function run() {
         $addend= 2;
-        $f= () ==> ($a) ==> $a + $addend;
+        $f= fn() => fn($a) => $a + $addend;
         return $f();
       }
     }');
@@ -95,7 +96,7 @@ class LambdasTest extends EmittingTest {
     $r= $this->run('class <T> {
       public function run() {
         [$addend]= [2];
-        return ($a) ==> $a + $addend;
+        return fn($a) => $a + $addend;
       }
     }');
 
@@ -106,7 +107,7 @@ class LambdasTest extends EmittingTest {
   public function captures_param() {
     $r= $this->run('class <T> {
       public function run($addend) {
-        return ($a) ==> $a + $addend;
+        return fn($a) => $a + $addend;
       }
     }', 2);
 
@@ -118,7 +119,7 @@ class LambdasTest extends EmittingTest {
     $r= $this->run('class <T> {
       public function run() {
         $addend= 2;
-        return ($a) ==> $a + ($addend);
+        return fn($a) => $a + ($addend);
       }
     }');
 
@@ -129,7 +130,7 @@ class LambdasTest extends EmittingTest {
   public function typed_parameters() {
     $r= $this->run('class <T> {
       public function run() {
-        return (\\lang\\Value $in) ==> $in;
+        return fn(\\lang\\Value $in) => $in;
       }
     }');
 
@@ -140,7 +141,7 @@ class LambdasTest extends EmittingTest {
   public function typed_return() {
     $r= $this->run('class <T> {
       public function run() {
-        return ($in): \\lang\\Value ==> $in;
+        return fn($in): \\lang\\Value => $in;
       }
     }');
 
@@ -148,33 +149,10 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
-  public function without_braces() {
-    $r= $this->run('class <T> {
-      public function run() {
-        return $a ==> $a + 1;
-      }
-    }');
-
-    $this->assertEquals(2, $r(1));
-  }
-
-  #[@test]
-  public function without_braces_as_argument() {
-    $r= $this->run('class <T> {
-      private function apply($f, ... $args) { return $f(...$args); }
-      public function run() {
-        return $this->apply($a ==> $a + 1, 2);
-      }
-    }');
-
-    $this->assertEquals(3, $r);
-  }
-
-  #[@test]
   public function without_params() {
     $r= $this->run('class <T> {
       public function run() {
-        return () ==> 1;
+        return fn() => 1;
       }
     }');
 
@@ -185,7 +163,7 @@ class LambdasTest extends EmittingTest {
   public function immediately_invoked_function_expression() {
     $r= $this->run('class <T> {
       public function run() {
-        return (() ==> "IIFE")();
+        return (fn() => "IIFE")();
       }
     }');
 
@@ -193,10 +171,10 @@ class LambdasTest extends EmittingTest {
   }
 
   #[@test]
-  public function with_braces() {
+  public function with_block() {
     $r= $this->run('class <T> {
       public function run() {
-        return () ==> {
+        return fn() => {
           $a= 1;
           return $a;
         };
@@ -204,5 +182,39 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(1, $r());
+  }
+
+  #[@test]
+  public function hack_variant_also_supportted() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return ($a) ==> $a + 1;
+      }
+    }');
+
+    $this->assertEquals(2, $r(1));
+  }
+
+  #[@test]
+  public function hack_variant_without_braces() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return $a ==> $a + 1;
+      }
+    }');
+
+    $this->assertEquals(2, $r(1));
+  }
+
+  #[@test]
+  public function hack_variant_without_braces_as_argument() {
+    $r= $this->run('class <T> {
+      private function apply($f, ... $args) { return $f(...$args); }
+      public function run() {
+        return $this->apply($a ==> $a + 1, 2);
+      }
+    }');
+
+    $this->assertEquals(3, $r);
   }
 }
