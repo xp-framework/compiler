@@ -183,38 +183,4 @@ class LambdasTest extends EmittingTest {
 
     $this->assertEquals(2, $r());
   }
-
-  #[@test]
-  public function hack_variant_also_supportted() {
-    $r= $this->run('class <T> {
-      public function run() {
-        return ($a) ==> $a + 1;
-      }
-    }');
-
-    $this->assertEquals(2, $r(1));
-  }
-
-  #[@test]
-  public function hack_variant_without_braces() {
-    $r= $this->run('class <T> {
-      public function run() {
-        return $a ==> $a + 1;
-      }
-    }');
-
-    $this->assertEquals(2, $r(1));
-  }
-
-  #[@test]
-  public function hack_variant_without_braces_as_argument() {
-    $r= $this->run('class <T> {
-      private function apply($f, ... $args) { return $f(...$args); }
-      public function run() {
-        return $this->apply($a ==> $a + 1, 2);
-      }
-    }');
-
-    $this->assertEquals(3, $r);
-  }
 }

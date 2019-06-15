@@ -157,22 +157,6 @@ class Parse {
       return $node;
     });
 
-    $this->infix('==>', 80, function($node, $left) {
-      $signature= new Signature([new Parameter($left->value, null)], null);
-
-      if ('{' === $this->token->value) {
-        $this->token= $this->expect('{');
-        $statements= $this->statements();
-        $this->token= $this->expect('}');
-      } else {
-        $statements= $this->expressionWithThrows(0);
-      }
-
-      $node->value= new LambdaExpression($signature, $statements);
-      $node->kind= 'lambda';
-      return $node;
-    });
-
     $this->infix('(', 80, function($node, $left) {
       $arguments= $this->arguments();
       $this->token= $this->expect(')');
@@ -241,7 +225,6 @@ class Parse {
 
     // This is ambiguous:
     //
-    // - An arrow function `($a) ==> $a + 1`
     // - An expression surrounded by parentheses `($a ?? $b)->invoke()`;
     // - A cast `(int)$a` or `(int)($a / 2)`.
     //
@@ -271,23 +254,7 @@ class Parse {
       }
       $this->queue= array_merge($skipped, $this->queue);
 
-      if (':' === $this->token->value || '==>' === $this->token->value) {
-        $node->kind= 'lambda';
-
-        $this->token= $this->advance();
-        $signature= $this->signature();
-        $this->token= $this->advance();
-
-        if ('{' === $this->token->value) {
-          $this->token= $this->expect('{');
-          $statements= $this->statements();
-          $this->token= $this->expect('}');
-        } else {
-          $statements= $this->expressionWithThrows(0);
-        }
-
-        $node->value= new LambdaExpression($signature, $statements);
-      } else if ($cast && ('operator' !== $this->token->kind || '(' === $this->token->value || '[' === $this->token->value)) {
+      if ($cast && ('operator' !== $this->token->kind || '(' === $this->token->value || '[' === $this->token->value)) {
         $node->kind= 'cast';
 
         $this->token= $this->advance();
@@ -440,19 +407,9 @@ class Parse {
         $this->token= $this->advance();
         $signature= $this->signature();
 
-        if ('==>' === $this->token->value) {  // Compact syntax, terminated with ';'
-          $n= new Node($this->token->symbol);
-          $this->token= $this->advance();
-          $n->value= $this->expressionWithThrows(0);
-          $n->line= $this->token->line;
-          $n->kind= 'return';
-          $statements= [$n];
-          $this->token= $this->expect(';');
-        } else {                              // Regular function
-          $this->token= $this->expect('{');
-          $statements= $this->statements();
-          $this->token= $this->expect('}');
-        }
+        $this->token= $this->expect('{');
+        $statements= $this->statements();
+        $this->token= $this->expect('}');
 
         $this->queue= [$this->token];
         $this->token= new Node(self::symbol(';'));
@@ -1219,10 +1176,10 @@ class Parse {
         $this->token= $this->advance();
         $signature= $this->signature();
 
-        $this->token= $this->expect('=>');
 
         $n= new Node($this->token->symbol);
         $n->line= $this->token->line;
+        $this->token= $this->expect('=>');
         $n->value= $this->expressionWithThrows(0);
         $n->kind= 'return';
         $statements= [$n];
@@ -1256,16 +1213,8 @@ class Parse {
         } else if (';' === $this->token->value) {   // Abstract or interface method
           $statements= null;
           $this->token= $this->expect(';');
-        } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
-          $n= new Node($this->token->symbol);
-          $n->line= $this->token->line;
-          $this->token= $this->advance();
-          $n->value= $this->expressionWithThrows(0);
-          $n->kind= 'return';
-          $statements= [$n];
-          $this->token= $this->expect(';');
         } else {
-          $this->token= $this->expect('{, ; or ==>', 'method declaration');
+          $this->token= $this->expect('{ or ;', 'method declaration');
         }
 
         $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);

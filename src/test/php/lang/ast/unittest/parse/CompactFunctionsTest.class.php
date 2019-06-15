@@ -5,19 +5,19 @@ class CompactFunctionsTest extends ParseTest {
   #[@test]
   public function function_returning_null() {
     $this->assertNodes(
-      [['function' => ['a', [[], null], [['==>' => ['null' => 'null']]]]]],
-      $this->parse('function a() ==> null;')
+      [['fn' => [[[], null], ['null' => 'null']]]],
+      $this->parse('fn() => null;')
     );
   }
 
   #[@test]
   public function short_method() {
-    $block= [['==>' => ['true' => 'true']]];
+    $block= [['=>' => ['true' => 'true']]];
     $this->assertNodes(
       [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['public'], [[], null], [], $block, null]]
+        'a()' => ['fn' => ['a', ['public'], [[], null], [], $block, null]]
       ], [], null]]],
-      $this->parse('class A { public function a() ==> true; }')
+      $this->parse('class A { public fn a() => true; }')
     );
   }
 }
