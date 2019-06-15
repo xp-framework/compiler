@@ -132,16 +132,25 @@ abstract class Emitter {
     }
   }
 
-  protected function paramType($name) {
-    return $this->type($name);
+  protected function paramType($type) {
+    return $this->type($type->literal());
   }
 
-  protected function returnType($name) {
-    return $this->type($name);
+  protected function returnType($type) {
+    return $this->type($type->literal());
   }
 
+  // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
   protected function propertyType($type) {
-    return '';
+    if (null === $type || $type instanceof UnionType || $type instanceof FunctionType) {
+      return '';
+    } else if ($type instanceof ArrayType || $type instanceof MapType) {
+      return 'array';
+    } else if ($type instanceof Type && 'callable' !== $type->literal() && 'void' !== $type->literal()) {
+      return $type->literal();
+    } else {
+      return '';
+    }
   }
 
   protected function emitStart($start) {
@@ -287,7 +296,7 @@ abstract class Emitter {
   }
 
   protected function emitParameter($parameter) {
-    if ($parameter->type && $t= $this->paramType($parameter->type->literal())) {
+    if ($parameter->type && $t= $this->paramType($parameter->type)) {
       $this->out->write($t.' ');
     }
     if ($parameter->variadic) {
@@ -311,7 +320,7 @@ abstract class Emitter {
     }
     $this->out->write(')');
 
-    if ($signature->returns && $t= $this->returnType($signature->returns->literal())) {
+    if ($signature->returns && $t= $this->returnType($signature->returns)) {
       $this->out->write(':'.$t);
     }
   }
@@ -351,41 +360,17 @@ abstract class Emitter {
   }
 
   protected function emitLambda($lambda) {
-    $capture= [];
-    foreach ($this->search($lambda->body, 'variable') as $var) {
-      if (isset($this->locals[$var->value])) {
-        $capture[$var->value]= true;
-      }
-    }
-    unset($capture['this']);
-
-    $this->stack[]= $this->locals;
-    $this->locals= [];
-
-    $this->out->write('function');
+    $this->out->write('fn');
     $this->emitSignature($lambda->signature);
-    foreach ($lambda->signature->parameters as $param) {
-      unset($capture[$param->name]);
-    }
-
-    if ($capture) {
-      $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
-      foreach ($capture as $name => $_) {
-        $this->locals[$name]= true;
-      }
-    }
+    $this->out->write('=>');
 
     if (is_array($lambda->body)) {
       $this->out->write('{');
       $this->emit($lambda->body);
       $this->out->write('}');
     } else {
-      $this->out->write('{ return ');
       $this->emit($lambda->body);
-      $this->out->write('; }');
     }
-
-    $this->locals= array_pop($this->stack);
   }
 
   protected function emitClass($class) {
@@ -604,17 +589,9 @@ abstract class Emitter {
   }
 
   protected function emitAssignment($assignment) {
-    if ('??=' === $assignment->operator) {
-      $this->emitAssign($assignment->variable);
-      $this->out->write('=');
-      $this->emit($assignment->variable);
-      $this->out->write('??');
-      $this->emit($assignment->expression);
-    } else {
-      $this->emitAssign($assignment->variable);
-      $this->out->write($assignment->operator);
-      $this->emit($assignment->expression);
-    }
+    $this->emitAssign($assignment->variable);
+    $this->out->write($assignment->operator);
+    $this->emit($assignment->expression);
   }
 
   protected function emitReturn($return) {
@@ -630,7 +607,7 @@ abstract class Emitter {
     $this->emit($if->body);
     $this->out->write('}');
 
-    if (isset($if->otherwise)) {
+    if ($if->otherwise) {
       $this->out->write('else {');
       $this->emit($if->otherwise);
       $this->out->write('}');

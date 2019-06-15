@@ -1,16 +1,17 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Emitter;
 use lang\ast\nodes\Value;
 
 /**
  * PHP 5.6 syntax
  *
- * @see  https://wiki.php.net/rfc/pow-operator
- * @see  https://wiki.php.net/rfc/variadics
- * @see  https://wiki.php.net/rfc/argument_unpacking
- * @see  https://wiki.php.net/rfc/use_function
+ * @see  https://wiki.php.net/rfc#php_56
  */
-class PHP56 extends \lang\ast\Emitter {
+class PHP56 extends Emitter {
+  use OmitPropertyTypes, OmitReturnTypes, OmitConstModifiers;
+  use RewriteLambdaExpressions;
+
   protected $unsupported= [
     'object'   => 72,
     'void'     => 71,
@@ -89,9 +90,6 @@ class PHP56 extends \lang\ast\Emitter {
     'parent'       => true
   ];
 
-  protected function returnType($name) {
-    return null;
-  }
 
   protected function emitLiteral($literal) {
     if ('"' === $literal{0}) {
@@ -119,12 +117,6 @@ class PHP56 extends \lang\ast\Emitter {
 
     $this->emit($catch->body);
     $this->out->write('}');
-  }
-
-  protected function emitConst($const) {
-    $this->out->write('const '.$const->name.'=');
-    $this->emit($const->expression);
-    $this->out->write(';');
   }
 
   protected function emitBinary($binary) {
