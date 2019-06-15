@@ -9,7 +9,7 @@
 trait OmitReturnTypes {
 
   /**
-   * Returns property type
+   * Returns return type
    *
    * @param  lang.ast.Type $type
    * @return string

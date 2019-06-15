@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.13.0 / 2019-06-15
+
 * Added preliminary PHP 8 support - see #62 (@thekid)
 * Added [support for PHP 7.4 features](https://github.com/xp-framework/compiler/projects/2)
   - Implemented numeric literal separator, e.g. `1_000_000_000` - see #61
