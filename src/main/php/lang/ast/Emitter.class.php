@@ -137,14 +137,7 @@ abstract class Emitter {
   }
 
   protected function returnType($type) {
-    if (null === $type || $type instanceof UnionType || $type instanceof FunctionType) {
-      return '';
-    } else if ($type instanceof ArrayType || $type instanceof MapType) {
-      return 'array';
-    } else {
-      $name= $type->literal();
-      return isset($this->unsupported[$name]) ? '' : $name;
-    }
+    return $this->type($type->literal());
   }
 
   // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
@@ -153,9 +146,10 @@ abstract class Emitter {
       return '';
     } else if ($type instanceof ArrayType || $type instanceof MapType) {
       return 'array';
+    } else if ($type instanceof Type && 'callable' !== $type->literal() && 'void' !== $type->literal()) {
+      return $type->literal();
     } else {
-      $name= $type->literal();
-      return 'callable' === $type->literal() || 'void' === $type->literal() ? '' : $name;
+      return '';
     }
   }
 
