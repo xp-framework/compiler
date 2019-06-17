@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\Error;
+use lang\ast\Errors;
 
 class ErrorsTest extends ParseTest {
 
@@ -14,8 +14,8 @@ class ErrorsTest extends ParseTest {
   private function assertError($message, $parse) {
     try {
       iterator_to_array($parse);
-      $this->fail('No exception raised', null, Error::class);
-    } catch (Error $expected) {
+      $this->fail('No exception raised', null, Errors::class);
+    } catch (Errors $expected) {
       $this->assertEquals($message, $expected->getMessage());
     }
   }
@@ -23,7 +23,7 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function missing_semicolon() {
     $this->assertError(
-      'Expected ";", have "b"',
+      'Missing semicolon after assignment statement',
       $this->parse('$a= 1 $b= 1;')
     );
   }
@@ -47,8 +47,8 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function unclosed_type() {
     $this->assertError(
-      'Expected "a type, modifier, property, annotation, method or }", have "-" in type body',
-      $this->parse('class T { -')
+      'Expected a type, modifier, property, annotation, method or "}", have "-"',
+      $this->parse('class T { - }')
     );
   }
 
@@ -56,7 +56,7 @@ class ErrorsTest extends ParseTest {
   public function missing_comma_in_implements() {
     $this->assertError(
       'Expected ", or {", have "B" in interfaces list',
-      $this->parse('class A implements I B')
+      $this->parse('class A implements I B { }')
     );
   }
 
@@ -64,7 +64,7 @@ class ErrorsTest extends ParseTest {
   public function missing_comma_in_interface_parents() {
     $this->assertError(
       'Expected ", or {", have "B" in interface parents',
-      $this->parse('interface I extends A B')
+      $this->parse('interface I extends A B { }')
     );
   }
 
@@ -73,6 +73,14 @@ class ErrorsTest extends ParseTest {
     $this->assertError(
       'Expected ", or >>", have "(end)" in annotation',
       $this->parse('<<annotation')
+    );
+  }
+
+  #[@test]
+  public function unclosed_offset() {
+    $this->assertError(
+      'Expected "]", have ";"',
+      $this->parse('$a[$s[0]= 5;')
     );
   }
 }
