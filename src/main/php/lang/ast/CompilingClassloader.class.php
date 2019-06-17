@@ -7,18 +7,23 @@ use lang\ClassNotFoundException;
 use lang\ElementNotFoundException;
 use lang\IClassLoader;
 use lang\XPClass;
+use lang\reflect\Package;
 
 class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
   private static $instance= [];
+  private $syntax= [];
   private $version;
 
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
-    Compiled::$emit[$this->version]= $emit;
+    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
+      $this->synax[]= $class->newInstance();
+    }
 
+    Compiled::$emit[$this->version]= $emit;
     stream_wrapper_register($this->version, Compiled::class);
   }
 
@@ -204,6 +209,10 @@ class CompilingClassLoader implements IClassLoader {
 
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
+      foreach ($this->syntax as $syntax) {
+        $syntax->parse($parse);
+      }
+
       $emitter= $this->emit->newInstance($declaration);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);

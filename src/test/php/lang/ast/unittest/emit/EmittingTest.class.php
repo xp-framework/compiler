@@ -7,14 +7,19 @@ use lang\ast\Emitter;
 use lang\ast\Node;
 use lang\ast\Parse;
 use lang\ast\Tokens;
+use lang\reflect\Package;
 use text\StringTokenizer;
 
 abstract class EmittingTest extends \unittest\TestCase {
   private static $cl;
+  private static $syntax= [];
   private static $id= 0;
 
   static function __static() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
+    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
+      self::$syntax[]= $class->newInstance();
+    }
   }
 
   /**
@@ -27,6 +32,10 @@ abstract class EmittingTest extends \unittest\TestCase {
     $name= 'T'.(self::$id++);
 
     $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
+    foreach (self::$syntax as $syntax) {
+      $syntax->parse($parse);
+    }
+
     $out= new MemoryOutputStream();
     $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
     $emit->emit($parse->execute());
