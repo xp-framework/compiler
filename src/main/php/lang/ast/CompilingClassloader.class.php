@@ -20,7 +20,7 @@ class CompilingClassLoader implements IClassLoader {
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      $this->synax[]= $class->newInstance();
+      $this->syntax[]= $class->newInstance();
     }
 
     Compiled::$emit[$this->version]= $emit;
@@ -210,7 +210,7 @@ class CompilingClassLoader implements IClassLoader {
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
       foreach ($this->syntax as $syntax) {
-        $syntax->parse($parse);
+        $syntax->setup($parse);
       }
 
       $emitter= $this->emit->newInstance($declaration);

@@ -5,7 +5,7 @@ use lang\ast\nodes\Method;
 
 class CompactMethods {
 
-  public function parse($parser) {
+  public function setup($parser) {
     $parser->body('fn', function(&$body, $annotations, $modifiers) {
       $member= new Node($this->token->symbol);
       $member->kind= 'method';

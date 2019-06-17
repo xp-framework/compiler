@@ -9,8 +9,9 @@ use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\reflect\Package;
 use text\StringTokenizer;
+use unittest\TestCase;
 
-abstract class EmittingTest extends \unittest\TestCase {
+abstract class EmittingTest extends TestCase {
   private static $cl;
   private static $syntax= [];
   private static $id= 0;
@@ -33,7 +34,7 @@ abstract class EmittingTest extends \unittest\TestCase {
 
     $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
     foreach (self::$syntax as $syntax) {
-      $syntax->parse($parse);
+      $syntax->setup($parse);
     }
 
     $out= new MemoryOutputStream();
