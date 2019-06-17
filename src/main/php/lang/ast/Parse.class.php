@@ -42,6 +42,7 @@ class Parse {
 
   private $tokens, $file, $token, $scope;
   private $comment= null;
+  private $body= [];
   private $queue= [];
   private $errors= [];
 
@@ -867,7 +868,7 @@ class Parse {
       }
 
       $this->token= $this->expect('{');
-      $body= $this->body();
+      $body= $this->typeBody();
       $this->token= $this->expect('}');
 
       $node->value= new InterfaceDeclaration([], $type, $parents, $body, $this->scope->annotations, $comment);
@@ -883,7 +884,7 @@ class Parse {
       $this->comment= null;
 
       $this->token= $this->expect('{');
-      $body= $this->body();
+      $body= $this->typeBody();
       $this->token= $this->expect('}');
 
       $node->value= new TraitDeclaration([], $type, $body, $this->scope->annotations, $comment);
@@ -904,6 +905,164 @@ class Parse {
       $node->value= new UsingStatement($arguments, $statements);
       $node->kind= 'using';
       return $node;
+    });
+
+    $this->body('use', function(&$body, $annotations, $modifiers) {
+      $member= new Node($this->token->symbol);
+      $member->kind= 'use';
+      $member->line= $this->token->line;
+
+      $this->token= $this->advance();
+      $types= [];
+      do {
+        $types[]= $this->scope->resolve($this->token->value);
+        $this->token= $this->advance();
+        if (',' === $this->token->value) {
+          $this->token= $this->advance();
+          continue;
+        } else {
+          break;
+        }
+      } while ($this->token->value);
+
+      $aliases= [];
+      if ('{' === $this->token->value) {
+        $this->token= $this->advance();
+        while ('}' !== $this->token->value) {
+          $method= $this->token->value;
+          $this->token= $this->advance();
+          if ('::' === $this->token->value) {
+            $this->token= $this->advance();
+            $method= $this->scope->resolve($method).'::'.$this->token->value;
+            $this->token= $this->advance();
+          }
+          $this->token= $this->expect('as');
+          $alias= $this->token->value;
+          $this->token= $this->advance();
+          $this->token= $this->expect(';');
+          $aliases[$method]= $alias;
+        }
+        $this->token= $this->expect('}');
+      } else {
+        $this->token= $this->expect(';');
+      }
+
+      $member->value= new UseExpression($types, $aliases);
+      $body[]= $member;
+    });
+
+    $this->body('const', function(&$body, $annotations, $modifiers) {
+      $n= new Node($this->token->symbol);
+      $n->kind= 'const';
+      $this->token= $this->advance();
+
+      $type= null;
+      while (';' !== $this->token->value) {
+        $member= clone $n;
+        $member->line= $this->token->line;
+        $first= $this->token;
+        $this->token= $this->advance();
+
+        // Untyped `const T = 5` vs. typed `const int T = 5`
+        if ('=' === $this->token->value) {
+          $name= $first->value;
+        } else {
+          $this->queue[]= $first;
+          $this->queue[]= $this->token;
+          $this->token= $first;
+
+          $type= $this->type(false);
+          $this->token= $this->advance();
+          $name= $this->token->value;
+          $this->token= $this->advance();
+        }
+
+        if (isset($body[$name])) {
+          $this->raise('Cannot redeclare constant '.$name);
+        }
+
+        $this->token= $this->expect('=');
+        $member->value= new Constant($modifiers, $name, $type, $this->expression(0));
+        $body[$name]= $member;
+        if (',' === $this->token->value) {
+          $this->token= $this->expect(',');
+        }
+      }
+      $this->token= $this->expect(';', 'constant declaration');
+    });
+
+    $this->body('@variable', function(&$body, $annotations, $modifiers) {
+      $this->properties($body, $annotations, $modifiers, null);
+    });
+
+    $this->body('fn', function(&$body, $annotations, $modifiers) {
+      $member= new Node($this->token->symbol);
+      $member->kind= 'method';
+      $member->line= $this->token->line;
+      $comment= $this->comment;
+      $this->comment= null;
+
+      $this->token= $this->advance();
+      $name= $this->token->value;
+      $lookup= $name.'()';
+      if (isset($body[$lookup])) {
+        $this->raise('Cannot redeclare method '.$lookup);
+      }
+
+      $this->token= $this->advance();
+      $signature= $this->signature();
+
+      $this->token= $this->expect('=>');
+      $n= new Node($this->token->symbol);
+      $n->line= $this->token->line;
+      $n->value= $this->expressionWithThrows(0);
+      $n->kind= 'return';
+      $this->token= $this->expect(';');
+
+      $member->value= new Method($modifiers, $name, $signature, [$n], $annotations, $comment);
+      $body[$lookup]= $member;
+    });
+
+    $this->body('function', function(&$body, $annotations, $modifiers) {
+      $member= new Node($this->token->symbol);
+      $member->kind= 'method';
+      $member->line= $this->token->line;
+      $comment= $this->comment;
+      $this->comment= null;
+
+      $this->token= $this->advance();
+      $name= $this->token->value;
+      $lookup= $name.'()';
+      if (isset($body[$lookup])) {
+        $this->raise('Cannot redeclare method '.$lookup);
+      }
+
+      $this->token= $this->advance();
+      $signature= $this->signature();
+
+      if ('{' === $this->token->value) {          // Regular body
+        $this->token= $this->advance();
+        $statements= $this->statements();
+        $this->token= $this->expect('}');
+      } else if (';' === $this->token->value) {   // Abstract or interface method
+        $statements= null;
+        $this->token= $this->expect(';');
+      } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
+        $this->warn('Hack language style compact functions are deprecated, please use `fn` syntax instead');
+
+        $n= new Node($this->token->symbol);
+        $n->line= $this->token->line;
+        $this->token= $this->advance();
+        $n->value= $this->expressionWithThrows(0);
+        $n->kind= 'return';
+        $statements= [$n];
+        $this->token= $this->expect(';');
+      } else {
+        $this->token= $this->expect('{, ; or ==>', 'method declaration');
+      }
+
+      $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
+      $body[$lookup]= $member;
     });
   }
 
@@ -979,6 +1138,45 @@ class Parse {
     } else {
       return new Type($type);
     }
+  }
+
+  private function properties(&$body, $annotations, $modifiers, $type) {
+    $n= new Node($this->token->symbol);
+    $n->kind= 'property';
+    $comment= $this->comment;
+    $this->comment= null;
+
+    while (';' !== $this->token->value) {
+      $member= clone $n;
+      $member->line= $this->token->line;
+
+      // Untyped `$a` vs. typed `int $a`
+      if ('variable' === $this->token->kind) {
+        $name= $this->token->value;
+      } else {
+        $type= $this->type(false);
+        $name= $this->token->value;
+      }
+
+      $lookup= '$'.$name;
+      if (isset($body[$lookup])) {
+        $this->raise('Cannot redeclare property '.$lookup);
+      }
+
+      $this->token= $this->advance();
+      if ('=' === $this->token->value) {
+        $this->token= $this->advance();
+        $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
+      } else {
+        $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
+      }
+
+      $body[$lookup]= $member;
+      if (',' === $this->token->value) {
+        $this->token= $this->advance();
+      }
+    }
+    $this->token= $this->next(';', 'field declaration');
   }
 
   private function parameters() {
@@ -1119,7 +1317,7 @@ class Parse {
     }
 
     $this->token= $this->expect('{');
-    $body= $this->body();
+    $body= $this->typeBody();
     $this->token= $this->expect('}');
 
     $return= new ClassDeclaration($modifiers, $name, $parent, $implements, $body, $this->scope->annotations, $comment);
@@ -1150,7 +1348,7 @@ class Parse {
    * - `[modifiers] const int T = 5`
    * - `[modifiers] function t(): int { }`
    */
-  private function body() {
+  private function typeBody() {
     static $modifier= [
       'private'   => true,
       'protected' => true,
@@ -1163,204 +1361,14 @@ class Parse {
     $body= [];
     $modifiers= [];
     $annotations= [];
-    $type= null;
     while ('}' !== $this->token->value) {
       if (isset($modifier[$this->token->value])) {
         $modifiers[]= $this->token->value;
         $this->token= $this->advance();
-      } else if ('use' === $this->token->value) {
-        $member= new Node($this->token->symbol);
-        $member->kind= 'use';
-        $member->line= $this->token->line;
-
-        $this->token= $this->advance();
-        $types= [];
-        do {
-          $types[]= $this->scope->resolve($this->token->value);
-          $this->token= $this->advance();
-          if (',' === $this->token->value) {
-            $this->token= $this->advance();
-            continue;
-          } else {
-            break;
-          }
-        } while ($this->token->value);
-
-        $aliases= [];
-        if ('{' === $this->token->value) {
-          $this->token= $this->advance();
-          while ('}' !== $this->token->value) {
-            $method= $this->token->value;
-            $this->token= $this->advance();
-            if ('::' === $this->token->value) {
-              $this->token= $this->advance();
-              $method= $this->scope->resolve($method).'::'.$this->token->value;
-              $this->token= $this->advance();
-            }
-            $this->token= $this->expect('as');
-            $alias= $this->token->value;
-            $this->token= $this->advance();
-            $this->token= $this->expect(';');
-            $aliases[$method]= $alias;
-          }
-          $this->token= $this->expect('}');
-        } else {
-          $this->token= $this->expect(';');
-        }
-
-        $member->value= new UseExpression($types, $aliases);
-        $body[]= $member;
-      } else if ('fn' === $this->token->value) {
-        $member= new Node($this->token->symbol);
-        $member->kind= 'method';
-        $member->line= $this->token->line;
-        $comment= $this->comment;
-        $this->comment= null;
-
-        $this->token= $this->advance();
-        $name= $this->token->value;
-        $lookup= $name.'()';
-        if (isset($body[$lookup])) {
-          $this->raise('Cannot redeclare method '.$lookup);
-        }
-
-        $this->token= $this->advance();
-        $signature= $this->signature();
-
-        $this->token= $this->expect('=>');
-
-        $n= new Node($this->token->symbol);
-        $n->line= $this->token->line;
-        $n->value= $this->expressionWithThrows(0);
-        $n->kind= 'return';
-        $statements= [$n];
-        $this->token= $this->expect(';');
-
-        $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
-        $body[$lookup]= $member;
+      } else if ($f= $this->body[$this->token->value] ?? $this->body['@'.$this->token->kind] ?? null) {
+        $f($body, $annotations, $modifiers);
         $modifiers= [];
         $annotations= [];
-      } else if ('function' === $this->token->value) {
-        $member= new Node($this->token->symbol);
-        $member->kind= 'method';
-        $member->line= $this->token->line;
-        $comment= $this->comment;
-        $this->comment= null;
-
-        $this->token= $this->advance();
-        $name= $this->token->value;
-        $lookup= $name.'()';
-        if (isset($body[$lookup])) {
-          $this->raise('Cannot redeclare method '.$lookup);
-        }
-
-        $this->token= $this->advance();
-        $signature= $this->signature();
-
-        if ('{' === $this->token->value) {          // Regular body
-          $this->token= $this->advance();
-          $statements= $this->statements();
-          $this->token= $this->expect('}');
-        } else if (';' === $this->token->value) {   // Abstract or interface method
-          $statements= null;
-          $this->token= $this->expect(';');
-        } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
-          $this->warn('Hack language style compact functions are deprecated, please use `fn` syntax instead');
-
-          $n= new Node($this->token->symbol);
-          $n->line= $this->token->line;
-          $this->token= $this->advance();
-          $n->value= $this->expressionWithThrows(0);
-          $n->kind= 'return';
-          $statements= [$n];
-          $this->token= $this->expect(';');
-        } else {
-          $this->token= $this->expect('{, ; or ==>', 'method declaration');
-        }
-
-        $member->value= new Method($modifiers, $name, $signature, $statements, $annotations, $comment);
-        $body[$lookup]= $member;
-        $modifiers= [];
-        $annotations= [];
-      } else if ('const' === $this->token->value) {
-        $n= new Node($this->token->symbol);
-        $n->kind= 'const';
-        $this->token= $this->advance();
-
-        $type= null;
-        while (';' !== $this->token->value) {
-          $member= clone $n;
-          $member->line= $this->token->line;
-          $first= $this->token;
-          $this->token= $this->advance();
-
-          // Untyped `const T = 5` vs. typed `const int T = 5`
-          if ('=' === $this->token->value) {
-            $name= $first->value;
-          } else {
-            $this->queue[]= $first;
-            $this->queue[]= $this->token;
-            $this->token= $first;
-
-            $type= $this->type(false);
-            $this->token= $this->advance();
-            $name= $this->token->value;
-            $this->token= $this->advance();
-          }
-
-          if (isset($body[$name])) {
-            $this->raise('Cannot redeclare constant '.$name);
-          }
-
-          $this->token= $this->expect('=');
-          $member->value= new Constant($modifiers, $name, $type, $this->expression(0));
-          $body[$name]= $member;
-          if (',' === $this->token->value) {
-            $this->token= $this->expect(',');
-          }
-        }
-        $this->token= $this->expect(';', 'constant declaration');
-        $modifiers= [];
-      } else if ('variable' === $this->token->kind) {
-        $n= new Node($this->token->symbol);
-        $n->kind= 'property';
-        $comment= $this->comment;
-        $this->comment= null;
-
-        while (';' !== $this->token->value) {
-          $member= clone $n;
-          $member->line= $this->token->line;
-
-          // Untyped `$a` vs. typed `int $a`
-          if ('variable' === $this->token->kind) {
-            $name= $this->token->value;
-          } else {
-            $type= $this->type(false);
-            $name= $this->token->value;
-          }
-
-          $lookup= '$'.$name;
-          if (isset($body[$lookup])) {
-            $this->raise('Cannot redeclare property '.$lookup);
-          }
-
-          $this->token= $this->advance();
-          if ('=' === $this->token->value) {
-            $this->token= $this->advance();
-            $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
-          } else {
-            $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
-          }
-
-          $body[$lookup]= $member;
-          if (',' === $this->token->value) {
-            $this->token= $this->advance();
-          }
-        }
-        $modifiers= [];
-        $annotations= [];
-        $type= null;
-        $this->token= $this->next(';', 'field declaration');
       } else if ('<<' === $this->token->symbol->id) {
         do {
           $this->token= $this->advance();
@@ -1386,7 +1394,7 @@ class Parse {
         } while (null !== $this->token->value);
         $this->token= $this->advance();
       } else if ($type= $this->type()) {
-        continue;
+        $this->properties($body, $annotations, $modifiers, $type);
       } else {
         $this->raise(sprintf(
           'Expected a type, modifier, property, annotation, method or "}", have "%s"',
@@ -1541,6 +1549,10 @@ class Parse {
       return $node;
     };
     return $suffix;
+  }
+
+  private function body($id, $func) {
+    $this->body[$id]= $func;
   }
   // }}}
 
