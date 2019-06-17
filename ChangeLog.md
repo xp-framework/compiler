@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #45 - Multiple errors - @thekid
 * Changed compiler to emit deprecation warnings for Hack language style
   arrow functions and compact methods using `==>`, instead advocating the
   use of PHP 7.4 with the `fn` keyword.
