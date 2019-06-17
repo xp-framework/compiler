@@ -166,7 +166,7 @@ class ExceptionsTest extends EmittingTest {
   #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_compact_method() {
     $t= $this->type('class <T> {
-      public function run() ==> throw new \\lang\\IllegalArgumentException("test");
+      public fn run() => throw new \\lang\\IllegalArgumentException("test");
     }');
     $t->newInstance()->run();
   }
