@@ -158,9 +158,9 @@ class Parse {
     });
 
     $this->infix('==>', 80, function($node, $left) {
-      trigger_error('Hack language style arrow functions are deprecated, please use `fn` syntax instead on line '.$this->token->line);
-      $signature= new Signature([new Parameter($left->value, null)], null);
+      $this->warn('Hack language style arrow functions are deprecated, please use `fn` syntax instead');
 
+      $signature= new Signature([new Parameter($left->value, null)], null);
       if ('{' === $this->token->value) {
         $this->token= $this->expect('{');
         $statements= $this->statements();
@@ -273,7 +273,7 @@ class Parse {
       $this->queue= array_merge($skipped, $this->queue);
 
       if (':' === $this->token->value || '==>' === $this->token->value) {
-        trigger_error('Hack language style arrow functions are deprecated, please use `fn` syntax instead on line '.$this->token->line);
+        $this->warn('Hack language style arrow functions are deprecated, please use `fn` syntax instead');
 
         $node->kind= 'lambda';
         $this->token= $this->advance();
@@ -1259,7 +1259,7 @@ class Parse {
           $statements= null;
           $this->token= $this->expect(';');
         } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
-          trigger_error('Hack language style compact functions are deprecated, please use `fn` syntax instead on line '.$this->token->line);
+          $this->warn('Hack language style compact functions are deprecated, please use `fn` syntax instead');
 
           $n= new Node($this->token->symbol);
           $n->line= $this->token->line;
@@ -1537,6 +1537,18 @@ class Parse {
   private function raise($message, $context= null) {
     $context && $message.= ' in '.$context;
     throw new Error($message, $this->file, $this->token->line);
+  }
+
+  /**
+   * Emit a warning
+   *
+   * @param  string $error
+   * @param  string $context
+   * @return void
+   */
+  private function warn($message, $context= null) {
+    $context && $message.= ' ('.$context.')';
+    trigger_error($message.' in '.$this->file.' on line '.$this->token->line);
   }
 
   /**
