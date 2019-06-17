@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed compiler to emit deprecation warnings for Hack language style
+  arrow functions and compact methods using `==>`, instead advocating the
+  use of PHP 7.4 with the `fn` keyword.
+  (@thekid)
+
 ## 2.13.0 / 2019-06-15
 
 * Added preliminary PHP 8 support - see #62 (@thekid)

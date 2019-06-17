@@ -193,6 +193,7 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(2, $r(1));
+    \xp::gc();
   }
 
   #[@test]
@@ -204,6 +205,7 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(2, $r(1));
+    \xp::gc();
   }
 
   #[@test]
@@ -216,5 +218,6 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(3, $r);
+    \xp::gc();
   }
 }

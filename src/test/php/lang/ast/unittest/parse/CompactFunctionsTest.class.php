@@ -8,6 +8,7 @@ class CompactFunctionsTest extends ParseTest {
       [['function' => ['a', [[], null], [['==>' => ['null' => 'null']]]]]],
       $this->parse('function a() ==> null;')
     );
+    \xp::gc();
   }
 
   #[@test]
@@ -19,5 +20,6 @@ class CompactFunctionsTest extends ParseTest {
       ], [], null]]],
       $this->parse('class A { public function a() ==> true; }')
     );
+    \xp::gc();
   }
 }

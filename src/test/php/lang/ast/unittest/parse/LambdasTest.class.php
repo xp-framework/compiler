@@ -9,6 +9,7 @@ class LambdasTest extends ParseTest {
       [['(' => [[[['a', false, null, false, null, null, []]], null], $block]]],
       $this->parse('($a) ==> $a + 1;')
     );
+    \xp::gc();
   }
 
   #[@test]
@@ -20,6 +21,7 @@ class LambdasTest extends ParseTest {
       ]]]],
       $this->parse('exec(($a) ==> $a + 1);')
     );
+    \xp::gc();
   }
 
   #[@test]
@@ -29,5 +31,6 @@ class LambdasTest extends ParseTest {
       [['(' => [[[['a', false, null, false, null, null, []]], null], [['return' => $block]]]]],
       $this->parse('($a) ==> { return $a + 1; };')
     );
+    \xp::gc();
   }
 }

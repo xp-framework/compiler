@@ -158,6 +158,7 @@ class Parse {
     });
 
     $this->infix('==>', 80, function($node, $left) {
+      trigger_error('Hack language style arrow functions are deprecated, please use `fn` syntax instead on line '.$this->token->line);
       $signature= new Signature([new Parameter($left->value, null)], null);
 
       if ('{' === $this->token->value) {
@@ -272,8 +273,9 @@ class Parse {
       $this->queue= array_merge($skipped, $this->queue);
 
       if (':' === $this->token->value || '==>' === $this->token->value) {
-        $node->kind= 'lambda';
+        trigger_error('Hack language style arrow functions are deprecated, please use `fn` syntax instead on line '.$this->token->line);
 
+        $node->kind= 'lambda';
         $this->token= $this->advance();
         $signature= $this->signature();
         $this->token= $this->advance();
@@ -1257,6 +1259,8 @@ class Parse {
           $statements= null;
           $this->token= $this->expect(';');
         } else if ('==>' === $this->token->value) { // Compact syntax, terminated with ';'
+          trigger_error('Hack language style compact functions are deprecated, please use `fn` syntax instead on line '.$this->token->line);
+
           $n= new Node($this->token->symbol);
           $n->line= $this->token->line;
           $this->token= $this->advance();

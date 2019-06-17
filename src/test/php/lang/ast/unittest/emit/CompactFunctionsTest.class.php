@@ -45,5 +45,6 @@ class CompactFunctionsTest extends EmittingTest {
       public function run() ==> "test";
     }');
     $this->assertEquals('test', $r);
+    \xp::gc();
   }
 }
