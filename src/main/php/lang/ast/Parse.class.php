@@ -1337,7 +1337,10 @@ class Parse {
       if (isset($modifier[$this->token->value])) {
         $modifiers[]= $this->token->value;
         $this->token= $this->advance();
-      } else if ($f= $this->body[$this->token->value] ?? $this->body['@'.$this->token->kind] ?? null) {
+      } else if (isset($this->body[$k= $this->token->value])
+        ? ($f= $this->body[$k])
+        : (isset($this->body[$k= '@'.$this->token->kind]) ? ($f= $this->body[$k]) : null)
+      ) {
         $f($body, $annotations, $modifiers);
         $modifiers= [];
         $annotations= [];
