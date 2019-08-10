@@ -60,7 +60,9 @@ class Scope {
    * @return string
    */
   public function resolve($name) {
-    if (isset(self::$reserved[$name])) {
+    if (null === $name) {
+      return '';
+    } else if (isset(self::$reserved[$name])) {
       return $name;
     } else if ('\\' === $name[0]) {
       return $name;
