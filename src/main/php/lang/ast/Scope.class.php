@@ -62,7 +62,7 @@ class Scope {
   public function resolve($name) {
     if (isset(self::$reserved[$name])) {
       return $name;
-    } else if ('\\' === $name{0}) {
+    } else if ('\\' === $name[0]) {
       return $name;
     } else if (isset($this->imports[$name])) {
       return $this->imports[$name];
