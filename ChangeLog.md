@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.0.0 / 2019-08-10
+
 * Made compatible with PHP 7.4 - refrain using `{}` for string offsets
   (@thekid)
 * Merged PR #45 - Multiple errors - @thekid
