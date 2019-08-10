@@ -20,7 +20,7 @@ class Tokens implements \IteratorAggregate {
     '/' => ['/='],
     '~' => ['~='],
     '%' => ['%='],
-    '?' => ['?:', '??', '?->'],
+    '?' => ['?:', '??', '?->', '??='],
     '.' => ['.=', '...'],
     ':' => ['::'],
     "\303" => ["\303\227"]
@@ -69,10 +69,10 @@ class Tokens implements \IteratorAggregate {
         continue;
       } else if (0 === strcspn($token, '0123456789')) {
         if ('.' === ($next= $this->source->nextToken())) {
-          yield 'decimal' => [$token.$next.$this->source->nextToken(), $line];
+          yield 'decimal' => [str_replace('_', '', $token.$next.$this->source->nextToken()), $line];
         } else {
           $this->source->pushBack($next);
-          yield 'integer' => [$token, $line];
+          yield 'integer' => [str_replace('_', '', $token), $line];
         }
       } else if (0 === strcspn($token, self::DELIMITERS)) {
         if ('.' === $token) {

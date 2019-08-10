@@ -3,6 +3,22 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #45 - Multiple errors - @thekid
+* Changed compiler to emit deprecation warnings for Hack language style
+  arrow functions and compact methods using `==>`, instead advocating the
+  use of PHP 7.4 with the `fn` keyword; see issue #65
+  (@thekid)
+
+## 2.13.0 / 2019-06-15
+
+* Added preliminary PHP 8 support - see #62 (@thekid)
+* Added [support for PHP 7.4 features](https://github.com/xp-framework/compiler/projects/2)
+  - Implemented numeric literal separator, e.g. `1_000_000_000` - see #61
+  - Implemented null-colaesce assignment operator `??=` - see #58
+  - Implemented support PHP 7.4-style short closures with `fn` - see #60
+  - Implemented support for emitting typed properties in PHP 7.4 - see #57
+  (@thekid)
+
 ## 2.12.0 / 2018-12-28
 
 * Added support for [PHP 7.3](http://php.net/archive/2018.php#id2018-12-06-1)

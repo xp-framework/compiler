@@ -52,10 +52,10 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test, @expect(
   #  class= ClassFormatException::class,
-  #  withMessage= '/Syntax error in .+Errors.php, line 2: Expected ";", have "Syntax"/'
+  #  withMessage= 'Compiler error: Expected "{", have "(end)"'
   #)]
   public function load_class_with_syntax_errors() {
-    $this->load('Errors', "<?php\n<Syntax error in line 2>");
+    $this->load('Errors', "<?php\nclass");
   }
 
   #[@test]

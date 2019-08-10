@@ -169,6 +169,9 @@ class CompilingClassLoader implements IClassLoader {
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
       throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
+    } catch (\Exception $e) {
+      unset(\xp::$cl[$class]);
+      throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
     } finally {
       \xp::$cll--;
       unset(Compiled::$source[$uri]);
@@ -181,6 +184,39 @@ class CompilingClassLoader implements IClassLoader {
       foreach ($invocations as $inv) $inv($name);
     }
     return $name;
+  }
+
+  /**
+   * Loads class bytes
+   *
+   * @param  string $class
+   * @return string
+   * @throws lang.ClassLoadingException
+   */
+  public function loadClassBytes($class) {
+    if (null === ($source= $this->locateSource($class))) {
+      throw new ClassNotFoundException($class);  
+    }
+
+    $declaration= new MemoryOutputStream();
+    $file= strtr($class, '.', '/').self::EXTENSION;
+    $in= $source->getResourceAsStream($file)->in();
+
+    try {
+      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
+      $emitter= $this->emit->newInstance($declaration);
+      foreach (Transformations::registered() as $kind => $function) {
+        $emitter->transform($kind, $function);
+      }
+      $emitter->emit($parse->execute());
+
+      return $declaration->getBytes();
+    } catch (Errors $e) {
+      $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
+      throw new ClassFormatException($message);
+    } finally {
+      $in->close();
+    }
   }
 
   /**

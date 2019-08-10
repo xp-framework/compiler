@@ -11,7 +11,7 @@ class CompactFunctionsTest extends EmittingTest {
   #[@test]
   public function with_scalar() {
     $r= $this->run('class <T> {
-      public function run() ==> "test";
+      public fn run() => "test";
     }');
     $this->assertEquals('test', $r);
   }
@@ -21,7 +21,7 @@ class CompactFunctionsTest extends EmittingTest {
     $r= $this->run('class <T> {
       private $id= "test";
 
-      public function run() ==> $this->id;
+      public fn run() => $this->id;
     }');
     $this->assertEquals('test', $r);
   }
@@ -29,13 +29,22 @@ class CompactFunctionsTest extends EmittingTest {
   #[@test]
   public function combined_with_argument_promotion() {
     $r= $this->run('class <T> {
-      public function withId(private $id) ==> $this;
-      public function id() ==> $this->id;
+      public fn withId(private $id) => $this;
+      public fn id() => $this->id;
 
       public function run() {
         return $this->withId("test")->id();
       }
     }');
     $this->assertEquals('test', $r);
+  }
+
+  #[@test]
+  public function hacklang_variation_also_supported() {
+    $r= $this->run('class <T> {
+      public function run() ==> "test";
+    }');
+    $this->assertEquals('test', $r);
+    \xp::gc();
   }
 }
