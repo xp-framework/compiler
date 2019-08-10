@@ -10,6 +10,7 @@ php:
   - 7.1
   - 7.2
   - 7.3
+  - 7.4snapshot
   - nightly
 
 matrix:
@@ -17,7 +18,7 @@ matrix:
     - php: nightly
 
 before_script:
-  - curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-master.sh > xp-run
+  - curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run
   - composer install --prefer-dist
   - echo "vendor/autoload.php" > composer.pth
 
