@@ -92,7 +92,7 @@ class Tokens implements \IteratorAggregate {
             do {
               $t= $this->source->nextToken('/');
               $comment.= $t;
-            } while ('*' !== $t{strlen($t)- 1} && $this->source->hasMoreTokens());
+            } while ('*' !== $t[strlen($t)- 1] && $this->source->hasMoreTokens());
             $comment.= $this->source->nextToken('/');
             yield 'comment' => [trim(preg_replace('/\n\s+\* ?/', "\n", substr($comment, 1, -2))), $line];
             $line+= substr_count($comment, "\n");

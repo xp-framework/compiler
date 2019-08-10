@@ -7,15 +7,12 @@
   "keywords": ["module", "xp"],
   "require" : {
     "xp-framework/core": "^9.0 | ^8.0 | ^7.0 | ^6.10",
-    "xp-framework/tokenize": "^8.0",
-    "xp-framework/ast": "^1.3",
+    "xp-framework/tokenize": "^8.1",
+    "xp-framework/ast": "^1.4",
     "php" : ">=5.6.0"
   },
   "require-dev" : {
     "xp-framework/unittest": "^9.3"
-  },
-  "suggest" : {
-    "xp-framework/core": "^9.4"
   },
   "bin": ["bin/xp.xp-framework.compiler.compile"],
   "autoload" : {

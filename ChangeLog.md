@@ -3,10 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Made compatible with PHP 7.4 - refrain using `{}` for string offsets
+  (@thekid)
 * Merged PR #45 - Multiple errors - @thekid
 * Changed compiler to emit deprecation warnings for Hack language style
   arrow functions and compact methods using `==>`, instead advocating the
-  use of PHP 7.4 with the `fn` keyword.
+  use of PHP 7.4 with the `fn` keyword; see issue #65
   (@thekid)
 
 ## 2.13.0 / 2019-06-15

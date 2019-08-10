@@ -88,8 +88,15 @@ class Compiled implements OutputStream {
     // NOOP
   }
 
-  /** @return void */
-  public function stream_flush() {
-    // NOOP
+  /**
+   * Stream wrapper method stream_set_option
+   *
+   * @param  int $option
+   * @param  int $arg1
+   * @param  int $arg2
+   * @return bool
+   */
+  public function stream_set_option($option, $arg1, $arg2) {
+    return true;
   }
 }
