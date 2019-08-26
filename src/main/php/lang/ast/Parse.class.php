@@ -501,6 +501,46 @@ class Parse {
       return $node;
     });
 
+    $this->prefix('switch', function($node) {
+      $this->token= $this->expect('(');
+      $condition= $this->expression(0);
+      $this->token= $this->expect(')');
+
+      $cases= [];
+      $this->token= $this->expect('{');
+      while ('}' !== $this->token->value) {
+        if ('default' === $this->token->value) {
+          $this->token= $this->advance();
+          $expr= null;
+        } else if ('case' === $this->token->value) {
+          $expr= [];
+          do {
+            $this->token= $this->advance();
+            if ('(' === $this->token->value) {
+              $this->token= $this->advance();
+              $expr[]= $this->scope->resolve($this->token->value);
+              $this->token= $this->advance();
+              $this->token= $this->expect(')');
+            } else {
+              $expr[]= $this->expression(0);
+            }
+          } while (',' === $this->token->value);
+        } else {
+          $this->expect('Either default or case');
+          break;
+        }
+
+        $this->token= $this->expect('=>');
+        $cases[]= new CaseLabel($expr, [$this->expressionWithThrows(0)]);
+        $this->token= $this->expect(';');
+      }
+      $this->token= $this->advance();
+
+      $node->value= new SwitchStatement($condition, $cases);
+      $node->kind= 'switchexpr';
+      return $node;
+    });
+
     $this->stmt('<?', function($node) {
       $node->kind= 'start';
       $node->value= $this->token->value;

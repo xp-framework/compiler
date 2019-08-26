@@ -631,6 +631,33 @@ abstract class Emitter {
     $this->out->write('}');
   }
 
+  protected function emitSwitchExpr($switch) {
+    static $is= ['string' => 1, 'int' => 1, 'float' => 1, 'bool' => 1, 'array' => 1, 'object' => 1, 'iterable' => 1, 'callable' => 1];
+
+    $t= $this->temp();
+    $this->out->write('['.$t.'=');
+    $this->emit($switch->expression);
+    $this->out->write(',');
+    $c= 0;
+    foreach ($switch->cases as $case) {
+      if (null === $case->expression) {
+        $this->emit($case->body[0]);
+      } else foreach ($case->expression as $i => $expr) {
+        if (is_string($expr)) {
+          $this->out->write(isset($is[$expr]) ? 'is_'.$expr.'('.$t.')' : $t.' instanceof '.$expr);
+        } else {
+          $this->out->write($t.'===');
+          $this->emit($expr);
+        }
+        $this->out->write('?');
+        $this->emit($case->body[0]);
+        $this->out->write(':(');
+        $c++;
+      }
+    }
+    $this->out->write(str_repeat(')', $c).'][1]');
+  }
+
   protected function emitCatch($catch) {
     if (empty($catch->types)) {
       $this->out->write('catch(\\Throwable $'.$catch->variable.') {');
