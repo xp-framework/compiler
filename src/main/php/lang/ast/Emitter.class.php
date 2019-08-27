@@ -742,6 +742,49 @@ abstract class Emitter {
     $this->out->write('goto '.$goto);
   }
 
+  protected function emitIs($instanceof) {
+    static $is= ['string' => 1, 'int' => 1, 'float' => 1, 'bool' => 1, 'array' => 1, 'object' => 1, 'callable' => 1];
+
+    if ($instanceof->type instanceof Node) {
+      $this->out->write('is(');
+      $this->emit($instanceof->type);
+      $this->out->write(',');
+      $this->emit($instanceof->expression);
+      $this->out->write(')');
+      return;
+    }
+
+    if ('?' === $instanceof->type[0]) {
+      $t= $this->temp();
+      $this->out->write('null===('.$t.'=');
+      $this->emit($instanceof->expression);
+      $this->out->write(')||');
+
+      $type= substr($instanceof->type, 1);
+      if ('iterable' === $type) {
+        $this->out->write('is_array('.$t.')||'.$t.' instanceof \\Traversable');
+      } else if (isset($is[$type])) {
+        $this->out->write('is_'.$type.'('.$t.')');
+      } else {
+        $this->out->write($t.' instanceof '.$type);
+      }
+    } else {
+      if ('iterable' === $instanceof->type) {
+        $t= $this->temp();
+        $this->out->write('is_array('.$t.'=');
+        $this->emit($instanceof->expression);
+        $this->out->write(')||'.$t.' instanceof \\Traversable');
+      } else if (isset($is[$instanceof->type])) {
+        $this->out->write('is_'.$instanceof->type.'(');
+        $this->emit($instanceof->expression);
+        $this->out->write(')');
+      } else {
+        $this->emit($instanceof->expression);
+        $this->out->write(' instanceof '.$instanceof->type);
+      }
+    }
+  }
+
   protected function emitInstanceOf($instanceof) {
     $this->emit($instanceof->expression);
     $this->out->write(' instanceof ');

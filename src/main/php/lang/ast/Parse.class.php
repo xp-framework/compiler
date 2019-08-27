@@ -121,6 +121,22 @@ class Parse {
       return $node;
     });
 
+    $this->infix('is', 60, function($node, $left) {
+      if ('?' === $this->token->value) {
+        $this->token= $this->advance();
+        $node->value= new InstanceOfExpression($left, '?'.$this->scope->resolve($this->token->value));
+        $this->token= $this->advance();
+      } else if ('name' === $this->token->kind) {
+        $node->value= new InstanceOfExpression($left, $this->scope->resolve($this->token->value));
+        $this->token= $this->advance();
+      } else {
+        $node->value= new InstanceOfExpression($left, $this->expression(0));
+      }
+
+      $node->kind= 'is';
+      return $node;
+    });
+
     $this->infix('->', 80, function($node, $left) {
       if ('{' === $this->token->value) {
         $this->token= $this->advance();
