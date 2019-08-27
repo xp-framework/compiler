@@ -92,7 +92,7 @@ class IsOperatorTest extends EmittingTest {
   }
 
   #[@test]
-  public function is_array_type() {
+  public function is_array_pseudo_type() {
     $r= $this->run('class <T> {
       public function run() {
         return [[] is array, [1, 2, 3] is array, ["key" => "value"] is array, null is array];
@@ -103,7 +103,7 @@ class IsOperatorTest extends EmittingTest {
   }
 
   #[@test]
-  public function is_object_type() {
+  public function is_object_pseudo_type() {
     $r= $this->run('class <T> {
       public function run() {
         return [$this is object, function() { } is object, null is object];
@@ -114,7 +114,7 @@ class IsOperatorTest extends EmittingTest {
   }
 
   #[@test]
-  public function is_callable_type() {
+  public function is_callable_pseudo_type() {
     $r= $this->run('class <T> {
       public function run() {
         return [function() { } is callable, [$this, "run"] is callable, null is callable];
@@ -125,7 +125,7 @@ class IsOperatorTest extends EmittingTest {
   }
 
   #[@test]
-  public function is_iterable_type() {
+  public function is_native_iterable_type() {
     $r= $this->run('class <T> implements \IteratorAggregate {
       public function getIterator() {
         yield 1;
@@ -137,5 +137,49 @@ class IsOperatorTest extends EmittingTest {
     }');
 
     $this->assertEquals([true, true, false], $r);
+  }
+
+  #[@test]
+  public function is_map_type() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [["key" => "value"] is array<string, string>, null is array<string, string>];
+      }
+    }');
+
+    $this->assertEquals([true, false], $r);
+  }
+
+  #[@test]
+  public function is_array_type() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [["key"] is array<string>, ["key"] is array<int>, null is array<string>];
+      }
+    }');
+
+    $this->assertEquals([true, false, false], $r);
+  }
+
+  #[@test]
+  public function is_union_type() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [1 is int|string, "test" is int|string, null is int|string];
+      }
+    }');
+
+    $this->assertEquals([true, true, false], $r);
+  }
+
+  #[@test]
+  public function is_function_type() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [function(int $a): int { } is function(int): int, null is function(int): int];
+      }
+    }');
+
+    $this->assertEquals([true, false], $r);
   }
 }

@@ -752,15 +752,26 @@ abstract class Emitter {
       $this->emit($instanceof->expression);
       $this->out->write(')');
       return;
+    } else if (
+      $instanceof->type instanceof MapType ||
+      $instanceof->type instanceof ArrayType ||
+      $instanceof->type instanceof UnionType ||
+      $instanceof->type instanceof FunctionType
+    ) {
+      $this->out->write('is("'.$instanceof->type->name().'",');
+      $this->emit($instanceof->expression);
+      $this->out->write(')');
+      return;
     }
 
-    if ('?' === $instanceof->type[0]) {
+    $type= $instanceof->type->literal();
+    if ('?' === $type[0]) {
       $t= $this->temp();
       $this->out->write('null===('.$t.'=');
       $this->emit($instanceof->expression);
       $this->out->write(')||');
 
-      $type= substr($instanceof->type, 1);
+      $type= substr($type, 1);
       if ('iterable' === $type) {
         $this->out->write('is_array('.$t.')||'.$t.' instanceof \\Traversable');
       } else if (isset($is[$type])) {
@@ -769,18 +780,18 @@ abstract class Emitter {
         $this->out->write($t.' instanceof '.$type);
       }
     } else {
-      if ('iterable' === $instanceof->type) {
+      if ('iterable' === $type) {
         $t= $this->temp();
         $this->out->write('is_array('.$t.'=');
         $this->emit($instanceof->expression);
         $this->out->write(')||'.$t.' instanceof \\Traversable');
-      } else if (isset($is[$instanceof->type])) {
-        $this->out->write('is_'.$instanceof->type.'(');
+      } else if (isset($is[$type])) {
+        $this->out->write('is_'.$type.'(');
         $this->emit($instanceof->expression);
         $this->out->write(')');
       } else {
         $this->emit($instanceof->expression);
-        $this->out->write(' instanceof '.$instanceof->type);
+        $this->out->write(' instanceof '.$type);
       }
     }
   }
