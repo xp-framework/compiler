@@ -182,4 +182,16 @@ class IsOperatorTest extends EmittingTest {
 
     $this->assertEquals([true, false], $r);
   }
+
+  #[@test]
+  public function precedence() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $arg= "Test";
+        return $arg is string ? sprintf("string <%s>", $arg) : typeof($arg)->literal();
+      }
+    }');
+
+    $this->assertEquals('string <Test>', $r);
+  }
 }
