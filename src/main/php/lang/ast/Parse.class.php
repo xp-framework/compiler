@@ -1162,7 +1162,7 @@ class Parse {
         $promote= null;
       }
 
-      $type= $this->type($parse, );
+      $type= $this->type($parse);
 
       if ('...' === $this->token->value) {
         $variadic= true;
