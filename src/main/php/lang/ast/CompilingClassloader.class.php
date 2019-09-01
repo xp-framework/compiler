@@ -13,14 +13,12 @@ class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
   private static $instance= [];
-  private $syntax= [];
   private $version;
 
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      $this->syntax[]= $class->newInstance();
       Compiled::$syntax[]= $class->newInstance();
     }
 
