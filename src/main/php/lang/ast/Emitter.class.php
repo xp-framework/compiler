@@ -1,7 +1,5 @@
 <?php namespace lang\ast;
 
-use io\streams\MemoryOutputStream;
-use io\streams\StringWriter;
 use lang\IllegalArgumentException;
 use lang\ast\nodes\Value;
 use lang\reflect\Package;

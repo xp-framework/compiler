@@ -1,5 +1,8 @@
 <?php namespace lang\ast;
 
+use io\streams\MemoryOutputStream;
+use io\streams\StringWriter;
+
 class Result {
   private $id= 0;
 
