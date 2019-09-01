@@ -7,6 +7,7 @@ use lang\ast\Emitter;
 use lang\ast\Errors;
 use lang\ast\Language;
 use lang\ast\Parse;
+use lang\ast\Result;
 use lang\ast\Tokens;
 use text\StreamTokenizer;
 use util\cmd\Console;
@@ -66,7 +67,12 @@ class CompileRunner {
       }
     }
 
-    $emit= Emitter::forRuntime($target);
+    $lang= Language::named('PHP');
+    $emit= Emitter::forRuntime($target)->newInstance();
+    foreach (CompilingClassloader::$syntax as $syntax) {
+      $syntax->setup($lang, $emit);
+    }
+
     $input= Input::newInstance($in);
     $output= Output::newInstance($out);
 
@@ -77,13 +83,8 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= new Parse(Language::named('PHP'), new Tokens(new StreamTokenizer($in)), $file);
-        $emitter= $emit->newInstance($output->target((string)$path));
-        foreach (CompilingClassloader::$syntax as $syntax) {
-          $syntax->setup($parse->language, $emitter);
-        }
-
-        $emitter->emit($parse->execute());
+        $parse= new Parse($lang, new Tokens(new StreamTokenizer($in)), $file);
+        $emit->emit(new Result($output->target((string)$path)), $parse->execute());
 
         $t->stop();
         Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
@@ -104,7 +105,7 @@ class CompileRunner {
       $errors ? "\033[41;1;37m×" : "\033[42;1;37m♥",
       $total,
       $out,
-      $emit->getName(),
+      typeof($emit)->getName(),
       $errors
     );
     Console::$err->writeLinef(
