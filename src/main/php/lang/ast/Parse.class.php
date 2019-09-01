@@ -174,7 +174,7 @@ class Parse {
 
     self::infix('{', 80, function($parse, $node, $left) {
       $expr= $parse->expression(0);
-      $parse->token= $parse->next('}');
+      $parse->expecting('}', 'dynamic member');
 
       $node->value= new OffsetExpression($left, $expr);
       $node->kind= 'offset';
@@ -183,7 +183,7 @@ class Parse {
 
     self::infix('?', 80, function($parse, $node, $left) {
       $when= $parse->expressionWithThrows(0);
-      $parse->token= $parse->next(':');
+      $parse->expecting(':', 'ternary');
       $else= $parse->expressionWithThrows(0);
       $node->value= new TernaryExpression($left, $when, $else);
       $node->kind= 'ternary';
@@ -358,12 +358,12 @@ class Parse {
     self::prefix('fn', function($parse, $node) {
       $signature= $parse->signature();
 
-      $parse->token= $parse->expect('=>');
+      $parse->expecting('=>', 'fn');
 
       if ('{' === $parse->token->value) {
-        $parse->token= $parse->expect('{');
+        $parse->expecting('{', 'fn');
         $statements= $parse->statements();
-        $parse->token= $parse->expect('}');
+        $parse->expecting('}', 'fn');
       } else {
         $statements= $parse->expressionWithThrows(0);
       }
@@ -395,16 +395,16 @@ class Parse {
             }
             $parse->forward();
             if (')' === $parse->token->value) break;
-            $parse->token= $parse->expect(',', 'use list');
+            $parse->expecting(',', 'use list');
           }
-          $parse->token= $parse->expect(')');
+          $parse->expecting(')', 'closure');
         } else {
           $use= null;
         }
 
-        $parse->token= $parse->expect('{');
+        $parse->expecting('{', 'function');
         $statements= $parse->statements();
-        $parse->token= $parse->expect('}');
+        $parse->expecting('}', 'function');
 
         $node->value= new ClosureExpression($signature, $use, $statements);
       } else {
@@ -420,11 +420,11 @@ class Parse {
           $n->line= $parse->token->line;
           $n->kind= 'return';
           $statements= [$n];
-          $parse->token= $parse->next(';');
+          $parse->expecting(';', 'function');
         } else {                              // Regular function
-          $parse->token= $parse->expect('{');
+          $parse->expecting('{', 'function');
           $statements= $parse->statements();
-          $parse->token= $parse->expect('}');
+          $parse->expecting('}', 'function');
         }
 
         $parse->queue= [$parse->token];
@@ -939,7 +939,7 @@ class Parse {
           $parse->raise('Cannot redeclare constant '.$name);
         }
 
-        $parse->token= $parse->expect('=');
+        $parse->expecting('=', 'const');
         $member->value= new Constant($modifiers, $name, $type, $parse->expression(0));
         $body[$name]= $member;
         if (',' === $parse->token->value) {
@@ -1023,47 +1023,47 @@ class Parse {
 
   private function type0($parse, $optional) {
     if ('?' === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       $type= '?'.$parse->scope->resolve($this->token->value);
-      $this->token= $this->advance();
+      $this->forward();
     } else if ('(' === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       $type= $this->type($parse, false);
-      $this->token= $this->advance();
+      $this->forward();
       return $type;
     } else if ('name' === $this->token->kind && 'function' === $this->token->value) {
-      $this->token= $this->advance();
-      $this->token= $this->expect('(');
+      $this->forward();
+      $this->expecting('(', 'type');
       $signature= [];
       if (')' !== $this->token->value) do {
         $signature[]= $this->type($parse, false);
         if (',' === $this->token->value) {
-          $this->token= $this->advance();
+          $this->forward();
         } else if (')' === $this->token->value) {
           break;
         } else {
-          $this->token= $this->next(', or )', 'function type');
+          $this->expecting(', or )', 'function type');
         }
       } while (null !== $this->token->value);
-      $this->token= $this->expect(')');
-      $this->token= $this->expect(':');
+      $this->expecting(')', 'type');
+      $this->expecting(':', 'type');
       return new FunctionType($signature, $this->type($parse, false));
     } else if ('name' === $this->token->kind) {
       $type= $parse->scope->resolve($this->token->value);
-      $this->token= $this->advance();
+      $this->forward();
     } else if ($optional) {
       return null;
     } else {
-      $this->expect('type name');
+      $this->expecting('type name', 'type');
     }
 
     if ('<' === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       $components= [];
       do {
         $components[]= $this->type($parse, false);
         if (',' === $this->token->value) {
-          $this->token= $this->advance();
+          $this->forward();
         } else if ('>' === $this->token->symbol->id) {
           break;
         } else if ('>>' === $this->token->value) {
@@ -1071,7 +1071,7 @@ class Parse {
           break;
         }
       } while (true);
-      $this->token= $this->expect('>');
+      $this->expecting('>', 'type');
 
       if ('array' === $type) {
         return 1 === sizeof($components) ? new ArrayType($components[0]) : new MapType($components[0], $components[1]);
@@ -1106,9 +1106,9 @@ class Parse {
         $this->raise('Cannot redeclare property '.$lookup);
       }
 
-      $this->token= $this->advance();
+      $this->forward();
       if ('=' === $this->token->value) {
-        $this->token= $this->advance();
+        $this->forward();
         $member->value= new Property($modifiers, $name, $type, $this->expression(0), $annotations, $comment);
       } else {
         $member->value= new Property($modifiers, $name, $type, null, $annotations, $comment);
@@ -1116,10 +1116,10 @@ class Parse {
 
       $body[$lookup]= $member;
       if (',' === $this->token->value) {
-        $this->token= $this->advance();
+        $this->forward();
       }
     }
-    $this->token= $this->next(';', 'field declaration');
+    $this->expecting(';', 'field declaration');
   }
 
   private function parameters($parse) {
@@ -1130,15 +1130,15 @@ class Parse {
     while (')' !== $this->token->value) {
       if ('<<' === $this->token->value) {
         do {
-          $this->token= $this->advance();
+          $this->forward();
 
           $name= $this->token->value;
-          $this->token= $this->advance();
+          $this->forward();
 
           if ('(' === $this->token->value) {
-            $this->token= $this->expect('(');
+            $this->expecting('(', 'parameters');
             $annotations[$name]= $this->expression(0);
-            $this->token= $this->expect(')');
+            $this->expecting(')', 'parameters');
           } else {
             $annotations[$name]= null;
           }
@@ -1148,15 +1148,15 @@ class Parse {
           } else if ('>>' === $this->token->value) {
             break;
           } else {
-            $this->token= $this->next(', or >>', 'parameter annotation');
+            $this->expecting(', or >>', 'parameter annotation');
           }
         } while (null !== $this->token->value);
-        $this->token= $this->expect('>>', 'parameter annotation');
+        $this->expecting('>>', 'parameter annotation');
       }
 
       if ('name' === $this->token->kind && isset($promotion[$this->token->value])) {
         $promote= $this->token->value;
-        $this->token= $this->advance();
+        $this->forward();
       } else {
         $promote= null;
       }
@@ -1165,31 +1165,37 @@ class Parse {
 
       if ('...' === $this->token->value) {
         $variadic= true;
-        $this->token= $this->advance();
+        $this->forward();
       } else {
         $variadic= false;
       }
 
       if ('&' === $this->token->value) {
         $byref= true;
-        $this->token= $this->advance();
+        $this->forward();
       } else {
         $byref= false;
       }
 
       $name= $this->token->value;
-      $this->token= $this->advance();
+      $this->forward();
 
       $default= null;
       if ('=' === $this->token->value) {
-        $this->token= $this->advance();
+        $this->forward();
         $default= $this->expression(0);
       }
       $parameters[]= new Parameter($name, $type, $default, $byref, $variadic, $promote, $annotations);
-
-      if (')' === $this->token->value) break;
-      $this->token= $this->expect(',', 'parameter list');
       $annotations= [];
+
+      if (')' === $this->token->value) {
+        break;
+      } else if (',' === $this->token->value) {
+        $this->forward();
+        continue;
+      } else {
+        $this->token= $this->expect(',', 'parameter list');
+      }
     }
     return $parameters;
   }
@@ -1310,29 +1316,9 @@ class Parse {
    * @param  int $line
    * @return void
    */
-  private function raise($message, $context= null, $line= null) {
+  public function raise($message, $context= null, $line= null) {
     $context && $message.= ' in '.$context;
     $this->errors[]= new Error($message, $this->file, $line ?: $this->token->line);
-  }
-
-  /**
-   * Expect a given token, raise an error if another is encountered
-   *
-   * @param  string $id
-   * @param  string $context
-   * @return var
-   */
-  private function next($id, $context= null) {
-    if ($id === $this->token->symbol->id) return $this->advance();
-
-    $message= sprintf(
-      'Expected "%s", have "%s"%s',
-      $id,
-      $this->token->value ?: $this->token->symbol->id,
-      $context ? ' in '.$context : ''
-    );
-    $this->errors[]= new Error($message, $this->file, $this->token->line);
-    return $this->token;
   }
 
   /**
@@ -1365,45 +1351,8 @@ class Parse {
       throw new Error($message, $this->file, $this->token->line);
     }
 
-    return $this->advance();
-  }
-
-  private function advance() {
-    static $line= 1;
-
-    if ($this->queue) return array_shift($this->queue);
-
-    while ($this->tokens->valid()) {
-      $type= $this->tokens->key();
-      list($value, $line)= $this->tokens->current();
-      $this->tokens->next();
-      if ('name' === $type) {
-        $node= new Node(isset(self::$symbols[$value]) ? self::$symbols[$value] : self::symbol('(name)'));
-        $node->kind= $type;
-      } else if ('operator' === $type) {
-        $node= new Node(self::symbol($value));
-        $node->kind= $type;
-      } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {
-        $node= new Node(self::symbol('(literal)'));
-        $node->kind= 'literal';
-      } else if ('variable' === $type) {
-        $node= new Node(self::symbol('(variable)'));
-        $node->kind= 'variable';
-      } else if ('comment' === $type) {
-        $this->comment= $value;
-        continue;
-      } else {
-        throw new Error('Unexpected token '.$value, $this->file, $line);
-      }
-
-      $node->value= $value;
-      $node->line= $line;
-      return $node;
-    }
-
-    $node= new Node(self::symbol('(end)'));
-    $node->line= $line;
-    return $node;
+    $this->forward();
+    return $this->token;
   }
 
   /**
@@ -1430,7 +1379,7 @@ class Parse {
     while ('}' !== $this->token->value) {
       if (isset($modifier[$this->token->value])) {
         $modifiers[]= $this->token->value;
-        $this->token= $this->advance();
+        $this->forward();
       } else if (isset(self::$body[$k= $this->token->value])
         ? ($f= self::$body[$k])
         : (isset(self::$body[$k= '@'.$this->token->kind]) ? ($f= self::$body[$k]) : null)
@@ -1440,15 +1389,15 @@ class Parse {
         $annotations= [];
       } else if ('<<' === $this->token->symbol->id) {
         do {
-          $this->token= $this->advance();
+          $this->forward();
 
           $name= $this->token->value;
-          $this->token= $this->advance();
+          $this->forward();
 
           if ('(' === $this->token->value) {
-            $this->token= $this->advance();
+            $this->forward();
             $annotations[$name]= $this->expression(0);
-            $this->token= $this->next(')');
+            $this->expecting(')', 'annotations');
           } else {
             $annotations[$name]= null;
           }
@@ -1458,10 +1407,10 @@ class Parse {
           } else if ('>>' === $this->token->value) {
             break;
           } else {
-            $this->token= $this->next(', or >>', 'annotations');
+            $this->expecting(', or >>', 'annotations');
           }
         } while (null !== $this->token->value);
-        $this->token= $this->advance();
+        $this->forward();
       } else if ($type= $this->type($this)) {
         $this->properties($this, $body, $annotations, $modifiers, $type);
         $modifiers= [];
@@ -1470,7 +1419,7 @@ class Parse {
           'Expected a type, modifier, property, annotation, method or "}", have "%s"',
           $this->token->symbol->id
         ));
-        $this->token= $this->advance();
+        $this->forward();
         if (null === $this->token->value) break;
       }
     }
@@ -1483,7 +1432,7 @@ class Parse {
     $this->token= $this->expect(')');
 
     if (':' === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       $return= $this->type($this);
     } else {
       $return= null;
@@ -1494,9 +1443,9 @@ class Parse {
 
    public function block() {
     if ('{'  === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       $block= $this->statements();
-      $this->token= $this->next('}');
+      $this->expecting('}', 'block');
       return $block;
     } else {
       return [$this->statement()];
@@ -1509,23 +1458,23 @@ class Parse {
 
     $parent= null;
     if ('extends' === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       $parent= $this->scope->resolve($this->token->value);
-      $this->token= $this->advance();
+      $this->forward();
     }
 
     $implements= [];
     if ('implements' === $this->token->value) {
-      $this->token= $this->advance();
+      $this->forward();
       do {
         $implements[]= $this->scope->resolve($this->token->value);
-        $this->token= $this->advance();
+        $this->forward();
         if (',' === $this->token->value) {
-          $this->token= $this->expect(',');
+          $this->forward();
         } else if ('{' === $this->token->value) {
           break;
         } else {
-          $this->token= $this->next(', or {', 'interfaces list');
+          $this->expecting(', or {', 'interfaces list');
         }
       } while (null !== $this->token->value);
     }
@@ -1543,7 +1492,7 @@ class Parse {
     if ('throw' === $this->token->value) {
       $expr= new Node($this->token->symbol);
       $expr->kind= 'throwexpression';
-      $this->token= $this->advance();
+      $this->forward();
       $expr->value= $this->expression($bp);
       return $expr;
     } else {
@@ -1553,12 +1502,12 @@ class Parse {
 
   public function expression($rbp) {
     $t= $this->token;
-    $this->token= $this->advance();
+    $this->forward();
     $left= $t->symbol->nud ? $t->symbol->nud->__invoke($this, $t) : $t;
 
     while ($rbp < $this->token->symbol->lbp) {
       $t= $this->token;
-      $this->token= $this->advance();
+      $this->forward();
       $left= $t->symbol->led ? $t->symbol->led->__invoke($this, $t, $left) : $t;
     }
 
@@ -1570,7 +1519,7 @@ class Parse {
     while ($end !== $this->token->value) {
       $arguments[]= $this->expression(0, false);    // Undefined arguments are OK
       if (',' === $this->token->value) {
-        $this->token= $this->advance();
+        $this->forward();
       } else if ($end === $this->token->value) {
         break;
       } else {
