@@ -7,19 +7,19 @@
  */
 trait RewriteMultiCatch {
  
-  protected function emitCatch($catch) {
+  protected function emitCatch($result, $catch) {
     if (empty($catch->types)) {
-      $this->out->write('catch(\\Throwable $'.$catch->variable.') {');
+      $result->out->write('catch(\\Throwable $'.$catch->variable.') {');
     } else {
       $last= array_pop($catch->types);
       $label= sprintf('c%u', crc32($last));
       foreach ($catch->types as $type) {
-        $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
+        $result->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
       }
-      $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
+      $result->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
     }
 
-    $this->emit($catch->body);
-    $this->out->write('}');
+    $this->emit($result, $catch->body);
+    $result->out->write('}');
   }
 }

@@ -19,8 +19,13 @@ class CompilingClassLoader implements IClassLoader {
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
-    Compiled::$emit[$this->version]= $emit;
+    Compiled::$emit[$this->version]= $emit->newInstance();
     Compiled::$lang= Language::named('PHP');
+
+    foreach (self::$syntax as $syntax) {
+      $syntax->setup(Compiled::$lang, Compiled::$emit[$this->version]);
+    }
+
     stream_wrapper_register($this->version, Compiled::class);
   }
 

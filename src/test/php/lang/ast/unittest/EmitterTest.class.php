@@ -1,20 +1,12 @@
 <?php namespace lang\ast\unittest;
 
 use lang\ast\Emitter;
-use io\streams\MemoryOutputStream;
-use io\streams\StringWriter;
+use unittest\TestCase;
 
-class EmitterTest extends \unittest\TestCase {
-  private $out;
-
-  /** @return void */
-  public function setUp() {
-    $this->out= new MemoryOutputStream();
-  }
+class EmitterTest extends TestCase {
 
   #[@test]
   public function can_create() {
-    $runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
-    Emitter::forRuntime($runtime)->newInstance(new StringWriter($this->out));
+    Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
   }
 }

@@ -8,17 +8,26 @@ use lang\ast\Emitter;
 use lang\ast\Language;
 use lang\ast\Node;
 use lang\ast\Parse;
+use lang\ast\Result;
 use lang\ast\Tokens;
 use text\StringTokenizer;
 use unittest\TestCase;
 
 abstract class EmittingTest extends TestCase {
-  private static $cl, $language;
+  private static $cl, $language, $emitter;
   private static $id= 0;
 
   static function __static() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
     self::$language= Language::named('PHP');
+    self::$emitter= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    foreach (CompilingClassLoader::$syntax as $syntax) {
+      $syntax->setup(self::$language, self::$emitter);
+    }
+  }
+
+  protected static function transform($type, $function) {
+    self::$emitter->transform($type, $function);
   }
 
   /**
@@ -32,12 +41,8 @@ abstract class EmittingTest extends TestCase {
     $out= new MemoryOutputStream();
 
     $parse= new Parse(self::$language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
-    $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
-    foreach (CompilingClassLoader::$syntax as $syntax) {
-      $syntax->setup($parse->language, $emit);
-    }
+    self::$emitter->emit(new Result(new StringWriter($out)), $parse->execute());
 
-    $emit->emit($parse->execute());
     // var_dump($out->getBytes());
     self::$cl->setClassBytes($name, $out->getBytes());
     return self::$cl->loadClass($name);

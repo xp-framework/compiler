@@ -9,11 +9,11 @@
 trait RewriteBlockLambdaExpressions {
   use RewriteLambdaExpressions { emitLambda as rewriteLambda; }
 
-  protected function emitLambda($lambda) {
+  protected function emitLambda($result, $lambda) {
     if (is_array($lambda->body)) {
-      $this->rewriteLambda($lambda);
+      $this->rewriteLambda($result, $lambda);
     } else {
-      parent::emitLambda($lambda);
+      parent::emitLambda($result, $lambda);
     }
   }
 }

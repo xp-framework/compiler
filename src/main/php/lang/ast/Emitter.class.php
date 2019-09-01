@@ -10,13 +10,7 @@ abstract class Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
 
-  protected $out;
-  protected $line= 1;
-  protected $meta= [];
   protected $unsupported= [];
-  protected $locals= [];
-  protected $stack= [];
-
   private $emit= [];
 
   /**
@@ -38,18 +32,16 @@ abstract class Emitter {
     throw new IllegalArgumentException('XP Compiler does not support '.$runtime.' yet');
   }
 
-  /** @param io.streams.Writer */
-  public function __construct($out) {
-    $this->out= $out;
-    $this->id= 0;
-  }
-
   public function transform($kind, $function) {
-    $this->emit[$kind]= function($arg) use($function) {
-      foreach ($function($arg) as $n) {
-        $this->{'emit'.$n->kind}($n->value);
-      }
-    };
+    if (null === $function) {
+      unset($this->emit[$kind]);
+    } else {
+      $this->emit[$kind]= function($result, $arg) use($function) {
+        foreach ($function($arg) as $n) {
+          $this->{'emit'.$n->kind}($result, $n->value);
+        }
+      };
+    }
     return $this;
   }
 
@@ -58,21 +50,12 @@ abstract class Emitter {
    * any previous handling, including builtin behavior!
    *
    * @param  string $kind
-   * @param  function(lang.ast.Node): void $function
+   * @param  function(lang.ast.Result, lang.ast.Node): void $function
    * @return self
    */
   public function handle($kind, $function) {
     $this->emit[$kind]= $function->bindTo($this, self::class);
     return $this;
-  }
-
-  /**
-   * Creates a temporary variable and returns its name
-   *
-   * @param  string
-   */
-  protected function temp() {
-    return '$T'.($this->id++);
   }
 
   /**
@@ -82,15 +65,15 @@ abstract class Emitter {
    * @return string
    */
   protected function buffer($callable) {
-    $o= $this->out;
+    $o= $result->out;
     $buffer= new MemoryOutputStream();
-    $this->out= new StringWriter($buffer  );
+    $result->out= new StringWriter($buffer  );
 
     try {
       $callable();
       return $buffer->getBytes();
     } finally {
-      $this->out= $o;
+      $result->out= $o;
     }
   }
 
@@ -171,99 +154,99 @@ abstract class Emitter {
     }
   }
 
-  protected function emitStart($start) {
-    $this->out->write('<?php ');
+  protected function emitStart($result, $start) {
+    $result->out->write('<?php ');
   }
 
-  protected function emitPackage($package) {
-    $this->out->write('namespace '.$package.";\n");
+  protected function emitPackage($result, $package) {
+    $result->out->write('namespace '.$package.";\n");
   }
 
-  protected function emitImport($import) {
+  protected function emitImport($result, $import) {
     foreach ($import as $type => $alias) {
-      $this->out->write('use '.$type.($alias ? ' as '.$alias : '').';');
+      $result->out->write('use '.$type.($alias ? ' as '.$alias : '').';');
     }
   }
 
-  protected function emitImportConst($import) {
+  protected function emitImportConst($result, $import) {
     foreach ($import as $type => $alias) {
-      $this->out->write('use const '.$type.($alias ? ' as '.$alias : '').';');
+      $result->out->write('use const '.$type.($alias ? ' as '.$alias : '').';');
     }
   }
 
-  protected function emitImportFunction($import) {
+  protected function emitImportFunction($result, $import) {
     foreach ($import as $type => $alias) {
-      $this->out->write('use function '.$type.($alias ? ' as '.$alias : '').';');
+      $result->out->write('use function '.$type.($alias ? ' as '.$alias : '').';');
     }
   }
 
-  protected function emitAnnotation($annotations) {
+  protected function emitAnnotation($result, $annotations) {
     // NOOP
   }
 
-  protected function emitCode($code) {
-    $this->out->write($code);
+  protected function emitCode($result, $code) {
+    $result->out->write($code);
   }
 
-  protected function emitLiteral($literal) {
-    $this->out->write($literal);
+  protected function emitLiteral($result, $literal) {
+    $result->out->write($literal);
   }
 
-  protected function emitName($name) {
-    $this->out->write($name);
+  protected function emitName($result, $name) {
+    $result->out->write($name);
   }
 
-  protected function emitEcho($echo) {
-    $this->out->write('echo ');
+  protected function emitEcho($result, $echo) {
+    $result->out->write('echo ');
     $s= sizeof($echo) - 1;
     foreach ($echo as $i => $expr) {
-      $this->emit($expr);
-      if ($i < $s) $this->out->write(',');
+      $this->emit($result, $expr);
+      if ($i < $s) $result->out->write(',');
     }
   }
 
-  protected function emitBlock($block) {
-    $this->out->write('{');
-    $this->emit($block);
-    $this->out->write('}');
+  protected function emitBlock($result, $block) {
+    $result->out->write('{');
+    $this->emit($result, $block);
+    $result->out->write('}');
   }
 
-  protected function emitStatic($static) {
+  protected function emitStatic($result, $static) {
     foreach ($static as $variable => $initial) {
-      $this->out->write('static $'.$variable);
+      $result->out->write('static $'.$variable);
       if ($initial) {
-        $this->out->write('=');
-        $this->emit($initial);
+        $result->out->write('=');
+        $this->emit($result, $initial);
       }
-      $this->out->write(';');
+      $result->out->write(';');
     }
   }
 
-  protected function emitVariable($variable) {
-    $this->out->write('$'.$variable);
+  protected function emitVariable($result, $variable) {
+    $result->out->write('$'.$variable);
   }
 
-  protected function emitCast($cast) {
+  protected function emitCast($result, $cast) {
     static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true];
 
     $name= $cast->type->name();
     if ('?' === $name{0}) {
-      $this->out->write('cast(');
-      $this->emit($cast->expression);
-      $this->out->write(',\''.$name.'\', false)');
+      $result->out->write('cast(');
+      $this->emit($result, $cast->expression);
+      $result->out->write(',\''.$name.'\', false)');
     } else if (isset($native[$name])) {
-      $this->out->write('('.$cast->type->literal().')');
-      $this->emit($cast->expression);
+      $result->out->write('('.$cast->type->literal().')');
+      $this->emit($result, $cast->expression);
     } else {
-      $this->out->write('cast(');
-      $this->emit($cast->expression);
-      $this->out->write(',\''.$name.'\')');
+      $result->out->write('cast(');
+      $this->emit($result, $cast->expression);
+      $result->out->write(',\''.$name.'\')');
     }
   }
 
-  protected function emitArray($array) {
+  protected function emitArray($result, $array) {
     if (empty($array)) {
-      $this->out->write('[]');
+      $result->out->write('[]');
       return;
     }
 
@@ -276,226 +259,226 @@ abstract class Emitter {
     }
 
     if ($unpack) {
-      $this->out->write('array_merge([');
+      $result->out->write('array_merge([');
       foreach ($array as $pair) {
         if ($pair[0]) {
-          $this->emit($pair[0]);
-          $this->out->write('=>');
+          $this->emit($result, $pair[0]);
+          $result->out->write('=>');
         }
         if ('unpack' === $pair[1]->kind) {
           if ('array' === $pair[1]->value->kind) {
-            $this->out->write('],');
-            $this->emit($pair[1]->value);
-            $this->out->write(',[');
+            $result->out->write('],');
+            $this->emit($result, $pair[1]->value);
+            $result->out->write(',[');
           } else {
-            $t= $this->temp();
-            $this->out->write('],('.$t.'=');
-            $this->emit($pair[1]->value);
-            $this->out->write(') instanceof \Traversable ? iterator_to_array('.$t.') : '.$t.',[');
+            $t= $result->temp();
+            $result->out->write('],('.$t.'=');
+            $this->emit($result, $pair[1]->value);
+            $result->out->write(') instanceof \Traversable ? iterator_to_array('.$t.') : '.$t.',[');
           }
         } else {
-          $this->emit($pair[1]);
-          $this->out->write(',');
+          $this->emit($result, $pair[1]);
+          $result->out->write(',');
         }
       }
-      $this->out->write('])');
+      $result->out->write('])');
     } else {
-      $this->out->write('[');
+      $result->out->write('[');
       foreach ($array as $pair) {
         if ($pair[0]) {
-          $this->emit($pair[0]);
-          $this->out->write('=>');
+          $this->emit($result, $pair[0]);
+          $result->out->write('=>');
         }
-        $this->emit($pair[1]);
-        $this->out->write(',');
+        $this->emit($result, $pair[1]);
+        $result->out->write(',');
       }
-      $this->out->write(']');
+      $result->out->write(']');
     }
   }
 
-  protected function emitParameter($parameter) {
+  protected function emitParameter($result, $parameter) {
     if ($parameter->type && $t= $this->paramType($parameter->type)) {
-      $this->out->write($t.' ');
+      $result->out->write($t.' ');
     }
     if ($parameter->variadic) {
-      $this->out->write('... $'.$parameter->name);
+      $result->out->write('... $'.$parameter->name);
     } else {
-      $this->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
+      $result->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
     }
     if ($parameter->default) {
-      $this->out->write('=');
-      $this->emit($parameter->default);
+      $result->out->write('=');
+      $this->emit($result, $parameter->default);
     }
-    $this->locals[$parameter->name]= true;
+    $result->locals[$parameter->name]= true;
   }
 
-  protected function emitSignature($signature) {
-    $this->out->write('(');
+  protected function emitSignature($result, $signature) {
+    $result->out->write('(');
     $s= sizeof($signature->parameters) - 1;
     foreach ($signature->parameters as $i => $parameter) {
-      $this->emitParameter($parameter);
-      if ($i < $s) $this->out->write(', ');
+      $this->emitParameter($result, $parameter);
+      if ($i < $s) $result->out->write(', ');
     }
-    $this->out->write(')');
+    $result->out->write(')');
 
     if ($signature->returns && $t= $this->returnType($signature->returns)) {
-      $this->out->write(':'.$t);
+      $result->out->write(':'.$t);
     }
   }
 
-  protected function emitFunction($function) {
-    $this->stack[]= $this->locals;
-    $this->locals= [];
+  protected function emitFunction($result, $function) {
+    $result->stack[]= $result->locals;
+    $result->locals= [];
 
-    $this->out->write('function '.$function->name); 
-    $this->emitSignature($function->signature);
+    $result->out->write('function '.$function->name); 
+    $this->emitSignature($result, $function->signature);
 
-    $this->out->write('{');
-    $this->emit($function->body);
-    $this->out->write('}');
+    $result->out->write('{');
+    $this->emit($result, $function->body);
+    $result->out->write('}');
 
-    $this->locals= array_pop($this->stack);
+    $result->locals= array_pop($result->stack);
   }
 
-  protected function emitClosure($closure) {
-    $this->stack[]= $this->locals;
-    $this->locals= [];
+  protected function emitClosure($result, $closure) {
+    $result->stack[]= $result->locals;
+    $result->locals= [];
 
-    $this->out->write('function'); 
-    $this->emitSignature($closure->signature);
+    $result->out->write('function'); 
+    $this->emitSignature($result, $closure->signature);
 
     if ($closure->use) {
-      $this->out->write(' use('.implode(',', $closure->use).') ');
+      $result->out->write(' use('.implode(',', $closure->use).') ');
       foreach ($closure->use as $variable) {
-        $this->locals[substr($variable, 1)]= true;
+        $result->locals[substr($variable, 1)]= true;
       }
     }
-    $this->out->write('{');
-    $this->emit($closure->body);
-    $this->out->write('}');
+    $result->out->write('{');
+    $this->emit($result, $closure->body);
+    $result->out->write('}');
 
-    $this->locals= array_pop($this->stack);
+    $result->locals= array_pop($result->stack);
   }
 
-  protected function emitLambda($lambda) {
-    $this->out->write('fn');
-    $this->emitSignature($lambda->signature);
-    $this->out->write('=>');
+  protected function emitLambda($result, $lambda) {
+    $result->out->write('fn');
+    $this->emitSignature($result, $lambda->signature);
+    $result->out->write('=>');
 
     if (is_array($lambda->body)) {
-      $this->out->write('{');
-      $this->emit($lambda->body);
-      $this->out->write('}');
+      $result->out->write('{');
+      $this->emit($result, $lambda->body);
+      $result->out->write('}');
     } else {
-      $this->emit($lambda->body);
+      $this->emit($result, $lambda->body);
     }
   }
 
-  protected function emitClass($class) {
-    array_unshift($this->meta, []);
+  protected function emitClass($result, $class) {
+    array_unshift($result->meta, []);
 
-    $this->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
-    $class->parent && $this->out->write(' extends '.$class->parent);
-    $class->implements && $this->out->write(' implements '.implode(', ', $class->implements));
-    $this->out->write('{');
+    $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
+    $class->parent && $result->out->write(' extends '.$class->parent);
+    $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
+    $result->out->write('{');
     foreach ($class->body as $member) {
-      $this->emit($member);
+      $this->emit($result, $member);
     }
 
-    $this->out->write('static function __init() {');
-    $this->emitMeta($class->name, $class->annotations, $class->comment);
-    $this->out->write('}} '.$class->name.'::__init();');
+    $result->out->write('static function __init() {');
+    $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
+    $result->out->write('}} '.$class->name.'::__init();');
   }
 
-  protected function emitAnnotations($annotations) {
+  protected function emitAnnotations($result, $annotations) {
     foreach ($annotations as $name => $annotation) {
-      $this->out->write("'".$name."' => ");
+      $result->out->write("'".$name."' => ");
       if ($annotation) {
-        $this->emit($annotation);
-        $this->out->write(',');
+        $this->emit($result, $annotation);
+        $result->out->write(',');
       } else {
-        $this->out->write('null,');
+        $result->out->write('null,');
       }
     }
   }
 
-  protected function emitMeta($name, $annotations, $comment) {
-    $this->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
-    $this->out->write('"class" => [DETAIL_ANNOTATIONS => [');
-    $this->emitAnnotations($annotations);
-    $this->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');
+  protected function emitMeta($result, $name, $annotations, $comment) {
+    $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+    $result->out->write('"class" => [DETAIL_ANNOTATIONS => [');
+    $this->emitAnnotations($result, $annotations);
+    $result->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');
 
-    foreach (array_shift($this->meta) as $type => $lookup) {
-      $this->out->write($type.' => [');
+    foreach (array_shift($result->meta) as $type => $lookup) {
+      $result->out->write($type.' => [');
       foreach ($lookup as $key => $meta) {
-        $this->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
-        $this->emitAnnotations($meta[DETAIL_ANNOTATIONS]);
-        $this->out->write('], DETAIL_TARGET_ANNO => [');
+        $result->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
+        $this->emitAnnotations($result, $meta[DETAIL_ANNOTATIONS]);
+        $result->out->write('], DETAIL_TARGET_ANNO => [');
         foreach ($meta[DETAIL_TARGET_ANNO] as $target => $annotations) {
-          $this->out->write("'$".$target."' => [");
-          $this->emitAnnotations($annotations);
-          $this->out->write('],');
+          $result->out->write("'$".$target."' => [");
+          $this->emitAnnotations($result, $annotations);
+          $result->out->write('],');
         }
-        $this->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
-        $this->out->write(', DETAIL_COMMENT => \''.str_replace("'", "\\'", $meta[DETAIL_COMMENT]).'\'');
-        $this->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
+        $result->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
+        $result->out->write(', DETAIL_COMMENT => \''.str_replace("'", "\\'", $meta[DETAIL_COMMENT]).'\'');
+        $result->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
       }
-      $this->out->write('],');
+      $result->out->write('],');
     }
-    $this->out->write('];');
+    $result->out->write('];');
   }
 
-  protected function emitInterface($interface) {
-    array_unshift($this->meta, []);
+  protected function emitInterface($result, $interface) {
+    array_unshift($result->meta, []);
 
-    $this->out->write('interface '.$this->declaration($interface->name));
-    $interface->parents && $this->out->write(' extends '.implode(', ', $interface->parents));
-    $this->out->write('{');
+    $result->out->write('interface '.$this->declaration($interface->name));
+    $interface->parents && $result->out->write(' extends '.implode(', ', $interface->parents));
+    $result->out->write('{');
     foreach ($interface->body as $member) {
-      $this->emit($member);
-      $this->out->write("\n");
+      $this->emit($result, $member);
+      $result->out->write("\n");
     }
-    $this->out->write('}');
+    $result->out->write('}');
 
-    $this->emitMeta($interface->name, $interface->annotations, $interface->comment);
+    $this->emitMeta($result, $interface->name, $interface->annotations, $interface->comment);
   }
 
-  protected function emitTrait($trait) {
-    array_unshift($this->meta, []);
+  protected function emitTrait($result, $trait) {
+    array_unshift($result->meta, []);
 
-    $this->out->write('trait '.$this->declaration($trait->name));
-    $this->out->write('{');
+    $result->out->write('trait '.$this->declaration($trait->name));
+    $result->out->write('{');
     foreach ($trait->body as $member) {
-      $this->emit($member);
-      $this->out->write("\n");
+      $this->emit($result, $member);
+      $result->out->write("\n");
     }
 
-    $this->out->write('static function __init() {');
-    $this->emitMeta($trait->name, $trait->annotations, $trait->comment);
-    $this->out->write('}} '.$trait->name.'::__init();');
+    $result->out->write('static function __init() {');
+    $this->emitMeta($result, $trait->name, $trait->annotations, $trait->comment);
+    $result->out->write('}} '.$trait->name.'::__init();');
   }
 
-  protected function emitUse($use) {
-    $this->out->write('use '.implode(',', $use->types));
+  protected function emitUse($result, $use) {
+    $result->out->write('use '.implode(',', $use->types));
     if ($use->aliases) {
-      $this->out->write('{');
+      $result->out->write('{');
       foreach ($use->aliases as $reference => $alias) {
-        $this->out->write($reference.' as '.$alias.';');
+        $result->out->write($reference.' as '.$alias.';');
       }
-      $this->out->write('}');
+      $result->out->write('}');
     } else {
-      $this->out->write(';');
+      $result->out->write(';');
     }
   }
 
-  protected function emitConst($const) {
-    $this->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
-    $this->emit($const->expression);
-    $this->out->write(';');
+  protected function emitConst($result, $const) {
+    $result->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
+    $this->emit($result, $const->expression);
+    $result->out->write(';');
   }
 
-  protected function emitProperty($property) {
-    $this->meta[0][self::PROPERTY][$property->name]= [
+  protected function emitProperty($result, $property) {
+    $result->meta[0][self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
       DETAIL_ANNOTATIONS => $property->annotations ? $property->annotations : [],
       DETAIL_COMMENT     => $property->comment,
@@ -503,17 +486,17 @@ abstract class Emitter {
       DETAIL_ARGUMENTS   => []
     ];
 
-    $this->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
+    $result->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
     if (isset($property->expression)) {
-      $this->out->write('=');
-      $this->emit($property->expression);
+      $result->out->write('=');
+      $this->emit($result, $property->expression);
     }
-    $this->out->write(';');
+    $result->out->write(';');
   }
 
-  protected function emitMethod($method) {
-    $this->stack[]= $this->locals;
-    $this->locals= ['this' => true];
+  protected function emitMethod($result, $method) {
+    $result->stack[]= $result->locals;
+    $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
@@ -527,7 +510,7 @@ abstract class Emitter {
       if (isset($param->promote)) {
         $declare.= $param->promote.' $'.$param->name.';';
         $promote.= '$this->'.$param->name.'= $'.$param->name.';';
-        $this->meta[0][self::PROPERTY][$param->name]= [
+        $result->meta[0][self::PROPERTY][$param->name]= [
           DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
           DETAIL_ANNOTATIONS => [],
           DETAIL_COMMENT     => null,
@@ -538,335 +521,335 @@ abstract class Emitter {
       $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
       $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
     }
-    $this->out->write($declare);
-    $this->out->write(implode(' ', $method->modifiers).' function '.$method->name);
-    $this->emitSignature($method->signature);
+    $result->out->write($declare);
+    $result->out->write(implode(' ', $method->modifiers).' function '.$method->name);
+    $this->emitSignature($result, $method->signature);
 
     if (null === $method->body) {
-      $this->out->write(';');
+      $result->out->write(';');
     } else {
-      $this->out->write(' {'.$promote);
-      $this->emit($method->body);
-      $this->out->write('}');
+      $result->out->write(' {'.$promote);
+      $this->emit($result, $method->body);
+      $result->out->write('}');
     }
 
-    $this->meta[0][self::METHOD][$method->name]= $meta;
-    $this->locals= array_pop($this->stack);
+    $result->meta[0][self::METHOD][$method->name]= $meta;
+    $result->locals= array_pop($result->stack);
   }
 
-  protected function emitBraced($braced) {
-    $this->out->write('(');
-    $this->emit($braced);
-    $this->out->write(')');
+  protected function emitBraced($result, $braced) {
+    $result->out->write('(');
+    $this->emit($result, $braced);
+    $result->out->write(')');
   }
 
-  protected function emitBinary($binary) {
-    $this->emit($binary->left);
-    $this->out->write(' '.$binary->operator.' ');
-    $this->emit($binary->right);
+  protected function emitBinary($result, $binary) {
+    $this->emit($result, $binary->left);
+    $result->out->write(' '.$binary->operator.' ');
+    $this->emit($result, $binary->right);
   }
 
-  protected function emitUnary($unary) {
-    $this->out->write($unary->operator);
-    $this->emit($unary->expression);
+  protected function emitUnary($result, $unary) {
+    $result->out->write($unary->operator);
+    $this->emit($result, $unary->expression);
   }
 
-  protected function emitTernary($ternary) {
-    $this->emit($ternary->condition);
-    $this->out->write('?');
-    $this->emit($ternary->expression);
-    $this->out->write(':');
-    $this->emit($ternary->otherwise);
+  protected function emitTernary($result, $ternary) {
+    $this->emit($result, $ternary->condition);
+    $result->out->write('?');
+    $this->emit($result, $ternary->expression);
+    $result->out->write(':');
+    $this->emit($result, $ternary->otherwise);
   }
 
-  protected function emitOffset($offset) {
-    $this->emit($offset->expression);
+  protected function emitOffset($result, $offset) {
+    $this->emit($result, $offset->expression);
     if (null === $offset->offset) {
-      $this->out->write('[]');
+      $result->out->write('[]');
     } else {
-      $this->out->write('[');
-      $this->emit($offset->offset);
-      $this->out->write(']');
+      $result->out->write('[');
+      $this->emit($result, $offset->offset);
+      $result->out->write(']');
     }
   }
 
-  protected function emitAssign($target) {
+  protected function emitAssign($result, $target) {
     if ('variable' === $target->kind) {
-      $this->out->write('$'.$target->value);
-      $this->locals[$target->value]= true;
+      $result->out->write('$'.$target->value);
+      $result->locals[$target->value]= true;
     } else if ('array' === $target->kind) {
-      $this->out->write('list(');
+      $result->out->write('list(');
       foreach ($target->value as $pair) {
-        $this->emitAssign($pair[1]);
-        $this->out->write(',');
+        $this->emitAssign($result, $pair[1]);
+        $result->out->write(',');
       }
-      $this->out->write(')');
+      $result->out->write(')');
     } else {
-      $this->emit($target);
+      $this->emit($result, $target);
     }
   }
 
-  protected function emitAssignment($assignment) {
-    $this->emitAssign($assignment->variable);
-    $this->out->write($assignment->operator);
-    $this->emit($assignment->expression);
+  protected function emitAssignment($result, $assignment) {
+    $this->emitAssign($result, $assignment->variable);
+    $result->out->write($assignment->operator);
+    $this->emit($result, $assignment->expression);
   }
 
-  protected function emitReturn($return) {
-    $this->out->write('return ');
-    $return && $this->emit($return);
-    $this->out->write(';');
+  protected function emitReturn($result, $return) {
+    $result->out->write('return ');
+    $return && $this->emit($result, $return);
+    $result->out->write(';');
   }
 
-  protected function emitIf($if) {
-    $this->out->write('if (');
-    $this->emit($if->expression);
-    $this->out->write(') {');
-    $this->emit($if->body);
-    $this->out->write('}');
+  protected function emitIf($result, $if) {
+    $result->out->write('if (');
+    $this->emit($result, $if->expression);
+    $result->out->write(') {');
+    $this->emit($result, $if->body);
+    $result->out->write('}');
 
     if ($if->otherwise) {
-      $this->out->write('else {');
-      $this->emit($if->otherwise);
-      $this->out->write('}');
+      $result->out->write('else {');
+      $this->emit($result, $if->otherwise);
+      $result->out->write('}');
     }
   }
 
-  protected function emitSwitch($switch) {
-    $this->out->write('switch (');
-    $this->emit($switch->expression);
-    $this->out->write(') {');
+  protected function emitSwitch($result, $switch) {
+    $result->out->write('switch (');
+    $this->emit($result, $switch->expression);
+    $result->out->write(') {');
     foreach ($switch->cases as $case) {
       if ($case->expression) {
-        $this->out->write('case ');
-        $this->emit($case->expression);
-        $this->out->write(':');
+        $result->out->write('case ');
+        $this->emit($result, $case->expression);
+        $result->out->write(':');
       } else {
-        $this->out->write('default:');
+        $result->out->write('default:');
       }
-      $this->emit($case->body);
+      $this->emit($result, $case->body);
     }
-    $this->out->write('}');
+    $result->out->write('}');
   }
 
-  protected function emitCatch($catch) {
+  protected function emitCatch($result, $catch) {
     if (empty($catch->types)) {
-      $this->out->write('catch(\\Throwable $'.$catch->variable.') {');
+      $result->out->write('catch(\\Throwable $'.$catch->variable.') {');
     } else {
-      $this->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+      $result->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
     }
-    $this->emit($catch->body);
-    $this->out->write('}');
+    $this->emit($result, $catch->body);
+    $result->out->write('}');
   }
 
-  protected function emitTry($try) {
-    $this->out->write('try {');
-    $this->emit($try->body);
-    $this->out->write('}');
+  protected function emitTry($result, $try) {
+    $result->out->write('try {');
+    $this->emit($result, $try->body);
+    $result->out->write('}');
     if (isset($try->catches)) {
       foreach ($try->catches as $catch) {
-        $this->emitCatch($catch);
+        $this->emitCatch($result, $catch);
       }
     }
     if (isset($try->finally)) {
-      $this->out->write('finally {');
-      $this->emit($try->finally);
-      $this->out->write('}');
+      $result->out->write('finally {');
+      $this->emit($result, $try->finally);
+      $result->out->write('}');
     }
   }
 
-  protected function emitThrow($throw) {
-    $this->out->write('throw ');
-    $this->emit($throw);
-    $this->out->write(';');
+  protected function emitThrow($result, $throw) {
+    $result->out->write('throw ');
+    $this->emit($result, $throw);
+    $result->out->write(';');
   }
 
-  protected function emitThrowExpression($throw) {
+  protected function emitThrowExpression($result, $throw) {
     $capture= [];
     foreach ($this->search($throw, 'variable') as $var) {
-      if (isset($this->locals[$var->value])) {
+      if (isset($result->locals[$var->value])) {
         $capture[$var->value]= true;
       }
     }
     unset($capture['this']);
 
-    $this->out->write('(function()');
-    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
-    $this->out->write('{ throw ');
-    $this->emit($throw);
-    $this->out->write('; })()');
+    $result->out->write('(function()');
+    $capture && $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
+    $result->out->write('{ throw ');
+    $this->emit($result, $throw);
+    $result->out->write('; })()');
   }
 
-  protected function emitForeach($foreach) {
-    $this->out->write('foreach (');
-    $this->emit($foreach->expression);
-    $this->out->write(' as ');
+  protected function emitForeach($result, $foreach) {
+    $result->out->write('foreach (');
+    $this->emit($result, $foreach->expression);
+    $result->out->write(' as ');
     if ($foreach->key) {
-      $this->emit($foreach->key);
-      $this->out->write(' => ');
+      $this->emit($result, $foreach->key);
+      $result->out->write(' => ');
     }
-    $this->emit($foreach->value);
-    $this->out->write(') {');
-    $this->emit($foreach->body);
-    $this->out->write('}');
+    $this->emit($result, $foreach->value);
+    $result->out->write(') {');
+    $this->emit($result, $foreach->body);
+    $result->out->write('}');
   }
 
-  protected function emitFor($for) {
-    $this->out->write('for (');
-    $this->emitArguments($for->initialization);
-    $this->out->write(';');
-    $this->emitArguments($for->condition);
-    $this->out->write(';');
-    $this->emitArguments($for->loop);
-    $this->out->write(') {');
-    $this->emit($for->body);
-    $this->out->write('}');
+  protected function emitFor($result, $for) {
+    $result->out->write('for (');
+    $this->emitArguments($result, $for->initialization);
+    $result->out->write(';');
+    $this->emitArguments($result, $for->condition);
+    $result->out->write(';');
+    $this->emitArguments($result, $for->loop);
+    $result->out->write(') {');
+    $this->emit($result, $for->body);
+    $result->out->write('}');
   }
 
-  protected function emitDo($do) {
-    $this->out->write('do');
-    $this->out->write('{');
-    $this->emit($do->body);
-    $this->out->write('} while (');
-    $this->emit($do->expression);
-    $this->out->write(');');
+  protected function emitDo($result, $do) {
+    $result->out->write('do');
+    $result->out->write('{');
+    $this->emit($result, $do->body);
+    $result->out->write('} while (');
+    $this->emit($result, $do->expression);
+    $result->out->write(');');
   }
 
-  protected function emitWhile($while) {
-    $this->out->write('while (');
-    $this->emit($while->expression);
-    $this->out->write(') {');
-    $this->emit($while->body);
-    $this->out->write('}');
+  protected function emitWhile($result, $while) {
+    $result->out->write('while (');
+    $this->emit($result, $while->expression);
+    $result->out->write(') {');
+    $this->emit($result, $while->body);
+    $result->out->write('}');
   }
 
-  protected function emitBreak($break) {
-    $this->out->write('break ');
-    $break && $this->emit($break);
-    $this->out->write(';');
+  protected function emitBreak($result, $break) {
+    $result->out->write('break ');
+    $break && $this->emit($result, $break);
+    $result->out->write(';');
   }
 
-  protected function emitContinue($continue) {
-    $this->out->write('continue ');
-    $continue && $this->emit($continue);
-    $this->out->write(';');
+  protected function emitContinue($result, $continue) {
+    $result->out->write('continue ');
+    $continue && $this->emit($result, $continue);
+    $result->out->write(';');
   }
 
-  protected function emitLabel($label) {
-    $this->out->write($label.':');
+  protected function emitLabel($result, $label) {
+    $result->out->write($label.':');
   }
 
-  protected function emitGoto($goto) {
-    $this->out->write('goto '.$goto);
+  protected function emitGoto($result, $goto) {
+    $result->out->write('goto '.$goto);
   }
 
-  protected function emitInstanceOf($instanceof) {
-    $this->emit($instanceof->expression);
-    $this->out->write(' instanceof ');
+  protected function emitInstanceOf($result, $instanceof) {
+    $this->emit($result, $instanceof->expression);
+    $result->out->write(' instanceof ');
     if ($instanceof->type instanceof Node) {
-      $this->emit($instanceof->type);
+      $this->emit($result, $instanceof->type);
     } else {
-      $this->out->write($instanceof->type);
+      $result->out->write($instanceof->type);
     }
   }
 
-  protected function emitArguments($arguments) {
+  protected function emitArguments($result, $arguments) {
     $s= sizeof($arguments) - 1;
     foreach ($arguments as $i => $argument) {
-      $this->emit($argument);
-      if ($i < $s) $this->out->write(', ');
+      $this->emit($result, $argument);
+      if ($i < $s) $result->out->write(', ');
     }
   }
 
-  protected function emitNew($new) {
-    $this->out->write('new '.$new->type.'(');
-    $this->emitArguments($new->arguments);
-    $this->out->write(')');
+  protected function emitNew($result, $new) {
+    $result->out->write('new '.$new->type.'(');
+    $this->emitArguments($result, $new->arguments);
+    $result->out->write(')');
   }
 
-  protected function emitNewClass($new) {
-    $this->out->write('new class(');
-    $this->emitArguments($new->arguments);
-    $this->out->write(')');
+  protected function emitNewClass($result, $new) {
+    $result->out->write('new class(');
+    $this->emitArguments($result, $new->arguments);
+    $result->out->write(')');
 
-    $new->definition->parent && $this->out->write(' extends '.$new->definition->parent);
-    $new->definition->implements && $this->out->write(' implements '.implode(', ', $new->definition->implements));
-    $this->out->write('{');
+    $new->definition->parent && $result->out->write(' extends '.$new->definition->parent);
+    $new->definition->implements && $result->out->write(' implements '.implode(', ', $new->definition->implements));
+    $result->out->write('{');
     foreach ($new->definition->body as $member) {
-      $this->emit($member);
-      $this->out->write("\n");
+      $this->emit($result, $member);
+      $result->out->write("\n");
     }
-    $this->out->write('}');
+    $result->out->write('}');
   }
 
-  protected function emitInvoke($invoke) {
-    $this->emit($invoke->expression);
-    $this->out->write('(');
-    $this->emitArguments($invoke->arguments);
-    $this->out->write(')');
+  protected function emitInvoke($result, $invoke) {
+    $this->emit($result, $invoke->expression);
+    $result->out->write('(');
+    $this->emitArguments($result, $invoke->arguments);
+    $result->out->write(')');
   }
 
-  protected function emitScope($scope) {
-    $this->out->write($scope->type.'::');
-    $this->emit($scope->member);
+  protected function emitScope($result, $scope) {
+    $result->out->write($scope->type.'::');
+    $this->emit($result, $scope->member);
   }
 
-  protected function emitInstance($instance) {
+  protected function emitInstance($result, $instance) {
     if ('new' === $instance->expression->kind) {
-      $this->out->write('(');
-      $this->emit($instance->expression);
-      $this->out->write(')->');
+      $result->out->write('(');
+      $this->emit($result, $instance->expression);
+      $result->out->write(')->');
     } else {
-      $this->emit($instance->expression);
-      $this->out->write('->');
+      $this->emit($result, $instance->expression);
+      $result->out->write('->');
     }
 
     if ('name' === $instance->member->kind) {
-      $this->out->write($instance->member->value);
+      $result->out->write($instance->member->value);
     } else {
-      $this->out->write('{');
-      $this->emit($instance->member);
-      $this->out->write('}');
+      $result->out->write('{');
+      $this->emit($result, $instance->member);
+      $result->out->write('}');
     }
   }
 
-  protected function emitUnpack($unpack) {
-    $this->out->write('...');
-    $this->emit($unpack);
+  protected function emitUnpack($result, $unpack) {
+    $result->out->write('...');
+    $this->emit($result, $unpack);
   }
 
-  protected function emitYield($yield) {
-    $this->out->write('yield ');
+  protected function emitYield($result, $yield) {
+    $result->out->write('yield ');
     if ($yield->key) {
-      $this->emit($yield->key);
-      $this->out->write('=>');
+      $this->emit($result, $yield->key);
+      $result->out->write('=>');
     }
     if ($yield->value) {
-      $this->emit($yield->value);
+      $this->emit($result, $yield->value);
     }
   }
 
-  protected function emitFrom($from) {
-    $this->out->write('yield from ');
-    $this->emit($from);
+  protected function emitFrom($result, $from) {
+    $result->out->write('yield from ');
+    $this->emit($result, $from);
   }
 
-  public function emit($arg) {
+  public function emit($result, $arg) {
     if ($arg instanceof Element) {
-      if ($arg->line > $this->line) {
-        $this->out->write(str_repeat("\n", $arg->line - $this->line));
-        $this->line= $arg->line;
+      if ($arg->line > $result->line) {
+        $result->out->write(str_repeat("\n", $arg->line - $result->line));
+        $result->line= $arg->line;
       }
 
       if (isset($this->emit[$arg->kind])) {
-        $this->emit[$arg->kind]($arg);
+        $this->emit[$arg->kind]($result, $arg);
       } else {
-        $this->{'emit'.$arg->kind}($arg->value);
+        $this->{'emit'.$arg->kind}($result, $arg->value);
       }
     } else {
       foreach ($arg as $node) {
-        $this->emit($node);
-        isset($node->symbol->std) || $this->out->write(';');
+        $this->emit($result, $node);
+        isset($node->symbol->std) || $result->out->write(';');
       }
     }
   }

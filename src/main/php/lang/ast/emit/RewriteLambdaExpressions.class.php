@@ -7,41 +7,41 @@
  */
 trait RewriteLambdaExpressions {
 
-  protected function emitLambda($lambda) {
+  protected function emitLambda($result, $lambda) {
     $capture= [];
     foreach ($this->search($lambda->body, 'variable') as $var) {
-      if (isset($this->locals[$var->value])) {
+      if (isset($result->locals[$var->value])) {
         $capture[$var->value]= true;
       }
     }
     unset($capture['this']);
 
-    $this->stack[]= $this->locals;
-    $this->locals= [];
+    $result->stack[]= $result->locals;
+    $result->locals= [];
 
-    $this->out->write('function');
-    $this->emitSignature($lambda->signature);
+    $result->out->write('function');
+    $this->emitSignature($result, $lambda->signature);
     foreach ($lambda->signature->parameters as $param) {
       unset($capture[$param->name]);
     }
 
     if ($capture) {
-      $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
+      $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
       foreach ($capture as $name => $_) {
-        $this->locals[$name]= true;
+        $result->locals[$name]= true;
       }
     }
 
     if (is_array($lambda->body)) {
-      $this->out->write('{');
-      $this->emit($lambda->body);
-      $this->out->write('}');
+      $result->out->write('{');
+      $this->emit($result, $lambda->body);
+      $result->out->write('}');
     } else {
-      $this->out->write('{ return ');
-      $this->emit($lambda->body);
-      $this->out->write('; }');
+      $result->out->write('{ return ');
+      $this->emit($result, $lambda->body);
+      $result->out->write('; }');
     }
 
-    $this->locals= array_pop($this->stack);
+    $result->locals= array_pop($result->stack);
   }
 }

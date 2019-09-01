@@ -17,12 +17,12 @@ class HHVM320 extends Emitter {
     'mixed'    => null,
    ];
 
-  protected function emitParameter($parameter) {
+  protected function emitParameter($result, $parameter) {
     if ($parameter->variadic) {
-      $this->out->write('... $'.$parameter->name);
-      $this->locals[$parameter->name]= true;
+      $result->out->write('... $'.$parameter->name);
+      $result->locals[$parameter->name]= true;
     } else {
-      parent::emitParameter($parameter);
+      parent::emitParameter($result$parameter);
     }
   }
 }

@@ -3,13 +3,12 @@
 use lang\ast\Code;
 use lang\ast\nodes\Method;
 use lang\ast\nodes\Signature;
-use lang\ast\transform\Transformations;
 
 class TransformationsTest extends EmittingTest {
 
   #[@beforeClass]
   public static function registerTransformation() {
-    Transformations::register('class', function($class) {
+    self::transform('class', function($class) {
       if ($class->value->annotation('getters')) {
         foreach ($class->value->properties() as $property) {
           $class->value->inject(new Method(
@@ -24,8 +23,13 @@ class TransformationsTest extends EmittingTest {
     });
   }
 
-  #[@test]
-  public function generates_accessor() {
+  #[@afterClass]
+  public static function removeTransformation() {
+    self::transform('class', null);
+  }
+
+  #[@test, @values(['id', 'name'])]
+  public function generates_accessor($name) {
     $t= $this->type('<<getters>> class <T> {
       private int $id;
       private string $name;
@@ -35,6 +39,6 @@ class TransformationsTest extends EmittingTest {
         $this->name= $name;
       }
     }');
-    $this->assertTrue($t->hasMethod('id'));
+    $this->assertTrue($t->hasMethod($name));
   }
 }
