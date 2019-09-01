@@ -542,7 +542,8 @@ class Parse {
           } else if ('}' === $parse->token->value) {
             break;
           } else {
-            $this->expect(', or }');
+            $this->expecting(', or }', 'use');
+            break;
           }
         }
         $parse->forward();
@@ -1194,7 +1195,8 @@ class Parse {
         $this->forward();
         continue;
       } else {
-        $this->token= $this->expect(',', 'parameter list');
+        $this->expecting(',', 'parameter list');
+        break;
       }
     }
     return $parameters;
@@ -1334,28 +1336,6 @@ class Parse {
   }
 
   /**
-   * Expect a given token, raise an error if another is encountered
-   *
-   * @param  string $id
-   * @param  string $context
-   * @return var
-   */
-  private function expect($id, $context= null) {
-    if ($id !== $this->token->symbol->id) {
-      $message= sprintf(
-        'Expected "%s", have "%s"%s',
-        $id,
-        $this->token->value ?: $this->token->symbol->id,
-        $context ? ' in '.$context : ''
-      );
-      throw new Error($message, $this->file, $this->token->line);
-    }
-
-    $this->forward();
-    return $this->token;
-  }
-
-  /**
    * Type body
    *
    * - `use [traits]`
@@ -1427,9 +1407,9 @@ class Parse {
   }
 
   public function signature() {
-    $this->token= $this->expect('(');
+    $this->expecting('(', 'signature');
     $parameters= $this->parameters($this);
-    $this->token= $this->expect(')');
+    $this->expecting(')', 'signature');
 
     if (':' === $this->token->value) {
       $this->forward();
@@ -1479,9 +1459,9 @@ class Parse {
       } while (null !== $this->token->value);
     }
 
-    $this->token= $this->expect('{');
+    $this->expecting('{', 'class');
     $body= $this->typeBody();
-    $this->token= $this->expect('}');
+    $this->expecting('}', 'class');
 
     $return= new ClassDeclaration($modifiers, $name, $parent, $implements, $body, $this->scope->annotations, $comment);
     $this->scope->annotations= [];
@@ -1523,7 +1503,8 @@ class Parse {
       } else if ($end === $this->token->value) {
         break;
       } else {
-        $this->expect($end.' or ,', 'argument list');
+        $this->expecting($end.' or ,', 'argument list');
+        break;
       }
     }
     return $arguments;
@@ -1622,7 +1603,14 @@ class Parse {
       $this->token->value ?: $this->token->symbol->id,
       $context
     );
-    $this->errors[]= new Error($message, $this->file, $this->token->line);
+    $e= new Error($message, $this->file, $this->token->line);
+
+    // Ensure we stop if we encounter the end
+    if (null === $this->token->value) {
+      throw $e;
+    } else {
+      $this->errors[]= $e;
+    }
   }
 
   /**
