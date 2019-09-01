@@ -209,11 +209,12 @@ class CompilingClassLoader implements IClassLoader {
 
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
+      $emitter= $this->emit->newInstance($declaration);
+
       foreach ($this->syntax as $syntax) {
-        $syntax->setup($parse);
+        $syntax->setup($parse, $emitter);
       }
 
-      $emitter= $this->emit->newInstance($declaration);
       foreach (Transformations::registered() as $kind => $function) {
         $emitter->transform($kind, $function);
       }

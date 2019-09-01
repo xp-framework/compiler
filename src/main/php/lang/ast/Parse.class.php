@@ -893,20 +893,6 @@ class Parse {
       return $node;
     });
 
-    $this->stmt('using', function($node) {
-      $this->token= $this->expect('(');
-      $arguments= $this->arguments();
-      $this->token= $this->expect(')');
-
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
-
-      $node->value= new UsingStatement($arguments, $statements);
-      $node->kind= 'using';
-      return $node;
-    });
-
     $this->body('use', function(&$body, $annotations, $modifiers) {
       $member= new Node($this->token->symbol);
       $member->kind= 'use';
@@ -1461,12 +1447,6 @@ class Parse {
     return $const;
   }
 
-  private function stmt($id, $func) {
-    $stmt= self::symbol($id);
-    $stmt->std= $func;
-    return $stmt;
-  }
-
   private function assignment($id) {
     $infix= self::symbol($id, 10);
     $infix->led= function($node, $left) use($id) {
@@ -1527,6 +1507,23 @@ class Parse {
     return $suffix;
   }
 
+  /**
+   * Statement
+   *
+   * @param  string $id
+   * @param  function(lang.ast.Node): lang.ast.Node
+   */
+  public function stmt($id, $func) {
+    $stmt= self::symbol($id);
+    $stmt->std= $func->bindTo($this, self::class);
+  }
+
+  /**
+   * Type body parsing
+   *
+   * @param  string $id
+   * @param  function([:string], [:string], string[]): void
+   */
   public function body($id, $func) {
     $this->body[$id]= $func->bindTo($this, self::class);
   }

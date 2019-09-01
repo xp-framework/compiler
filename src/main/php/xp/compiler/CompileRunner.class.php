@@ -7,6 +7,7 @@ use lang\ast\Errors;
 use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\transform\Transformations;
+use lang\reflect\Package;
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -48,6 +49,11 @@ class CompileRunner {
       return 2;
     }
 
+    $syntaxes= [];
+    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
+      $syntaxes[]= $class->newInstance();
+    }
+
     $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     $in= $out= '-';
     for ($i= 0; $i < sizeof($args); $i++) {
@@ -81,6 +87,10 @@ class CompileRunner {
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
         $emitter= $emit->newInstance($output->target((string)$path));
+        foreach ($syntaxes as $syntax) {
+          $syntax->setup($parse, $emitter);
+        }
+
         foreach (Transformations::registered() as $kind => $function) {
           $emitter->transform($kind, $function);
         }

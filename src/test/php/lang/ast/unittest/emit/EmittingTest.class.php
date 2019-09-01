@@ -7,6 +7,7 @@ use lang\ast\Emitter;
 use lang\ast\Node;
 use lang\ast\Parse;
 use lang\ast\Tokens;
+use lang\ast\transform\Transformations;
 use lang\reflect\Package;
 use text\StringTokenizer;
 use unittest\TestCase;
@@ -31,14 +32,18 @@ abstract class EmittingTest extends TestCase {
    */
   protected function type($code) {
     $name= 'T'.(self::$id++);
+    $out= new MemoryOutputStream();
 
     $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
+    $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
     foreach (self::$syntax as $syntax) {
-      $syntax->setup($parse);
+      $syntax->setup($parse, $emit);
     }
 
-    $out= new MemoryOutputStream();
-    $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
+    foreach (Transformations::registered() as $kind => $function) {
+      $emit->transform($kind, $function);
+    }
+
     $emit->emit($parse->execute());
     // var_dump($out->getBytes());
     self::$cl->setClassBytes($name, $out->getBytes());

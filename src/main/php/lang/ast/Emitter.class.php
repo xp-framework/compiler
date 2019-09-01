@@ -14,9 +14,10 @@ abstract class Emitter {
   protected $line= 1;
   protected $meta= [];
   protected $unsupported= [];
-  protected $transformations= [];
   protected $locals= [];
   protected $stack= [];
+
+  private $emit= [];
 
   /**
    * Selects the correct emitter for a given runtime
@@ -44,7 +45,24 @@ abstract class Emitter {
   }
 
   public function transform($kind, $function) {
-    $this->transformations[$kind]= $function;
+    $this->emit[$kind]= function($arg) use($function) {
+      foreach ($function($arg) as $n) {
+        $this->{'emit'.$n->kind}($n->value);
+      }
+    };
+    return $this;
+  }
+
+  /**
+   * Emit nodes of a certain kind using the given emitter function. Overwrites
+   * any previous handling, including builtin behavior!
+   *
+   * @param  string $kind
+   * @param  function(lang.ast.Node): void $function
+   * @return self
+   */
+  public function handle($kind, $function) {
+    $this->emit[$kind]= $function->bindTo($this, self::class);
     return $this;
   }
 
@@ -848,30 +866,6 @@ abstract class Emitter {
     $this->emit($from);
   }
 
-  protected function emitUsing($using) {
-    $variables= [];
-    foreach ($using->arguments as $expression) {
-      switch ($expression->kind) {
-        case 'variable': $variables[]= '$'.$expression->value; break;
-        case 'assignment': $variables[]= '$'.$expression->value->variable->value; break;
-        default: $temp= $this->temp(); $variables[]= $temp; $this->out->write($temp.'=');
-      }
-      $this->emit($expression);
-      $this->out->write(';');
-    }
-
-    $this->out->write('try {');
-    $this->emit($using->body);
-
-    $this->out->write('} finally {');
-    foreach ($variables as $variable) {
-      $this->out->write('if ('.$variable.' instanceof \lang\Closeable) { '.$variable.'->close(); }');
-      $this->out->write('else if ('.$variable.' instanceof \IDisposable) { '.$variable.'->__dispose(); }');
-      $this->out->write('unset('.$variable.');');
-    }
-    $this->out->write('}');
-  }
-
   public function emit($arg) {
     if ($arg instanceof Element) {
       if ($arg->line > $this->line) {
@@ -879,10 +873,8 @@ abstract class Emitter {
         $this->line= $arg->line;
       }
 
-      if (isset($this->transformations[$arg->kind])) {
-        foreach ($this->transformations[$arg->kind]($arg) as $n) {
-          $this->{'emit'.$n->kind}($n->value);
-        }
+      if (isset($this->emit[$arg->kind])) {
+        $this->emit[$arg->kind]($arg);
       } else {
         $this->{'emit'.$arg->kind}($arg->value);
       }
