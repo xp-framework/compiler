@@ -61,13 +61,14 @@ abstract class Emitter {
   /**
    * Collects emitted code into a buffer and returns it
    *
+   * @param  lang.ast.Result
    * @param  function(): void $callable
    * @return string
    */
-  protected function buffer($callable) {
+  protected function buffer($result, $callable) {
     $o= $result->out;
     $buffer= new MemoryOutputStream();
-    $result->out= new StringWriter($buffer  );
+    $result->out= new StringWriter($buffer);
 
     try {
       $callable();

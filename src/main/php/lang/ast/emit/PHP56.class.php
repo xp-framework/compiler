@@ -135,7 +135,7 @@ class PHP56 extends Emitter {
       $this->emit($result, $binary->right);
       $result->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
-      parent::emitBinary($binary);
+      parent::emitBinary($result, $binary);
     }
   }
 
@@ -175,7 +175,7 @@ class PHP56 extends Emitter {
       $this->emitArguments($invoke->arguments);
       $result->out->write(')');
     } else {
-      parent::emitInvoke($invoke);
+      parent::emitInvoke($result, $invoke);
     }
   }
 
@@ -204,7 +204,7 @@ class PHP56 extends Emitter {
     $result->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
     $result->out->write(', "use" => []');
     $result->out->write('], \'{');
-    $result->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
+    $result->out->write(str_replace('\'', '\\\'', $this->buffer($result, function() use($result, $definition) {
       foreach ($definition->body as $member) {
         $this->emit($result, $member);
         $result->out->write("\n");
@@ -234,7 +234,7 @@ class PHP56 extends Emitter {
 
   protected function emitClass($result, $class) {
     $result->call= [false => [], true => []];
-    array_unshift($this->meta, []);
+    array_unshift($result->meta, []);
     $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
     $class->parent && $result->out->write(' extends '.$class->parent);
     $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
