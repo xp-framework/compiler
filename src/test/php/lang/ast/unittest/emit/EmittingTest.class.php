@@ -13,11 +13,12 @@ use text\StringTokenizer;
 use unittest\TestCase;
 
 abstract class EmittingTest extends TestCase {
-  private static $cl;
+  private static $cl, $language;
   private static $id= 0;
 
   static function __static() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
+    self::$language= Language::named('PHP');
   }
 
   /**
@@ -30,7 +31,7 @@ abstract class EmittingTest extends TestCase {
     $name= 'T'.(self::$id++);
     $out= new MemoryOutputStream();
 
-    $parse= new Parse(Language::named('PHP'), new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
+    $parse= new Parse(self::$language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
     $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
     foreach (CompilingClassLoader::$syntax as $syntax) {
       $syntax->setup($parse->language, $emit);
