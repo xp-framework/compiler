@@ -30,7 +30,7 @@ class Result {
    * @param  function(lang.ast.Result): void $callable
    * @return string
    */
-  protected function buffer($callable) {
+  public function buffer($callable) {
     $out= $this->out;
     $buffer= new MemoryOutputStream();
     $this->out= new StringWriter($buffer);
