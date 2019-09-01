@@ -1,17 +1,12 @@
 <?php namespace lang\ast;
 
 class Parse {
-  private static $symbols= [];
-  private static $body= [];
-
   private $tokens, $file;
   private $errors= [];
 
   public $token, $scope;
   public $comment= null;
   public $queue= [];
-
-  public static function rules() { /* NOOP */ }
 
   /**
    * Creates a new parse instance

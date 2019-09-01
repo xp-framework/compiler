@@ -17,8 +17,6 @@ module xp-framework/compiler {
       CompilingClassloader::$syntax[]= $class->newInstance();
     }
 
-    Parse::rules();
-
     if (!interface_exists(\IDisposable::class, false)) {
       eval('interface IDisposable { public function __dispose(); }');
     }

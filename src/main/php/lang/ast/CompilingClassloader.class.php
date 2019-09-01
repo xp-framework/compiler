@@ -20,6 +20,7 @@ class CompilingClassLoader implements IClassLoader {
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
     Compiled::$emit[$this->version]= $emit;
+    Compiled::$lang= Language::named('PHP');
     stream_wrapper_register($this->version, Compiled::class);
   }
 
