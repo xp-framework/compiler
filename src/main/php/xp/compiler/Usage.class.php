@@ -1,6 +1,6 @@
 <?php namespace xp\compiler;
 
-use lang\reflect\Package;
+use lang\ast\Compiled;
 use util\cmd\Console;
 
 class Usage {
@@ -12,14 +12,15 @@ class Usage {
 
     // Show syntax implementations sorted by class loader
     $loaders= $sorted= [];
-    foreach (Package::forName('lang.ast.syntax')->getClasses() as $syntax) {
-      $l= $syntax->getClassLoader();
+    foreach (Compiled::$syntax as $syntax) {
+      $t= typeof($syntax);
+      $l= $t->getClassLoader();
       $hash= $l->hashCode();
       if (isset($sorted[$hash])) {
-        $sorted[$hash][]= $syntax;
+        $sorted[$hash][]= $t;
       } else {
         $loaders[$hash]= $l;
-        $sorted[$hash]= [$syntax];
+        $sorted[$hash]= [$t];
       }
     }
     foreach ($sorted as $hash => $list) {
