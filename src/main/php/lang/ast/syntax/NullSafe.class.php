@@ -5,14 +5,14 @@ use lang\ast\nodes\InstanceExpression;
 class NullSafe {
 
   public function setup($parser, $emitter) {
-    $parser->infix('?->', 80, function($node, $left) {
-      if ('{' === $this->token->value) {
-        $this->token= $this->advance();
-        $expr= $this->expression(0);
-        $this->token= $this->next('}');
+    $parser->infix('?->', 80, function($parse, $node, $left) {
+      if ('{' === $parse->token->value) {
+        $parse->forward();
+        $expr= $parse->expression(0);
+        $parse->expecting('}', 'dynamic member');
       } else {
-        $expr= $this->token;
-        $this->token= $this->advance();
+        $expr= $parse->token;
+        $parse->forward();
       }
 
       $node->value= new InstanceExpression($left, $expr);

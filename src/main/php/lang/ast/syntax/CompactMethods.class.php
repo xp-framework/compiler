@@ -6,29 +6,29 @@ use lang\ast\nodes\Method;
 class CompactMethods {
 
   public function setup($parser, $emitter) {
-    $parser->body('fn', function(&$body, $annotations, $modifiers) {
-      $member= new Node($this->token->symbol);
+    $parser->body('fn', function($parse, &$body, $annotations, $modifiers) {
+      $member= new Node($parse->token->symbol);
       $member->kind= 'method';
-      $member->line= $this->token->line;
-      $comment= $this->comment;
-      $this->comment= null;
+      $member->line= $parse->token->line;
+      $comment= $parse->comment;
+      $parse->comment= null;
 
-      $this->token= $this->advance();
-      $name= $this->token->value;
+      $parse->forward();
+      $name= $parse->token->value;
       $lookup= $name.'()';
       if (isset($body[$lookup])) {
-        $this->raise('Cannot redeclare method '.$lookup);
+        $parse->raise('Cannot redeclare method '.$lookup);
       }
 
-      $this->token= $this->advance();
-      $signature= $this->signature();
+      $parse->forward();
+      $signature= $parse->signature();
 
-      $this->token= $this->expect('=>');
-      $return= new Node($this->token->symbol);
-      $return->line= $this->token->line;
-      $return->value= $this->expressionWithThrows(0);
+      $parse->expecting('=>', 'compact function');
+      $return= new Node($parse->token->symbol);
+      $return->line= $parse->token->line;
+      $return->value= $parse->expressionWithThrows(0);
       $return->kind= 'return';
-      $this->token= $this->expect(';');
+      $parse->expecting(';', 'compact function');
 
       $member->value= new Method($modifiers, $name, $signature, [$return], $annotations, $comment);
       $body[$lookup]= $member;

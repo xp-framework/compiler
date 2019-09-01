@@ -5,14 +5,14 @@ use lang\ast\nodes\UsingStatement;
 class Using {
 
   public function setup($parser, $emitter) {
-    $parser->stmt('using', function($node) {
-      $this->token= $this->expect('(');
-      $arguments= $this->arguments();
-      $this->token= $this->expect(')');
+    $parser->stmt('using', function($parse, $node) {
+      $parse->expecting('(', 'using arguments');
+      $arguments= $parse->expressions(')');
+      $parse->expecting(')', 'using arguments');
 
-      $this->token= $this->expect('{');
-      $statements= $this->statements();
-      $this->token= $this->expect('}');
+      $parse->expecting('{', 'using block');
+      $statements= $parse->statements();
+      $parse->expecting('}', 'using block');
 
       $node->value= new UsingStatement($arguments, $statements);
       $node->kind= 'using';
