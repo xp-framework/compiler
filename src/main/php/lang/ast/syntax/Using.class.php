@@ -4,8 +4,8 @@ use lang\ast\nodes\UsingStatement;
 
 class Using {
 
-  public function setup($parser, $emitter) {
-    $parser->stmt('using', function($parse, $node) {
+  public function setup($language, $emitter) {
+    $language->stmt('using', function($parse, $node) {
       $parse->expecting('(', 'using arguments');
       $arguments= $this->expressions($parse, ')');
       $parse->expecting(')', 'using arguments');

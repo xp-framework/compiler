@@ -4,7 +4,7 @@ use lang\ast\transform\Transformations;
 
 class TransformationApi {
 
-  public function setup($parser, $emitter) {
+  public function setup($language, $emitter) {
     foreach (Transformations::registered() as $kind => $function) {
       $emitter->transform($kind, $function);
     }

@@ -4,8 +4,8 @@ use lang\ast\nodes\InstanceExpression;
 
 class NullSafe {
 
-  public function setup($parser, $emitter) {
-    $parser->infix('?->', 80, function($parse, $node, $left) {
+  public function setup($language, $emitter) {
+    $language->infix('?->', 80, function($parse, $node, $left) {
       if ('{' === $parse->token->value) {
         $parse->forward();
         $expr= $this->expression($parse, 0);
