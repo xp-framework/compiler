@@ -15,13 +15,15 @@ class CompilingClassLoader implements IClassLoader {
   private static $instance= [];
   private $version;
 
-  /** Creates a new instances with a given PHP runtime */
-  private function __construct($emit) {
-    $this->version= $emit->getSimpleName();
+  static function __static() {
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
       Compiled::$syntax[]= $class->newInstance();
     }
+  }
 
+  /** Creates a new instances with a given PHP runtime */
+  private function __construct($emit) {
+    $this->version= $emit->getSimpleName();
     Compiled::$emit[$this->version]= $emit;
     stream_wrapper_register($this->version, Compiled::class);
   }
