@@ -6,8 +6,9 @@ use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\nodes\Value;
 use text\StringTokenizer;
+use unittest\TestCase;
 
-abstract class ParseTest extends \unittest\TestCase {
+abstract class ParseTest extends TestCase {
 
   /**
    * Transforms nodes for easy comparison
@@ -42,7 +43,7 @@ abstract class ParseTest extends \unittest\TestCase {
    * @return iterable
    */
   protected function parse($code) {
-    return (new Parse(Language::named('php'), new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
+    return (new Parse(Language::named('PHP'), new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
   }
 
   /**
