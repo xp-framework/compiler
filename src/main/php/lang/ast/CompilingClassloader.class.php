@@ -21,6 +21,7 @@ class CompilingClassLoader implements IClassLoader {
     $this->version= $emit->getSimpleName();
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
       $this->syntax[]= $class->newInstance();
+      Compiled::$syntax[]= $class->newInstance();
     }
 
     Compiled::$emit[$this->version]= $emit;
@@ -203,30 +204,7 @@ class CompilingClassLoader implements IClassLoader {
       throw new ClassNotFoundException($class);  
     }
 
-    $declaration= new MemoryOutputStream();
-    $file= strtr($class, '.', '/').self::EXTENSION;
-    $in= $source->getResourceAsStream($file)->in();
-
-    try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
-      $emitter= $this->emit->newInstance($declaration);
-
-      foreach ($this->syntax as $syntax) {
-        $syntax->setup($parse, $emitter);
-      }
-
-      foreach (Transformations::registered() as $kind => $function) {
-        $emitter->transform($kind, $function);
-      }
-      $emitter->emit($parse->execute());
-
-      return $declaration->getBytes();
-    } catch (Errors $e) {
-      $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
-      throw new ClassFormatException($message);
-    } finally {
-      $in->close();
-    }
+    return Compiled::bytes($this->version, $source, strtr($class, '.', '/').self::EXTENSION);
   }
 
   /**

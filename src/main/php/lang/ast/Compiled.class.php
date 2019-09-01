@@ -1,14 +1,31 @@
 <?php namespace lang\ast;
 
 use io\streams\OutputStream;
-use lang\ClassFormatException;
-use lang\ast\transform\Transformations;
 use text\StreamTokenizer;
 
 class Compiled implements OutputStream {
-  public static $source= [], $emit= [];
+  public static $source= [], $syntax= [], $emit= [];
 
   private $compiled= '', $offset= 0;
+
+  public static function bytes($version, $source, $file) {
+    $stream= $source->getResourceAsStream($file);
+    return self::parse($version, $stream->in(), new self(), $file)->compiled;
+  }
+
+  private static function parse($version, $in, $out, $file) {
+    try {
+      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
+      $emitter= self::$emit[$version]->newInstance($out);
+      foreach (self::$syntax as $syntax) {
+        $syntax->setup($parse, $emitter);
+      }
+      $emitter->emit($parse->execute());
+      return $out;
+    } finally {
+      $in->close();
+    }
+  }
 
   /**
    * Opens path
@@ -21,23 +38,9 @@ class Compiled implements OutputStream {
   public function stream_open($path, $mode, $options, &$opened) {
     list($version, $file)= explode('://', $path);
     $stream= self::$source[$file]->getResourceAsStream($file);
-    $in= $stream->in();
-
-    try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
-      $emitter= self::$emit[$version]->newInstance($this);
-      foreach (Transformations::registered() as $kind => $function) {
-        $emitter->transform($kind, $function);
-      }
-      $emitter->emit($parse->execute());
-      $opened= $stream->getURI();
-      return true;
-    } catch (Error $e) {
-      $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
-      throw new ClassFormatException($message);
-    } finally {
-      $in->close();
-    }
+    self::parse($version, $stream->in(), $this, $file);
+    $opened= $stream->getURI();
+    return true;
   }
 
   /** @param string $bytes */

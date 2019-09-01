@@ -40,10 +40,6 @@ abstract class EmittingTest extends TestCase {
       $syntax->setup($parse, $emit);
     }
 
-    foreach (Transformations::registered() as $kind => $function) {
-      $emit->transform($kind, $function);
-    }
-
     $emit->emit($parse->execute());
     // var_dump($out->getBytes());
     self::$cl->setClassBytes($name, $out->getBytes());

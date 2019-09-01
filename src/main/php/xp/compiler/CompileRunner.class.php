@@ -6,7 +6,6 @@ use lang\ast\Emitter;
 use lang\ast\Errors;
 use lang\ast\Parse;
 use lang\ast\Tokens;
-use lang\ast\transform\Transformations;
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -83,9 +82,6 @@ class CompileRunner {
           $syntax->newInstance()->setup($parse, $emitter);
         }
 
-        foreach (Transformations::registered() as $kind => $function) {
-          $emitter->transform($kind, $function);
-        }
         $emitter->emit($parse->execute());
 
         $t->stop();
