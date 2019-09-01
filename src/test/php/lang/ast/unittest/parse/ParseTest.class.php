@@ -1,10 +1,11 @@
 <?php namespace lang\ast\unittest\parse;
 
-use text\StringTokenizer;
-use lang\ast\Parse;
+use lang\ast\Language;
 use lang\ast\Node;
+use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\nodes\Value;
+use text\StringTokenizer;
 
 abstract class ParseTest extends \unittest\TestCase {
 
@@ -41,7 +42,7 @@ abstract class ParseTest extends \unittest\TestCase {
    * @return iterable
    */
   protected function parse($code) {
-    return (new Parse(new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
+    return (new Parse(Language::named('php'), new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
   }
 
   /**

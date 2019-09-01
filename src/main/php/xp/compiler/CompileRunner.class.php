@@ -5,6 +5,7 @@ use lang\Runtime;
 use lang\ast\CompilingClassloader;
 use lang\ast\Emitter;
 use lang\ast\Errors;
+use lang\ast\Language;
 use lang\ast\Parse;
 use lang\ast\Tokens;
 use text\StreamTokenizer;
@@ -76,10 +77,10 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
+        $parse= new Parse(Language::named('PHP'), new Tokens(new StreamTokenizer($in)), $file);
         $emitter= $emit->newInstance($output->target((string)$path));
         foreach (CompilingClassloader::$syntax as $syntax) {
-          $syntax->setup($parse, $emitter);
+          $syntax->setup($parse->language, $emitter);
         }
 
         $emitter->emit($parse->execute());

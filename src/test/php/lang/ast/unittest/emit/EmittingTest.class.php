@@ -5,6 +5,7 @@ use io\streams\StringWriter;
 use lang\DynamicClassLoader;
 use lang\ast\CompilingClassLoader;
 use lang\ast\Emitter;
+use lang\ast\Language;
 use lang\ast\Node;
 use lang\ast\Parse;
 use lang\ast\Tokens;
@@ -29,10 +30,10 @@ abstract class EmittingTest extends TestCase {
     $name= 'T'.(self::$id++);
     $out= new MemoryOutputStream();
 
-    $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
+    $parse= new Parse(Language::named('PHP'), new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
     $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
     foreach (CompilingClassLoader::$syntax as $syntax) {
-      $syntax->setup($parse, $emit);
+      $syntax->setup($parse->language, $emit);
     }
 
     $emit->emit($parse->execute());

@@ -8,7 +8,7 @@ class NullSafe {
     $parser->infix('?->', 80, function($parse, $node, $left) {
       if ('{' === $parse->token->value) {
         $parse->forward();
-        $expr= $parse->expression(0);
+        $expr= $this->expression($parse, 0);
         $parse->expecting('}', 'dynamic member');
       } else {
         $expr= $parse->token;

@@ -21,12 +21,12 @@ class CompactMethods {
       }
 
       $parse->forward();
-      $signature= $parse->signature();
+      $signature= $this->signature($parse);
 
       $parse->expecting('=>', 'compact function');
       $return= new Node($parse->token->symbol);
       $return->line= $parse->token->line;
-      $return->value= $parse->expressionWithThrows(0);
+      $return->value= $this->expressionWithThrows($parse, 0);
       $return->kind= 'return';
       $parse->expecting(';', 'compact function');
 

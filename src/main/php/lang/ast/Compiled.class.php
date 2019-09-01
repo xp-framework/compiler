@@ -15,10 +15,10 @@ class Compiled implements OutputStream {
 
   private static function parse($version, $in, $out, $file) {
     try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
+      $parse= new Parse(Language::named('php'), new Tokens(new StreamTokenizer($in)), $file);
       $emitter= self::$emit[$version]->newInstance($out);
       foreach (CompilingClassloader::$syntax as $syntax) {
-        $syntax->setup($parse, $emitter);
+        $syntax->setup($parse->language, $emitter);
       }
       $emitter->emit($parse->execute());
       return $out;

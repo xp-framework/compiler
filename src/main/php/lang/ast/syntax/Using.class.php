@@ -7,11 +7,11 @@ class Using {
   public function setup($parser, $emitter) {
     $parser->stmt('using', function($parse, $node) {
       $parse->expecting('(', 'using arguments');
-      $arguments= $parse->expressions(')');
+      $arguments= $this->expressions($parse, ')');
       $parse->expecting(')', 'using arguments');
 
       $parse->expecting('{', 'using block');
-      $statements= $parse->statements();
+      $statements= $this->statements($parse);
       $parse->expecting('}', 'using block');
 
       $node->value= new UsingStatement($arguments, $statements);
