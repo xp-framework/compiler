@@ -11,15 +11,16 @@ class Parse {
   /**
    * Creates a new parse instance
    *
+   * @param  lang.ast.Language $language
    * @param  lang.ast.Tokens $tokens
    * @param  string $file
    * @param  lang.ast.Scope $scope
    */
-  public function __construct($language, $tokens, $file= null, $scope= null) {
+  public function __construct($language, $tokens, $file= null) {
     $this->language= $language;
     $this->tokens= $tokens->getIterator();
-    $this->scope= $scope ?: new Scope(null);
     $this->file= $file;
+    $this->scope= new Scope(null);
   }
 
   /**
