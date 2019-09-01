@@ -137,21 +137,6 @@ class Parse {
       return $node;
     });
 
-    $this->infix('?->', 80, function($node, $left) {
-      if ('{' === $this->token->value) {
-        $this->token= $this->advance();
-        $expr= $this->expression(0);
-        $this->token= $this->next('}');
-      } else {
-        $expr= $this->token;
-        $this->token= $this->advance();
-      }
-
-      $node->value= new InstanceExpression($left, $expr);
-      $node->kind= 'nullsafeinstance';
-      return $node;
-    });
-
     $this->infix('::', 80, function($node, $left) {
       $node->value= new ScopeExpression($this->scope->resolve($left->value), $this->token);
       $node->kind= 'scope';
@@ -1437,7 +1422,7 @@ class Parse {
     return $symbol;
   }
 
-  private static function constant($id, $value) {
+  public static function constant($id, $value) {
     $const= self::symbol($id);
     $const->nud= function($node) use($value) {
       $node->kind= 'literal';
@@ -1447,7 +1432,7 @@ class Parse {
     return $const;
   }
 
-  private function assignment($id) {
+  public function assignment($id) {
     $infix= self::symbol($id, 10);
     $infix->led= function($node, $left) use($id) {
       $node->kind= 'assignment';
@@ -1457,9 +1442,9 @@ class Parse {
     return $infix;
   }
 
-  private function infix($id, $bp, $led= null) {
+  public function infix($id, $bp, $led= null) {
     $infix= self::symbol($id, $bp);
-    $infix->led= $led ?: function($node, $left) use($id, $bp) {
+    $infix->led= $led ? $led->bindTo($this, self::class) : function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expression($bp));
       $node->kind= 'binary';
       return $node;
@@ -1467,9 +1452,9 @@ class Parse {
     return $infix;
   }
 
-  private function infixr($id, $bp, $led= null) {
+  public function infixr($id, $bp, $led= null) {
     $infix= self::symbol($id, $bp);
-    $infix->led= $led ?: function($node, $left) use($id, $bp) {
+    $infix->led= $led ? $led->bindTo($this, self::class) : function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expression($bp - 1));
       $node->kind= 'binary';
       return $node;
@@ -1477,7 +1462,7 @@ class Parse {
     return $infix;
   }
 
-  private function infixt($id, $bp) {
+  public function infixt($id, $bp) {
     $infix= self::symbol($id, $bp);
     $infix->led= function($node, $left) use($id, $bp) {
       $node->value= new BinaryExpression($left, $id, $this->expressionWithThrows($bp - 1));
@@ -1487,7 +1472,7 @@ class Parse {
     return $infix;
   }
 
-  private function prefix($id, $nud= null) {
+  public function prefix($id, $nud= null) {
     $prefix= self::symbol($id);
     $prefix->nud= $nud ?: function($node) use($id) {
       $node->value= new UnaryExpression($this->expression(70), $id);
@@ -1497,9 +1482,9 @@ class Parse {
     return $prefix;
   }
 
-  private function suffix($id, $bp, $led= null) {
+  public function suffix($id, $bp, $led= null) {
     $suffix= self::symbol($id, $bp);
-    $suffix->led= $led ?: function($node, $left) use($id) {
+    $suffix->led= $led ? $led->bindTo($this, self::class) : function($node, $left) use($id) {
       $node->value= new UnaryExpression($left, $id);
       $node->kind= 'unary';
       return $node;
