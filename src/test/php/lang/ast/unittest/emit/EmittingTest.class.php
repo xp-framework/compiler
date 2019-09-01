@@ -3,25 +3,20 @@
 use io\streams\MemoryOutputStream;
 use io\streams\StringWriter;
 use lang\DynamicClassLoader;
+use lang\ast\CompilingClassLoader;
 use lang\ast\Emitter;
 use lang\ast\Node;
 use lang\ast\Parse;
 use lang\ast\Tokens;
-use lang\ast\transform\Transformations;
-use lang\reflect\Package;
 use text\StringTokenizer;
 use unittest\TestCase;
 
 abstract class EmittingTest extends TestCase {
   private static $cl;
-  private static $syntax= [];
   private static $id= 0;
 
   static function __static() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
-    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      self::$syntax[]= $class->newInstance();
-    }
   }
 
   /**
@@ -36,7 +31,7 @@ abstract class EmittingTest extends TestCase {
 
     $parse= new Parse(new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
     $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance(new StringWriter($out));
-    foreach (self::$syntax as $syntax) {
+    foreach (CompilingClassLoader::$syntax as $syntax) {
       $syntax->setup($parse, $emit);
     }
 
