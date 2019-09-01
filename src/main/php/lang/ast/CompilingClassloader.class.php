@@ -15,12 +15,6 @@ class CompilingClassLoader implements IClassLoader {
   private static $instance= [];
   private $version;
 
-  static function __static() {
-    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      Compiled::$syntax[]= $class->newInstance();
-    }
-  }
-
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
