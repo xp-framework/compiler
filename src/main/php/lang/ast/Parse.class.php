@@ -48,7 +48,7 @@ class Parse {
   public $comment= null;
   public $queue= [];
 
-  static function __static() {
+  public static function rules() {
     self::symbol(':');
     self::symbol(';');
     self::symbol(',');
