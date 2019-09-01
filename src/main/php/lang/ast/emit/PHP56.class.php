@@ -245,14 +245,14 @@ class PHP56 extends Emitter {
 
     if ($result->call[false]) {
       $result->out->write('function __call($name, $args) {');
-      foreach ($this->call[false] as $name) {
+      foreach ($result->call[false] as $name) {
         $result->out->write('if (\''.$name.'\' === $name) return $this->__'.$name.'(...$args); else ');
       }
       $result->out->write('return $this->__call0($name, $args); }');
     }
     if ($result->call[true]) {
       $result->out->write('static function __callStatic($name, $args) {');
-      foreach ($this->call[true] as $name) {
+      foreach ($result->call[true] as $name) {
         $result->out->write('if (\''.$name.'\' === $name) return self::__'.$name.'(...$args); else ');
       }
       $result->out->write('return self::__callStatic0($name, ...$args); }');
