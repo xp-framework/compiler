@@ -149,7 +149,7 @@ class PHP extends Language {
     });
 
     $this->infix('(', 80, function($parse, $node, $left) {
-      $arguments= $this->expressions($parse, );
+      $arguments= $this->expressions($parse);
       $parse->expecting(')', 'invoke expression');
       $node->value= new InvokeExpression($left, $arguments);
       $node->kind= 'invoke';
@@ -310,7 +310,7 @@ class PHP extends Language {
       $parse->forward();
 
       $parse->expecting('(', 'new arguments');
-      $arguments= $this->expressions($parse, );
+      $arguments= $this->expressions($parse);
       $parse->expecting(')', 'new arguments');
 
       if ('variable' === $type->kind) {
