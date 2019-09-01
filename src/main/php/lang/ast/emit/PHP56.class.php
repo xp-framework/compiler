@@ -142,13 +142,13 @@ class PHP56 extends Emitter {
   protected function emitAssignment($result, $assignment) {
     if ('??=' === $assignment->operator) {
       $result->out->write('isset(');
-      $this->emitAssign($assignment->variable);
+      $this->emitAssign($result, $assignment->variable);
       $result->out->write(') ||');
       $this->emit($result, $assignment->variable);
       $result->out->write('=');
       $this->emit($result, $assignment->expression);
     } else {
-      $this->emitAssign($assignment->variable);
+      $this->emitAssign($result, $assignment->variable);
       $result->out->write($assignment->operator);
       $this->emit($result, $assignment->expression);
     }
@@ -163,7 +163,7 @@ class PHP56 extends Emitter {
       $this->emit($result, $expr->value);
       $result->out->write(') ? '.$t);
       $result->out->write('(');
-      $this->emitArguments($invoke->arguments);
+      $this->emitArguments($result, $invoke->arguments);
       $result->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
     } else if (
       'scope' === $expr->kind &&
@@ -172,7 +172,7 @@ class PHP56 extends Emitter {
     ) {
       $result->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
       $result->out->write('(');
-      $this->emitArguments($invoke->arguments);
+      $this->emitArguments($result, $invoke->arguments);
       $result->out->write(')');
     } else {
       parent::emitInvoke($result, $invoke);
