@@ -204,7 +204,7 @@ class PHP56 extends Emitter {
     $result->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
     $result->out->write(', "use" => []');
     $result->out->write('], \'{');
-    $result->out->write(str_replace('\'', '\\\'', $this->buffer($result, function() use($result, $definition) {
+    $result->out->write(str_replace('\'', '\\\'', $result->buffer(function($result) use($definition) {
       foreach ($definition->body as $member) {
         $this->emit($result, $member);
         $result->out->write("\n");

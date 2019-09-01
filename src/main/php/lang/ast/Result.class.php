@@ -23,4 +23,23 @@ class Result {
   public function temp() {
     return '$T'.($this->id++);
   }
+
+  /**
+   * Collects emitted code into a buffer and returns it
+   *
+   * @param  function(lang.ast.Result): void $callable
+   * @return string
+   */
+  protected function buffer($callable) {
+    $out= $this->out;
+    $buffer= new MemoryOutputStream();
+    $this->out= new StringWriter($buffer);
+
+    try {
+      $callable($this);
+      return $buffer->getBytes();
+    } finally {
+      $this->out= $out;
+    }
+  }
 }
