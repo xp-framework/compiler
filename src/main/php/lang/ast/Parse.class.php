@@ -1370,6 +1370,7 @@ class Parse {
         $this->token= $this->advance();
       } else if ($type= $this->type()) {
         $this->properties($body, $annotations, $modifiers, $type);
+        $modifiers= [];
       } else {
         $this->raise(sprintf(
           'Expected a type, modifier, property, annotation, method or "}", have "%s"',
