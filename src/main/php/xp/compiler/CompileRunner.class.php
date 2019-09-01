@@ -2,6 +2,7 @@
 
 use io\Path;
 use lang\Runtime;
+use lang\ast\Compiled;
 use lang\ast\Emitter;
 use lang\ast\Errors;
 use lang\ast\Parse;
@@ -44,7 +45,6 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $syntaxes= Package::forName('lang.ast.syntax')->getClasses();
     $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     $in= $out= '-';
     for ($i= 0; $i < sizeof($args); $i++) {
@@ -78,8 +78,8 @@ class CompileRunner {
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
         $emitter= $emit->newInstance($output->target((string)$path));
-        foreach ($syntaxes as $syntax) {
-          $syntax->newInstance()->setup($parse, $emitter);
+        foreach (Compiled::$syntax as $syntax) {
+          $syntax->setup($parse, $emitter);
         }
 
         $emitter->emit($parse->execute());
