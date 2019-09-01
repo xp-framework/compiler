@@ -2,7 +2,7 @@
 
 use io\Path;
 use lang\Runtime;
-use lang\ast\Compiled;
+use lang\ast\CompilingClassloader;
 use lang\ast\Emitter;
 use lang\ast\Errors;
 use lang\ast\Parse;
@@ -78,7 +78,7 @@ class CompileRunner {
       try {
         $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
         $emitter= $emit->newInstance($output->target((string)$path));
-        foreach (Compiled::$syntax as $syntax) {
+        foreach (CompilingClassloader::$syntax as $syntax) {
           $syntax->setup($parse, $emitter);
         }
 

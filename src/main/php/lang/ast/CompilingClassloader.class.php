@@ -13,6 +13,7 @@ class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
   private static $instance= [];
+  public static $syntax= [];
   private $version;
 
   /** Creates a new instances with a given PHP runtime */

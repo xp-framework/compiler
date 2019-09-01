@@ -14,7 +14,7 @@ module xp-framework/compiler {
     ClassLoader::registerLoader(CompilingClassloader::instanceFor($runtime));
 
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      Compiled::$syntax[]= $class->newInstance();
+      CompilingClassloader::$syntax[]= $class->newInstance();
     }
 
     if (!interface_exists(\IDisposable::class, false)) {

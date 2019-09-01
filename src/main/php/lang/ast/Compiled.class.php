@@ -4,7 +4,7 @@ use io\streams\OutputStream;
 use text\StreamTokenizer;
 
 class Compiled implements OutputStream {
-  public static $source= [], $syntax= [], $emit= [];
+  public static $source= [], $emit= [];
 
   private $compiled= '', $offset= 0;
 
@@ -17,7 +17,7 @@ class Compiled implements OutputStream {
     try {
       $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
       $emitter= self::$emit[$version]->newInstance($out);
-      foreach (self::$syntax as $syntax) {
+      foreach (CompilingClassloader::$syntax as $syntax) {
         $syntax->setup($parse, $emitter);
       }
       $emitter->emit($parse->execute());
