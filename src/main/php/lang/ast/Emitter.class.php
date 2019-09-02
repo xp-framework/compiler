@@ -36,7 +36,7 @@ abstract class Emitter {
     } else {
       $this->emit[$kind]= function($result, $arg) use($function) {
         foreach ($function($arg) as $n) {
-          $this->{'emit'.$n->kind}($result, $n->value);
+          $this->{'emit'.$n->kind}($result, $n);
         }
       };
     }
@@ -84,30 +84,15 @@ abstract class Emitter {
   /**
    * Search a given scope recursively for nodes with a given kind
    *
-   * @param  lang.ast.Node|lang.ast.Node[] $arg
+   * @param  lang.ast.Element $arg
    * @param  string $kind
    * @return iterable
    */
   protected function search($arg, $kind) {
-    if ($arg instanceof Node) {         // TODO: Do we need this?
-      if ($arg->kind === $kind) {
-        yield $arg;
-      } else {
-        foreach ($this->search($arg->value, $kind) as $result) {
-          yield $result;
-        }
-      }
-    } else if ($arg instanceof Value) {  // TODO: Move recursion into Kind subclasses
-      foreach ((array)$arg as $node) {
-        foreach ($this->search($node, $kind) as $result) {
-          yield $result;
-        }
-      }
-    } else if (is_array($arg)) {
-      foreach ($arg as $node) {
-        foreach ($this->search($node, $kind) as $result) {
-          yield $result;
-        }
+    if ($arg->kind === $kind) yield $arg;
+    foreach ($arg->children() as $child) {
+      foreach ($this->search($child, $kind) as $result) {
+        yield $result;
       }
     }
   }
@@ -137,25 +122,13 @@ abstract class Emitter {
     $result->out->write('<?php ');
   }
 
-  protected function emitPackage($result, $package) {
-    $result->out->write('namespace '.$package.";\n");
+  protected function emitNamespace($result, $declaration) {
+    $result->out->write('namespace '.$declaration->name.";\n");
   }
 
   protected function emitImport($result, $import) {
-    foreach ($import as $type => $alias) {
-      $result->out->write('use '.$type.($alias ? ' as '.$alias : '').';');
-    }
-  }
-
-  protected function emitImportConst($result, $import) {
-    foreach ($import as $type => $alias) {
-      $result->out->write('use const '.$type.($alias ? ' as '.$alias : '').';');
-    }
-  }
-
-  protected function emitImportFunction($result, $import) {
-    foreach ($import as $type => $alias) {
-      $result->out->write('use function '.$type.($alias ? ' as '.$alias : '').';');
+    foreach ($import->names as $name => $alias) {
+      $result->out->write('use '.$import->type.' '.$name.($alias ? ' as '.$alias : '').';');
     }
   }
 
@@ -164,11 +137,11 @@ abstract class Emitter {
   }
 
   protected function emitCode($result, $code) {
-    $result->out->write($code);
+    $result->out->write($code->value);
   }
 
   protected function emitLiteral($result, $literal) {
-    $result->out->write($literal);
+    $result->out->write($literal->expression);
   }
 
   protected function emitName($result, $name) {
@@ -177,8 +150,8 @@ abstract class Emitter {
 
   protected function emitEcho($result, $echo) {
     $result->out->write('echo ');
-    $s= sizeof($echo) - 1;
-    foreach ($echo as $i => $expr) {
+    $s= sizeof($echo->expressions) - 1;
+    foreach ($echo->expressions as $i => $expr) {
       $this->emit($result, $expr);
       if ($i < $s) $result->out->write(',');
     }
@@ -186,12 +159,12 @@ abstract class Emitter {
 
   protected function emitBlock($result, $block) {
     $result->out->write('{');
-    $this->emit($result, $block);
+    $this->emit($result, $block->statements);
     $result->out->write('}');
   }
 
   protected function emitStatic($result, $static) {
-    foreach ($static as $variable => $initial) {
+    foreach ($static->initializations as $variable => $initial) {
       $result->out->write('static $'.$variable);
       if ($initial) {
         $result->out->write('=');
@@ -202,7 +175,7 @@ abstract class Emitter {
   }
 
   protected function emitVariable($result, $variable) {
-    $result->out->write('$'.$variable);
+    $result->out->write('$'.$variable->name);
   }
 
   protected function emitCast($result, $cast) {
@@ -224,13 +197,13 @@ abstract class Emitter {
   }
 
   protected function emitArray($result, $array) {
-    if (empty($array)) {
+    if (empty($array->values)) {
       $result->out->write('[]');
       return;
     }
 
     $unpack= false;
-    foreach ($array as $pair) {
+    foreach ($array->values as $pair) {
       if ('unpack' === $pair[1]->kind) {
         $unpack= true;
         break;
@@ -239,20 +212,20 @@ abstract class Emitter {
 
     if ($unpack) {
       $result->out->write('array_merge([');
-      foreach ($array as $pair) {
+      foreach ($array->values as $pair) {
         if ($pair[0]) {
           $this->emit($result, $pair[0]);
           $result->out->write('=>');
         }
         if ('unpack' === $pair[1]->kind) {
-          if ('array' === $pair[1]->value->kind) {
+          if ('array' === $pair[1]->expression->kind) {
             $result->out->write('],');
-            $this->emit($result, $pair[1]->value);
+            $this->emit($result, $pair[1]->expression);
             $result->out->write(',[');
           } else {
             $t= $result->temp();
             $result->out->write('],('.$t.'=');
-            $this->emit($result, $pair[1]->value);
+            $this->emit($result, $pair[1]->expression);
             $result->out->write(') instanceof \Traversable ? iterator_to_array('.$t.') : '.$t.',[');
           }
         } else {
@@ -263,7 +236,7 @@ abstract class Emitter {
       $result->out->write('])');
     } else {
       $result->out->write('[');
-      foreach ($array as $pair) {
+      foreach ($array->values as $pair) {
         if ($pair[0]) {
           $this->emit($result, $pair[0]);
           $result->out->write('=>');
@@ -518,7 +491,7 @@ abstract class Emitter {
 
   protected function emitBraced($result, $braced) {
     $result->out->write('(');
-    $this->emit($result, $braced);
+    $this->emit($result, $braced->expression);
     $result->out->write(')');
   }
 
@@ -554,11 +527,11 @@ abstract class Emitter {
 
   protected function emitAssign($result, $target) {
     if ('variable' === $target->kind) {
-      $result->out->write('$'.$target->value);
-      $result->locals[$target->value]= true;
+      $result->out->write('$'.$target->name);
+      $result->locals[$target->name]= true;
     } else if ('array' === $target->kind) {
       $result->out->write('list(');
-      foreach ($target->value as $pair) {
+      foreach ($target->values as $pair) {
         $this->emitAssign($result, $pair[1]);
         $result->out->write(',');
       }
@@ -576,7 +549,7 @@ abstract class Emitter {
 
   protected function emitReturn($result, $return) {
     $result->out->write('return ');
-    $return && $this->emit($result, $return);
+    $return->expression && $this->emit($result, $return->expression);
     $result->out->write(';');
   }
 
@@ -639,15 +612,15 @@ abstract class Emitter {
 
   protected function emitThrow($result, $throw) {
     $result->out->write('throw ');
-    $this->emit($result, $throw);
+    $this->emit($result, $throw->expression);
     $result->out->write(';');
   }
 
   protected function emitThrowExpression($result, $throw) {
     $capture= [];
-    foreach ($this->search($throw, 'variable') as $var) {
-      if (isset($result->locals[$var->value])) {
-        $capture[$var->value]= true;
+    foreach ($this->search($throw->expression, 'variable') as $var) {
+      if (isset($result->locals[$var->name])) {
+        $capture[$var->name]= true;
       }
     }
     unset($capture['this']);
@@ -655,7 +628,7 @@ abstract class Emitter {
     $result->out->write('(function()');
     $capture && $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
     $result->out->write('{ throw ');
-    $this->emit($result, $throw);
+    $this->emit($result, $throw->expression);
     $result->out->write('; })()');
   }
 
@@ -704,28 +677,28 @@ abstract class Emitter {
 
   protected function emitBreak($result, $break) {
     $result->out->write('break ');
-    $break && $this->emit($result, $break);
+    $break->expression && $this->emit($result, $break->expression);
     $result->out->write(';');
   }
 
   protected function emitContinue($result, $continue) {
     $result->out->write('continue ');
-    $continue && $this->emit($result, $continue);
+    $continue->expression && $this->emit($result, $continue->expression);
     $result->out->write(';');
   }
 
   protected function emitLabel($result, $label) {
-    $result->out->write($label.':');
+    $result->out->write($label->name.':');
   }
 
   protected function emitGoto($result, $goto) {
-    $result->out->write('goto '.$goto);
+    $result->out->write('goto '.$goto->label);
   }
 
   protected function emitInstanceOf($result, $instanceof) {
     $this->emit($result, $instanceof->expression);
     $result->out->write(' instanceof ');
-    if ($instanceof->type instanceof Node) {
+    if ($instanceof->type instanceof Value) {
       $this->emit($result, $instanceof->type);
     } else {
       $result->out->write($instanceof->type);
@@ -783,8 +756,8 @@ abstract class Emitter {
       $result->out->write('->');
     }
 
-    if ('name' === $instance->member->kind) {
-      $result->out->write($instance->member->value);
+    if ('literal' === $instance->member->kind) {
+      $result->out->write($instance->member->expression);
     } else {
       $result->out->write('{');
       $this->emit($result, $instance->member);
@@ -794,7 +767,7 @@ abstract class Emitter {
 
   protected function emitUnpack($result, $unpack) {
     $result->out->write('...');
-    $this->emit($result, $unpack);
+    $this->emit($result, $unpack->expression);
   }
 
   protected function emitYield($result, $yield) {
@@ -810,7 +783,7 @@ abstract class Emitter {
 
   protected function emitFrom($result, $from) {
     $result->out->write('yield from ');
-    $this->emit($result, $from);
+    $this->emit($result, $from->iterable);
   }
 
   public function emit($result, $arg) {
@@ -823,7 +796,7 @@ abstract class Emitter {
       if (isset($this->emit[$arg->kind])) {
         $this->emit[$arg->kind]($result, $arg);
       } else {
-        $this->{'emit'.$arg->kind}($result, $arg->value);
+        $this->{'emit'.$arg->kind}($result, $arg);
       }
     } else {
       foreach ($arg as $node) {
