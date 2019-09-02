@@ -15,21 +15,21 @@ class NullSafe {
         $parse->forward();
       }
 
-      $node->value= new InstanceExpression($left, $expr);
-      $node->kind= 'nullsafeinstance';
-      return $node;
+      $value= new InstanceExpression($left, $expr);
+      $value->kind= 'nullsafeinstance';
+      return $value;
     });
     $emitter->handle('nullsafeinstance', function($result, $instance) {
       $t= $result->temp();
       $result->out->write('null === ('.$t.'= ');
-      $this->emit($result, $instance->value->expression);
+      $this->emit($result, $instance->expression);
       $result->out->write(') ? null : '.$t.'->');
 
-      if ('name' === $instance->value->member->kind) {
-        $result->out->write($instance->value->member->value);
+      if ('name' === $instance->member->kind) {
+        $result->out->write($instance->member->value);
       } else {
         $result->out->write('{');
-        $this->emit($result, $instance->value->member);
+        $this->emit($result, $instance->member);
         $result->out->write('}');
       }
     });

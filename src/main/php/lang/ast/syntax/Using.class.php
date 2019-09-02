@@ -14,17 +14,15 @@ class Using {
       $statements= $this->statements($parse);
       $parse->expecting('}', 'using block');
 
-      $node->value= new UsingStatement($arguments, $statements);
-      $node->kind= 'using';
-      return $node;
+      return new UsingStatement($arguments, $statements);
     });
 
     $emitter->handle('using', function($result, $node) {
       $variables= [];
-      foreach ($node->value->arguments as $expression) {
+      foreach ($node->arguments as $expression) {
         switch ($expression->kind) {
-          case 'variable': $variables[]= '$'.$expression->value; break;
-          case 'assignment': $variables[]= '$'.$expression->value->variable->value; break;
+          case 'variable': $variables[]= '$'.$expression->name; break;
+          case 'assignment': $variables[]= '$'.$expression->variable->name; break;
           default: $temp= $result->temp(); $variables[]= $temp; $result->out->write($temp.'=');
         }
         $this->emit($result, $expression);
@@ -32,7 +30,7 @@ class Using {
       }
 
       $result->out->write('try {');
-      $this->emit($result, $node->value->body);
+      $this->emit($result, $node->body);
 
       $result->out->write('} finally {');
       foreach ($variables as $variable) {

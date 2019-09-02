@@ -9,9 +9,9 @@ trait RewriteLambdaExpressions {
 
   protected function emitLambda($result, $lambda) {
     $capture= [];
-    foreach ($this->search($lambda->body, 'variable') as $var) {
-      if (isset($result->locals[$var->value])) {
-        $capture[$var->value]= true;
+    foreach ($this->search($lambda, 'variable') as $var) {
+      if (isset($result->locals[$var->name])) {
+        $capture[$var->name]= true;
       }
     }
     unset($capture['this']);
