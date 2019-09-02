@@ -1,44 +1,49 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\nodes\Literal;
+use lang\ast\nodes\OffsetExpression;
+use lang\ast\nodes\StaticLocals;
+use lang\ast\nodes\Variable;
+
 class VariablesTest extends ParseTest {
 
   #[@test, @values(['v', 'key', 'this', 'class', 'protected'])]
   public function variable($name) {
-    $this->assertNodes(
-      [['(variable)' => $name]],
-      $this->parse('$'.$name.';')
+    $this->assertParsed(
+      [new Variable($name, self::LINE)],
+      '$'.$name.';'
     );
   }
 
   #[@test]
   public function static_variable() {
-    $this->assertNodes(
-      [['static' => ['v' => null]]],
-      $this->parse('static $v;')
+    $this->assertParsed(
+      [new StaticLocals(['v' => null], self::LINE)],
+      'static $v;'
     );
   }
 
   #[@test]
   public function static_variable_with_initialization() {
-    $this->assertNodes(
-      [['static' => ['id' => ['(literal)' => '0']]]],
-      $this->parse('static $id= 0;')
+    $this->assertParsed(
+      [new StaticLocals(['id' => new Literal('0', self::LINE)], self::LINE)],
+      'static $id= 0;'
     );
   }
 
   #[@test]
   public function array_offset() {
-    $this->assertNodes(
-      [['[' => [['(variable)' => 'a'], ['(literal)' => '0']]]],
-      $this->parse('$a[0];')
+    $this->assertParsed(
+      [new OffsetExpression(new Variable('a', self::LINE), new Literal('0', self::LINE), self::LINE)],
+      '$a[0];'
     );
   }
 
   #[@test]
   public function string_offset() {
-    $this->assertNodes(
-      [['{' => [['(variable)' => 'a'], ['(literal)' => '0']]]],
-      $this->parse('$a{0};')
+    $this->assertParsed(
+      [new OffsetExpression(new Variable('a', self::LINE), new Literal('0', self::LINE), self::LINE)],
+      '$a{0};'
     );
   }
 }

@@ -1,20 +1,23 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\nodes\NamespaceDeclaration;
+use lang\ast\nodes\Start;
+
 class StartTokensTest extends ParseTest {
 
   #[@test]
   public function php() {
-    $this->assertNodes(
-      [['<?' => 'php'], ['namespace' => 'test']],
-      $this->parse('<?php namespace test;')
+    $this->assertParsed(
+      [new Start('php', self::LINE), new NamespaceDeclaration('test', self::LINE)],
+      '<?php namespace test;'
     );
   }
 
   #[@test]
   public function hack() {
-    $this->assertNodes(
-      [['<?' => 'hh'], ['namespace' => 'test']],
-      $this->parse('<?hh namespace test;')
+    $this->assertParsed(
+      [new Start('hh', self::LINE), new NamespaceDeclaration('test', self::LINE)],
+      '<?hh namespace test;'
     );
   }
 }

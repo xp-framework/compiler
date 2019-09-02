@@ -1,134 +1,169 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\nodes\Assignment;
+use lang\ast\nodes\BinaryExpression;
+use lang\ast\nodes\BreakStatement;
+use lang\ast\nodes\ContinueStatement;
+use lang\ast\nodes\DoLoop;
+use lang\ast\nodes\ForLoop;
+use lang\ast\nodes\ForeachLoop;
+use lang\ast\nodes\GotoStatement;
+use lang\ast\nodes\InvokeExpression;
+use lang\ast\nodes\Label;
+use lang\ast\nodes\Literal;
+use lang\ast\nodes\UnaryExpression;
+use lang\ast\nodes\Variable;
+use lang\ast\nodes\WhileLoop;
+
 class LoopsTest extends ParseTest {
-  private $block;
+  private $loop;
 
   /** @return void */
   public function setUp() {
-    $this->block= ['(' => [['(name)' => 'loop'], []]];
+    $this->loop= new InvokeExpression(new Literal('loop', self::LINE), [], self::LINE);
   }
 
   #[@test]
   public function foreach_value() {
-    $this->assertNodes(
-      [['foreach' => [
-        ['(variable)' => 'iterable'],
+    $this->assertParsed(
+      [new ForeachLoop(
+        new Variable('iterable', self::LINE),
         null,
-        ['(variable)' => 'value'],
-        [$this->block]
-      ]]],
-      $this->parse('foreach ($iterable as $value) { loop(); }')
+        new Variable('value', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'foreach ($iterable as $value) { loop(); }'
     );
   }
 
   #[@test]
   public function foreach_key_value() {
-    $this->assertNodes(
-      [['foreach' => [
-        ['(variable)' => 'iterable'],
-        ['(variable)' => 'key'],
-        ['(variable)' => 'value'],
-        [$this->block]
-      ]]],
-      $this->parse('foreach ($iterable as $key => $value) { loop(); }')
+    $this->assertParsed(
+      [new ForeachLoop(
+        new Variable('iterable', self::LINE),
+        new Variable('key', self::LINE),
+        new Variable('value', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'foreach ($iterable as $key => $value) { loop(); }'
     );
   }
 
   #[@test]
   public function foreach_value_without_curly_braces() {
-    $this->assertNodes(
-      [['foreach' => [
-        ['(variable)' => 'iterable'],
+    $this->assertParsed(
+      [new ForeachLoop(
+        new Variable('iterable', self::LINE),
         null,
-        ['(variable)' => 'value'],
-        [$this->block]
-      ]]],
-      $this->parse('foreach ($iterable as $value) loop();')
+        new Variable('value', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'foreach ($iterable as $value) loop();'
     );
   }
 
   #[@test]
   public function for_loop() {
-    $this->assertNodes(
-      [['for' => [
-        [['=' => [['(variable)' => 'i'], '=', ['(literal)' => '0']]]],
-        [['<' => [['(variable)' => 'i'], '<', ['(literal)' => '10']]]],
-        [['++' => [['(variable)' => 'i'], '++']]],
-        [$this->block]
-      ]]],
-      $this->parse('for ($i= 0; $i < 10; $i++) { loop(); }')
+    $this->assertParsed(
+      [new ForLoop(
+        [new Assignment(new Variable('i', self::LINE), '=', new Literal('0', self::LINE), self::LINE)],
+        [new BinaryExpression(new Variable('i', self::LINE), '<', new Literal('10', self::LINE), self::LINE)],
+        [new UnaryExpression(new Variable('i', self::LINE), '++', self::LINE)],
+        [$this->loop],
+        self::LINE
+      )],
+      'for ($i= 0; $i < 10; $i++) { loop(); }'
     );
   }
 
   #[@test]
   public function while_loop() {
-    $this->assertNodes(
-      [['while' => [['(variable)' => 'continue'], [$this->block]]]],
-      $this->parse('while ($continue) { loop(); }')
+    $this->assertParsed(
+      [new WhileLoop(
+        new Variable('continue', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'while ($continue) { loop(); }'
     );
   }
 
   #[@test]
   public function while_loop_without_curly_braces() {
-    $this->assertNodes(
-      [['while' => [['(variable)' => 'continue'], [$this->block]]]],
-      $this->parse('while ($continue) loop();')
+    $this->assertParsed(
+      [new WhileLoop(
+        new Variable('continue', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'while ($continue) loop();'
     );
   }
 
   #[@test]
   public function do_loop() {
-    $this->assertNodes(
-      [['do' => [['(variable)' => 'continue'], [$this->block]]]],
-      $this->parse('do { loop(); } while ($continue);')
+    $this->assertParsed(
+      [new DoLoop(
+        new Variable('continue', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'do { loop(); } while ($continue);'
     );
   }
 
   #[@test]
   public function do_loop_without_curly_braces() {
-    $this->assertNodes(
-      [['do' => [['(variable)' => 'continue'], [$this->block]]]],
-      $this->parse('do loop(); while ($continue);')
+    $this->assertParsed(
+      [new DoLoop(
+        new Variable('continue', self::LINE),
+        [$this->loop],
+        self::LINE
+      )],
+      'do loop(); while ($continue);'
     );
   }
 
   #[@test]
   public function break_statement() {
-    $this->assertNodes(
-      [['break' => null]],
-      $this->parse('break;')
+    $this->assertParsed(
+      [new BreakStatement(null, self::LINE)],
+      'break;'
     );
   }
 
   #[@test]
   public function break_statement_with_level() {
-    $this->assertNodes(
-      [['break' => ['(literal)' => '2']]],
-      $this->parse('break 2;')
+    $this->assertParsed(
+      [new BreakStatement(new Literal('2', self::LINE), self::LINE)],
+      'break 2;'
     );
   }
 
   #[@test]
   public function continue_statement() {
-    $this->assertNodes(
-      [['continue' => null]],
-      $this->parse('continue;')
+    $this->assertParsed(
+      [new ContinueStatement(null, self::LINE)],
+      'continue;'
     );
   }
 
   #[@test]
   public function continue_statement_with_level() {
-    $this->assertNodes(
-      [['continue' => ['(literal)' => '2']]],
-      $this->parse('continue 2;')
+    $this->assertParsed(
+      [new ContinueStatement(new Literal('2', self::LINE), self::LINE)],
+      'continue 2;'
     );
   }
 
   #[@test]
   public function goto_statement() {
-    $this->assertNodes(
-      [['(name)' => 'start'], $this->block, ['goto' => 'start']],
-      $this->parse('start: loop(); goto start;')
+    $this->assertParsed(
+      [new Label('start', self::LINE), $this->loop, new GotoStatement('start', self::LINE)],
+      'start: loop(); goto start;'
     );
   }
 }

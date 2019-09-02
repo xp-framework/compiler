@@ -1,118 +1,125 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\Errors;
+use lang\ast\nodes\ClassDeclaration;
+use lang\ast\nodes\InterfaceDeclaration;
+use lang\ast\nodes\NamespaceDeclaration;
+use lang\ast\nodes\TraitDeclaration;
+use lang\ast\nodes\UseExpression;
 
 class TypesTest extends ParseTest {
 
   #[@test]
   public function empty_class() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [], [], null]]],
-      $this->parse('class A { }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], [], [], null, self::LINE)],
+      'class A { }'
     );
   }
 
   #[@test]
   public function class_with_parent() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], '\\B', [], [], [], null]]],
-      $this->parse('class A extends B { }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', '\\B', [], [], [], null, self::LINE)],
+      'class A extends B { }'
     );
   }
 
   #[@test]
   public function class_with_interface() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, ['\\C'], [], [], null]]],
-      $this->parse('class A implements C { }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, ['\\C'], [], [], null, self::LINE)],
+      'class A implements C { }'
     );
   }
 
   #[@test]
   public function class_with_interfaces() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, ['\\C', '\\D'], [], [], null]]],
-      $this->parse('class A implements C, D { }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, ['\\C', '\\D'], [], [], null, self::LINE)],
+      'class A implements C, D { }'
     );
   }
 
   #[@test]
   public function abstract_class() {
-    $this->assertNodes(
-      [['abstract' => ['\\A', ['abstract'], null, [], [], [], null]]],
-      $this->parse('abstract class A { }')
+    $this->assertParsed(
+      [new ClassDeclaration(['abstract'], '\\A', null, [], [], [], null, self::LINE)],
+      'abstract class A { }'
     );
   }
 
   #[@test]
   public function final_class() {
-    $this->assertNodes(
-      [['final' => ['\\A', ['final'], null, [], [], [], null]]],
-      $this->parse('final class A { }')
+    $this->assertParsed(
+      [new ClassDeclaration(['final'], '\\A', null, [], [], [], null, self::LINE)],
+      'final class A { }'
     );
   }
 
   #[@test]
   public function empty_interface() {
-    $this->assertNodes(
-      [['interface' => ['\\A', [], [], [], [], null]]],
-      $this->parse('interface A { }')
+    $this->assertParsed(
+      [new InterfaceDeclaration([], '\\A', [], [], [], null, self::LINE)],
+      'interface A { }'
     );
   }
 
   #[@test]
   public function interface_with_parent() {
-    $this->assertNodes(
-      [['interface' => ['\\A', [], ['\\B'], [], [], null]]],
-      $this->parse('interface A extends B { }')
+    $this->assertParsed(
+      [new InterfaceDeclaration([], '\\A', ['\\B'], [], [], null, self::LINE)],
+      'interface A extends B { }'
     );
   }
 
   #[@test]
   public function interface_with_parents() {
-    $this->assertNodes(
-      [['interface' => ['\\A', [], ['\\B', '\\C'], [], [], null]]],
-      $this->parse('interface A extends B, C { }')
+    $this->assertParsed(
+      [new InterfaceDeclaration([], '\\A', ['\\B', '\\C'], [], [], null, self::LINE)],
+      'interface A extends B, C { }'
     );
   }
 
   #[@test]
   public function empty_trait() {
-    $this->assertNodes(
-      [['trait' => ['\\A', [], [], [], null]]],
-      $this->parse('trait A { }')
+    $this->assertParsed(
+      [new TraitDeclaration([], '\\A', [], [], null, self::LINE)],
+      'trait A { }'
     );
   }
 
   #[@test]
   public function class_with_trait() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['use' => [['\\B'], []]]], [], null]]],
-      $this->parse('class A { use B; }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], [new UseExpression(['\\B'], [], self::LINE)], [], null, self::LINE)],
+      'class A { use B; }'
     );
   }
 
   #[@test]
   public function class_with_multiple_traits() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['use' => [['\\B'], []]], ['use' => [['\\C'], []]]], [], null]]],
-      $this->parse('class A { use B; use C; }')
+    $body= [new UseExpression(['\\B'], [], self::LINE), new UseExpression(['\\C'], [], self::LINE)];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { use B; use C; }'
     );
   }
 
   #[@test]
   public function class_with_comma_separated_traits() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [['use' => [['\\B', '\\C'], []]]], [], null]]],
-      $this->parse('class A { use B, C; }')
+    $body= [new UseExpression(['\\B', '\\C'], [], self::LINE)];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { use B, C; }'
     );
   }
 
   #[@test]
   public function class_in_namespace() {
-    $this->assertNodes(
-      [['namespace' => 'test'], ['class' => ['\\test\\A', [], null, [], [], [], null]]],
-      $this->parse('namespace test; class A { }')
+    $this->assertParsed(
+      [new NamespaceDeclaration('test', self::LINE), new ClassDeclaration([], '\\test\\A', null, [], [], [], null, self::LINE)],
+      'namespace test; class A { }'
     );
   }
 

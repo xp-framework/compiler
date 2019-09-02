@@ -1,5 +1,10 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\nodes\InstanceExpression;
+use lang\ast\nodes\InvokeExpression;
+use lang\ast\nodes\Literal;
+use lang\ast\nodes\Variable;
+
 /**
  * Invocation expressions
  *
@@ -9,41 +14,45 @@ class InvokeTest extends ParseTest {
 
   #[@test]
   public function invoke_function() {
-    $this->assertNodes(
-      [['(' => [['(name)' => 'test'], []]]],
-      $this->parse('test();')
+    $this->assertParsed(
+      [new InvokeExpression(new Literal('test', self::LINE), [], self::LINE)],
+      'test();'
     );
   }
 
   #[@test]
   public function invoke_method() {
-    $this->assertNodes(
-      [['(' => [['->' => [['(variable)' => 'this'], ['(name)' => 'test']]], []]]],
-      $this->parse('$this->test();')
+    $instance= new InstanceExpression(new Variable('this', self::LINE), new Literal('test', self::LINE), self::LINE);
+    $this->assertParsed(
+      [new InvokeExpression($instance, [], self::LINE)],
+      '$this->test();'
     );
   }
 
   #[@test]
   public function invoke_function_with_argument() {
-    $this->assertNodes(
-      [['(' => [['(name)' => 'test'], [['(literal)' => '1']]]]],
-      $this->parse('test(1);')
+    $arguments= [new Literal('1', self::LINE)];
+    $this->assertParsed(
+      [new InvokeExpression(new Literal('test', self::LINE), $arguments, self::LINE)],
+      'test(1);'
     );
   }
 
   #[@test]
   public function invoke_function_with_arguments() {
-    $this->assertNodes(
-      [['(' => [['(name)' => 'test'], [['(literal)' => '1'], ['(literal)' => '2']]]]],
-      $this->parse('test(1, 2);')
+    $arguments= [new Literal('1', self::LINE), new Literal('2', self::LINE)];
+    $this->assertParsed(
+      [new InvokeExpression(new Literal('test', self::LINE), $arguments, self::LINE)],
+      'test(1, 2);'
     );
   }
 
   #[@test]
   public function invoke_function_with_dangling_comma() {
-    $this->assertNodes(
-      [['(' => [['(name)' => 'test'], [['(literal)' => '1'], ['(literal)' => '2']]]]],
-      $this->parse('test(1, 2, );')
+    $arguments= [new Literal('1', self::LINE), new Literal('2', self::LINE)];
+    $this->assertParsed(
+      [new InvokeExpression(new Literal('test', self::LINE), $arguments, self::LINE)],
+      'test(1, 2, );'
     );
   }
 }
