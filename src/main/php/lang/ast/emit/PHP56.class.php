@@ -183,8 +183,8 @@ class PHP56 extends Emitter {
   protected function emitThrowExpression($result, $throw) {
     $capture= [];
     foreach ($this->search($throw, 'variable') as $var) {
-      if (isset($result->locals[$var->value])) {
-        $capture[$var->value]= true;
+      if (isset($result->locals[$var->name])) {
+        $capture[$var->name]= true;
       }
     }
     unset($capture['this']);
@@ -193,7 +193,7 @@ class PHP56 extends Emitter {
     $result->out->write('(('.$t.'=function()');
     $capture && $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
     $result->out->write('{ throw ');
-    $this->emit($result, $throw);
+    $this->emit($result, $throw->expression);
     $result->out->write('; }) ? '.$t.'() : null)');
   }
 
