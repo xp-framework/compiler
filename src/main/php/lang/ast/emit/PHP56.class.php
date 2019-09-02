@@ -91,14 +91,14 @@ class PHP56 extends Emitter {
 
 
   protected function emitLiteral($result, $literal) {
-    if ('"' === $literal{0}) {
+    if ('"' === $literal->expression[0]) {
       $result->out->write(preg_replace_callback(
         '/\\\\u\{([0-9a-f]+)\}/i',
         function($matches) { return html_entity_decode('&#'.hexdec($matches[1]).';', ENT_HTML5, \xp::ENCODING); },
-        $literal
+        $literal->expression
       ));
     } else {
-      $result->out->write($literal);
+      $result->out->write($literal->expression);
     }
   }
 
@@ -160,17 +160,17 @@ class PHP56 extends Emitter {
     if ('braced' === $expr->kind) {
       $t= $result->temp();
       $result->out->write('(('.$t.'=');
-      $this->emit($result, $expr->value);
+      $this->emit($result, $expr->expression);
       $result->out->write(') ? '.$t);
       $result->out->write('(');
       $this->emitArguments($result, $invoke->arguments);
       $result->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
     } else if (
       'scope' === $expr->kind &&
-      'name' === $expr->value->member->kind &&
-      isset(self::$keywords[strtolower($expr->value->member->value)])
+      'literal' === $expr->member->kind &&
+      isset(self::$keywords[strtolower($expr->member->expression)])
     ) {
-      $result->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
+      $result->out->write($expr->type.'::{\''.$expr->member->expression.'\'}');
       $result->out->write('(');
       $this->emitArguments($result, $invoke->arguments);
       $result->out->write(')');
@@ -217,7 +217,7 @@ class PHP56 extends Emitter {
 
   protected function emitFrom($result, $from) {
     $result->out->write('foreach (');
-    $this->emit($result, $from);
+    $this->emit($result, $from->iterable);
     $result->out->write(' as $key => $val) yield $key => $val;');
   }
 
