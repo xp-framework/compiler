@@ -41,7 +41,7 @@ abstract class EmittingTest extends TestCase {
     $out= new MemoryOutputStream();
 
     $parse= new Parse(self::$language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
-    self::$emitter->emit(new Result(new StringWriter($out)), $parse->execute());
+    self::$emitter->emitAll(new Result(new StringWriter($out)), $parse->execute());
 
     // var_dump($out->getBytes());
     self::$cl->setClassBytes($name, $out->getBytes());

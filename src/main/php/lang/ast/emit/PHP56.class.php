@@ -114,7 +114,7 @@ class PHP56 extends Emitter {
       $result->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
     }
 
-    $this->emit($result, $catch->body);
+    $this->emitAll($result, $catch->body);
     $result->out->write('}');
   }
 

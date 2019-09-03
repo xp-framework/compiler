@@ -34,7 +34,7 @@ trait RewriteLambdaExpressions {
 
     if (is_array($lambda->body)) {
       $result->out->write('{');
-      $this->emit($result, $lambda->body);
+      $this->emitAll($result, $lambda->body);
       $result->out->write('}');
     } else {
       $result->out->write('{ return ');

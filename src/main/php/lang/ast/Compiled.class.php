@@ -16,7 +16,7 @@ class Compiled implements OutputStream {
   private static function parse($version, $in, $out, $file) {
     try {
       $parse= new Parse(self::$lang, new Tokens(new StreamTokenizer($in)), $file);
-      self::$emit[$version]->emit(new Result($out), $parse->execute());
+      self::$emit[$version]->emitAll(new Result($out), $parse->execute());
       return $out;
     } finally {
       $in->close();

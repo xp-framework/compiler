@@ -30,7 +30,7 @@ class Using {
       }
 
       $result->out->write('try {');
-      $this->emit($result, $node->body);
+      $this->emitAll($result, $node->body);
 
       $result->out->write('} finally {');
       foreach ($variables as $variable) {

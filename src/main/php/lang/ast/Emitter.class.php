@@ -159,7 +159,7 @@ abstract class Emitter {
 
   protected function emitBlock($result, $block) {
     $result->out->write('{');
-    $this->emit($result, $block->statements);
+    $this->emitAll($result, $block->statements);
     $result->out->write('}');
   }
 
@@ -286,7 +286,7 @@ abstract class Emitter {
     $this->emitSignature($result, $function->signature);
 
     $result->out->write('{');
-    $this->emit($result, $function->body);
+    $this->emitAll($result, $function->body);
     $result->out->write('}');
 
     $result->locals= array_pop($result->stack);
@@ -306,7 +306,7 @@ abstract class Emitter {
       }
     }
     $result->out->write('{');
-    $this->emit($result, $closure->body);
+    $this->emitAll($result, $closure->body);
     $result->out->write('}');
 
     $result->locals= array_pop($result->stack);
@@ -319,7 +319,7 @@ abstract class Emitter {
 
     if (is_array($lambda->body)) {
       $result->out->write('{');
-      $this->emit($result, $lambda->body);
+      $this->emitAll($result, $lambda->body);
       $result->out->write('}');
     } else {
       $this->emit($result, $lambda->body);
@@ -481,7 +481,7 @@ abstract class Emitter {
       $result->out->write(';');
     } else {
       $result->out->write(' {'.$promote);
-      $this->emit($result, $method->body);
+      $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
 
@@ -557,12 +557,12 @@ abstract class Emitter {
     $result->out->write('if (');
     $this->emit($result, $if->expression);
     $result->out->write(') {');
-    $this->emit($result, $if->body);
+    $this->emitAll($result, $if->body);
     $result->out->write('}');
 
     if ($if->otherwise) {
       $result->out->write('else {');
-      $this->emit($result, $if->otherwise);
+      $this->emitAll($result, $if->otherwise);
       $result->out->write('}');
     }
   }
@@ -590,13 +590,13 @@ abstract class Emitter {
     } else {
       $result->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
     }
-    $this->emit($result, $catch->body);
+    $this->emitAll($result, $catch->body);
     $result->out->write('}');
   }
 
   protected function emitTry($result, $try) {
     $result->out->write('try {');
-    $this->emit($result, $try->body);
+    $this->emitAll($result, $try->body);
     $result->out->write('}');
     if (isset($try->catches)) {
       foreach ($try->catches as $catch) {
@@ -605,7 +605,7 @@ abstract class Emitter {
     }
     if (isset($try->finally)) {
       $result->out->write('finally {');
-      $this->emit($result, $try->finally);
+      $this->emitAll($result, $try->finally);
       $result->out->write('}');
     }
   }
@@ -642,7 +642,7 @@ abstract class Emitter {
     }
     $this->emit($result, $foreach->value);
     $result->out->write(') {');
-    $this->emit($result, $foreach->body);
+    $this->emitAll($result, $foreach->body);
     $result->out->write('}');
   }
 
@@ -654,14 +654,14 @@ abstract class Emitter {
     $result->out->write(';');
     $this->emitArguments($result, $for->loop);
     $result->out->write(') {');
-    $this->emit($result, $for->body);
+    $this->emitAll($result, $for->body);
     $result->out->write('}');
   }
 
   protected function emitDo($result, $do) {
     $result->out->write('do');
     $result->out->write('{');
-    $this->emit($result, $do->body);
+    $this->emitAll($result, $do->body);
     $result->out->write('} while (');
     $this->emit($result, $do->expression);
     $result->out->write(');');
@@ -671,7 +671,7 @@ abstract class Emitter {
     $result->out->write('while (');
     $this->emit($result, $while->expression);
     $result->out->write(') {');
-    $this->emit($result, $while->body);
+    $this->emitAll($result, $while->body);
     $result->out->write('}');
   }
 
@@ -786,23 +786,23 @@ abstract class Emitter {
     $this->emit($result, $from->iterable);
   }
 
-  public function emit($result, $arg) {
-    if ($arg instanceof Element) {
-      if ($arg->line > $result->line) {
-        $result->out->write(str_repeat("\n", $arg->line - $result->line));
-        $result->line= $arg->line;
-      }
+  public function emitAll($result, $nodes) {
+    foreach ($nodes as $node) {
+      $this->emit($result, $node);
+      $result->out->write(';');
+    }
+  }
 
-      if (isset($this->emit[$arg->kind])) {
-        $this->emit[$arg->kind]($result, $arg);
-      } else {
-        $this->{'emit'.$arg->kind}($result, $arg);
-      }
+  public function emit($result, $node) {
+    if ($node->line > $result->line) {
+      $result->out->write(str_repeat("\n", $node->line - $result->line));
+      $result->line= $node->line;
+    }
+
+    if (isset($this->emit[$node->kind])) {
+      $this->emit[$node->kind]($result, $node);
     } else {
-      foreach ($arg as $node) {
-        $this->emit($result, $node);
-        isset($node->symbol->std) || $result->out->write(';');
-      }
+      $this->{'emit'.$node->kind}($result, $node);
     }
   }
 }
