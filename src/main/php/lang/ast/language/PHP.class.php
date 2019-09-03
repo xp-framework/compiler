@@ -63,10 +63,13 @@ use lang\ast\nodes\YieldFromExpression;
 
 /**
  * PHP language
+ *
+ * @see   https://github.com/php/php-langspec
  */
 class PHP extends Language {
   private $body= [];
 
+  /** Setup language parser */
   public function __construct() {
     $this->symbol(':');
     $this->symbol(';');
