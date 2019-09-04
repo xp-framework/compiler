@@ -35,8 +35,14 @@ abstract class Emitter {
       unset($this->emit[$kind]);
     } else {
       $this->emit[$kind]= function($result, $arg) use($function) {
-        foreach ($function($arg) as $n) {
-          $this->{'emit'.$n->kind}($result, $n);
+        $r= $function($arg);
+        if ($r instanceof Value) {
+          $this->{'emit'.$r->kind}($result, $r);
+        } else {
+          foreach ($r as $node) {
+            $this->{'emit'.$node->kind}($result, $node);
+            $result->out->write(';');
+          }
         }
       };
     }
