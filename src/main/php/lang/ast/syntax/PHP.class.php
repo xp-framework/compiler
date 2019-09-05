@@ -159,21 +159,6 @@ class PHP extends Language {
       return new ScopeExpression($scope, $expr, $node->line);
     });
 
-    $this->infix('==>', 80, function($parse, $node, $left) {
-      $parse->warn('Hack language style arrow functions are deprecated, please use `fn` syntax instead');
-
-      $signature= new Signature([new Parameter($left->name, null)], null);
-      if ('{' === $parse->token->value) {
-        $parse->forward();
-        $statements= $this->statements($parse);
-        $parse->expecting('}', 'arrow function');
-      } else {
-        $statements= $this->expressionWithThrows($parse, 0);
-      }
-
-      return new LambdaExpression($signature, $statements, $node->line);
-    });
-
     $this->infix('(', 80, function($parse, $node, $left) {
       $arguments= $this->expressions($parse);
       $parse->expecting(')', 'invoke expression');
@@ -366,7 +351,6 @@ class PHP extends Language {
 
       return new LambdaExpression($signature, $statements, $node->line);
     });
-
 
     $this->prefix('function', function($parse, $node) {
 
