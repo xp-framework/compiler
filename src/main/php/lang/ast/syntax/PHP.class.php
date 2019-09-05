@@ -1,4 +1,4 @@
-<?php namespace lang\ast\language;
+<?php namespace lang\ast\syntax;
 
 use lang\ast\ArrayType;
 use lang\ast\FunctionType;

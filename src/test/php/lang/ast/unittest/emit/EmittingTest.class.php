@@ -17,16 +17,17 @@ abstract class EmittingTest extends TestCase {
   private static $cl, $language, $emitter;
   private static $id= 0;
 
-  static function __static() {
+  #[@beforeClass]
+  public static function setupCompiler() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
     self::$language= Language::named('PHP');
     self::$emitter= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
-    foreach (CompilingClassLoader::$syntax as $syntax) {
-      $syntax->setup(self::$language, self::$emitter);
+    foreach (self::$language->extensions() as $extension) {
+      $extension->setup(self::$language, self::$emitter);
     }
   }
 
-  protected static function transform($type, $function) {
+  protected function transform($type, $function) {
     self::$emitter->transform($type, $function);
   }
 

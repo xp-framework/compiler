@@ -1,7 +1,6 @@
 <?php namespace lang\ast;
 
 use lang\ClassLoader;
-use lang\reflect\Package;
 
 /**
  * XP Compiler
@@ -12,10 +11,6 @@ module xp-framework/compiler {
   public function initialize() {
     $runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     ClassLoader::registerLoader(CompilingClassloader::instanceFor($runtime));
-
-    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      CompilingClassloader::$syntax[]= $class->newInstance();
-    }
 
     if (!interface_exists(\IDisposable::class, false)) {
       eval('interface IDisposable { public function __dispose(); }');

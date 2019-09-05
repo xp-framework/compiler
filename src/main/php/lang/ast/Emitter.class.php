@@ -9,7 +9,7 @@ abstract class Emitter {
   const METHOD   = 1;
 
   protected $unsupported= [];
-  private $emit= [];
+  private $transformations= [];
 
   /**
    * Selects the correct emitter for a given runtime
@@ -30,35 +30,22 @@ abstract class Emitter {
     throw new IllegalArgumentException('XP Compiler does not support '.$runtime.' yet');
   }
 
-  public function transform($kind, $function) {
-    if (null === $function) {
-      unset($this->emit[$kind]);
-    } else {
-      $this->emit[$kind]= function($result, $arg) use($function) {
-        $r= $function($arg);
-        if ($r instanceof Value) {
-          $this->{'emit'.$r->kind}($result, $r);
-        } else {
-          foreach ($r as $node) {
-            $this->{'emit'.$node->kind}($result, $node);
-            $result->out->write(';');
-          }
-        }
-      };
-    }
-    return $this;
-  }
-
   /**
-   * Emit nodes of a certain kind using the given emitter function. Overwrites
-   * any previous handling, including builtin behavior!
+   * Transforms nodes of a certain kind using the given function, which
+   * may return either single node, which will be then emitted, or an
+   * iterable producing nodes, which will then be emitted as statements.
+   * Pass NULL to remove the transformation again.
    *
    * @param  string $kind
-   * @param  function(lang.ast.Result, lang.ast.Node): void $function
+   * @param  ?(function(lang.ast.Node): lang.ast.Node|iterable) $function
    * @return self
    */
-  public function handle($kind, $function) {
-    $this->emit[$kind]= $function->bindTo($this, self::class);
+  public function transform($kind, $function) {
+    if (null === $function) {
+      unset($this->transformations[$kind]);
+    } else {
+      $this->transformations[$kind]= $function;
+    }
     return $this;
   }
 
@@ -805,8 +792,17 @@ abstract class Emitter {
       $result->line= $node->line;
     }
 
-    if (isset($this->emit[$node->kind])) {
-      $this->emit[$node->kind]($result, $node);
+    // Check for transformations
+    if (isset($this->transformations[$node->kind])) {
+      $r= $this->transformations[$node->kind]($node);
+      if ($r instanceof Value) {
+        $this->{'emit'.$r->kind}($result, $r);
+      } else {
+        foreach ($r as $n) {
+          $this->{'emit'.$n->kind}($result, $n);
+          $result->out->write(';');
+        }
+      }
     } else {
       $this->{'emit'.$node->kind}($result, $node);
     }

@@ -22,8 +22,8 @@ class CompilingClassLoader implements IClassLoader {
 
     $emitter= $emit->newInstance();
     $language= Language::named('PHP');
-    foreach (self::$syntax as $syntax) {
-      $syntax->setup($language, $emitter);
+    foreach ($language->extensions() as $extension) {
+      $extension->setup($language, $emitter);
     }
 
     Compiled::$emit[$this->version]= $emitter;

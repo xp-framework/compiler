@@ -69,8 +69,8 @@ class CompileRunner {
 
     $lang= Language::named('PHP');
     $emit= Emitter::forRuntime($target)->newInstance();
-    foreach (CompilingClassloader::$syntax as $syntax) {
-      $syntax->setup($lang, $emit);
+    foreach ($lang->extensions() as $extension) {
+      $extension->setup($lang, $emit);
     }
 
     $input= Input::newInstance($in);

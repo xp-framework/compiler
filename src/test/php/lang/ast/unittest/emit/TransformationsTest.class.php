@@ -6,30 +6,30 @@ use lang\ast\nodes\Signature;
 
 class TransformationsTest extends EmittingTest {
 
-  #[@beforeClass]
-  public static function registerTransformation() {
-    self::transform('class', function($class) {
+  /** @return void */
+  public function setUp() {
+    $this->transform('class', function($class) {
       if ($class->annotation('getters')) {
         foreach ($class->properties() as $property) {
           $class->inject(new Method(
             ['public'],
             $property->name,
             new Signature([], $property->type),
-            [new Code('return $this->'.$property->name.';')]
+            [new Code('return $this->'.$property->name)]
           ));
         }
       }
-      yield $class;
+      return $class;
     });
   }
 
-  #[@afterClass]
-  public static function removeTransformation() {
-    self::transform('class', null);
+  /** @return void */
+  public function tearDown() {
+    $this->transform('class', null);
   }
 
-  #[@test, @values(['id', 'name'])]
-  public function generates_accessor($name) {
+  #[@test, @values([['id', 1], ['name', 'Test']])]
+  public function generates_accessor($name, $expected) {
     $t= $this->type('<<getters>> class <T> {
       private int $id;
       private string $name;
@@ -40,5 +40,6 @@ class TransformationsTest extends EmittingTest {
       }
     }');
     $this->assertTrue($t->hasMethod($name));
+    $this->assertEquals($expected, $t->getMethod($name)->invoke($t->newInstance(1, 'Test')));
   }
 }

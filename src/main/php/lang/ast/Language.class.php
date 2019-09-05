@@ -150,9 +150,27 @@ abstract class Language {
     return $statements;
   }
 
+  /**
+   * Returns extension classes for this language. By convention, these are loaded
+   * from a package with the same name as the class (but in lowercase).
+   *
+   * @return iterable
+   */
+  public function extensions() {
+    foreach (Package::forName(strtolower(static::class))->getClasses() as $class) {
+      yield $class->newInstance();
+    }
+  }
+
+  /**
+   * Returns a language with the given name
+   *
+   * @param  string $name
+   * @return self
+   */
   public static function named($name) {
     if (!isset(self::$instance[$name])) {
-      self::$instance[$name]= Package::forName('lang.ast.language')->loadClass($name)->newinstance();
+      self::$instance[$name]= Package::forName('lang.ast.syntax')->loadClass($name)->newInstance();
     }
     return self::$instance[$name];
   }

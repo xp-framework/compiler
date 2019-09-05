@@ -1,9 +1,28 @@
-<?php namespace lang\ast\syntax;
+<?php namespace lang\ast\syntax\php;
 
 use lang\ast\Node;
 use lang\ast\nodes\Method;
 use lang\ast\nodes\ReturnStatement;
 
+/**
+ * Compact functions
+ *
+ * ```php
+ * // Syntax
+ * class Person {
+ *   private string $name;
+ *   public function name(): string ==> $this->name;
+ * }
+ *
+ * // Rewritten to
+ * class Person {
+ *   private string $name;
+ *   public function name(): string { return $this->name; }
+ * }
+ * ```
+ * @see  https://github.com/xp-framework/rfc/issues/241
+ * @test xp://lang.ast.unittest.emit.CompactFunctionsTest
+ */
 class CompactMethods {
 
   public function setup($parser, $emitter) {
