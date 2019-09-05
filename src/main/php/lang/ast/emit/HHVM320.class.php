@@ -22,7 +22,7 @@ class HHVM320 extends Emitter {
       $result->out->write('... $'.$parameter->name);
       $result->locals[$parameter->name]= true;
     } else {
-      parent::emitParameter($result$parameter);
+      parent::emitParameter($result, $parameter);
     }
   }
 }
