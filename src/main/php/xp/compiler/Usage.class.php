@@ -1,6 +1,6 @@
 <?php namespace xp\compiler;
 
-use lang\ast\CompilingClassloader;
+use lang\ast\Language;
 use util\cmd\Console;
 
 class Usage {
@@ -12,8 +12,8 @@ class Usage {
 
     // Show syntax implementations sorted by class loader
     $loaders= $sorted= [];
-    foreach (CompilingClassloader::$syntax as $syntax) {
-      $t= typeof($syntax);
+    foreach (Language::named('PHP')->extensions() as $extension) {
+      $t= typeof($extension);
       $l= $t->getClassLoader();
       $hash= $l->hashCode();
       if (isset($sorted[$hash])) {
