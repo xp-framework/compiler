@@ -719,16 +719,17 @@ class PHP extends Language {
     });
 
     $this->stmt('<<', function($parse, $node) {
+      $values= [];
       do {
         $name= $parse->token->value;
         $parse->forward();
 
         if ('(' === $parse->token->value) {
           $parse->forward();
-          $parse->scope->annotations[$name]= $this->expression($parse, 0);
+          $values[$name]= $parse->scope->annotations[$name]= $this->expression($parse, 0);
           $parse->expecting(')', 'annotations');
         } else {
-          $parse->scope->annotations[$name]= null;
+          $values[$name]= $parse->scope->annotations[$name]= null;
         }
 
         if (',' === $parse->token->value) {
@@ -741,7 +742,7 @@ class PHP extends Language {
       } while (null !== $parse->token->value);
 
       $parse->forward();
-      return new Annotations([], $node->line);
+      return new Annotations($values, $node->line);
     });
 
     $this->stmt('class', function($parse, $node) {
