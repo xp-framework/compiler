@@ -1250,6 +1250,22 @@ class PHP extends Language {
     return $return;
   }
 
+  public function expressions($parse, $end= ')') {
+    $arguments= [];
+    while ($end !== $parse->token->value) {
+      $arguments[]= $this->expression($parse, 0);
+      if (',' === $parse->token->value) {
+        $parse->forward();
+      } else if ($end === $parse->token->value) {
+        break;
+      } else {
+        $parse->expecting($end.' or ,', 'argument list');
+        break;
+      }
+    }
+    return $arguments;
+  }
+
   public function expressionWithThrows($parse, $bp) {
     if ('throw' === $parse->token->value) {
       $line= $parse->token->line;

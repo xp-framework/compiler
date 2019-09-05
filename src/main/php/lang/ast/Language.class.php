@@ -4,8 +4,12 @@ use lang\ast\nodes\Assignment;
 use lang\ast\nodes\BinaryExpression;
 use lang\ast\nodes\Literal;
 use lang\ast\nodes\UnaryExpression;
+use lang\ast\syntax\TransformationApi;
 use lang\reflect\Package;
 
+/**
+ * Base class for input languages
+ */
 abstract class Language {
   private static $instance= [];
 
@@ -80,6 +84,13 @@ abstract class Language {
     $stmt->std= $func->bindTo($this, static::class);
   }
 
+  /**
+   * Returns a single expression
+   *
+   * @param  lang.ast.Parse $parse
+   * @param  int $rbp
+   * @return lang.ast.Node
+   */
   public function expression($parse, $rbp) {
     $t= $parse->token;
     $parse->forward();
@@ -92,22 +103,6 @@ abstract class Language {
     }
 
     return $left;
-  }
-
-  public function expressions($parse, $end= ')') {
-    $arguments= [];
-    while ($end !== $parse->token->value) {
-      $arguments[]= $this->expression($parse, 0);
-      if (',' === $parse->token->value) {
-        $parse->forward();
-      } else if ($end === $parse->token->value) {
-        break;
-      } else {
-        $parse->expecting($end.' or ,', 'argument list');
-        break;
-      }
-    }
-    return $arguments;
   }
 
   /**
@@ -151,12 +146,13 @@ abstract class Language {
   }
 
   /**
-   * Returns extension classes for this language. By convention, these are loaded
+   * Returns extensions for this language. By convention, these are loaded
    * from a package with the same name as the class (but in lowercase).
    *
    * @return iterable
    */
   public function extensions() {
+    yield new TransformationApi();
     foreach (Package::forName(strtr(strtolower(static::class), '\\', '.'))->getClasses() as $class) {
       yield $class->newInstance();
     }
