@@ -55,7 +55,6 @@ use lang\ast\nodes\TryStatement;
 use lang\ast\nodes\UnpackExpression;
 use lang\ast\nodes\UseExpression;
 use lang\ast\nodes\UseStatement;
-use lang\ast\nodes\UsingStatement;
 use lang\ast\nodes\Variable;
 use lang\ast\nodes\WhileLoop;
 use lang\ast\nodes\YieldExpression;
