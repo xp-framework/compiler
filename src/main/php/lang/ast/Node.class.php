@@ -3,7 +3,7 @@
 use lang\Value;
 use util\Objects;
 
-class Node implements Element, Value {
+class Node implements Value {
   public $symbol, $value, $kind;
   public $comment= null;
   public $line= -1;
