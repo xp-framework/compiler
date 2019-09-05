@@ -157,7 +157,7 @@ abstract class Language {
    * @return iterable
    */
   public function extensions() {
-    foreach (Package::forName(strtolower(static::class))->getClasses() as $class) {
+    foreach (Package::forName(strtr(strtolower(static::class), '\\', '.'))->getClasses() as $class) {
       yield $class->newInstance();
     }
   }
