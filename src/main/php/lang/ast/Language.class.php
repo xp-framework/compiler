@@ -4,6 +4,7 @@ use lang\ast\nodes\Assignment;
 use lang\ast\nodes\BinaryExpression;
 use lang\ast\nodes\Literal;
 use lang\ast\nodes\UnaryExpression;
+use lang\ast\syntax\Extension;
 use lang\ast\syntax\TransformationApi;
 use lang\reflect\Package;
 
@@ -154,7 +155,7 @@ abstract class Language {
   public function extensions() {
     yield new TransformationApi();
     foreach (Package::forName(strtr(strtolower(static::class), '\\', '.'))->getClasses() as $class) {
-      yield $class->newInstance();
+      if ($class->isSubclassOf(Extension::class)) yield $class->newInstance();
     }
   }
 

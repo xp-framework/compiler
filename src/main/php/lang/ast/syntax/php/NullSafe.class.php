@@ -7,6 +7,7 @@ use lang\ast\nodes\InstanceExpression;
 use lang\ast\nodes\Literal;
 use lang\ast\nodes\TernaryExpression;
 use lang\ast\nodes\Variable;
+use lang\ast\syntax\Extension;
 
 /**
  * Null-safe instance operator
@@ -22,7 +23,7 @@ use lang\ast\nodes\Variable;
  * @see  https://github.com/xp-framework/compiler/issues/9
  * @test xp://lang.ast.unittest.emit.NullSafeTest
  */
-class NullSafe {
+class NullSafe implements Extension {
 
   public function setup($language, $emitter) {
     $language->infix('?->', 80, function($parse, $node, $left) {

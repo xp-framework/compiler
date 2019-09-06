@@ -3,6 +3,7 @@
 use lang\ast\Node;
 use lang\ast\nodes\Method;
 use lang\ast\nodes\ReturnStatement;
+use lang\ast\syntax\Extension;
 
 /**
  * Compact functions
@@ -23,7 +24,7 @@ use lang\ast\nodes\ReturnStatement;
  * @see  https://github.com/xp-framework/rfc/issues/241
  * @test xp://lang.ast.unittest.emit.CompactFunctionsTest
  */
-class CompactMethods {
+class CompactMethods implements Extension {
 
   public function setup($parser, $emitter) {
     $parser->body('fn', function($parse, &$body, $annotations, $modifiers) {

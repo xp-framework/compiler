@@ -3,6 +3,7 @@
 use lang\ast\nodes\LambdaExpression;
 use lang\ast\nodes\Parameter;
 use lang\ast\nodes\Signature;
+use lang\ast\syntax\Extension;
 
 /**
  * Hack-style arrow functions
@@ -11,7 +12,7 @@ use lang\ast\nodes\Signature;
  * @see  https://docs.hhvm.com/hack/functions/anonymous-functions
  * @test xp://lang.ast.unittest.emit.LambdasTest
  */
-class HackArrowFunctions {
+class HackArrowFunctions implements Extension {
 
   public function setup($parser, $emitter) {
     $parser->infix('==>', 80, function($parse, $node, $left) {

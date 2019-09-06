@@ -9,6 +9,7 @@ use lang\ast\nodes\Literal;
 use lang\ast\nodes\TryStatement;
 use lang\ast\nodes\UsingStatement;
 use lang\ast\nodes\Variable;
+use lang\ast\syntax\Extension;
 
 /**
  * Using statement
@@ -33,7 +34,7 @@ use lang\ast\nodes\Variable;
  * @see  https://github.com/xp-framework/compiler/pull/33
  * @test xp://lang.ast.unittest.emit.UsingTest
  */
-class Using {
+class Using implements Extension {
 
   public function setup($language, $emitter) {
     $language->stmt('using', function($parse, $node) {
