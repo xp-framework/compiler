@@ -77,4 +77,16 @@ class AnnotationsTest extends EmittingTest {
       [$m->getParameter(0)->getAnnotations(), $m->getParameter(1)->getAnnotations()]
     );
   }
+
+  #[@test]
+  public function multiple_class_annotations() {
+    $t= $this->type('<<resource("/"), authenticated>> class <T> { }');
+    $this->assertEquals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function multiple_member_annotations() {
+    $t= $this->type('class <T> { <<test, values([1, 2, 3])>> public function fixture() { } }');
+    $this->assertEquals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
+  }
 }

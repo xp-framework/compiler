@@ -732,11 +732,13 @@ class PHP extends Language {
         }
 
         if (',' === $parse->token->value) {
+          $parse->forward();
           continue;
         } else if ('>>' === $parse->token->value) {
           break;
         } else {
           $parse->expecting(', or >>', 'annotation');
+          break;
         }
       } while (null !== $parse->token->value);
 
