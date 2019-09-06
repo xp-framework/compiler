@@ -16,6 +16,7 @@ use unittest\TestCase;
 abstract class EmittingTest extends TestCase {
   private static $cl, $language, $emitter;
   private static $id= 0;
+  private $transformations= [];
 
   #[@beforeClass]
   public static function setupCompiler() {
@@ -27,8 +28,22 @@ abstract class EmittingTest extends TestCase {
     }
   }
 
+  /** @return void */
+  public function tearDown() {
+    foreach ($this->transformations as $transformation) {
+      self::$emitter->remove($transformation);
+    }
+  }
+
+  /**
+   * Register a transformation. Will take care of removing it on test shutdown.
+   *
+   * @param  string $kind
+   * @param  function(lang.ast.Node): lang.ast.Node|iterable $function
+   * @return void
+   */
   protected function transform($type, $function) {
-    self::$emitter->transform($type, $function);
+    $this->transformations[]= self::$emitter->transform($type, $function);
   }
 
   /**

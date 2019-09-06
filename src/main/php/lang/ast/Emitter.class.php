@@ -34,19 +34,42 @@ abstract class Emitter {
    * Transforms nodes of a certain kind using the given function, which
    * may return either single node, which will be then emitted, or an
    * iterable producing nodes, which will then be emitted as statements.
-   * Pass NULL to remove the transformation again.
+   * Returns a handle to remove the transformation again
    *
    * @param  string $kind
-   * @param  ?(function(lang.ast.Node): lang.ast.Node|iterable) $function
-   * @return self
+   * @param  (function(lang.ast.Node): lang.ast.Node|iterable) $function
+   * @return var
    */
   public function transform($kind, $function) {
-    if (null === $function) {
-      unset($this->transformations[$kind]);
+    if (isset($this->transformations[$kind])) {
+      $i= sizeof($this->transformations[$kind]);
+      $this->transformations[$kind][]= $function;
     } else {
-      $this->transformations[$kind]= $function;
+      $i= 0;
+      $this->transformations[$kind]= [$function];
     }
-    return $this;
+    return ['kind' => $kind, 'id' => $i];
+  }
+
+  /**
+   * Removes a transformation added with transform()
+   *
+   * @param  var $transformation
+   * @return void
+   */
+  public function remove($transformation) {
+    $kind= $transformation['kind'];
+    array_splice($this->transformations[$kind], $transformation['id'], 1);
+    if (empty($this->transformations[$kind])) unset($this->transformations[$kind]);
+  }
+
+  /**
+   * Returns all transformations
+   *
+   * @return [:var[]]
+   */
+  public function transformations() {
+    return $this->transformations;
   }
 
   /**
@@ -794,17 +817,22 @@ abstract class Emitter {
 
     // Check for transformations
     if (isset($this->transformations[$node->kind])) {
-      $r= $this->transformations[$node->kind]($node);
-      if ($r instanceof Value) {
-        $this->{'emit'.$r->kind}($result, $r);
-      } else {
-        foreach ($r as $n) {
-          $this->{'emit'.$n->kind}($result, $n);
-          $result->out->write(';');
+      foreach ($this->transformations[$node->kind] as $transformation) {
+        $r= $transformation($node);
+        if ($r instanceof Value) {
+          if ($r->kind === $node->kind) continue;
+          $this->{'emit'.$r->kind}($result, $r);
+          return;
+        } else if ($r) {
+          foreach ($r as $n) {
+            $this->{'emit'.$n->kind}($result, $n);
+            $result->out->write(';');
+          }
+          return;
         }
       }
-    } else {
-      $this->{'emit'.$node->kind}($result, $node);
+      // Fall through, use default
     }
+    $this->{'emit'.$node->kind}($result, $node);
   }
 }
