@@ -37,7 +37,7 @@ abstract class Emitter {
    * Returns a handle to remove the transformation again
    *
    * @param  string $kind
-   * @param  (function(lang.ast.Node): lang.ast.Node|iterable) $function
+   * @param  function(lang.ast.Node): lang.ast.Node|iterable $function
    * @return var
    */
   public function transform($kind, $function) {
@@ -139,7 +139,7 @@ abstract class Emitter {
   }
 
   protected function emitNamespace($result, $declaration) {
-    $result->out->write('namespace '.$declaration->name.";\n");
+    $result->out->write('namespace '.$declaration->name."\n");
   }
 
   protected function emitImport($result, $import) {
@@ -566,7 +566,6 @@ abstract class Emitter {
   protected function emitReturn($result, $return) {
     $result->out->write('return ');
     $return->expression && $this->emit($result, $return->expression);
-    $result->out->write(';');
   }
 
   protected function emitIf($result, $if) {
