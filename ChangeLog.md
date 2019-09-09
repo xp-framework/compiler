@@ -3,6 +3,15 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.0.0 / ????-??-??
+
+* Merged PR #66: Syntax plugins. With this facility in place, the compiler
+  can be extended much like [Babel](https://babeljs.io/docs/en/plugins).
+  This is useful for adapting features which may or may not make it into
+  PHP one day. Current extensions like compact methods are kept for BC
+  reasons, but will be extracted into their own libraries in the future!
+  (@thekid)
+
 ## 3.0.0 / 2019-08-10
 
 * Made compatible with PHP 7.4 - refrain using `{}` for string offsets
