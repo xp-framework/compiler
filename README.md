@@ -42,6 +42,26 @@ Features supported
 
 XP Compiler supports features such as annotations, arrow functions, property type-hints, the null-safe instance operator as well as all PHP 7 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
 
+Additional syntax can be added by installing compiler plugins from [here](https://github.com/xp-lang):
+
+```bash
+$ composer require xp-lang/php-is-operator
+# ...
+
+$ xp compile
+Usage: xp compile <in> [<out>]
+
+@FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
+lang.ast.syntax.TransformationApi
+lang.ast.syntax.php.CompactMethods
+lang.ast.syntax.php.HackArrowFunctions
+lang.ast.syntax.php.NullSafe
+lang.ast.syntax.php.ThrowExpressions
+lang.ast.syntax.php.Using
+
+@FileSystemCL<./vendor/xp-lang/php-is-operator/src/main/php>
+lang.ast.syntax.php.IsOperator
+```
 
 Implementation status
 ---------------------
