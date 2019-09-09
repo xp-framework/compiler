@@ -1,224 +1,266 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\Type;
+use lang\ast\nodes\ClassDeclaration;
+use lang\ast\nodes\Constant;
+use lang\ast\nodes\InstanceExpression;
+use lang\ast\nodes\InvokeExpression;
+use lang\ast\nodes\Literal;
+use lang\ast\nodes\Method;
+use lang\ast\nodes\Property;
+use lang\ast\nodes\ScopeExpression;
+use lang\ast\nodes\Signature;
+use lang\ast\nodes\Variable;
 
 class MembersTest extends ParseTest {
 
   #[@test]
   public function private_instance_property() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], ['$a' => ['(variable)' => ['a', ['private'], null, null, [], null]]], [], null]]],
-      $this->parse('class A { private $a; }')
+    $body= [
+      '$a' => new Property(['private'], 'a', null, null, [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private $a; }'
     );
   }
 
   #[@test]
   public function private_instance_properties() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        '$a' => ['(variable)' => ['a', ['private'], null, null, [], null]],
-        '$b' => ['(variable)' => ['b', ['private'], null, null, [], null]],
-      ], [], null]]],
-      $this->parse('class A { private $a, $b; }')
+    $body= [
+      '$a' => new Property(['private'], 'a', null, null, [], null, self::LINE),
+      '$b' => new Property(['private'], 'b', null, null, [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private $a, $b; }'
     );
   }
 
   #[@test]
   public function private_instance_method() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['private'], [[], null], [], [], null]]
-      ], [], null]]],
-      $this->parse('class A { private function a() { } }')
+    $body= [
+      'a()' => new Method(['private'], 'a', new Signature([], null), [], [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private function a() { } }'
     );
   }
 
   #[@test]
   public function private_static_method() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['private', 'static'], [[], null], [], [], null]]
-      ], [], null]]],
-      $this->parse('class A { private static function a() { } }')
+    $body= [
+      'a()' => new Method(['private', 'static'], 'a', new Signature([], null), [], [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private static function a() { } }'
     );
   }
 
   #[@test]
   public function class_constant() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], ['T' => ['const' => ['T', [], ['(literal)' => '1'], null]]], [], null]]],
-      $this->parse('class A { const T = 1; }')
+    $body= [
+      'T' => new Constant([], 'T', null, new Literal('1', self::LINE), self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { const T = 1; }'
     );
   }
 
   #[@test]
   public function class_constants() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        'T' => ['const' => ['T', [], ['(literal)' => '1'], null]],
-        'S' => ['const' => ['S', [], ['(literal)' => '2'], null]]
-      ], [], null]]],
-      $this->parse('class A { const T = 1, S = 2; }')
+    $body= [
+      'T' => new Constant([], 'T', null, new Literal('1', self::LINE), self::LINE),
+      'S' => new Constant([], 'S', null, new Literal('2', self::LINE), self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { const T = 1, S = 2; }'
     );
   }
 
   #[@test]
   public function private_class_constant() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], ['T' => ['const' => ['T', ['private'], ['(literal)' => '1'], null]]], [], null]]],
-      $this->parse('class A { private const T = 1; }')
+    $body= [
+      'T' => new Constant(['private'], 'T', null, new Literal('1', self::LINE), self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private const T = 1; }'
     );
   }
 
   #[@test]
   public function method_with_return_type() {
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['public'], [[], new Type('void')], [], [], null]]
-      ], [], null]]],
-      $this->parse('class A { public function a(): void { } }')
+    $body= [
+      'a()' => new Method(['public'], 'a', new Signature([], new Type('void')), [], [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { public function a(): void { } }'
     );
   }
 
   #[@test]
   public function method_with_annotation() {
     $annotations= ['test' => null];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['public'], [[], null], $annotations, [], null]]
-      ], [], null]]],
-      $this->parse('class A { <<test>> public function a() { } }')
+    $body= [
+      'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { <<test>> public function a() { } }'
     );
   }
 
   #[@test]
   public function method_with_annotations() {
-    $annotations= ['test' => null, 'ignore' => ['(literal)' => '"Not implemented"']];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], [
-        'a()' => ['function' => ['a', ['public'], [[], null], $annotations, [], null]]
-      ], [], null]]],
-      $this->parse('class A { <<test, ignore("Not implemented")>> public function a() { } }')
+    $annotations= ['test' => null, 'ignore' => new Literal('"Not implemented"', self::LINE)];
+    $body= [
+      'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { <<test, ignore("Not implemented")>> public function a() { } }'
     );
   }
 
   #[@test]
   public function instance_property_access() {
-    $this->assertNodes(
-      [['->' => [['(variable)' => 'a'], ['(name)' => 'member']]]],
-      $this->parse('$a->member;')
+    $this->assertParsed(
+      [new InstanceExpression(new Variable('a', self::LINE), new Literal('member', self::LINE), self::LINE)],
+      '$a->member;'
     );
   }
 
   #[@test]
   public function dynamic_instance_property_access_via_variable() {
-    $this->assertNodes(
-      [['->' => [['(variable)' => 'a'], ['(variable)' => 'member']]]],
-      $this->parse('$a->{$member};')
+    $this->assertParsed(
+      [new InstanceExpression(new Variable('a', self::LINE), new Variable('member', self::LINE), self::LINE)],
+      '$a->{$member};'
     );
   }
 
   #[@test]
   public function dynamic_instance_property_access_via_expression() {
-    $this->assertNodes(
-      [['->' => [['(variable)' => 'a'], ['(' => [
-        ['->' => [['(variable)' => 'field'], ['(name)' => 'get']]],
-        [['(variable)' => 'instance']]
-      ]]]]],
-      $this->parse('$a->{$field->get($instance)};')
+    $member= new InvokeExpression(
+      new InstanceExpression(new Variable('field', self::LINE), new Literal('get', self::LINE), self::LINE),
+      [new Variable('instance', self::LINE)],
+      self::LINE
+    );
+    $this->assertParsed(
+      [new InstanceExpression(new Variable('a', self::LINE), $member, self::LINE)],
+      '$a->{$field->get($instance)};'
     );
   }
 
   #[@test]
   public function static_property_access() {
-    $this->assertNodes(
-      [['::' => ['\\A', ['(variable)' => 'member']]]],
-      $this->parse('A::$member;')
+    $this->assertParsed(
+      [new ScopeExpression('\\A', new Variable('member', self::LINE), self::LINE)],
+      'A::$member;'
     );
   }
 
   #[@test, @values(['self', 'parent', 'static'])]
   public function scope_resolution($scope) {
-    $this->assertNodes(
-      [['::' => [$scope, ['class' => 'class']]]],
-      $this->parse($scope.'::class;')
+    $this->assertParsed(
+      [new ScopeExpression($scope, new Literal('class', self::LINE), self::LINE)],
+      $scope.'::class;'
     );
   }
 
   #[@test]
   public function class_resolution() {
-    $this->assertNodes(
-      [['::' => ['\\A', ['class' => 'class']]]],
-      $this->parse('A::class;')
+    $this->assertParsed(
+      [new ScopeExpression('\\A', new Literal('class', self::LINE), self::LINE)],
+      'A::class;'
     );
   }
 
   #[@test]
   public function instance_method_invocation() {
-    $this->assertNodes(
-      [['(' => [['->' => [['(variable)' => 'a'], ['(name)' => 'member']]], [['(literal)' => '1']]]]],
-      $this->parse('$a->member(1);')
+    $this->assertParsed(
+      [new InvokeExpression(
+        new InstanceExpression(new Variable('a', self::LINE), new Literal('member', self::LINE), self::LINE),
+        [new Literal('1', self::LINE)],
+        self::LINE
+      )],
+      '$a->member(1);'
     );
   }
 
   #[@test]
   public function static_method_invocation() {
-    $this->assertNodes(
-      [['(' => [['::' => ['\\A', ['(name)' => 'member']]], [['(literal)' => '1']]]]],
-      $this->parse('A::member(1);')
+    $this->assertParsed(
+      [new InvokeExpression(
+        new ScopeExpression('\\A', new Literal('member', self::LINE), self::LINE),
+        [new Literal('1', self::LINE)],
+        self::LINE
+      )],
+      'A::member(1);'
     );
   }
 
   #[@test]
   public function typed_property() {
-    $decl= ['$a' => ['(variable)' => ['a', ['private'], null, new Type('string'), [], null]]];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], $decl, [], null]]],
-      $this->parse('class A { private string $a; }')
+    $body= [
+      '$a' => new Property(['private'], 'a', new Type('string'), null, [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private string $a; }'
     );
   }
 
   #[@test]
   public function typed_property_with_value() {
-    $decl= ['$a' => ['(variable)' => ['a', ['private'], ['(literal)' => '"test"'], new Type('string'), [], null]]];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], $decl, [], null]]],
-      $this->parse('class A { private string $a = "test"; }')
+    $body= [
+      '$a' => new Property(['private'], 'a', new Type('string'), new Literal('"test"', self::LINE), [], null, self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private string $a = "test"; }'
     );
   }
 
   #[@test]
   public function typed_properties() {
-    $decl= [
-      '$a' => ['(variable)' => ['a', ['private'], null, new Type('string'), [], null]],
-      '$b' => ['(variable)' => ['b', ['private'], null, new Type('string'), [], null]],
-      '$c' => ['(variable)' => ['c', ['private'], null, new Type('int'), [], null]],
+    $body= [
+      '$a' => new Property(['private'], 'a', new Type('string'), null, [], null, self::LINE),
+      '$b' => new Property(['private'], 'b', new Type('string'), null, [], null, self::LINE),
+      '$c' => new Property(['private'], 'c', new Type('int'), null, [], null, self::LINE)
     ];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], $decl, [], null]]],
-      $this->parse('class A { private string $a, $b, int $c; }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { private string $a, $b, int $c; }'
     );
   }
 
   #[@test]
   public function typed_constant() {
-    $decl= ['T' => ['const' => ['T', [], ['(literal)' => '1'], new Type('int')]]];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], $decl, [], null]]],
-      $this->parse('class A { const int T = 1; }')
+    $body= [
+      'T' => new Constant([], 'T', new Type('int'), new Literal('1', self::LINE), self::LINE)
+    ];
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { const int T = 1; }'
     );
   }
 
   #[@test]
   public function typed_constants() {
-    $decl= [
-      'T' => ['const' => ['T', [], ['(literal)' => '1'], new Type('int')]],
-      'S' => ['const' => ['S', [], ['(literal)' => '2'], new Type('int')]],
-      'I' => ['const' => ['I', [], ['(literal)' => '"i"'], new Type('string')]],
+    $body= [
+      'T' => new Constant([], 'T', new Type('int'), new Literal('1', self::LINE), self::LINE),
+      'S' => new Constant([], 'S', new Type('int'), new Literal('2', self::LINE), self::LINE),
+      'I' => new Constant([], 'I', new Type('string'), new Literal('"i"', self::LINE), self::LINE)
     ];
-    $this->assertNodes(
-      [['class' => ['\\A', [], null, [], $decl, [], null]]],
-      $this->parse('class A { const int T = 1, S = 2, string I = "i"; }')
+    $this->assertParsed(
+      [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
+      'class A { const int T = 1, S = 2, string I = "i"; }'
     );
   }
 }

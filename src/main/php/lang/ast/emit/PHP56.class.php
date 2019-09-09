@@ -1,14 +1,11 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Emitter;
-use lang\ast\nodes\Value;
-
 /**
  * PHP 5.6 syntax
  *
  * @see  https://wiki.php.net/rfc#php_56
  */
-class PHP56 extends Emitter {
+class PHP56 extends PHP {
   use OmitPropertyTypes, OmitReturnTypes, OmitConstModifiers;
   use RewriteLambdaExpressions;
 
@@ -22,7 +19,6 @@ class PHP56 extends Emitter {
     'float'    => 70,
     'mixed'    => null,
   ];
-  private $call= [];
   private static $keywords= [
     'callable'     => true,
     'class'        => true,
@@ -91,176 +87,176 @@ class PHP56 extends Emitter {
   ];
 
 
-  protected function emitLiteral($literal) {
-    if ('"' === $literal{0}) {
-      $this->out->write(preg_replace_callback(
+  protected function emitLiteral($result, $literal) {
+    if ('"' === $literal->expression[0]) {
+      $result->out->write(preg_replace_callback(
         '/\\\\u\{([0-9a-f]+)\}/i',
         function($matches) { return html_entity_decode('&#'.hexdec($matches[1]).';', ENT_HTML5, \xp::ENCODING); },
-        $literal
+        $literal->expression
       ));
     } else {
-      $this->out->write($literal);
+      $result->out->write($literal->expression);
     }
   }
 
-  protected function emitCatch($catch) {
+  protected function emitCatch($result, $catch) {
     if (empty($catch->types)) {
-      $this->out->write('catch(\\Exception $'.$catch->variable.') {');
+      $result->out->write('catch(\\Exception $'.$catch->variable.') {');
     } else {
       $last= array_pop($catch->types);
       $label= sprintf('c%u', crc32($last));
       foreach ($catch->types as $type) {
-        $this->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
+        $result->out->write('catch('.$type.' $'.$catch->variable.') { goto '.$label.'; }');
       }
-      $this->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
+      $result->out->write('catch('.$last.' $'.$catch->variable.') { '.$label.':');
     }
 
-    $this->emit($catch->body);
-    $this->out->write('}');
+    $this->emitAll($result, $catch->body);
+    $result->out->write('}');
   }
 
-  protected function emitBinary($binary) {
+  protected function emitBinary($result, $binary) {
     if ('??' === $binary->operator) {
-      $this->out->write('isset(');
-      $this->emit($binary->left);
-      $this->out->write(') ?');
-      $this->emit($binary->left);
-      $this->out->write(' : ');
-      $this->emit($binary->right);
+      $result->out->write('isset(');
+      $this->emitOne($result, $binary->left);
+      $result->out->write(') ?');
+      $this->emitOne($result, $binary->left);
+      $result->out->write(' : ');
+      $this->emitOne($result, $binary->right);
     } else if ('<=>' === $binary->operator) {
-      $l= $this->temp();
-      $r= $this->temp();
-      $this->out->write('('.$l.'= ');
-      $this->emit($binary->left);
-      $this->out->write(') < ('.$r.'=');
-      $this->emit($binary->right);
-      $this->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
+      $l= $result->temp();
+      $r= $result->temp();
+      $result->out->write('('.$l.'= ');
+      $this->emitOne($result, $binary->left);
+      $result->out->write(') < ('.$r.'=');
+      $this->emitOne($result, $binary->right);
+      $result->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
-      parent::emitBinary($binary);
+      parent::emitBinary($result, $binary);
     }
   }
 
-  protected function emitAssignment($assignment) {
+  protected function emitAssignment($result, $assignment) {
     if ('??=' === $assignment->operator) {
-      $this->out->write('isset(');
-      $this->emitAssign($assignment->variable);
-      $this->out->write(') ||');
-      $this->emit($assignment->variable);
-      $this->out->write('=');
-      $this->emit($assignment->expression);
+      $result->out->write('isset(');
+      $this->emitAssign($result, $assignment->variable);
+      $result->out->write(') ||');
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write('=');
+      $this->emitOne($result, $assignment->expression);
     } else {
-      $this->emitAssign($assignment->variable);
-      $this->out->write($assignment->operator);
-      $this->emit($assignment->expression);
+      $this->emitAssign($result, $assignment->variable);
+      $result->out->write($assignment->operator);
+      $this->emitOne($result, $assignment->expression);
     }
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitInvoke($invoke) {
+  protected function emitInvoke($result, $invoke) {
     $expr= $invoke->expression;
     if ('braced' === $expr->kind) {
-      $t= $this->temp();
-      $this->out->write('(('.$t.'=');
-      $this->emit($expr->value);
-      $this->out->write(') ? '.$t);
-      $this->out->write('(');
-      $this->emitArguments($invoke->arguments);
-      $this->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
+      $t= $result->temp();
+      $result->out->write('(('.$t.'=');
+      $this->emitOne($result, $expr->expression);
+      $result->out->write(') ? '.$t);
+      $result->out->write('(');
+      $this->emitArguments($result, $invoke->arguments);
+      $result->out->write(') : __error(E_RECOVERABLE_ERROR, "Function name must be a string", __FILE__, __LINE__))');
     } else if (
       'scope' === $expr->kind &&
-      'name' === $expr->value->member->kind &&
-      isset(self::$keywords[strtolower($expr->value->member->value)])
+      'literal' === $expr->member->kind &&
+      isset(self::$keywords[strtolower($expr->member->expression)])
     ) {
-      $this->out->write($expr->value->type.'::{\''.$expr->value->member->value.'\'}');
-      $this->out->write('(');
-      $this->emitArguments($invoke->arguments);
-      $this->out->write(')');
+      $result->out->write($expr->type.'::{\''.$expr->member->expression.'\'}');
+      $result->out->write('(');
+      $this->emitArguments($result, $invoke->arguments);
+      $result->out->write(')');
     } else {
-      parent::emitInvoke($invoke);
+      parent::emitInvoke($result, $invoke);
     }
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitThrowExpression($throw) {
+  protected function emitThrowExpression($result, $throw) {
     $capture= [];
-    foreach ($this->search($throw, 'variable') as $var) {
-      if (isset($this->locals[$var->value])) {
-        $capture[$var->value]= true;
+    foreach ($result->codegen->search($throw, 'variable') as $var) {
+      if (isset($result->locals[$var->name])) {
+        $capture[$var->name]= true;
       }
     }
     unset($capture['this']);
 
-    $t= $this->temp();
-    $this->out->write('(('.$t.'=function()');
-    $capture && $this->out->write(' use($'.implode(', $', array_keys($capture)).')');
-    $this->out->write('{ throw ');
-    $this->emit($throw);
-    $this->out->write('; }) ? '.$t.'() : null)');
+    $t= $result->temp();
+    $result->out->write('(('.$t.'=function()');
+    $capture && $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
+    $result->out->write('{ throw ');
+    $this->emitOne($result, $throw->expression);
+    $result->out->write('; }) ? '.$t.'() : null)');
   }
 
-  protected function emitNewClass($new) {
-    $this->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
+  protected function emitNewClass($result, $new) {
+    $result->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
     $definition= $new->definition;
-    $this->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
-    $this->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
-    $this->out->write(', "use" => []');
-    $this->out->write('], \'{');
-    $this->out->write(str_replace('\'', '\\\'', $this->buffer(function() use($definition) {
+    $result->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
+    $result->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
+    $result->out->write(', "use" => []');
+    $result->out->write('], \'{');
+    $result->out->write(str_replace('\'', '\\\'', $result->buffer(function($result) use($definition) {
       foreach ($definition->body as $member) {
-        $this->emit($member);
-        $this->out->write("\n");
+        $this->emitOne($result, $member);
+        $result->out->write("\n");
       }
     })));
-    $this->out->write('}\')->newInstance(');
-    $this->emitArguments($new->arguments);
-    $this->out->write(')');
+    $result->out->write('}\')->newInstance(');
+    $this->emitArguments($result, $new->arguments);
+    $result->out->write(')');
   }
 
-  protected function emitFrom($from) {
-    $this->out->write('foreach (');
-    $this->emit($from);
-    $this->out->write(' as $key => $val) yield $key => $val;');
+  protected function emitFrom($result, $from) {
+    $result->out->write('foreach (');
+    $this->emitOne($result, $from->iterable);
+    $result->out->write(' as $key => $val) yield $key => $val;');
   }
 
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
-  protected function emitMethod($method) {
+  protected function emitMethod($result, $method) {
     if (isset(self::$keywords[strtolower($method->name)])) {
-      $this->call[in_array('static', $method->modifiers)][]= $method->name;
+      $result->call[in_array('static', $method->modifiers)][]= $method->name;
       $method->name= '__'.$method->name;
     } else if ('__call' === $method->name || '__callStatic' === $method->name) {
       $method->name.= '0';
     }
-    parent::emitMethod($method);
+    parent::emitMethod($result, $method);
   }
 
-  protected function emitClass($class) {
-    $this->call= [false => [], true => []];
-    array_unshift($this->meta, []);
-    $this->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
-    $class->parent && $this->out->write(' extends '.$class->parent);
-    $class->implements && $this->out->write(' implements '.implode(', ', $class->implements));
-    $this->out->write('{');
+  protected function emitClass($result, $class) {
+    $result->call= [false => [], true => []];
+    array_unshift($result->meta, []);
+    $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
+    $class->parent && $result->out->write(' extends '.$class->parent);
+    $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
+    $result->out->write('{');
     foreach ($class->body as $member) {
-      $this->emit($member);
+      $this->emitOne($result, $member);
     }
 
-    if ($this->call[false]) {
-      $this->out->write('function __call($name, $args) {');
-      foreach ($this->call[false] as $name) {
-        $this->out->write('if (\''.$name.'\' === $name) return $this->__'.$name.'(...$args); else ');
+    if ($result->call[false]) {
+      $result->out->write('function __call($name, $args) {');
+      foreach ($result->call[false] as $name) {
+        $result->out->write('if (\''.$name.'\' === $name) return $this->__'.$name.'(...$args); else ');
       }
-      $this->out->write('return $this->__call0($name, $args); }');
+      $result->out->write('return $this->__call0($name, $args); }');
     }
-    if ($this->call[true]) {
-      $this->out->write('static function __callStatic($name, $args) {');
-      foreach ($this->call[true] as $name) {
-        $this->out->write('if (\''.$name.'\' === $name) return self::__'.$name.'(...$args); else ');
+    if ($result->call[true]) {
+      $result->out->write('static function __callStatic($name, $args) {');
+      foreach ($result->call[true] as $name) {
+        $result->out->write('if (\''.$name.'\' === $name) return self::__'.$name.'(...$args); else ');
       }
-      $this->out->write('return self::__callStatic0($name, ...$args); }');
+      $result->out->write('return self::__callStatic0($name, ...$args); }');
     }
 
-    $this->out->write('static function __init() {');
-    $this->emitMeta($class->name, $class->annotations, $class->comment);
-    $this->out->write('}} '.$class->name.'::__init();');
+    $result->out->write('static function __init() {');
+    $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
+    $result->out->write('}} '.$class->name.'::__init();');
   }
 }

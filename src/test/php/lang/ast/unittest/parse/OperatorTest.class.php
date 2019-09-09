@@ -1,5 +1,20 @@
 <?php namespace lang\ast\unittest\parse;
 
+use lang\ast\nodes\ArrayLiteral;
+use lang\ast\nodes\Assignment;
+use lang\ast\nodes\BinaryExpression;
+use lang\ast\nodes\Braced;
+use lang\ast\nodes\ClassDeclaration;
+use lang\ast\nodes\InstanceExpression;
+use lang\ast\nodes\Literal;
+use lang\ast\nodes\NewClassExpression;
+use lang\ast\nodes\NewExpression;
+use lang\ast\nodes\OffsetExpression;
+use lang\ast\nodes\ScopeExpression;
+use lang\ast\nodes\TernaryExpression;
+use lang\ast\nodes\UnaryExpression;
+use lang\ast\nodes\Variable;
+
 class OperatorTest extends ParseTest {
 
   #[@test, @values([
@@ -9,17 +24,17 @@ class OperatorTest extends ParseTest {
   #  '>>', '<<'
   #])]
   public function binary($operator) {
-    $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], $operator, ['(variable)' => 'b']]]],
-      $this->parse('$a '.$operator.' $b;')
+    $this->assertParsed(
+      [new BinaryExpression(new Variable('a', self::LINE), $operator, new Variable('b', self::LINE), self::LINE)],
+      '$a '.$operator.' $b;'
     );
   }
 
   #[@test]
   public function ternary() {
-    $this->assertNodes(
-      [['?' => [['(variable)' => 'a'], ['(literal)' => '1'], ['(literal)' => '2']]]],
-      $this->parse('$a ? 1 : 2;')
+    $this->assertParsed(
+      [new TernaryExpression(new Variable('a', self::LINE), new Literal('1', self::LINE), new Literal('2', self::LINE), self::LINE)],
+      '$a ? 1 : 2;'
     );
   }
 
@@ -29,25 +44,25 @@ class OperatorTest extends ParseTest {
   #  '>', '>=', '<=', '<', '<=>'
   #])]
   public function comparison($operator) {
-    $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], $operator, ['(variable)' => 'b']]]],
-      $this->parse('$a '.$operator.' $b;')
+    $this->assertParsed(
+      [new BinaryExpression(new Variable('a', self::LINE), $operator, new Variable('b', self::LINE), self::LINE)],
+      '$a '.$operator.' $b;'
     );
   }
 
   #[@test, @values(['++', '--'])]
   public function suffix($operator) {
-    $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], $operator]]],
-      $this->parse('$a'.$operator.';')
+    $this->assertParsed(
+      [new UnaryExpression('suffix', new Variable('a', self::LINE), $operator, self::LINE)],
+      '$a'.$operator.';'
     );
   }
 
   #[@test, @values(['!', '~', '-', '+', '++', '--'])]
   public function prefix($operator) {
-    $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], $operator]]],
-      $this->parse(''.$operator.'$a;')
+    $this->assertParsed(
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), $operator, self::LINE)],
+      ''.$operator.'$a;'
     );
   }
 
@@ -58,121 +73,134 @@ class OperatorTest extends ParseTest {
   #  '>>=', '<<='
   #])]
   public function assignment($operator) {
-    $this->assertNodes(
-      [[$operator => [['(variable)' => 'a'], $operator, ['(variable)' => 'b']]]],
-      $this->parse('$a '.$operator.' $b;')
+    $this->assertParsed(
+      [new Assignment(new Variable('a', self::LINE), $operator, new Variable('b', self::LINE), self::LINE)],
+      '$a '.$operator.' $b;'
     );
   }
 
   #[@test]
   public function assignment_to_offset() {
-    $this->assertNodes(
-      [['=' => [['[' => [['(variable)' => 'a'], ['(literal)' => '0']]], '=', ['(literal)' => '1']]]],
-      $this->parse('$a[0]= 1;')
+    $target= new OffsetExpression(new Variable('a', self::LINE), new Literal('0', self::LINE), self::LINE);
+    $this->assertParsed(
+      [new Assignment($target, '=', new Variable('b', self::LINE), self::LINE)],
+      '$a[0]= $b;'
     );
   }
 
   #[@test]
   public function destructuring_assignment() {
-    $this->assertNodes(
-      [['=' => [['[' => [[null, ['(variable)' => 'a']], [null, ['(variable)' => 'b']]]], '=', ['(' => [['(name)' => 'result'], []]]]]],
-      $this->parse('[$a, $b]= result();')
+    $target= new ArrayLiteral([[null, new Variable('a', self::LINE)], [null, new Variable('b', self::LINE)]], self::LINE);
+    $this->assertParsed(
+      [new Assignment($target, '=', new Variable('c', self::LINE), self::LINE)],
+      '[$a, $b]= $c;'
     );
   }
 
   #[@test]
   public function comparison_to_assignment() {
-    $this->assertNodes(
-      [['===' => [['(literal)' => '1'], '===', ['(' => ['=' => [['(variable)' => 'a'], '=', ['(literal)' => '1']]]]]]],
-      $this->parse('1 === ($a= 1);')
+    $this->assertParsed(
+      [new BinaryExpression(
+        new Literal('1', self::LINE), '===', new Braced(
+          new Assignment(new Variable('a', self::LINE), '=', new Literal('1', self::LINE), self::LINE),
+          self::LINE
+        ),
+        self::LINE
+      )],
+      '1 === ($a= 1);'
     );
   }
 
   #[@test]
   public function append_array() {
-    $this->assertNodes(
-      [['=' => [['[' => [['(variable)' => 'a'], null]], '=', ['(literal)' => '1']]]],
-      $this->parse('$a[]= 1;')
+    $target= new OffsetExpression(new Variable('a', self::LINE), null, self::LINE);
+    $this->assertParsed(
+      [new Assignment($target, '=', new Variable('b', self::LINE), self::LINE)],
+      '$a[]= $b;'
     );
   }
 
   #[@test]
   public function clone_expression() {
-    $this->assertNodes(
-      [['clone' => [['(variable)' => 'a'], 'clone']]],
-      $this->parse('clone $a;')
+    $this->assertParsed(
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), 'clone', self::LINE)],
+      'clone $a;'
     );
   }
 
   #[@test]
   public function error_suppression() {
-    $this->assertNodes(
-      [['@' => [['(variable)' => 'a'], '@']]],
-      $this->parse('@$a;')
+    $this->assertParsed(
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), '@', self::LINE)],
+      '@$a;'
     );
   }
 
   #[@test]
   public function reference() {
-    $this->assertNodes(
-      [['&' => [['(variable)' => 'a'], '&']]],
-      $this->parse('&$a;')
+    $this->assertParsed(
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), '&', self::LINE)],
+      '&$a;'
     );
   }
 
   #[@test]
   public function new_type() {
-    $this->assertNodes(
-      [['new' => ['\\T', []]]],
-      $this->parse('new T();')
+    $this->assertParsed(
+      [new NewExpression('\\T', [], self::LINE)],
+      'new T();'
     );
   }
 
   #[@test]
   public function new_type_with_args() {
-    $this->assertNodes(
-      [['new' => ['\\T', [['(variable)' => 'a'], ['(variable)' => 'b']]]]],
-      $this->parse('new T($a, $b);')
+    $this->assertParsed(
+      [new NewExpression('\\T', [new Variable('a', self::LINE), new Variable('b', self::LINE)], self::LINE)],
+      'new T($a, $b);'
     );
   }
 
   #[@test]
   public function new_anonymous_extends() {
-    $this->assertNodes(
-      [['new' => [[null, [], '\\T', [], [], [], null], []]]],
-      $this->parse('new class() extends T { };')
+    $declaration= new ClassDeclaration([], null, '\\T', [], [], [], null, self::LINE);
+    $this->assertParsed(
+      [new NewClassExpression($declaration, [], self::LINE)],
+      'new class() extends T { };'
     );
   }
 
   #[@test]
   public function new_anonymous_implements() {
-    $this->assertNodes(
-      [['new' => [[null, [], null, ['\\A', '\\B'], [], [], null], []]]],
-      $this->parse('new class() implements A, B { };')
+    $declaration= new ClassDeclaration([], null, null, ['\\A', '\\B'], [], [], null, self::LINE);
+    $this->assertParsed(
+      [new NewClassExpression($declaration, [], self::LINE)],
+      'new class() implements A, B { };'
     );
   }
 
   #[@test]
   public function precedence_of_object_operator() {
-    $this->assertNodes(
-      [['.' => [
-        ['->' => [['(variable)' => 'this'], ['(name)' => 'a']]],
+    $this->assertParsed(
+      [new BinaryExpression(
+        new InstanceExpression(new Variable('this', self::LINE), new Literal('a', self::LINE), self::LINE),
         '.',
-        ['(literal)' => '"test"']
-      ]]],
-      $this->parse('$this->a."test";')
+        new Literal('"test"', self::LINE),
+        self::LINE
+      )],
+      '$this->a."test";'
     );
   }
 
   #[@test]
   public function precedence_of_scope_resolution_operator() {
-    $this->assertNodes(
-      [['.' => [
-        ['::' => ['self', ['class' => 'class']]],
+    $this->assertParsed(
+      [new BinaryExpression(
+        new ScopeExpression('self', new Literal('class', self::LINE), self::LINE),
         '.',
-        ['(literal)' => '"test"']
-      ]]],
-      $this->parse('self::class."test";')
+        new Literal('"test"', self::LINE),
+        self::LINE
+      )],
+      'self::class."test";'
     );
   }
 }

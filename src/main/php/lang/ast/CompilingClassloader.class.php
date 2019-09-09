@@ -7,18 +7,27 @@ use lang\ClassNotFoundException;
 use lang\ElementNotFoundException;
 use lang\IClassLoader;
 use lang\XPClass;
+use lang\reflect\Package;
 
 class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
   private static $instance= [];
+  public static $syntax= [];
   private $version;
 
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
     $this->version= $emit->getSimpleName();
-    Compiled::$emit[$this->version]= $emit;
 
+    $emitter= $emit->newInstance();
+    $language= Language::named('PHP');
+    foreach ($language->extensions() as $extension) {
+      $extension->setup($language, $emitter);
+    }
+
+    Compiled::$emit[$this->version]= $emitter;
+    Compiled::$lang= $language;
     stream_wrapper_register($this->version, Compiled::class);
   }
 
@@ -198,25 +207,7 @@ class CompilingClassLoader implements IClassLoader {
       throw new ClassNotFoundException($class);  
     }
 
-    $declaration= new MemoryOutputStream();
-    $file= strtr($class, '.', '/').self::EXTENSION;
-    $in= $source->getResourceAsStream($file)->in();
-
-    try {
-      $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
-      $emitter= $this->emit->newInstance($declaration);
-      foreach (Transformations::registered() as $kind => $function) {
-        $emitter->transform($kind, $function);
-      }
-      $emitter->emit($parse->execute());
-
-      return $declaration->getBytes();
-    } catch (Errors $e) {
-      $message= sprintf('Syntax error in %s, line %d: %s', $e->getFile(), $e->getLine(), $e->getMessage());
-      throw new ClassFormatException($message);
-    } finally {
-      $in->close();
-    }
+    return Compiled::bytes($this->version, $source, strtr($class, '.', '/').self::EXTENSION);
   }
 
   /**

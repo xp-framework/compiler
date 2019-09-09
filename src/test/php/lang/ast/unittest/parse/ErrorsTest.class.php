@@ -79,7 +79,7 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function unclosed_offset() {
     $this->assertError(
-      'Expected "]", have ";"',
+      'Expected "]", have ";" in offset access',
       $this->parse('$a[$s[0]= 5;')
     );
   }

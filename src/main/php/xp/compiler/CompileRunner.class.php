@@ -2,11 +2,13 @@
 
 use io\Path;
 use lang\Runtime;
+use lang\ast\CompilingClassloader;
 use lang\ast\Emitter;
 use lang\ast\Errors;
+use lang\ast\Language;
 use lang\ast\Parse;
+use lang\ast\Result;
 use lang\ast\Tokens;
-use lang\ast\transform\Transformations;
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -43,10 +45,7 @@ class CompileRunner {
 
   /** @return int */
   public static function main(array $args) {
-    if (empty($args)) {
-      Console::$err->writeLine('Usage: xp compile <in> [<out>]');
-      return 2;
-    }
+    if (empty($args)) return Usage::main($args);
 
     $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
     $in= $out= '-';
@@ -68,7 +67,12 @@ class CompileRunner {
       }
     }
 
-    $emit= Emitter::forRuntime($target);
+    $lang= Language::named('PHP');
+    $emit= Emitter::forRuntime($target)->newInstance();
+    foreach ($lang->extensions() as $extension) {
+      $extension->setup($lang, $emit);
+    }
+
     $input= Input::newInstance($in);
     $output= Output::newInstance($out);
 
@@ -79,12 +83,8 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= new Parse(new Tokens(new StreamTokenizer($in)), $file);
-        $emitter= $emit->newInstance($output->target((string)$path));
-        foreach (Transformations::registered() as $kind => $function) {
-          $emitter->transform($kind, $function);
-        }
-        $emitter->emit($parse->execute());
+        $parse= new Parse($lang, new Tokens(new StreamTokenizer($in)), $file);
+        $emit->emitAll(new Result($output->target((string)$path)), $parse->execute());
 
         $t->stop();
         Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
@@ -105,7 +105,7 @@ class CompileRunner {
       $errors ? "\033[41;1;37m×" : "\033[42;1;37m♥",
       $total,
       $out,
-      $emit->getName(),
+      typeof($emit)->getName(),
       $errors
     );
     Console::$err->writeLinef(

@@ -2,191 +2,167 @@
 
 use lang\ast\FunctionType;
 use lang\ast\Type;
+use lang\ast\nodes\ArrayLiteral;
+use lang\ast\nodes\BinaryExpression;
+use lang\ast\nodes\FunctionDeclaration;
+use lang\ast\nodes\Literal;
+use lang\ast\nodes\Parameter;
+use lang\ast\nodes\ReturnStatement;
+use lang\ast\nodes\Signature;
+use lang\ast\nodes\YieldExpression;
+use lang\ast\nodes\YieldFromExpression;
 
 class FunctionsTest extends ParseTest {
 
   #[@test]
   public function empty_function_without_parameters() {
-    $this->assertNodes(
-      [['function' => ['a', [[], null], []]]],
-      $this->parse('function a() { }')
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], null), [], self::LINE)],
+      'function a() { }'
     );
   }
 
   #[@test]
   public function two_functions() {
-    $this->assertNodes(
-      [['function' => ['a', [[], null], []]], ['function' => ['b', [[], null], []]]],
-      $this->parse('function a() { } function b() { }')
+    $this->assertParsed(
+      [
+        new FunctionDeclaration('a', new Signature([], null), [], self::LINE),
+        new FunctionDeclaration('b', new Signature([], null), [], self::LINE)
+      ],
+      'function a() { } function b() { }'
     );
   }
 
   #[@test, @values(['param', 'protected'])]
   public function with_parameter($name) {
-    $this->assertNodes(
-      [['function' => ['a', [[[$name, false, null, false, null, null, []]], null], []]]],
-      $this->parse('function a($'.$name.') { }')
+    $params= [new Parameter($name, null, null, false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a($'.$name.') { }'
     );
   }
 
   #[@test]
   public function with_reference_parameter() {
-    $this->assertNodes(
-      [['function' => ['a', [[['param', true, null, false, null, null, []]], null], []]]],
-      $this->parse('function a(&$param) { }')
+    $params= [new Parameter('param', null, null, true, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a(&$param) { }'
     );
   }
 
   #[@test]
   public function dangling_comma_in_parameter_lists() {
-    $this->assertNodes(
-      [['function' => ['a', [[['param', false, null, false, null, null, []]], null], []]]],
-      $this->parse('function a($param, ) { }')
+    $params= [new Parameter('param', null, null, false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a($param, ) { }'
     );
   }
 
   #[@test]
   public function with_typed_parameter() {
-    $this->assertNodes(
-      [['function' => ['a', [[['param', false, new Type('string'), false, null, null, []]], null], []]]],
-      $this->parse('function a(string $param) { }')
+    $params= [new Parameter('param', new Type('string'), null, false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a(string $param) { }'
     );
   }
 
   #[@test]
   public function with_nullable_typed_parameter() {
-    $this->assertNodes(
-      [['function' => ['a', [[['param', false, new Type('?string'), false, null, null, []]], null], []]]],
-      $this->parse('function a(?string $param) { }')
+    $params= [new Parameter('param', new Type('?string'), null, false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a(?string $param) { }'
     );
   }
 
   #[@test]
   public function with_variadic_parameter() {
-    $this->assertNodes(
-      [['function' => ['a', [[['param', false, null, true, null, null, []]], null], []]]],
-      $this->parse('function a(... $param) { }')
+    $params= [new Parameter('param', null, null, false, true, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a(... $param) { }'
     );
   }
 
   #[@test]
   public function with_optional_parameter() {
-    $this->assertNodes(
-      [['function' => ['a', [[['param', false, null, false, null, ['null' => 'null'], []]], null], []]]],
-      $this->parse('function a($param= null) { }')
+    $params= [new Parameter('param', null, new Literal('null', self::LINE), false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a($param= null) { }'
     );
   }
 
   #[@test]
   public function with_parameter_named_function() {
-    $this->assertNodes(
-      [['function' => ['a', [[['function', false, null, false, null, null, []]], null], []]]],
-      $this->parse('function a($function) { }')
+    $params= [new Parameter('function', null, null, false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a($function, ) { }'
     );
   }
 
   #[@test]
   public function with_typed_parameter_named_function() {
-    $this->assertNodes(
-      [['function' => ['a', [[['function', false, new FunctionType([], new Type('void')), false, null, null, []]], null], []]]],
-      $this->parse('function a((function(): void) $function) { }')
+    $params= [new Parameter('function', new FunctionType([], new Type('void')), null, false, false, null, [])];
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature($params, null), [], self::LINE)],
+      'function a((function(): void) $function) { }'
     );
   }
 
   #[@test]
   public function with_return_type() {
-    $this->assertNodes(
-      [['function' => ['a', [[], new Type('void')], []]]],
-      $this->parse('function a(): void { }')
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], new Type('void')), [], self::LINE)],
+      'function a(): void { }'
     );
   }
 
   #[@test]
   public function with_nullable_return() {
-    $this->assertNodes(
-      [['function' => ['a', [[], new Type('?string')], []]]],
-      $this->parse('function a(): ?string { }')
-    );
-  }
-
-  #[@test]
-  public function default_closure() {
-    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => [[[], null], null, [['return' => $block]]]]],
-      $this->parse('function() { return $a + 1; };')
-    );
-  }
-
-  #[@test]
-  public function default_closure_with_use_by_value() {
-    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => [[[], null], ['$a', '$b'], [['return' => $block]]]]],
-      $this->parse('function() use($a, $b) { return $a + 1; };')
-    );
-  }
-
-  #[@test]
-  public function default_closure_with_use_by_reference() {
-    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => [[[], null], ['$a', '&$b'], [['return' => $block]]]]],
-      $this->parse('function() use($a, &$b) { return $a + 1; };')
-    );
-  }
-
-  #[@test]
-  public function default_closure_with_return_type() {
-    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => [[[], new Type('int')], null, [['return' => $block]]]]],
-      $this->parse('function(): int { return $a + 1; };')
-    );
-  }
-
-  #[@test]
-  public function default_closure_with_nullable_return_type() {
-    $block= ['+' => [['(variable)' => 'a'], '+', ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => [[[], new Type('?int')], null, [['return' => $block]]]]],
-      $this->parse('function(): ?int { return $a + 1; };')
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], new Type('?string')), [], self::LINE)],
+      'function a(): ?string { }'
     );
   }
 
   #[@test]
   public function generator() {
-    $statement= ['yield' => [null, null]];
-    $this->assertNodes(
-      [['function' => ['a', [[], null], [$statement]]]],
-      $this->parse('function a() { yield; }')
+    $yield= new YieldExpression(null, null, self::LINE);
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], null), [$yield], self::LINE)],
+      'function a() { yield; }'
     );
   }
 
   #[@test]
   public function generator_with_value() {
-    $statement= ['yield' => [null, ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => ['a', [[], null], [$statement]]]],
-      $this->parse('function a() { yield 1; }')
+    $yield= new YieldExpression(null, new Literal('1', self::LINE), self::LINE);
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], null), [$yield], self::LINE)],
+      'function a() { yield 1; }'
     );
   }
 
   #[@test]
   public function generator_with_key_and_value() {
-    $statement= ['yield' => [['(literal)' => '"number"'], ['(literal)' => '1']]];
-    $this->assertNodes(
-      [['function' => ['a', [[], null], [$statement]]]],
-      $this->parse('function a() { yield "number" => 1; }')
+    $yield= new YieldExpression(new Literal('"number"', self::LINE), new Literal('1', self::LINE), self::LINE);
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], null), [$yield], self::LINE)],
+      'function a() { yield "number" => 1; }'
     );
   }
 
   #[@test]
   public function generator_delegation() {
-    $statement= ['yield' => ['[' => []]];
-    $this->assertNodes(
-      [['function' => ['a', [[], null], [$statement]]]],
-      $this->parse('function a() { yield from []; }')
+    $yield= new YieldFromExpression(new ArrayLiteral([], self::LINE), self::LINE);
+    $this->assertParsed(
+      [new FunctionDeclaration('a', new Signature([], null), [$yield], self::LINE)],
+      'function a() { yield from []; }'
     );
   }
 }

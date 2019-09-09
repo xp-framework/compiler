@@ -1,20 +1,63 @@
 <?php namespace lang\ast\unittest;
 
-use lang\ast\Emitter;
 use io\streams\MemoryOutputStream;
-use io\streams\StringWriter;
+use lang\IllegalStateException;
+use lang\ast\Emitter;
+use lang\ast\Node;
+use lang\ast\Result;
+use unittest\TestCase;
 
-class EmitterTest extends \unittest\TestCase {
-  private $out;
+class EmitterTest extends TestCase {
 
-  /** @return void */
-  public function setUp() {
-    $this->out= new MemoryOutputStream();
+  private function newEmitter() {
+    return Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
   }
 
   #[@test]
   public function can_create() {
-    $runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
-    Emitter::forRuntime($runtime)->newInstance(new StringWriter($this->out));
+    $this->newEmitter();
+  }
+
+  #[@test]
+  public function transformations_initially_empty() {
+    $this->assertEquals([], $this->newEmitter()->transformations());
+  }
+
+  #[@test]
+  public function transform() {
+    $function= function($class) { return $class; };
+
+    $fixture= $this->newEmitter();
+    $fixture->transform('class', $function);
+    $this->assertEquals(['class' => [$function]], $fixture->transformations());
+  }
+
+  #[@test]
+  public function remove() {
+    $first= function($class) { return $class; };
+    $second= function($class) { $class->annotations['author']= 'Test'; return $class; };
+
+    $fixture= $this->newEmitter();
+    $transformation= $fixture->transform('class', $first);
+    $fixture->transform('class', $second);
+    $fixture->remove($transformation);
+    $this->assertEquals(['class' => [$second]], $fixture->transformations());
+  }
+
+  #[@test]
+  public function remove_unsets_empty_kind() {
+    $function= function($class) { return $class; };
+
+    $fixture= $this->newEmitter();
+    $transformation= $fixture->transform('class', $function);
+    $fixture->remove($transformation);
+    $this->assertEquals([], $fixture->transformations());
+  }
+
+  #[@test, @expect(IllegalStateException::class)]
+  public function emit_node_without_kind() {
+    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), newinstance(Node::class, [], [
+      'kind' => null
+    ]));
   }
 }

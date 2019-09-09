@@ -8,9 +8,9 @@
  */
 trait OmitConstModifiers {
 
-  protected function emitConst($const) {
-    $this->out->write('const '.$const->name.'=');
-    $this->emit($const->expression);
-    $this->out->write(';');
+  protected function emitConst($result, $const) {
+    $result->out->write('const '.$const->name.'=');
+    $this->emitOne($result, $const->expression);
+    $result->out->write(';');
   }
 }

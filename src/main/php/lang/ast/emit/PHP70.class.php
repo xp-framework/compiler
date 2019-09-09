@@ -1,13 +1,11 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Emitter;
-
 /**
  * PHP 7.0 syntax
  *
  * @see  https://wiki.php.net/rfc#php_70
  */
-class PHP70 extends Emitter {
+class PHP70 extends PHP {
   use OmitPropertyTypes, OmitConstModifiers;
   use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteMultiCatch;
 

@@ -1,12 +1,10 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Emitter;
-
 /**
  * HHVM syntax. Like PHP 7.0, but does not allow variadic parameters with
  * types.
  */
-class HHVM320 extends Emitter {
+class HHVM320 extends PHP {
   use OmitPropertyTypes, OmitConstModifiers;
   use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteMultiCatch;
 
@@ -17,12 +15,12 @@ class HHVM320 extends Emitter {
     'mixed'    => null,
    ];
 
-  protected function emitParameter($parameter) {
+  protected function emitParameter($result, $parameter) {
     if ($parameter->variadic) {
-      $this->out->write('... $'.$parameter->name);
-      $this->locals[$parameter->name]= true;
+      $result->out->write('... $'.$parameter->name);
+      $result->locals[$parameter->name]= true;
     } else {
-      parent::emitParameter($parameter);
+      parent::emitParameter($result, $parameter);
     }
   }
 }

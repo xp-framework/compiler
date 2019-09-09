@@ -8,15 +8,15 @@
  */
 trait RewriteNullCoalesceAssignment {
 
-  protected function emitAssignment($assignment) {
+  protected function emitAssignment($result, $assignment) {
     if ('??=' === $assignment->operator) {
-      $this->emitAssign($assignment->variable);
-      $this->out->write('=');
-      $this->emit($assignment->variable);
-      $this->out->write('??');
-      $this->emit($assignment->expression);
+      $this->emitAssign($result, $assignment->variable);
+      $result->out->write('=');
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write('??');
+      $this->emitOne($result, $assignment->expression);
     } else {
-      parent::emitAssignment($assignment);
+      parent::emitAssignment($result, $assignment);
     }
   }
 }

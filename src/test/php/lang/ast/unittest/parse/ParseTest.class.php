@@ -1,38 +1,15 @@
 <?php namespace lang\ast\unittest\parse;
 
-use text\StringTokenizer;
-use lang\ast\Parse;
+use lang\ast\Language;
 use lang\ast\Node;
+use lang\ast\Parse;
 use lang\ast\Tokens;
 use lang\ast\nodes\Value;
+use text\StringTokenizer;
+use unittest\TestCase;
 
-abstract class ParseTest extends \unittest\TestCase {
-
-  /**
-   * Transforms nodes for easy comparison
-   *
-   * @param  var $arg
-   * @return var
-   */
-  private function value($arg) {
-    if ($arg instanceof Node) {
-      return [$arg->symbol->id => $this->value($arg->value)];
-    } else if ($arg instanceof Value) {
-      $r= [];
-      foreach ((array)$arg as $key => $value) {
-        $r[]= $this->value($value);
-      }
-      return $r;
-    } else if (is_array($arg)) {
-      $r= [];
-      foreach ($arg as $key => $value) {
-        $r[$key]= $this->value($value);
-      }
-      return $r;
-    } else {
-      return $arg;
-    }
-  }
+abstract class ParseTest extends TestCase {
+  const LINE = 1;
 
   /**
    * Parse code, returning nodes on at a time
@@ -41,7 +18,7 @@ abstract class ParseTest extends \unittest\TestCase {
    * @return iterable
    */
   protected function parse($code) {
-    return (new Parse(new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
+    return (new Parse(Language::named('PHP'), new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
   }
 
   /**
@@ -52,10 +29,10 @@ abstract class ParseTest extends \unittest\TestCase {
    * @throws unittest.AssertionFailedError
    * @return void
    */
-  protected function assertNodes($expected, $nodes) {
+  protected function assertParsed($expected, $code) {
     $actual= [];
-    foreach ($nodes as $node) {
-      $actual[]= $this->value($node);
+    foreach ($this->parse($code) as $node) {
+      $actual[]= $node;
     }
     $this->assertEquals($expected, $actual);
   }
