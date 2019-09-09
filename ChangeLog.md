@@ -3,7 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 4.0.0 / ????-??-??
+## 4.0.0 / 2019-09-09
 
 * Merged PR #69: Remove support for Hack arrow functions - @thekid
 * Fixed operator precedence for unary prefix operators - @thekid
