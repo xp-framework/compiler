@@ -6,6 +6,7 @@ use lang\ast\nodes\BinaryExpression;
 use lang\ast\nodes\Braced;
 use lang\ast\nodes\ClassDeclaration;
 use lang\ast\nodes\InstanceExpression;
+use lang\ast\nodes\InstanceOfExpression;
 use lang\ast\nodes\Literal;
 use lang\ast\nodes\NewClassExpression;
 use lang\ast\nodes\NewExpression;
@@ -201,6 +202,32 @@ class OperatorTest extends ParseTest {
         self::LINE
       )],
       'self::class."test";'
+    );
+  }
+
+  #[@test]
+  public function precedence_of_not_and_instance_of() {
+    $this->assertParsed(
+      [new UnaryExpression(
+        'prefix',
+        new InstanceOfExpression(new Variable('this', self::LINE), 'self', self::LINE),
+        '!',
+        self::LINE
+      )],
+      '!$this instanceof self;'
+    );
+  }
+
+  #[@test, @values(['+', '-', '~'])]
+  public function precedence_of_prefix($operator) {
+    $this->assertParsed(
+      [new BinaryExpression(
+        new UnaryExpression('prefix', new Literal('2', self::LINE), $operator, self::LINE),
+        '===',
+        new Variable('value', self::LINE),
+        self::LINE
+      )],
+      $operator.'2 === $value;'
     );
   }
 }

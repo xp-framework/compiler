@@ -59,10 +59,11 @@ abstract class Language {
     };
   }
 
-  public function prefix($id, $nud= null) {
+  public function prefix($id, $bp, $nud= null) {
     $prefix= $this->symbol($id);
-    $prefix->nud= $nud ? $nud->bindTo($this, static::class) : function($parse, $token) use($id) {
-      return new UnaryExpression('prefix', $this->expression($parse, 0), $id, $token->line);
+    $prefix->nud= $nud ? $nud->bindTo($this, static::class) : function($parse, $token) use($id, $bp) {
+      $expr= $this->expression($parse, $bp);
+      return new UnaryExpression('prefix', $expr, $id, $token->line);
     };
   }
 

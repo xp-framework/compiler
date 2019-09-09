@@ -119,7 +119,7 @@ class PHP extends Language {
     $this->infixr('<<', 70);
     $this->infixr('>>', 70);
 
-    $this->infix('instanceof', 60, function($parse, $token, $left) {
+    $this->infix('instanceof', 110, function($parse, $token, $left) {
       if ('name' === $parse->token->kind) {
         $type= $parse->scope->resolve($parse->token->value);
         $parse->forward();
@@ -189,15 +189,15 @@ class PHP extends Language {
       return new TernaryExpression($left, $when, $else, $token->line);
     });
 
-    $this->prefix('@');
-    $this->prefix('&');
-    $this->prefix('~');
-    $this->prefix('!');
-    $this->prefix('+');
-    $this->prefix('-');
-    $this->prefix('++');
-    $this->prefix('--');
-    $this->prefix('clone');
+    $this->prefix('@', 100);
+    $this->prefix('&', 100);
+    $this->prefix('!', 100);
+    $this->prefix('~', 100);
+    $this->prefix('+', 100);
+    $this->prefix('-', 100);
+    $this->prefix('++', 100);
+    $this->prefix('--', 100);
+    $this->prefix('clone', 100);
 
     $this->assignment('=');
     $this->assignment('&=');
@@ -220,7 +220,7 @@ class PHP extends Language {
     // - A cast `(int)$a` or `(int)($a / 2)`.
     //
     // Resolve by looking ahead after the closing ")"
-    $this->prefix('(', function($parse, $token) {
+    $this->prefix('(', 0, function($parse, $token) {
       static $types= [
         '<'        => true,
         '>'        => true,
@@ -275,7 +275,7 @@ class PHP extends Language {
       }
     });
 
-    $this->prefix('[', function($parse, $token) {
+    $this->prefix('[', 0, function($parse, $token) {
       $values= [];
       while (']' !== $parse->token->value) {
         $expr= $this->expression($parse, 0);
@@ -298,7 +298,7 @@ class PHP extends Language {
       return new ArrayLiteral($values, $token->line);
     });
 
-    $this->prefix('new', function($parse, $token) {
+    $this->prefix('new', 0, function($parse, $token) {
       $type= $parse->token;
       $parse->forward();
 
@@ -315,7 +315,7 @@ class PHP extends Language {
       }
     });
 
-    $this->prefix('yield', function($parse, $token) {
+    $this->prefix('yield', 0, function($parse, $token) {
       if (';' === $parse->token->value) {
         return new YieldExpression(null, null, $token->line);
       } else if ('from' === $parse->token->value) {
@@ -332,11 +332,11 @@ class PHP extends Language {
       }
     });
 
-    $this->prefix('...', function($parse, $token) {
+    $this->prefix('...', 0, function($parse, $token) {
       return new UnpackExpression($this->expression($parse, 0), $token->line);
     });
 
-    $this->prefix('fn', function($parse, $token) {
+    $this->prefix('fn', 0, function($parse, $token) {
       $signature= $this->signature($parse);
       $parse->expecting('=>', 'fn');
 
@@ -351,7 +351,7 @@ class PHP extends Language {
       return new LambdaExpression($signature, $statements, $token->line);
     });
 
-    $this->prefix('function', function($parse, $token) {
+    $this->prefix('function', 0, function($parse, $token) {
 
       // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;
       // the latter explicitely becomes a statement by pushing a semicolon.
@@ -405,7 +405,7 @@ class PHP extends Language {
       }
     });
 
-    $this->prefix('static', function($parse, $token) {
+    $this->prefix('static', 0, function($parse, $token) {
       if ('variable' === $parse->token->kind) {
         $init= [];
         while (';' !== $parse->token->value) {
@@ -428,13 +428,13 @@ class PHP extends Language {
       return new Literal($token->value, $token->line);
     });
 
-    $this->prefix('goto', function($parse, $token) {
+    $this->prefix('goto', 0, function($parse, $token) {
       $label= $parse->token->value;
       $parse->forward();
       return new GotoStatement($label, $token->line);
     });
 
-    $this->prefix('(name)', function($parse, $token) {
+    $this->prefix('(name)', 0, function($parse, $token) {
       if (':' === $parse->token->value) {
         $parse->token= new Token($this->symbol(';'));
         return new Label($token->value, $token->line);
@@ -443,12 +443,12 @@ class PHP extends Language {
       }
     });
 
-    $this->prefix('(variable)', function($parse, $token) {
+    $this->prefix('(variable)', 0, function($parse, $token) {
       return new Variable($token->value, $token->line);
     });
 
 
-    $this->prefix('(literal)', function($parse, $token) {
+    $this->prefix('(literal)', 0, function($parse, $token) {
       return new Literal($token->value, $token->line);
     });
 
@@ -464,7 +464,7 @@ class PHP extends Language {
       return new Block($statements, $token->line);
     });
 
-    $this->prefix('echo', function($parse, $token) {
+    $this->prefix('echo', 0, function($parse, $token) {
       return new EchoStatement($this->expressions($parse, ';'), $token->line);
     });
 
