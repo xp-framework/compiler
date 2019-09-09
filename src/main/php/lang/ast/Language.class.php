@@ -59,13 +59,6 @@ abstract class Language {
     };
   }
 
-  public function infixt($id, $bp) {
-    $infix= $this->symbol($id, $bp);
-    $infix->led= function($parse, $token, $left) use($id, $bp) {
-      return new BinaryExpression($left, $id, $this->expression($parse, $bp - 1), $token->line);
-    };
-  }
-
   public function prefix($id, $nud= null) {
     $prefix= $this->symbol($id);
     $prefix->nud= $nud ? $nud->bindTo($this, static::class) : function($parse, $token) use($id) {

@@ -87,8 +87,8 @@ class PHP extends Language {
     $this->constant('false', 'false');
     $this->constant('null', 'null');
 
-    $this->infixt('??', 30);
-    $this->infixt('?:', 30);
+    $this->infixr('??', 30);
+    $this->infixr('?:', 30);
     $this->infixr('&&', 30);
     $this->infixr('||', 30);
 
