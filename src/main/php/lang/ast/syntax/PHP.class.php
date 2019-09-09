@@ -119,30 +119,30 @@ class PHP extends Language {
     $this->infixr('<<', 70);
     $this->infixr('>>', 70);
 
-    $this->infix('instanceof', 60, function($parse, $node, $left) {
+    $this->infix('instanceof', 60, function($parse, $token, $left) {
       if ('name' === $parse->token->kind) {
         $type= $parse->scope->resolve($parse->token->value);
         $parse->forward();
-        return new InstanceOfExpression($left, $type, $node->line);
+        return new InstanceOfExpression($left, $type, $token->line);
       } else {
-        return new InstanceOfExpression($left, $this->expression($parse, 0), $node->line);
+        return new InstanceOfExpression($left, $this->expression($parse, 0), $token->line);
       }
     });
 
-    $this->infix('->', 80, function($parse, $node, $left) {
+    $this->infix('->', 80, function($parse, $token, $left) {
       if ('{' === $parse->token->value) {
         $parse->forward();
         $expr= $this->expression($parse, 0);
         $parse->expecting('}', 'dynamic member');
       } else {
-        $expr= new Literal($parse->token->value, $node->line);
+        $expr= new Literal($parse->token->value, $token->line);
         $parse->forward();
       }
 
-      return new InstanceExpression($left, $expr, $node->line);
+      return new InstanceExpression($left, $expr, $token->line);
     });
 
-    $this->infix('::', 80, function($parse, $node, $left) {
+    $this->infix('::', 80, function($parse, $token, $left) {
       $scope= $parse->scope->resolve($left->expression);
 
       if ('variable' === $parse->token->kind) {
@@ -155,16 +155,16 @@ class PHP extends Language {
       }
 
       $parse->forward();
-      return new ScopeExpression($scope, $expr, $node->line);
+      return new ScopeExpression($scope, $expr, $token->line);
     });
 
-    $this->infix('(', 80, function($parse, $node, $left) {
+    $this->infix('(', 80, function($parse, $token, $left) {
       $arguments= $this->expressions($parse);
       $parse->expecting(')', 'invoke expression');
-      return new InvokeExpression($left, $arguments, $node->line);
+      return new InvokeExpression($left, $arguments, $token->line);
     });
 
-    $this->infix('[', 80, function($parse, $node, $left) {
+    $this->infix('[', 80, function($parse, $token, $left) {
       if (']' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -173,20 +173,20 @@ class PHP extends Language {
         $parse->expecting(']', 'offset access');
       }
 
-      return new OffsetExpression($left, $expr, $node->line);
+      return new OffsetExpression($left, $expr, $token->line);
     });
 
-    $this->infix('{', 80, function($parse, $node, $left) {
+    $this->infix('{', 80, function($parse, $token, $left) {
       $expr= $this->expression($parse, 0);
       $parse->expecting('}', 'dynamic member');
-      return new OffsetExpression($left, $expr, $node->line);
+      return new OffsetExpression($left, $expr, $token->line);
     });
 
-    $this->infix('?', 80, function($parse, $node, $left) {
+    $this->infix('?', 80, function($parse, $token, $left) {
       $when= $this->expressionWithThrows($parse, 0);
       $parse->expecting(':', 'ternary');
       $else= $this->expressionWithThrows($parse, 0);
-      return new TernaryExpression($left, $when, $else, $node->line);
+      return new TernaryExpression($left, $when, $else, $token->line);
     });
 
     $this->prefix('@');
@@ -220,7 +220,7 @@ class PHP extends Language {
     // - A cast `(int)$a` or `(int)($a / 2)`.
     //
     // Resolve by looking ahead after the closing ")"
-    $this->prefix('(', function($parse, $node) {
+    $this->prefix('(', function($parse, $token) {
       static $types= [
         '<'        => true,
         '>'        => true,
@@ -229,7 +229,7 @@ class PHP extends Language {
         ':'        => true
       ];
 
-      $skipped= [$node, $parse->token];
+      $skipped= [$token, $parse->token];
       $cast= true;
       $level= 1;
       while ($level > 0 && null !== $parse->token->value) {
@@ -259,23 +259,23 @@ class PHP extends Language {
           $statements= $this->expressionWithThrows($parse, 0);
         }
 
-        return new LambdaExpression($signature, $statements, $node->line);
+        return new LambdaExpression($signature, $statements, $token->line);
       } else if ($cast && ('operator' !== $parse->token->kind || '(' === $parse->token->value || '[' === $parse->token->value)) {
         $parse->forward();
         $parse->expecting('(', 'cast');
         $type= $this->type0($parse, false);
         $parse->expecting(')', 'cast');
-        return new CastExpression($type, $this->expression($parse, 0), $node->line);
+        return new CastExpression($type, $this->expression($parse, 0), $token->line);
       } else {
         $parse->forward();
         $parse->expecting('(', 'braced');
         $expr= $this->expression($parse, 0);
         $parse->expecting(')', 'braced');
-        return new Braced($expr, $node->line);
+        return new Braced($expr, $token->line);
       }
     });
 
-    $this->prefix('[', function($parse, $node) {
+    $this->prefix('[', function($parse, $token) {
       $values= [];
       while (']' !== $parse->token->value) {
         $expr= $this->expression($parse, 0);
@@ -295,10 +295,10 @@ class PHP extends Language {
       }
 
       $parse->expecting(']', 'array literal');
-      return new ArrayLiteral($values, $node->line);
+      return new ArrayLiteral($values, $token->line);
     });
 
-    $this->prefix('new', function($parse, $node) {
+    $this->prefix('new', function($parse, $token) {
       $type= $parse->token;
       $parse->forward();
 
@@ -307,36 +307,36 @@ class PHP extends Language {
       $parse->expecting(')', 'new arguments');
 
       if ('variable' === $type->kind) {
-        return new NewExpression('$'.$type->value, $arguments, $node->line);
+        return new NewExpression('$'.$type->value, $arguments, $token->line);
       } else if ('class' === $type->value) {
-        return new NewClassExpression($this->clazz($parse, null), $arguments, $node->line);
+        return new NewClassExpression($this->clazz($parse, null), $arguments, $token->line);
       } else {
-        return new NewExpression($parse->scope->resolve($type->value), $arguments, $node->line);
+        return new NewExpression($parse->scope->resolve($type->value), $arguments, $token->line);
       }
     });
 
-    $this->prefix('yield', function($parse, $node) {
+    $this->prefix('yield', function($parse, $token) {
       if (';' === $parse->token->value) {
-        return new YieldExpression(null, null, $node->line);
+        return new YieldExpression(null, null, $token->line);
       } else if ('from' === $parse->token->value) {
         $parse->forward();
-        return new YieldFromExpression($this->expression($parse, 0), $node->line);
+        return new YieldFromExpression($this->expression($parse, 0), $token->line);
       } else {
         $expr= $this->expression($parse, 0);
         if ('=>' === $parse->token->value) {
           $parse->forward();
-          return new YieldExpression($expr, $this->expression($parse, 0), $node->line);
+          return new YieldExpression($expr, $this->expression($parse, 0), $token->line);
         } else {
-          return new YieldExpression(null, $expr, $node->line);
+          return new YieldExpression(null, $expr, $token->line);
         }
       }
     });
 
-    $this->prefix('...', function($parse, $node) {
-      return new UnpackExpression($this->expression($parse, 0), $node->line);
+    $this->prefix('...', function($parse, $token) {
+      return new UnpackExpression($this->expression($parse, 0), $token->line);
     });
 
-    $this->prefix('fn', function($parse, $node) {
+    $this->prefix('fn', function($parse, $token) {
       $signature= $this->signature($parse);
       $parse->expecting('=>', 'fn');
 
@@ -348,10 +348,10 @@ class PHP extends Language {
         $statements= $this->expressionWithThrows($parse, 0);
       }
 
-      return new LambdaExpression($signature, $statements, $node->line);
+      return new LambdaExpression($signature, $statements, $token->line);
     });
 
-    $this->prefix('function', function($parse, $node) {
+    $this->prefix('function', function($parse, $token) {
 
       // Closure `$a= function() { ... };` vs. declaration `function a() { ... }`;
       // the latter explicitely becomes a statement by pushing a semicolon.
@@ -382,7 +382,7 @@ class PHP extends Language {
         $statements= $this->statements($parse);
         $parse->expecting('}', 'function');
 
-        return new ClosureExpression($signature, $use, $statements, $node->line);
+        return new ClosureExpression($signature, $use, $statements, $token->line);
       } else {
         $name= $parse->token->value;
         $parse->forward();
@@ -391,7 +391,7 @@ class PHP extends Language {
         if ('==>' === $parse->token->value) {  // Compact syntax, terminated with ';'
           $parse->forward();
           $expr= $this->expressionWithThrows($parse, 0);
-          $statements= [new ReturnStatement($expr, $node->line)];
+          $statements= [new ReturnStatement($expr, $token->line)];
           $parse->expecting(';', 'function');
         } else {                              // Regular function
           $parse->expecting('{', 'function');
@@ -401,11 +401,11 @@ class PHP extends Language {
 
         $parse->queue= [$parse->token];
         $parse->token= new Token($this->symbol(';'));
-        return new FunctionDeclaration($name, $signature, $statements, $node->line);
+        return new FunctionDeclaration($name, $signature, $statements, $token->line);
       }
     });
 
-    $this->prefix('static', function($parse, $node) {
+    $this->prefix('static', function($parse, $token) {
       if ('variable' === $parse->token->kind) {
         $init= [];
         while (';' !== $parse->token->value) {
@@ -423,60 +423,60 @@ class PHP extends Language {
             $parse->forward();
           }
         }
-        return new StaticLocals($init, $node->line);
+        return new StaticLocals($init, $token->line);
       }
-      return new Literal($node->value, $node->line);
+      return new Literal($token->value, $token->line);
     });
 
-    $this->prefix('goto', function($parse, $node) {
+    $this->prefix('goto', function($parse, $token) {
       $label= $parse->token->value;
       $parse->forward();
-      return new GotoStatement($label, $node->line);
+      return new GotoStatement($label, $token->line);
     });
 
-    $this->prefix('(name)', function($parse, $node) {
+    $this->prefix('(name)', function($parse, $token) {
       if (':' === $parse->token->value) {
         $parse->token= new Token($this->symbol(';'));
-        return new Label($node->value, $node->line);
+        return new Label($token->value, $token->line);
       } else {
-        return new Literal($node->value, $node->line);
+        return new Literal($token->value, $token->line);
       }
     });
 
-    $this->prefix('(variable)', function($parse, $node) {
-      return new Variable($node->value, $node->line);
+    $this->prefix('(variable)', function($parse, $token) {
+      return new Variable($token->value, $token->line);
     });
 
 
-    $this->prefix('(literal)', function($parse, $node) {
-      return new Literal($node->value, $node->line);
+    $this->prefix('(literal)', function($parse, $token) {
+      return new Literal($token->value, $token->line);
     });
 
-    $this->stmt('<?', function($parse, $node) {
+    $this->stmt('<?', function($parse, $token) {
       $syntax= $parse->token->value;
       $parse->forward();
-      return new Start($syntax, $node->line);
+      return new Start($syntax, $token->line);
     });
 
-    $this->stmt('{', function($parse, $node) {
+    $this->stmt('{', function($parse, $token) {
       $statements= $this->statements($parse);
       $parse->expecting('}', 'block');
-      return new Block($statements, $node->line);
+      return new Block($statements, $token->line);
     });
 
-    $this->prefix('echo', function($parse, $node) {
-      return new EchoStatement($this->expressions($parse, ';'), $node->line);
+    $this->prefix('echo', function($parse, $token) {
+      return new EchoStatement($this->expressions($parse, ';'), $token->line);
     });
 
-    $this->stmt('namespace', function($parse, $node) {
+    $this->stmt('namespace', function($parse, $token) {
       $name= $parse->token->value;
       $parse->forward();
       $parse->expecting(';', 'namespace');
       $parse->scope->package($name);
-      return new NamespaceDeclaration($name, $node->line);
+      return new NamespaceDeclaration($name, $token->line);
     });
 
-    $this->stmt('use', function($parse, $node) {
+    $this->stmt('use', function($parse, $token) {
       if ('function' === $parse->token->value) {
         $type= 'function';
         $parse->forward();
@@ -528,10 +528,10 @@ class PHP extends Language {
       }
 
       $parse->expecting(';', 'use');
-      return new UseStatement($type, $names, $node->line);
+      return new UseStatement($type, $names, $token->line);
     });
 
-    $this->stmt('if', function($parse, $node) {
+    $this->stmt('if', function($parse, $token) {
       $parse->expecting('(', 'if');
       $condition= $this->expression($parse, 0);
       $parse->expecting(')', 'if');
@@ -543,10 +543,10 @@ class PHP extends Language {
         $otherwise= null;
       }
 
-      return new IfStatement($condition, $when, $otherwise, $node->line);
+      return new IfStatement($condition, $when, $otherwise, $token->line);
     });
 
-    $this->stmt('switch', function($parse, $node) {
+    $this->stmt('switch', function($parse, $token) {
       $parse->expecting('(', 'switch');
       $condition= $this->expression($parse, 0);
       $parse->expecting(')', 'switch');
@@ -569,10 +569,10 @@ class PHP extends Language {
       }
       $parse->forward();
 
-      return new SwitchStatement($condition, $cases, $node->line);
+      return new SwitchStatement($condition, $cases, $token->line);
     });
 
-    $this->stmt('break', function($parse, $node) {
+    $this->stmt('break', function($parse, $token) {
       if (';' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -581,10 +581,10 @@ class PHP extends Language {
         $parse->expecting(';', 'break');
       }
 
-      return new BreakStatement($expr, $node->line);
+      return new BreakStatement($expr, $token->line);
     });
 
-    $this->stmt('continue', function($parse, $node) {
+    $this->stmt('continue', function($parse, $token) {
       if (';' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -593,28 +593,28 @@ class PHP extends Language {
         $parse->expecting(';', 'continue');
       }
 
-      return new ContinueStatement($expr, $node->line);
+      return new ContinueStatement($expr, $token->line);
     });
 
-    $this->stmt('do', function($parse, $node) {
+    $this->stmt('do', function($parse, $token) {
       $block= $this->block($parse);
       $parse->expecting('while', 'do');
       $parse->expecting('(', 'do');
       $expression= $this->expression($parse, 0);
       $parse->expecting(')', 'do');
       $parse->expecting(';', 'do');
-      return new DoLoop($expression, $block, $node->line);
+      return new DoLoop($expression, $block, $token->line);
     });
 
-    $this->stmt('while', function($parse, $node) {
+    $this->stmt('while', function($parse, $token) {
       $parse->expecting('(', 'while');
       $expression= $this->expression($parse, 0);
       $parse->expecting(')', 'while');
       $block= $this->block($parse);
-      return new WhileLoop($expression, $block, $node->line);
+      return new WhileLoop($expression, $block, $token->line);
     });
 
-    $this->stmt('for', function($parse, $node) {
+    $this->stmt('for', function($parse, $token) {
       $parse->expecting('(', 'for');
       $init= $this->expressions($parse, ';');
       $parse->expecting(';', 'for');
@@ -623,10 +623,10 @@ class PHP extends Language {
       $loop= $this->expressions($parse, ')');
       $parse->expecting(')', 'for');
       $block= $this->block($parse);
-      return new ForLoop($init, $cond, $loop, $block, $node->line);
+      return new ForLoop($init, $cond, $loop, $block, $token->line);
     });
 
-    $this->stmt('foreach', function($parse, $node) {
+    $this->stmt('foreach', function($parse, $token) {
       $parse->expecting('(', 'foreach');
       $expression= $this->expression($parse, 0);
       $parse->expecting('as', 'foreach');
@@ -643,16 +643,16 @@ class PHP extends Language {
 
       $parse->expecting(')', 'foreach');
       $block= $this->block($parse);
-      return new ForeachLoop($expression, $key, $value, $block, $node->line);
+      return new ForeachLoop($expression, $key, $value, $block, $token->line);
     });
 
-    $this->stmt('throw', function($parse, $node) {
+    $this->stmt('throw', function($parse, $token) {
       $expr= $this->expression($parse, 0);
       $parse->expecting(';', 'throw');
-      return new ThrowStatement($expr, $node->line);
+      return new ThrowStatement($expr, $token->line);
     });
 
-    $this->stmt('try', function($parse, $node) {
+    $this->stmt('try', function($parse, $token) {
       $parse->expecting('{', 'try');
       $statements= $this->statements($parse);
       $parse->expecting('}', 'try');
@@ -688,10 +688,10 @@ class PHP extends Language {
         $finally= null;
       }
 
-      return new TryStatement($statements, $catches, $finally, $node->line);
+      return new TryStatement($statements, $catches, $finally, $token->line);
     });
 
-    $this->stmt('return', function($parse, $node) {
+    $this->stmt('return', function($parse, $token) {
       if (';' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -700,24 +700,24 @@ class PHP extends Language {
         $parse->expecting(';', 'return');
       }
 
-      return new ReturnStatement($expr, $node->line);
+      return new ReturnStatement($expr, $token->line);
     });
 
-    $this->stmt('abstract', function($parse, $node) {
+    $this->stmt('abstract', function($parse, $token) {
       $parse->forward();
       $type= $parse->scope->resolve($parse->token->value);
       $parse->forward();
       return $this->clazz($parse, $type, ['abstract']);
     });
 
-    $this->stmt('final', function($parse, $node) {
+    $this->stmt('final', function($parse, $token) {
       $parse->forward();
       $type= $parse->scope->resolve($parse->token->value);
       $parse->forward();
       return $this->clazz($parse, $type, ['final']);
     });
 
-    $this->stmt('<<', function($parse, $node) {
+    $this->stmt('<<', function($parse, $token) {
       $values= [];
       do {
         $name= $parse->token->value;
@@ -743,17 +743,17 @@ class PHP extends Language {
       } while (null !== $parse->token->value);
 
       $parse->forward();
-      return new Annotations($values, $node->line);
+      return new Annotations($values, $token->line);
     });
 
-    $this->stmt('class', function($parse, $node) {
+    $this->stmt('class', function($parse, $token) {
       $type= $parse->scope->resolve($parse->token->value);
       $parse->forward();
 
       return $this->clazz($parse, $type);
     });
 
-    $this->stmt('interface', function($parse, $node) {
+    $this->stmt('interface', function($parse, $token) {
       $type= $parse->scope->resolve($parse->token->value);
       $parse->forward();
       $comment= $parse->comment;
@@ -779,12 +779,12 @@ class PHP extends Language {
       $body= $this->typeBody($parse);
       $parse->expecting('}', 'interface');
 
-      $decl= new InterfaceDeclaration([], $type, $parents, $body, $parse->scope->annotations, $comment, $node->line);
+      $decl= new InterfaceDeclaration([], $type, $parents, $body, $parse->scope->annotations, $comment, $token->line);
       $parse->scope->annotations= [];
       return $decl;
     });
 
-    $this->stmt('trait', function($parse, $node) {
+    $this->stmt('trait', function($parse, $token) {
       $type= $parse->scope->resolve($parse->token->value);
       $parse->forward();
       $comment= $parse->comment;
@@ -794,7 +794,7 @@ class PHP extends Language {
       $body= $this->typeBody($parse);
       $parse->expecting('}', 'trait');
 
-      $decl= new TraitDeclaration([], $type, $body, $parse->scope->annotations, $comment, $node->line);
+      $decl= new TraitDeclaration([], $type, $body, $parse->scope->annotations, $comment, $token->line);
       $parse->scope->annotations= [];
       return $decl;
     });

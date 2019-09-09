@@ -33,50 +33,50 @@ abstract class Language {
 
   public function constant($id, $value) {
     $const= $this->symbol($id);
-    $const->nud= function($parse, $node) use($value) {
-      return new Literal($value, $node->line);
+    $const->nud= function($parse, $token) use($value) {
+      return new Literal($value, $token->line);
     };
   }
 
   public function assignment($id) {
     $infix= $this->symbol($id, 10);
-    $infix->led= function($parse, $node, $left) use($id) {
-      return new Assignment($left, $id, $this->expression($parse, 9), $node->line);
+    $infix->led= function($parse, $token, $left) use($id) {
+      return new Assignment($left, $id, $this->expression($parse, 9), $token->line);
     };
   }
 
   public function infix($id, $bp, $led= null) {
     $infix= $this->symbol($id, $bp);
-    $infix->led= $led ? $led->bindTo($this, static::class) : function($parse, $node, $left) use($id, $bp) {
-      return new BinaryExpression($left, $id, $this->expression($parse, $bp), $node->line);
+    $infix->led= $led ? $led->bindTo($this, static::class) : function($parse, $token, $left) use($id, $bp) {
+      return new BinaryExpression($left, $id, $this->expression($parse, $bp), $token->line);
     };
   }
 
   public function infixr($id, $bp, $led= null) {
     $infix= $this->symbol($id, $bp);
-    $infix->led= $led ? $led->bindTo($this, static::class) : function($parse, $node, $left) use($id, $bp) {
-      return new BinaryExpression($left, $id, $this->expression($parse, $bp - 1), $node->line);
+    $infix->led= $led ? $led->bindTo($this, static::class) : function($parse, $token, $left) use($id, $bp) {
+      return new BinaryExpression($left, $id, $this->expression($parse, $bp - 1), $token->line);
     };
   }
 
   public function infixt($id, $bp) {
     $infix= $this->symbol($id, $bp);
-    $infix->led= function($parse, $node, $left) use($id, $bp) {
-      return new BinaryExpression($left, $id, $this->expressionWithThrows($parse, $bp - 1), $node->line);
+    $infix->led= function($parse, $token, $left) use($id, $bp) {
+      return new BinaryExpression($left, $id, $this->expressionWithThrows($parse, $bp - 1), $token->line);
     };
   }
 
   public function prefix($id, $nud= null) {
     $prefix= $this->symbol($id);
-    $prefix->nud= $nud ? $nud->bindTo($this, static::class) : function($parse, $node) use($id) {
-      return new UnaryExpression($this->expression($parse, 0), $id, $node->line);
+    $prefix->nud= $nud ? $nud->bindTo($this, static::class) : function($parse, $token) use($id) {
+      return new UnaryExpression($this->expression($parse, 0), $id, $token->line);
     };
   }
 
   public function suffix($id, $bp, $led= null) {
     $suffix= $this->symbol($id, $bp);
-    $suffix->led= $led ? $led->bindTo($this, static::class) : function($parse, $node, $left) use($id) {
-      return new UnaryExpression($left, $id, $node->line);
+    $suffix->led= $led ? $led->bindTo($this, static::class) : function($parse, $token, $left) use($id) {
+      return new UnaryExpression($left, $id, $token->line);
     };
   }
 
