@@ -118,4 +118,46 @@ class ExceptionsTest extends EmittingTest {
     }');
     $t->newInstance()->run(null);
   }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_lambda() {
+    $this->run('use lang\IllegalArgumentException; class <T> {
+      public function run() {
+        $f= fn() => throw new IllegalArgumentException("test");
+        $f();
+      }
+    }');
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_lambda_throwing_variable() {
+    $t= $this->type('class <T> {
+      public function run($e) {
+        $f= fn() => throw $e;
+        $f();
+      }
+    }');
+    $t->newInstance()->run(new IllegalArgumentException('Test'));
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_lambda_capturing_variable() {
+    $this->run('use lang\IllegalArgumentException; class <T> {
+      public function run() {
+        $f= fn($message) => throw new IllegalArgumentException($message);
+        $f("test");
+      }
+    }');
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_lambda_capturing_parameter() {
+    $t= $this->type('use lang\IllegalArgumentException; class <T> {
+      public function run($message) {
+        $f= fn() => throw new IllegalArgumentException($message);
+        $f();
+      }
+    }');
+    $t->newInstance()->run('Test');
+  }
 }
