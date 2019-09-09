@@ -1,6 +1,7 @@
 <?php namespace lang\ast;
 
 use lang\IllegalArgumentException;
+use lang\IllegalStateException;
 use lang\ast\nodes\Value;
 use lang\reflect\Package;
 

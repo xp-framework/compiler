@@ -1,6 +1,10 @@
 <?php namespace lang\ast\unittest;
 
+use io\streams\MemoryOutputStream;
+use lang\IllegalStateException;
+use lang\ast\Element;
 use lang\ast\Emitter;
+use lang\ast\Result;
 use unittest\TestCase;
 
 class EmitterTest extends TestCase {
@@ -48,5 +52,13 @@ class EmitterTest extends TestCase {
     $transformation= $fixture->transform('class', $function);
     $fixture->remove($transformation);
     $this->assertEquals([], $fixture->transformations());
+  }
+
+  #[@test, @expect(IllegalStateException::class)]
+  public function emit_element_without_kind() {
+    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), newinstance(Element::class, [], [
+      'line' => -1,
+      'kind' => null
+    ]));
   }
 }
