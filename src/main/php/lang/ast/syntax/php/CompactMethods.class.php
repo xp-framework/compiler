@@ -43,7 +43,7 @@ class CompactMethods implements Extension {
       $signature= $this->signature($parse);
 
       $parse->expecting('=>', 'compact function');
-      $return= new ReturnStatement($this->expressionWithThrows($parse, 0), $parse->token->line);
+      $return= new ReturnStatement($this->expression($parse, 0), $parse->token->line);
       $parse->expecting(';', 'compact function');
 
       $body[$lookup]= new Method($modifiers, $name, $signature, [$return], $annotations, $comment, $line);

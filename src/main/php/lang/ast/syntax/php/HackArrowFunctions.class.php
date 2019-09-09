@@ -24,7 +24,7 @@ class HackArrowFunctions implements Extension {
         $statements= $this->statements($parse);
         $parse->expecting('}', 'arrow function');
       } else {
-        $statements= $this->expressionWithThrows($parse, 0);
+        $statements= $this->expression($parse, 0);
       }
 
       return new LambdaExpression($signature, $statements, $node->line);

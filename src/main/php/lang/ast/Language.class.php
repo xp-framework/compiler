@@ -62,7 +62,7 @@ abstract class Language {
   public function infixt($id, $bp) {
     $infix= $this->symbol($id, $bp);
     $infix->led= function($parse, $token, $left) use($id, $bp) {
-      return new BinaryExpression($left, $id, $this->expressionWithThrows($parse, $bp - 1), $token->line);
+      return new BinaryExpression($left, $id, $this->expression($parse, $bp - 1), $token->line);
     };
   }
 

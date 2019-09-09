@@ -183,9 +183,9 @@ class PHP extends Language {
     });
 
     $this->infix('?', 80, function($parse, $token, $left) {
-      $when= $this->expressionWithThrows($parse, 0);
+      $when= $this->expression($parse, 0);
       $parse->expecting(':', 'ternary');
-      $else= $this->expressionWithThrows($parse, 0);
+      $else= $this->expression($parse, 0);
       return new TernaryExpression($left, $when, $else, $token->line);
     });
 
@@ -256,7 +256,7 @@ class PHP extends Language {
           $statements= $this->statements($parse);
           $parse->expecting('}', 'arrow function');
         } else {
-          $statements= $this->expressionWithThrows($parse, 0);
+          $statements= $this->expression($parse, 0);
         }
 
         return new LambdaExpression($signature, $statements, $token->line);
@@ -345,7 +345,7 @@ class PHP extends Language {
         $statements= $this->statements($parse);
         $parse->expecting('}', 'fn');
       } else {
-        $statements= $this->expressionWithThrows($parse, 0);
+        $statements= $this->expression($parse, 0);
       }
 
       return new LambdaExpression($signature, $statements, $token->line);
@@ -390,7 +390,7 @@ class PHP extends Language {
 
         if ('==>' === $parse->token->value) {  // Compact syntax, terminated with ';'
           $parse->forward();
-          $expr= $this->expressionWithThrows($parse, 0);
+          $expr= $this->expression($parse, 0);
           $statements= [new ReturnStatement($expr, $token->line)];
           $parse->expecting(';', 'function');
         } else {                              // Regular function
@@ -906,7 +906,7 @@ class PHP extends Language {
         $parse->warn('Hack language style compact functions are deprecated, please use `fn` syntax instead');
         $parse->forward();
         $line= $parse->token->line;
-        $expr= $this->expressionWithThrows($parse, 0);
+        $expr= $this->expression($parse, 0);
         $statements= [new ReturnStatement($expr, $line)];
         $parse->expecting(';', 'method declaration');
       } else {
@@ -1250,15 +1250,5 @@ class PHP extends Language {
       }
     }
     return $arguments;
-  }
-
-  public function expressionWithThrows($parse, $bp) {
-    if ('throw' === $parse->token->value) {
-      $line= $parse->token->line;
-      $parse->forward();
-      return new ThrowExpression($this->expression($parse, $bp), $line);
-    } else {
-      return $this->expression($parse, $bp);
-    }
   }
 }
