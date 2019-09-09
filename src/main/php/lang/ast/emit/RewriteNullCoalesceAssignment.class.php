@@ -12,9 +12,9 @@ trait RewriteNullCoalesceAssignment {
     if ('??=' === $assignment->operator) {
       $this->emitAssign($result, $assignment->variable);
       $result->out->write('=');
-      $this->emit($result, $assignment->variable);
+      $this->emitOne($result, $assignment->variable);
       $result->out->write('??');
-      $this->emit($result, $assignment->expression);
+      $this->emitOne($result, $assignment->expression);
     } else {
       parent::emitAssignment($result, $assignment);
     }

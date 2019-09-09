@@ -121,18 +121,18 @@ class PHP56 extends Emitter {
   protected function emitBinary($result, $binary) {
     if ('??' === $binary->operator) {
       $result->out->write('isset(');
-      $this->emit($result, $binary->left);
+      $this->emitOne($result, $binary->left);
       $result->out->write(') ?');
-      $this->emit($result, $binary->left);
+      $this->emitOne($result, $binary->left);
       $result->out->write(' : ');
-      $this->emit($result, $binary->right);
+      $this->emitOne($result, $binary->right);
     } else if ('<=>' === $binary->operator) {
       $l= $result->temp();
       $r= $result->temp();
       $result->out->write('('.$l.'= ');
-      $this->emit($result, $binary->left);
+      $this->emitOne($result, $binary->left);
       $result->out->write(') < ('.$r.'=');
-      $this->emit($result, $binary->right);
+      $this->emitOne($result, $binary->right);
       $result->out->write(') ? -1 : ('.$l.' == '.$r.' ? 0 : 1)');
     } else {
       parent::emitBinary($result, $binary);
@@ -144,13 +144,13 @@ class PHP56 extends Emitter {
       $result->out->write('isset(');
       $this->emitAssign($result, $assignment->variable);
       $result->out->write(') ||');
-      $this->emit($result, $assignment->variable);
+      $this->emitOne($result, $assignment->variable);
       $result->out->write('=');
-      $this->emit($result, $assignment->expression);
+      $this->emitOne($result, $assignment->expression);
     } else {
       $this->emitAssign($result, $assignment->variable);
       $result->out->write($assignment->operator);
-      $this->emit($result, $assignment->expression);
+      $this->emitOne($result, $assignment->expression);
     }
   }
 
@@ -160,7 +160,7 @@ class PHP56 extends Emitter {
     if ('braced' === $expr->kind) {
       $t= $result->temp();
       $result->out->write('(('.$t.'=');
-      $this->emit($result, $expr->expression);
+      $this->emitOne($result, $expr->expression);
       $result->out->write(') ? '.$t);
       $result->out->write('(');
       $this->emitArguments($result, $invoke->arguments);
@@ -193,7 +193,7 @@ class PHP56 extends Emitter {
     $result->out->write('(('.$t.'=function()');
     $capture && $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
     $result->out->write('{ throw ');
-    $this->emit($result, $throw->expression);
+    $this->emitOne($result, $throw->expression);
     $result->out->write('; }) ? '.$t.'() : null)');
   }
 
@@ -206,7 +206,7 @@ class PHP56 extends Emitter {
     $result->out->write('], \'{');
     $result->out->write(str_replace('\'', '\\\'', $result->buffer(function($result) use($definition) {
       foreach ($definition->body as $member) {
-        $this->emit($result, $member);
+        $this->emitOne($result, $member);
         $result->out->write("\n");
       }
     })));
@@ -217,7 +217,7 @@ class PHP56 extends Emitter {
 
   protected function emitFrom($result, $from) {
     $result->out->write('foreach (');
-    $this->emit($result, $from->iterable);
+    $this->emitOne($result, $from->iterable);
     $result->out->write(' as $key => $val) yield $key => $val;');
   }
 
@@ -240,7 +240,7 @@ class PHP56 extends Emitter {
     $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
     $result->out->write('{');
     foreach ($class->body as $member) {
-      $this->emit($result, $member);
+      $this->emitOne($result, $member);
     }
 
     if ($result->call[false]) {

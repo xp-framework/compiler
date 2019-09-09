@@ -38,7 +38,7 @@ trait RewriteLambdaExpressions {
       $result->out->write('}');
     } else {
       $result->out->write('{ return ');
-      $this->emit($result, $lambda->body);
+      $this->emitOne($result, $lambda->body);
       $result->out->write('; }');
     }
 
