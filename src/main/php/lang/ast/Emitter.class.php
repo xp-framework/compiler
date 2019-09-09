@@ -70,23 +70,6 @@ abstract class Emitter {
   }
 
   /**
-   * Search a given scope recursively for nodes with a given kind
-   *
-   * @param  lang.ast.Element $node
-   * @param  string $kind
-   * @return iterable
-   */
-  protected function search($node, $kind) {
-    if ($node->kind === $kind) yield $node;
-
-    foreach ($node->children() as $child) {
-      foreach ($this->search($child, $kind) as $result) {
-        yield $result;
-      }
-    }
-  }
-
-  /**
    * Catch-all, should `$node->kind` be empty in `{'emit'.$node->kind}`.
    *
    * @return void

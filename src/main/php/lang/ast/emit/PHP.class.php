@@ -554,7 +554,7 @@ abstract class PHP extends Emitter {
 
   protected function emitThrowExpression($result, $throw) {
     $capture= [];
-    foreach ($this->search($throw->expression, 'variable') as $var) {
+    foreach ($result->codegen->search($throw->expression, 'variable') as $var) {
       if (isset($result->locals[$var->name])) {
         $capture[$var->name]= true;
       }

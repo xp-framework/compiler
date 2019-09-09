@@ -9,7 +9,7 @@ trait RewriteLambdaExpressions {
 
   protected function emitLambda($result, $lambda) {
     $capture= [];
-    foreach ($this->search($lambda, 'variable') as $var) {
+    foreach ($result->codegen->search($lambda, 'variable') as $var) {
       if (isset($result->locals[$var->name])) {
         $capture[$var->name]= true;
       }

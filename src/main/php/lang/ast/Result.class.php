@@ -4,9 +4,8 @@ use io\streams\MemoryOutputStream;
 use io\streams\StringWriter;
 
 class Result {
-  private $id= 0;
-
   public $out;
+  public $codegen;
   public $line= 1;
   public $meta= [];
   public $locals= [];
@@ -16,6 +15,7 @@ class Result {
   /** @param io.streams.Writer */
   public function __construct($out) {
     $this->out= $out;
+    $this->codegen= new CodeGen();
   }
 
   /**
@@ -24,7 +24,7 @@ class Result {
    * @return string
    */
   public function temp() {
-    return '$T'.($this->id++);
+    return '$'.$this->codegen->symbol();
   }
 
   /**

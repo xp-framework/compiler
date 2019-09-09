@@ -179,7 +179,7 @@ class PHP56 extends PHP {
   /** @see https://wiki.php.net/rfc/context_sensitive_lexer */
   protected function emitThrowExpression($result, $throw) {
     $capture= [];
-    foreach ($this->search($throw, 'variable') as $var) {
+    foreach ($result->codegen->search($throw, 'variable') as $var) {
       if (isset($result->locals[$var->name])) {
         $capture[$var->name]= true;
       }

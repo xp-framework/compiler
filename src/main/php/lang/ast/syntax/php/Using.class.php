@@ -49,7 +49,7 @@ class Using implements Extension {
       return new UsingStatement($arguments, $statements);
     });
 
-    $emitter->transform('using', function($node) {
+    $emitter->transform('using', function($codegen, $node) {
       static $i= 0;
 
       $cleanup= [];

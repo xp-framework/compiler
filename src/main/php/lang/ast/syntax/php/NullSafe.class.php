@@ -41,7 +41,7 @@ class NullSafe implements Extension {
       return $value;
     });
 
-    $emitter->transform('nullsafeinstance', function($node) {
+    $emitter->transform('nullsafeinstance', function($codegen, $node) {
       static $i= 0;
 
       $temp= new Variable('_N'.($i++));

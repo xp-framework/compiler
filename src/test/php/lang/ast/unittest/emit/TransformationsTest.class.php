@@ -9,7 +9,7 @@ class TransformationsTest extends EmittingTest {
 
   /** @return void */
   public function setUp() {
-    $this->transform('class', function($class) {
+    $this->transform('class', function($codegen, $class) {
       if ($class->annotation('repr')) {
         $class->inject(new Method(
           ['public'],
@@ -20,7 +20,7 @@ class TransformationsTest extends EmittingTest {
       }
       return $class;
     });
-    $this->transform('class', function($class) {
+    $this->transform('class', function($codegen, $class) {
       if ($class->annotation('getters')) {
         foreach ($class->properties() as $property) {
           $class->inject(new Method(
