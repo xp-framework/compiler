@@ -50,14 +50,12 @@ class Using implements Extension {
     });
 
     $emitter->transform('using', function($codegen, $node) {
-      static $i= 0;
-
       $cleanup= [];
       foreach ($node->arguments as $expression) {
         switch ($expression->kind) {
           case 'variable': $variable= $expression; yield $expression; break;
           case 'assignment': $variable= $expression->variable; yield $expression; break;
-          default: $variable= new Variable('_U'.($i++)); yield new Assignment($variable, '=', $expression); break;
+          default: $variable= new Variable($codegen->symbol()); yield new Assignment($variable, '=', $expression); break;
         }
 
         $cleanup[]= new IfStatement(new InstanceOfExpression($variable, '\lang\Closeable'),

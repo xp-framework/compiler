@@ -42,9 +42,7 @@ class NullSafe implements Extension {
     });
 
     $emitter->transform('nullsafeinstance', function($codegen, $node) {
-      static $i= 0;
-
-      $temp= new Variable('_N'.($i++));
+      $temp= new Variable($codegen->symbol());
       $null= new Literal('null');
       return new TernaryExpression(
         new BinaryExpression($null, '===', new Braced(new Assignment($temp, '=', $node->expression))),
