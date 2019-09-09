@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Element;
 use lang\ast\Emitter;
+use lang\ast\Node;
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
@@ -634,7 +634,7 @@ abstract class PHP extends Emitter {
   protected function emitInstanceOf($result, $instanceof) {
     $this->emitOne($result, $instanceof->expression);
     $result->out->write(' instanceof ');
-    if ($instanceof->type instanceof Element) {
+    if ($instanceof->type instanceof Node) {
       $this->emitOne($result, $instanceof->type);
     } else {
       $result->out->write($instanceof->type);

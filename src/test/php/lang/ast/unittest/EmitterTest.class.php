@@ -2,8 +2,8 @@
 
 use io\streams\MemoryOutputStream;
 use lang\IllegalStateException;
-use lang\ast\Element;
 use lang\ast\Emitter;
+use lang\ast\Node;
 use lang\ast\Result;
 use unittest\TestCase;
 
@@ -55,9 +55,8 @@ class EmitterTest extends TestCase {
   }
 
   #[@test, @expect(IllegalStateException::class)]
-  public function emit_element_without_kind() {
-    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), newinstance(Element::class, [], [
-      'line' => -1,
+  public function emit_node_without_kind() {
+    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), newinstance(Node::class, [], [
       'kind' => null
     ]));
   }

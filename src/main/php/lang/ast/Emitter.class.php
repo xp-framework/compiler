@@ -2,7 +2,7 @@
 
 use lang\IllegalArgumentException;
 use lang\IllegalStateException;
-use lang\ast\nodes\Value;
+use lang\ast\Node;
 use lang\reflect\Package;
 
 abstract class Emitter {
@@ -113,7 +113,7 @@ abstract class Emitter {
    * Emit single nodes
    *
    * @param  lang.ast.Result $result
-   * @param  lang.ast.Element $node
+   * @param  lang.ast.Node $node
    * @return void
    */
   public function emitOne($result, $node) {
@@ -125,8 +125,8 @@ abstract class Emitter {
     // Check for transformations
     if (isset($this->transformations[$node->kind])) {
       foreach ($this->transformations[$node->kind] as $transformation) {
-        $r= $transformation($node);
-        if ($r instanceof Value) {
+        $r= $transformation($result->codegen, $node);
+        if ($r instanceof Node) {
           if ($r->kind === $node->kind) continue;
           $this->{'emit'.$r->kind}($result, $r);
           return;
