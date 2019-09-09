@@ -12,10 +12,12 @@ use lang\ast\Result;
 use lang\ast\Tokens;
 use text\StringTokenizer;
 use unittest\TestCase;
+use util\cmd\Console;
 
 abstract class EmittingTest extends TestCase {
   private static $cl, $language, $emitter;
   private static $id= 0;
+  private $output;
   private $transformations= [];
 
   #[@beforeClass]
@@ -26,6 +28,11 @@ abstract class EmittingTest extends TestCase {
     foreach (self::$language->extensions() as $extension) {
       $extension->setup(self::$language, self::$emitter);
     }
+  }
+
+  public function __construct($name, $output= null) {
+    parent::__construct($name);
+    $this->output= $output;
   }
 
   /** @return void */
@@ -59,7 +66,11 @@ abstract class EmittingTest extends TestCase {
     $parse= new Parse(self::$language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
     self::$emitter->emitAll(new Result(new StringWriter($out)), $parse->execute());
 
-    // var_dump($out->getBytes());
+    if ($this->output) {
+      Console::writeLine();
+      Console::writeLine('=== ', $this->name, ' ===');
+      Console::writeLine($out->getBytes());
+    }
     self::$cl->setClassBytes($name, $out->getBytes());
     return self::$cl->loadClass($name);
   }
