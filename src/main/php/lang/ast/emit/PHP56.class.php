@@ -1,14 +1,11 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Emitter;
-use lang\ast\nodes\Value;
-
 /**
  * PHP 5.6 syntax
  *
  * @see  https://wiki.php.net/rfc#php_56
  */
-class PHP56 extends Emitter {
+class PHP56 extends PHP {
   use OmitPropertyTypes, OmitReturnTypes, OmitConstModifiers;
   use RewriteLambdaExpressions;
 
