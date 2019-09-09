@@ -4,7 +4,7 @@ use lang\ast\ArrayType;
 use lang\ast\FunctionType;
 use lang\ast\Language;
 use lang\ast\MapType;
-use lang\ast\Node;
+use lang\ast\Token;
 use lang\ast\Type;
 use lang\ast\UnionType;
 use lang\ast\nodes\Annotations;
@@ -400,7 +400,7 @@ class PHP extends Language {
         }
 
         $parse->queue= [$parse->token];
-        $parse->token= new Node($this->symbol(';'));
+        $parse->token= new Token($this->symbol(';'));
         return new FunctionDeclaration($name, $signature, $statements, $node->line);
       }
     });
@@ -436,7 +436,7 @@ class PHP extends Language {
 
     $this->prefix('(name)', function($parse, $node) {
       if (':' === $parse->token->value) {
-        $parse->token= new Node($this->symbol(';'));
+        $parse->token= new Token($this->symbol(';'));
         return new Label($node->value, $node->line);
       } else {
         return new Literal($node->value, $node->line);
@@ -976,7 +976,7 @@ class PHP extends Language {
         } else if ('>' === $parse->token->symbol->id) {
           break;
         } else if ('>>' === $parse->token->value) {
-          $parse->queue[]= $parse->token= new Node(self::symbol('>'));
+          $parse->queue[]= $parse->token= new Token(self::symbol('>'));
           break;
         }
       } while (true);

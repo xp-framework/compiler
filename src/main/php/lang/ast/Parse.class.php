@@ -65,16 +65,16 @@ class Parse {
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
-        $node= new Node(isset($this->language->symbols[$value]) ? $this->language->symbols[$value] : $this->language->symbol('(name)'));
+        $node= new Token(isset($this->language->symbols[$value]) ? $this->language->symbols[$value] : $this->language->symbol('(name)'));
         $node->kind= $type;
       } else if ('operator' === $type) {
-        $node= new Node($this->language->symbol($value));
+        $node= new Token($this->language->symbol($value));
         $node->kind= $type;
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {
-        $node= new Node($this->language->symbol('(literal)'));
+        $node= new Token($this->language->symbol('(literal)'));
         $node->kind= 'literal';
       } else if ('variable' === $type) {
-        $node= new Node($this->language->symbol('(variable)'));
+        $node= new Token($this->language->symbol('(variable)'));
         $node->kind= 'variable';
       } else if ('comment' === $type) {
         $this->comment= $value;
@@ -89,7 +89,7 @@ class Parse {
       return;
     }
 
-    $node= new Node($this->language->symbol('(end)'));
+    $node= new Token($this->language->symbol('(end)'));
     $node->line= $line;
     $this->token= $node;
   }
