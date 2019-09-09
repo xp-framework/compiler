@@ -71,7 +71,7 @@ class LoopsTest extends ParseTest {
       [new ForLoop(
         [new Assignment(new Variable('i', self::LINE), '=', new Literal('0', self::LINE), self::LINE)],
         [new BinaryExpression(new Variable('i', self::LINE), '<', new Literal('10', self::LINE), self::LINE)],
-        [new UnaryExpression(new Variable('i', self::LINE), '++', self::LINE)],
+        [new UnaryExpression('suffix', new Variable('i', self::LINE), '++', self::LINE)],
         [$this->loop],
         self::LINE
       )],

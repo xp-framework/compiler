@@ -53,7 +53,7 @@ class OperatorTest extends ParseTest {
   #[@test, @values(['++', '--'])]
   public function suffix($operator) {
     $this->assertParsed(
-      [new UnaryExpression(new Variable('a', self::LINE), $operator, self::LINE)],
+      [new UnaryExpression('suffix', new Variable('a', self::LINE), $operator, self::LINE)],
       '$a'.$operator.';'
     );
   }
@@ -61,7 +61,7 @@ class OperatorTest extends ParseTest {
   #[@test, @values(['!', '~', '-', '+', '++', '--'])]
   public function prefix($operator) {
     $this->assertParsed(
-      [new UnaryExpression(new Variable('a', self::LINE), $operator, self::LINE)],
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), $operator, self::LINE)],
       ''.$operator.'$a;'
     );
   }
@@ -123,7 +123,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function clone_expression() {
     $this->assertParsed(
-      [new UnaryExpression(new Variable('a', self::LINE), 'clone', self::LINE)],
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), 'clone', self::LINE)],
       'clone $a;'
     );
   }
@@ -131,7 +131,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function error_suppression() {
     $this->assertParsed(
-      [new UnaryExpression(new Variable('a', self::LINE), '@', self::LINE)],
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), '@', self::LINE)],
       '@$a;'
     );
   }
@@ -139,7 +139,7 @@ class OperatorTest extends ParseTest {
   #[@test]
   public function reference() {
     $this->assertParsed(
-      [new UnaryExpression(new Variable('a', self::LINE), '&', self::LINE)],
+      [new UnaryExpression('prefix', new Variable('a', self::LINE), '&', self::LINE)],
       '&$a;'
     );
   }

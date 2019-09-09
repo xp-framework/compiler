@@ -62,14 +62,15 @@ abstract class Language {
   public function prefix($id, $nud= null) {
     $prefix= $this->symbol($id);
     $prefix->nud= $nud ? $nud->bindTo($this, static::class) : function($parse, $token) use($id) {
-      return new UnaryExpression($this->expression($parse, 0), $id, $token->line);
+      return new UnaryExpression('prefix', $this->expression($parse, 0), $id, $token->line);
     };
   }
 
   public function suffix($id, $bp, $led= null) {
     $suffix= $this->symbol($id, $bp);
     $suffix->led= $led ? $led->bindTo($this, static::class) : function($parse, $token, $left) use($id) {
-      return new UnaryExpression($left, $id, $token->line);
+      $expr= new UnaryExpression('suffix', $left, $id, $token->line);
+      return $expr;
     };
   }
 

@@ -73,7 +73,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3', $r);
+    $this->assertEquals('1,2,3,4', $r);
   }
 
   #[@test]
@@ -89,7 +89,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3', $r);
+    $this->assertEquals('1,2,3,4', $r);
   }
 
   #[@test]
@@ -118,7 +118,7 @@ class LoopsTest extends EmittingTest {
       public function run() {
         $i= 0;
         $r= [];
-        while ($i++ < 5) {
+        while (++$i < 5) {
           if (1 === $i) {
             continue;
           } else {

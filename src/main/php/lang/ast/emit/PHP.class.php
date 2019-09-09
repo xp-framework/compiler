@@ -438,9 +438,14 @@ abstract class PHP extends Emitter {
     $this->emitOne($result, $binary->right);
   }
 
-  protected function emitUnary($result, $unary) {
+  protected function emitPrefix($result, $unary) {
     $result->out->write($unary->operator);
     $this->emitOne($result, $unary->expression);
+  }
+
+  protected function emitSuffix($result, $unary) {
+    $this->emitOne($result, $unary->expression);
+    $result->out->write($unary->operator);
   }
 
   protected function emitTernary($result, $ternary) {
