@@ -38,13 +38,4 @@ class CompactFunctionsTest extends EmittingTest {
     }');
     $this->assertEquals('test', $r);
   }
-
-  #[@test]
-  public function hacklang_variation_also_supported() {
-    $r= $this->run('class <T> {
-      public function run() ==> "test";
-    }');
-    $this->assertEquals('test', $r);
-    \xp::gc();
-  }
 }
