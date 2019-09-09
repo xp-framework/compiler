@@ -76,7 +76,6 @@ class TokensTest extends \unittest\TestCase {
   #  '<=', '>=', '<=>',
   #  '===', '!==',
   #  '=>',
-  #  '==>',
   #  '->',
   #])]
   public function operators($input) {

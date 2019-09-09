@@ -21,7 +21,7 @@ class LambdasTest extends ParseTest {
   public function short_closure() {
     $this->assertParsed(
       [new LambdaExpression(new Signature([new Parameter('a', null)], null), $this->expression, self::LINE)],
-      '($a) ==> $a + 1;'
+      'fn($a) => $a + 1;'
     );
     \xp::gc();
   }
@@ -34,7 +34,7 @@ class LambdasTest extends ParseTest {
         [new LambdaExpression(new Signature([new Parameter('a', null)], null), $this->expression, self::LINE)],
         self::LINE
       )],
-      'execute(($a) ==> $a + 1);'
+      'execute(fn($a) => $a + 1);'
     );
     \xp::gc();
   }
@@ -43,7 +43,7 @@ class LambdasTest extends ParseTest {
   public function short_closure_with_braces() {
     $this->assertParsed(
       [new LambdaExpression(new Signature([new Parameter('a', null)], null), [new ReturnStatement($this->expression, self::LINE)], self::LINE)],
-      '($a) ==> { return $a + 1; };'
+      'fn($a) => { return $a + 1; };'
     );
     \xp::gc();
   }

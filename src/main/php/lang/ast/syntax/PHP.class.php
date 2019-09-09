@@ -245,22 +245,7 @@ class PHP extends Language {
       }
       $parse->queue= array_merge($skipped, $parse->queue);
 
-      if (':' === $parse->token->value || '==>' === $parse->token->value) {
-        $parse->warn('Hack language style arrow functions are deprecated, please use `fn` syntax instead');
-        $parse->forward();
-        $signature= $this->signature($parse);
-        $parse->forward();
-
-        if ('{' === $parse->token->value) {
-          $parse->forward();
-          $statements= $this->statements($parse);
-          $parse->expecting('}', 'arrow function');
-        } else {
-          $statements= $this->expression($parse, 0);
-        }
-
-        return new LambdaExpression($signature, $statements, $token->line);
-      } else if ($cast && ('operator' !== $parse->token->kind || '(' === $parse->token->value || '[' === $parse->token->value)) {
+      if ($cast && ('operator' !== $parse->token->kind || '(' === $parse->token->value || '[' === $parse->token->value)) {
         $parse->forward();
         $parse->expecting('(', 'cast');
         $type= $this->type0($parse, false);
@@ -388,16 +373,9 @@ class PHP extends Language {
         $parse->forward();
         $signature= $this->signature($parse);
 
-        if ('==>' === $parse->token->value) {  // Compact syntax, terminated with ';'
-          $parse->forward();
-          $expr= $this->expression($parse, 0);
-          $statements= [new ReturnStatement($expr, $token->line)];
-          $parse->expecting(';', 'function');
-        } else {                              // Regular function
-          $parse->expecting('{', 'function');
-          $statements= $this->statements($parse);
-          $parse->expecting('}', 'function');
-        }
+        $parse->expecting('{', 'function');
+        $statements= $this->statements($parse);
+        $parse->expecting('}', 'function');
 
         $parse->queue= [$parse->token];
         $parse->token= new Token($this->symbol(';'));
@@ -902,15 +880,8 @@ class PHP extends Language {
       } else if (';' === $parse->token->value) {   // Abstract or interface method
         $statements= null;
         $parse->expecting(';', 'method declaration');
-      } else if ('==>' === $parse->token->value) { // Compact syntax, terminated with ';'
-        $parse->warn('Hack language style compact functions are deprecated, please use `fn` syntax instead');
-        $parse->forward();
-        $line= $parse->token->line;
-        $expr= $this->expression($parse, 0);
-        $statements= [new ReturnStatement($expr, $line)];
-        $parse->expecting(';', 'method declaration');
       } else {
-        $parse->expecting('{, ; or ==>', 'method declaration');
+        $parse->expecting('{ or ;', 'method declaration');
       }
 
       $body[$lookup]= new Method($modifiers, $name, $signature, $statements, $annotations, $comment, $line);

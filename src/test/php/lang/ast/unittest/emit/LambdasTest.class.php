@@ -5,14 +5,7 @@ use unittest\actions\RuntimeVersion;
 /**
  * Lambdas (a.k.a. arrow functions) support
  *
- * NOTE: Like in Hack, all captured variables are captured by value;
- * capturing by reference is not supported. If you need to capture by
- * reference, use a full PHP closure.
- *
  * @see  https://wiki.php.net/rfc/arrow_functions_v2
- * @see  https://docs.hhvm.com/hack/operators/lambda
- * @see  https://docs.hhvm.com/hack/lambdas/introduction
- * @see  https://wiki.php.net/rfc/arrow_functions (Under Discussion)
  */
 class LambdasTest extends EmittingTest {
 
@@ -182,42 +175,5 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(2, $r());
-  }
-
-  #[@test]
-  public function hack_variant_also_supportted() {
-    $r= $this->run('class <T> {
-      public function run() {
-        return ($a) ==> $a + 1;
-      }
-    }');
-
-    $this->assertEquals(2, $r(1));
-    \xp::gc();
-  }
-
-  #[@test]
-  public function hack_variant_without_braces() {
-    $r= $this->run('class <T> {
-      public function run() {
-        return $a ==> $a + 1;
-      }
-    }');
-
-    $this->assertEquals(2, $r(1));
-    \xp::gc();
-  }
-
-  #[@test]
-  public function hack_variant_without_braces_as_argument() {
-    $r= $this->run('class <T> {
-      private function apply($f, ... $args) { return $f(...$args); }
-      public function run() {
-        return $this->apply($a ==> $a + 1, 2);
-      }
-    }');
-
-    $this->assertEquals(3, $r);
-    \xp::gc();
   }
 }
