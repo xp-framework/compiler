@@ -92,7 +92,7 @@ class NullSafeTest extends EmittingTest {
           public $member= true;
         };
         $member= new class() {
-          public fn name() => "member";
+          public function name() { return "member"; }
         };
         return $object?->{$member->name()};
       }
