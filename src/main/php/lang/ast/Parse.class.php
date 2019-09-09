@@ -65,17 +65,17 @@ class Parse {
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
-        $node= new Token(isset($this->language->symbols[$value]) ? $this->language->symbols[$value] : $this->language->symbol('(name)'));
-        $node->kind= $type;
+        $t= new Token(isset($this->language->symbols[$value]) ? $this->language->symbols[$value] : $this->language->symbol('(name)'));
+        $t->kind= $type;
       } else if ('operator' === $type) {
-        $node= new Token($this->language->symbol($value));
-        $node->kind= $type;
+        $t= new Token($this->language->symbol($value));
+        $t->kind= $type;
       } else if ('string' === $type || 'integer' === $type || 'decimal' === $type) {
-        $node= new Token($this->language->symbol('(literal)'));
-        $node->kind= 'literal';
+        $t= new Token($this->language->symbol('(literal)'));
+        $t->kind= 'literal';
       } else if ('variable' === $type) {
-        $node= new Token($this->language->symbol('(variable)'));
-        $node->kind= 'variable';
+        $t= new Token($this->language->symbol('(variable)'));
+        $t->kind= 'variable';
       } else if ('comment' === $type) {
         $this->comment= $value;
         continue;
@@ -83,15 +83,15 @@ class Parse {
         throw new Error('Unexpected token '.$value, $this->file, $line);
       }
 
-      $node->value= $value;
-      $node->line= $line;
-      $this->token= $node;
+      $t->value= $value;
+      $t->line= $line;
+      $this->token= $t;
       return;
     }
 
-    $node= new Token($this->language->symbol('(end)'));
-    $node->line= $line;
-    $this->token= $node;
+    $t= new Token($this->language->symbol('(end)'));
+    $t->line= $line;
+    $this->token= $t;
   }
 
   /**
