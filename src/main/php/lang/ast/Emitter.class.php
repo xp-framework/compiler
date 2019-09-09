@@ -72,13 +72,14 @@ abstract class Emitter {
   /**
    * Search a given scope recursively for nodes with a given kind
    *
-   * @param  lang.ast.Element $arg
+   * @param  lang.ast.Element $node
    * @param  string $kind
    * @return iterable
    */
-  protected function search($arg, $kind) {
-    if ($arg->kind === $kind) yield $arg;
-    foreach ($arg->children() as $child) {
+  protected function search($node, $kind) {
+    if ($node->kind === $kind) yield $node;
+
+    foreach ($node->children() as $child) {
       foreach ($this->search($child, $kind) as $result) {
         yield $result;
       }
@@ -90,7 +91,7 @@ abstract class Emitter {
    *
    * @return void
    */
-  public function emit() {
+  protected function emit() {
     throw new IllegalStateException('Called without node kind');
   }
 
