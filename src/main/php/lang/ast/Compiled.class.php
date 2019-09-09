@@ -4,18 +4,31 @@ use io\streams\OutputStream;
 use text\StreamTokenizer;
 
 class Compiled implements OutputStream {
-  public static $source= [], $emit= [], $lang;
+  public static $source= [], $emit= [], $lang= [];
 
   private $compiled= '', $offset= 0;
 
   public static function bytes($version, $source, $file) {
-    $stream= $source->getResourceAsStream($file);
-    return self::parse($version, $stream->in(), new self(), $file)->compiled;
+    $stream= $source[1]->getResourceAsStream($file);
+    return self::parse($source[0], $stream->in(), $version, new self(), $file)->compiled;
   }
 
-  private static function parse($version, $in, $out, $file) {
+  private static function language($name, $emitter) {
+    $language= Language::named(strtoupper($name));
+    foreach ($language->extensions() as $extension) {
+      $extension->setup($language, $emitter);
+    }
+    return $language;
+  }
+
+  private static function parse($lang, $in, $version, $out, $file) {
+    $language= isset(self::$lang[$lang])
+      ? self::$lang[$lang]
+      : self::$lang[$lang]= self::language($lang, self::$emit[$version])
+    ;
+
     try {
-      $parse= new Parse(self::$lang, new Tokens(new StreamTokenizer($in)), $file);
+      $parse= new Parse($language, new Tokens(new StreamTokenizer($in)), $file);
       self::$emit[$version]->emitAll(new Result($out), $parse->execute());
       return $out;
     } finally {
@@ -33,8 +46,8 @@ class Compiled implements OutputStream {
    */
   public function stream_open($path, $mode, $options, &$opened) {
     list($version, $file)= explode('://', $path);
-    $stream= self::$source[$file]->getResourceAsStream($file);
-    self::parse($version, $stream->in(), $this, $file);
+    $stream= self::$source[$file][1]->getResourceAsStream($file);
+    self::parse(self::$source[$file][0], $stream->in(), $version, $this, $file);
     $opened= $stream->getURI();
     return true;
   }
