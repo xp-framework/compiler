@@ -30,9 +30,15 @@ abstract class EmittingTest extends TestCase {
     }
   }
 
+  /**
+   * Constructor
+   *
+   * @param  string $name
+   * @param  ?string $output E.g. `ast,code` to dump both AST and emitted code
+   */
   public function __construct($name, $output= null) {
     parent::__construct($name);
-    $this->output= $output;
+    $this->output= $output ? array_flip(explode(',', $output)) : [];
   }
 
   /** @return void */
@@ -64,13 +70,20 @@ abstract class EmittingTest extends TestCase {
     $out= new MemoryOutputStream();
 
     $parse= new Parse(self::$language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
-    self::$emitter->emitAll(new Result(new StringWriter($out)), $parse->execute());
+    $ast= iterator_to_array($parse->execute());
+    if (isset($this->output['ast'])) {
+      Console::writeLine();
+      Console::writeLine('=== ', $this->name, ' ===');
+      Console::writeLine($ast);
+    }
 
-    if ($this->output) {
+    self::$emitter->emitAll(new Result(new StringWriter($out)), $ast);
+    if (isset($this->output['code'])) {
       Console::writeLine();
       Console::writeLine('=== ', $this->name, ' ===');
       Console::writeLine($out->getBytes());
     }
+
     self::$cl->setClassBytes($name, $out->getBytes());
     return self::$cl->loadClass($name);
   }
