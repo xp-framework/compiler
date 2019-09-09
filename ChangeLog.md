@@ -5,6 +5,7 @@ XP Compiler ChangeLog
 
 ## 4.0.0 / ????-??-??
 
+* Merged PR #69: Remove support for Hack arrow functions - @thekid
 * Fixed operator precedence for unary prefix operators - @thekid
 * Merged PR #66: Syntax plugins. With this facility in place, the compiler
   can be extended much like [Babel](https://babeljs.io/docs/en/plugins).
