@@ -1,7 +1,15 @@
 <?php namespace lang\ast;
 
-use lang\{ClassFormatException, ClassLoader, ClassLoadingException, ClassNotFoundException, ElementNotFoundException, IClassLoader, XPClass};
 use lang\reflect\Package;
+use lang\{
+  ClassFormatException,
+  ClassLoader,
+  ClassLoadingException,
+  ClassNotFoundException,
+  ElementNotFoundException,
+  IClassLoader,
+  XPClass
+};
 
 class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
@@ -161,9 +169,6 @@ class CompilingClassLoader implements IClassLoader {
       unset(\xp::$cl[$class]);
       throw $e;
     } catch (\Throwable $e) {
-      unset(\xp::$cl[$class]);
-      throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
-    } catch (\Exception $e) {
       unset(\xp::$cl[$class]);
       throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
     } finally {
