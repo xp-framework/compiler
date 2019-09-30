@@ -54,8 +54,8 @@ class EmitterTest extends TestCase {
 
   #[@test, @expect(IllegalStateException::class)]
   public function emit_node_without_kind() {
-    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), newinstance(Node::class, [], [
-      'kind' => null
-    ]));
+    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), new class() extends Node {
+      public $kind= null;
+    });
   }
 }
