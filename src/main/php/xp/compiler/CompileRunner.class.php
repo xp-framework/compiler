@@ -62,7 +62,7 @@ class CompileRunner {
         break;
       } else {
         $in= $args[$i];
-        $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
+        $out= $args[$i + 1] ?? '-';
         break;
       }
     }

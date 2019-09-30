@@ -1098,10 +1098,7 @@ class PHP extends Language {
       if (isset($modifier[$parse->token->value])) {
         $modifiers[]= $parse->token->value;
         $parse->forward();
-      } else if (isset($this->body[$k= $parse->token->value])
-        ? ($f= $this->body[$k])
-        : (isset($this->body[$k= '@'.$parse->token->kind]) ? ($f= $this->body[$k]) : null)
-      ) {
+      } else if ($f= $this->body[$parse->token->value] ?? $this->body['@'.$parse->token->kind] ?? null) {
         $f($parse, $body, $annotations, $modifiers);
         $modifiers= [];
         $annotations= [];

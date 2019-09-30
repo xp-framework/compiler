@@ -388,7 +388,7 @@ abstract class PHP extends Emitter {
     $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
-      DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
+      DETAIL_ANNOTATIONS => $method->annotations ?? [],
       DETAIL_COMMENT     => $method->comment,
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []

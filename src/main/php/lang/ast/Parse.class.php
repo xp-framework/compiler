@@ -65,7 +65,7 @@ class Parse {
       list($value, $line)= $this->tokens->current();
       $this->tokens->next();
       if ('name' === $type) {
-        $t= new Token(isset($this->language->symbols[$value]) ? $this->language->symbols[$value] : $this->language->symbol('(name)'));
+        $t= new Token($this->language->symbols[$value] ?? $this->language->symbol('(name)'));
         $t->kind= $type;
       } else if ('operator' === $type) {
         $t= new Token($this->language->symbol($value));
