@@ -1,11 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\Errors;
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\InterfaceDeclaration;
-use lang\ast\nodes\NamespaceDeclaration;
-use lang\ast\nodes\TraitDeclaration;
-use lang\ast\nodes\UseExpression;
+use lang\ast\nodes\{ClassDeclaration, InterfaceDeclaration, NamespaceDeclaration, TraitDeclaration, UseExpression};
 
 class TypesTest extends ParseTest {
 

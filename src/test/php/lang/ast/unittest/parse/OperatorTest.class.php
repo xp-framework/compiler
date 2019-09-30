@@ -1,20 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\ArrayLiteral;
-use lang\ast\nodes\Assignment;
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\Braced;
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InstanceOfExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\NewClassExpression;
-use lang\ast\nodes\NewExpression;
-use lang\ast\nodes\OffsetExpression;
-use lang\ast\nodes\ScopeExpression;
-use lang\ast\nodes\TernaryExpression;
-use lang\ast\nodes\UnaryExpression;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{ArrayLiteral, Assignment, BinaryExpression, Braced, ClassDeclaration, InstanceExpression, InstanceOfExpression, Literal, NewClassExpression, NewExpression, OffsetExpression, ScopeExpression, TernaryExpression, UnaryExpression, Variable};
 
 class OperatorTest extends ParseTest {
 

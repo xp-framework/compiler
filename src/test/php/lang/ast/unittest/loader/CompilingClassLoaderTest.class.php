@@ -1,11 +1,7 @@
 <?php namespace lang\ast\unittest\loader;
 
-use io\File;
-use io\FileUtil;
-use io\Folder;
-use lang\ClassFormatException;
-use lang\ClassLoader;
-use lang\Environment;
+use io\{File, FileUtil, Folder};
+use lang\{ClassFormatException, ClassLoader, Environment};
 use lang\ast\CompilingClassLoader;
 use unittest\TestCase;
 

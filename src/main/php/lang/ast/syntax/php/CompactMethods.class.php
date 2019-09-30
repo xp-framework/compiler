@@ -1,8 +1,7 @@
 <?php namespace lang\ast\syntax\php;
 
 use lang\ast\Node;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\ReturnStatement;
+use lang\ast\nodes\{Method, ReturnStatement};
 use lang\ast\syntax\Extension;
 
 /**

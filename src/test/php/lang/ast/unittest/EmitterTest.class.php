@@ -2,9 +2,7 @@
 
 use io\streams\MemoryOutputStream;
 use lang\IllegalStateException;
-use lang\ast\Emitter;
-use lang\ast\Node;
-use lang\ast\Result;
+use lang\ast\{Emitter, Node, Result};
 use unittest\TestCase;
 
 class EmitterTest extends TestCase {

@@ -1,15 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
-use io\streams\MemoryOutputStream;
-use io\streams\StringWriter;
+use io\streams\{MemoryOutputStream, StringWriter};
 use lang\DynamicClassLoader;
-use lang\ast\CompilingClassLoader;
-use lang\ast\Emitter;
-use lang\ast\Language;
-use lang\ast\Node;
-use lang\ast\Parse;
-use lang\ast\Result;
-use lang\ast\Tokens;
+use lang\ast\{CompilingClassLoader, Emitter, Language, Node, Parse, Result, Tokens};
 use text\StringTokenizer;
 use unittest\TestCase;
 use util\cmd\Console;

@@ -2,13 +2,7 @@
 
 use io\Path;
 use lang\Runtime;
-use lang\ast\CompilingClassloader;
-use lang\ast\Emitter;
-use lang\ast\Errors;
-use lang\ast\Language;
-use lang\ast\Parse;
-use lang\ast\Result;
-use lang\ast\Tokens;
+use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Parse, Result, Tokens};
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;

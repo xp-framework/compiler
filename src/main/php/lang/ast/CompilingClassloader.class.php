@@ -1,12 +1,6 @@
 <?php namespace lang\ast;
 
-use lang\ClassFormatException;
-use lang\ClassLoader;
-use lang\ClassLoadingException;
-use lang\ClassNotFoundException;
-use lang\ElementNotFoundException;
-use lang\IClassLoader;
-use lang\XPClass;
+use lang\{ClassFormatException, ClassLoader, ClassLoadingException, ClassNotFoundException, ElementNotFoundException, IClassLoader, XPClass};
 use lang\reflect\Package;
 
 class CompilingClassLoader implements IClassLoader {
