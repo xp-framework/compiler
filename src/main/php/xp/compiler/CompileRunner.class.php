@@ -47,7 +47,7 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    $target= 'PHP.'.PHP_VERSION;
     $in= $out= '-';
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {

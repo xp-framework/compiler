@@ -10,7 +10,7 @@ use unittest\TestCase;
 class EmitterTest extends TestCase {
 
   private function newEmitter() {
-    return Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    return Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
   }
 
   #[@test]

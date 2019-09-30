@@ -24,7 +24,7 @@ abstract class EmittingTest extends TestCase {
   public static function setupCompiler() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
     self::$language= Language::named('PHP');
-    self::$emitter= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    self::$emitter= Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
     foreach (self::$language->extensions() as $extension) {
       $extension->setup(self::$language, self::$emitter);
     }

@@ -13,7 +13,7 @@ class CompilingClassLoaderTest extends TestCase {
   private static $runtime;
 
   static function __static() {
-    self::$runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    self::$runtime= 'PHP.'.PHP_VERSION;
   }
 
   /**
