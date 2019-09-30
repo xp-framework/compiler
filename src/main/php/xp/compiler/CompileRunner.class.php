@@ -32,9 +32,9 @@ use util\profiling\Timer;
  *   ```sh
  *   $ xp compile -n src/main/php/
  *   ```
- * - Target PHP 5.6 (default target is current PHP version)
+ * - Target PHP 7.0 (default target is current PHP version)
  *   ```sh
- *   $ xp compile -t PHP.5.6 HelloWorld.php HelloWorld.class.php
+ *   $ xp compile -t PHP.7.0 HelloWorld.php HelloWorld.class.php
  *   ```
  *
  * The *-o* and *-n* options accept multiple input sources following them.
