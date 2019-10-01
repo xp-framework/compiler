@@ -50,4 +50,19 @@ class AnonymousClassTest extends EmittingTest {
     }');
     $this->assertInstanceOf(Runnable::class, $r);
   }
+
+  #[@test]
+  public function method_annotations() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return new class() {
+
+          <<inside>>
+          public function fixture() { }
+        };
+      }
+    }');
+
+    $this->assertEquals(['inside' => null], typeof($r)->getMethod('fixture')->getAnnotations());
+  }
 }

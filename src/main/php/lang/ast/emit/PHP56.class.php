@@ -195,21 +195,28 @@ class PHP56 extends PHP {
   }
 
   protected function emitNewClass($result, $new) {
+    array_unshift($result->meta, []);
+
     $result->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
     $definition= $new->definition;
     $result->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
     $result->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
     $result->out->write(', "use" => []');
     $result->out->write('], \'{');
-    $result->out->write(str_replace('\'', '\\\'', $result->buffer(function($result) use($definition) {
+    $result->out->write(strtr($result->buffer(function($result) use($definition) {
       foreach ($definition->body as $member) {
         $this->emitOne($result, $member);
         $result->out->write("\n");
       }
-    })));
+
+      $result->out->write('function __new() {');
+      $this->emitMeta($result, null, [], null);
+      $result->out->write('return $this; }');
+
+    }), ['\'' => '\\\'', '\\' => '\\\\']));
     $result->out->write('}\')->newInstance(');
     $this->emitArguments($result, $new->arguments);
-    $result->out->write(')');
+    $result->out->write(')->__new()');
   }
 
   protected function emitFrom($result, $from) {
