@@ -1,5 +1,9 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Code;
+use lang\ast\nodes\Method;
+use lang\ast\nodes\Signature;
+
 /**
  * PHP 5.6 syntax
  *
@@ -195,18 +199,35 @@ class PHP56 extends PHP {
   }
 
   protected function emitNewClass($result, $new) {
+    array_unshift($result->meta, []);
+
     $result->out->write('\\lang\\ClassLoader::defineType("class©anonymous'.md5(uniqid()).'", ["kind" => "class"');
     $definition= $new->definition;
     $result->out->write(', "extends" => '.($definition->parent ? '[\''.$definition->parent.'\']' : 'null'));
     $result->out->write(', "implements" => '.($definition->implements ? '[\''.implode('\', \'', $definition->implements).'\']' : 'null'));
     $result->out->write(', "use" => []');
     $result->out->write('], \'{');
-    $result->out->write(str_replace('\'', '\\\'', $result->buffer(function($result) use($definition) {
+    $result->out->write(strtr($result->buffer(function($result) use($definition) {
+
+      // Initialize meta data in constructor
+      if (isset($definition->body['__construct()'])) {
+        array_unshift($definition->body['__construct()']->body, new Code('self::__init()'));
+      } else {
+        $definition->body['__construct()']= new Method([], '__construct', new Signature([], null), [
+          new Code('self::__init()')
+        ]);
+      }
+
       foreach ($definition->body as $member) {
         $this->emitOne($result, $member);
         $result->out->write("\n");
       }
-    })));
+
+      $result->out->write('static function __init() {');
+      $this->emitMeta($result, null, [], null);
+      $result->out->write('}');
+
+    }), ['\'' => '\\\'', '\\' => '\\\\']));
     $result->out->write('}\')->newInstance(');
     $this->emitArguments($result, $new->arguments);
     $result->out->write(')');
