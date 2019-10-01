@@ -2,6 +2,7 @@
 
 use lang\ast\Code;
 use lang\ast\nodes\Method;
+use lang\ast\nodes\Parameter;
 use lang\ast\nodes\Signature;
 
 /**
@@ -212,6 +213,11 @@ class PHP56 extends PHP {
       // Initialize meta data in constructor
       if (isset($definition->body['__construct()'])) {
         array_unshift($definition->body['__construct()']->body, new Code('self::__init()'));
+      } else if ($definition->parent) {
+        $param= new Parameter('args', null, null, false, true, null, []);
+        $definition->body['__construct()']= new Method([], '__construct', new Signature([$param], null), [
+          new Code('method_exists(parent::class, "__construct") && parent::__construct(...$args); self::__init()')
+        ]);
       } else {
         $definition->body['__construct()']= new Method([], '__construct', new Signature([], null), [
           new Code('self::__init()')

@@ -87,4 +87,25 @@ class AnonymousClassTest extends EmittingTest {
     $this->assertEquals(['test' => null], typeof($r)->getMethod('fixture')->getAnnotations());
     $this->assertEquals('test', $r->name);
   }
+
+  #[@test]
+  public function method_annotations_with_inherited_constructor() {
+    $r= $this->run('class <T> {
+      public $name;
+
+      public function __construct($name= null) {
+        $this->name= $name;
+      }
+
+      public function run() {
+        return new class("test") extends <T> {
+
+          <<test>>
+          public function fixture() { }
+        };
+      }
+    }');
+    $this->assertEquals(['test' => null], typeof($r)->getMethod('fixture')->getAnnotations());
+    $this->assertEquals('test', $r->name);
+  }
 }

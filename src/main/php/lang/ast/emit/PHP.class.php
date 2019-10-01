@@ -4,6 +4,7 @@ use lang\ast\Code;
 use lang\ast\Emitter;
 use lang\ast\Node;
 use lang\ast\nodes\Method;
+use lang\ast\nodes\Parameter;
 use lang\ast\nodes\Signature;
 
 abstract class PHP extends Emitter {
@@ -681,6 +682,11 @@ abstract class PHP extends Emitter {
     // Initialize meta data in constructor
     if (isset($new->definition->body['__construct()'])) {
       array_unshift($new->definition->body['__construct()']->body, new Code('self::__init()'));
+    } else if ($new->definition->parent) {
+      $param= new Parameter('args', null, null, false, true, null, []);
+      $new->definition->body['__construct()']= new Method([], '__construct', new Signature([$param], null), [
+        new Code('method_exists(parent::class, "__construct") && parent::__construct(...$args); self::__init()')
+      ]);
     } else {
       $new->definition->body['__construct()']= new Method([], '__construct', new Signature([], null), [
         new Code('self::__init()')
