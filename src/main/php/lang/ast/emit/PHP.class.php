@@ -1,7 +1,10 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Code;
 use lang\ast\Emitter;
 use lang\ast\Node;
+use lang\ast\nodes\Method;
+use lang\ast\nodes\Signature;
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
@@ -292,7 +295,11 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitMeta($result, $name, $annotations, $comment) {
-    $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+    if (null === $name) {
+      $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
+    } else {
+      $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+    }
     $result->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->emitAnnotations($result, $annotations);
     $result->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');
@@ -661,6 +668,8 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNewClass($result, $new) {
+    array_unshift($result->meta, []);
+
     $result->out->write('new class(');
     $this->emitArguments($result, $new->arguments);
     $result->out->write(')');
@@ -668,11 +677,23 @@ abstract class PHP extends Emitter {
     $new->definition->parent && $result->out->write(' extends '.$new->definition->parent);
     $new->definition->implements && $result->out->write(' implements '.implode(', ', $new->definition->implements));
     $result->out->write('{');
+
+    // Initialize meta data in constructor
+    if (isset($new->definition->body['__construct()'])) {
+      array_unshift($new->definition->body['__construct()']->body, new Code('self::__init()'));
+    } else {
+      $new->definition->body['__construct()']= new Method([], '__construct', new Signature([], null), [
+        new Code('self::__init()')
+      ]);
+    }
+
     foreach ($new->definition->body as $member) {
       $this->emitOne($result, $member);
       $result->out->write("\n");
     }
-    $result->out->write('}');
+    $result->out->write('static function __init() {');
+    $this->emitMeta($result, null, [], null);
+    $result->out->write('}}');
   }
 
   protected function emitInvoke($result, $invoke) {
