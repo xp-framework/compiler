@@ -1,10 +1,5 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Code;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\Signature;
-
 /**
  * PHP 5.6 syntax
  *
@@ -209,34 +204,19 @@ class PHP56 extends PHP {
     $result->out->write(', "use" => []');
     $result->out->write('], \'{');
     $result->out->write(strtr($result->buffer(function($result) use($definition) {
-
-      // Initialize meta data in constructor
-      if (isset($definition->body['__construct()'])) {
-        array_unshift($definition->body['__construct()']->body, new Code('self::__init()'));
-      } else if ($definition->parent) {
-        $param= new Parameter('args', null, null, false, true, null, []);
-        $definition->body['__construct()']= new Method([], '__construct', new Signature([$param], null), [
-          new Code('method_exists(parent::class, "__construct") && parent::__construct(...$args); self::__init()')
-        ]);
-      } else {
-        $definition->body['__construct()']= new Method([], '__construct', new Signature([], null), [
-          new Code('self::__init()')
-        ]);
-      }
-
       foreach ($definition->body as $member) {
         $this->emitOne($result, $member);
         $result->out->write("\n");
       }
 
-      $result->out->write('static function __init() {');
+      $result->out->write('function __new() {');
       $this->emitMeta($result, null, [], null);
-      $result->out->write('}');
+      $result->out->write('return $this; }');
 
     }), ['\'' => '\\\'', '\\' => '\\\\']));
     $result->out->write('}\')->newInstance(');
     $this->emitArguments($result, $new->arguments);
-    $result->out->write(')');
+    $result->out->write(')->__new()');
   }
 
   protected function emitFrom($result, $from) {
