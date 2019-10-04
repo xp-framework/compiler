@@ -85,6 +85,10 @@ abstract class PHP extends Emitter {
     $result->out->write($name);
   }
 
+  protected function emitOperator($result, $operator) {
+    $result->out->write($operator->value);
+  }
+
   protected function emitEcho($result, $echo) {
     $result->out->write('echo ');
     $s= sizeof($echo->expressions) - 1;
