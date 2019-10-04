@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #75: Add "ast" subcommand to display the abstract syntax tree
+  (@thekid)
+
 ## 4.1.0 / 2019-10-01
 
 * Merged PR #73: Add support for annotations in anonymous classes
