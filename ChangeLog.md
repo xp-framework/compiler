@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.2.0 / 2019-10-04
+
 * Fixed issue #74: No longer shadow compiler errors in certain cases
   (@thekid)
 * Merged PR #75: Add "ast" subcommand to display the abstract syntax tree
