@@ -77,16 +77,16 @@ abstract class PHP extends Emitter {
     // NOOP
   }
 
+  protected function emitName($result, $name) {
+    // NOOP
+  }
+
   protected function emitCode($result, $code) {
     $result->out->write($code->value);
   }
 
   protected function emitLiteral($result, $literal) {
     $result->out->write($literal->expression);
-  }
-
-  protected function emitName($result, $name) {
-    $result->out->write($name);
   }
 
   protected function emitEcho($result, $echo) {
