@@ -178,7 +178,7 @@ class PHP extends Language {
 
     $this->infix('{', 80, function($parse, $token, $left) {
       $expr= $this->expression($parse, 0);
-      $parse->expecting('}', 'dynamic member');
+      $parse->expecting('}', 'offset');
       return new OffsetExpression($left, $expr, $token->line);
     });
 
@@ -424,7 +424,6 @@ class PHP extends Language {
     $this->prefix('(variable)', 0, function($parse, $token) {
       return new Variable($token->value, $token->line);
     });
-
 
     $this->prefix('(literal)', 0, function($parse, $token) {
       return new Literal($token->value, $token->line);
