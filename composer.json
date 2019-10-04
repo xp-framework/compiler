@@ -14,7 +14,7 @@
   "require-dev" : {
     "xp-framework/unittest": "^9.3"
   },
-  "bin": ["bin/xp.xp-framework.compiler.compile"],
+  "bin": ["bin/xp.xp-framework.compiler.compile", "bin/xp.xp-framework.compiler.ast"],
   "autoload" : {
     "files" : ["src/main/php/autoload.php"]
   }
