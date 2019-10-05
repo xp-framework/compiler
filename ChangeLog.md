@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.2.1 / 2019-10-05
+
+* Fixed parser to allow "extending" final and abstract types - @thekid
+
 ## 4.2.0 / 2019-10-04
 
 * Fixed issue #74: No longer shadow compiler errors in certain cases
