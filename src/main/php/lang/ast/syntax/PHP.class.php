@@ -681,17 +681,15 @@ class PHP extends Language {
     });
 
     $this->stmt('abstract', function($parse, $token) {
-      $parse->forward();
-      $type= $parse->scope->resolve($parse->token->value);
-      $parse->forward();
-      return $this->clazz($parse, $type, ['abstract']);
+      $type= $this->statement($parse);
+      $type->modifiers[]= 'abstract';
+      return $type;
     });
 
     $this->stmt('final', function($parse, $token) {
-      $parse->forward();
-      $type= $parse->scope->resolve($parse->token->value);
-      $parse->forward();
-      return $this->clazz($parse, $type, ['final']);
+      $type= $this->statement($parse);
+      $type->modifiers[]= 'final';
+      return $type;
     });
 
     $this->stmt('<<', function($parse, $token) {
