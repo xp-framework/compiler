@@ -100,7 +100,7 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
-  public function throw_expression_with_ternary() {
+  public function throw_expression_with_short_ternary() {
     $t= $this->type('class <T> {
       public function run($user) {
         return $user ?: throw new \\lang\\IllegalArgumentException("test");
@@ -110,7 +110,7 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
-  public function throw_expression_with_short_ternary() {
+  public function throw_expression_with_normal_ternary() {
     $t= $this->type('class <T> {
       public function run($user) {
         return $user ? new User($user) : throw new \\lang\\IllegalArgumentException("test");
