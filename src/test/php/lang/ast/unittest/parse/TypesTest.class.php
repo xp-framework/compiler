@@ -6,6 +6,7 @@ use lang\ast\nodes\InterfaceDeclaration;
 use lang\ast\nodes\NamespaceDeclaration;
 use lang\ast\nodes\TraitDeclaration;
 use lang\ast\nodes\UseExpression;
+use unittest\Assert;
 
 class TypesTest extends ParseTest {
 

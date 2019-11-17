@@ -9,11 +9,13 @@ use lang\ast\nodes\Parameter;
 use lang\ast\nodes\ReturnStatement;
 use lang\ast\nodes\Signature;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 class ClosuresTest extends ParseTest {
   private $returns;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->returns= new ReturnStatement(
       new BinaryExpression(

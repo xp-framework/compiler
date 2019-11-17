@@ -1,10 +1,12 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class InvocationTest extends EmittingTest {
 
   #[@test]
   public function instance_method() {
-    $this->assertEquals('instance', $this->run(
+    Assert::equals('instance', $this->run(
       'class <T> {
 
         public function instanceMethod() { return "instance"; }
@@ -18,7 +20,7 @@ class InvocationTest extends EmittingTest {
 
   #[@test]
   public function instance_method_dynamic_variable() {
-    $this->assertEquals('instance', $this->run(
+    Assert::equals('instance', $this->run(
       'class <T> {
 
         public function instanceMethod() { return "instance"; }
@@ -33,7 +35,7 @@ class InvocationTest extends EmittingTest {
 
   #[@test]
   public function instance_method_dynamic_expression() {
-    $this->assertEquals('instance', $this->run(
+    Assert::equals('instance', $this->run(
       'class <T> {
 
         public function instanceMethod() { return "instance"; }
@@ -48,7 +50,7 @@ class InvocationTest extends EmittingTest {
 
   #[@test]
   public function static_method() {
-    $this->assertEquals('static', $this->run(
+    Assert::equals('static', $this->run(
       'class <T> {
 
         public function staticMethod() { return "static"; }
@@ -62,7 +64,7 @@ class InvocationTest extends EmittingTest {
 
   #[@test]
   public function static_method_dynamic() {
-    $this->assertEquals('static', $this->run(
+    Assert::equals('static', $this->run(
       'class <T> {
 
         public static function staticMethod() { return "static"; }
@@ -77,7 +79,7 @@ class InvocationTest extends EmittingTest {
 
   #[@test]
   public function closure() {
-    $this->assertEquals('closure', $this->run(
+    Assert::equals('closure', $this->run(
       'class <T> {
 
         public function run() {
@@ -90,7 +92,7 @@ class InvocationTest extends EmittingTest {
 
   #[@test]
   public function global_function() {
-    $this->assertEquals('function', $this->run(
+    Assert::equals('function', $this->run(
       'function fixture() { return "function"; }
       class <T> {
 

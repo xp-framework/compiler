@@ -2,6 +2,7 @@
 
 use lang\ast\nodes\NamespaceDeclaration;
 use lang\ast\nodes\Start;
+use unittest\Assert;
 
 class StartTokensTest extends ParseTest {
 

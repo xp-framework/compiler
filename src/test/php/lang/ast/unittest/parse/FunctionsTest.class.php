@@ -11,6 +11,7 @@ use lang\ast\nodes\ReturnStatement;
 use lang\ast\nodes\Signature;
 use lang\ast\nodes\YieldExpression;
 use lang\ast\nodes\YieldFromExpression;
+use unittest\Assert;
 
 class FunctionsTest extends ParseTest {
 

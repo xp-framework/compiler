@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class BracesTest extends EmittingTest {
 
   #[@test]
@@ -12,7 +14,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('test1', $r);
+    Assert::equals('test1', $r);
   }
 
   #[@test]
@@ -23,7 +25,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(250905600, $r);
+    Assert::equals(250905600, $r);
   }
 
   #[@test]
@@ -34,7 +36,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(250905600, $r);
+    Assert::equals(250905600, $r);
   }
 
   #[@test]
@@ -51,7 +53,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 
   #[@test]
@@ -64,7 +66,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 
   #[@test]
@@ -77,7 +79,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(320, $r);
+    Assert::equals(320, $r);
   }
 
   #[@test, @values(map= [
@@ -92,7 +94,7 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals($expected, $r);
+    Assert::equals($expected, $r);
   }
 
   #[@test]
@@ -106,6 +108,6 @@ class BracesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('OK', $r);
+    Assert::equals('OK', $r);
   }
 }

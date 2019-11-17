@@ -5,9 +5,10 @@ use lang\IllegalStateException;
 use lang\ast\Emitter;
 use lang\ast\Node;
 use lang\ast\Result;
+use unittest\Assert;
 use unittest\TestCase;
 
-class EmitterTest extends TestCase {
+class EmitterTest {
 
   private function newEmitter() {
     return Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
@@ -20,7 +21,7 @@ class EmitterTest extends TestCase {
 
   #[@test]
   public function transformations_initially_empty() {
-    $this->assertEquals([], $this->newEmitter()->transformations());
+    Assert::equals([], $this->newEmitter()->transformations());
   }
 
   #[@test]
@@ -29,7 +30,7 @@ class EmitterTest extends TestCase {
 
     $fixture= $this->newEmitter();
     $fixture->transform('class', $function);
-    $this->assertEquals(['class' => [$function]], $fixture->transformations());
+    Assert::equals(['class' => [$function]], $fixture->transformations());
   }
 
   #[@test]
@@ -41,7 +42,7 @@ class EmitterTest extends TestCase {
     $transformation= $fixture->transform('class', $first);
     $fixture->transform('class', $second);
     $fixture->remove($transformation);
-    $this->assertEquals(['class' => [$second]], $fixture->transformations());
+    Assert::equals(['class' => [$second]], $fixture->transformations());
   }
 
   #[@test]
@@ -51,7 +52,7 @@ class EmitterTest extends TestCase {
     $fixture= $this->newEmitter();
     $transformation= $fixture->transform('class', $function);
     $fixture->remove($transformation);
-    $this->assertEquals([], $fixture->transformations());
+    Assert::equals([], $fixture->transformations());
   }
 
   #[@test, @expect(IllegalStateException::class)]

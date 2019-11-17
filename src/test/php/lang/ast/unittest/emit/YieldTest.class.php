@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
 /** @see http://php.net/manual/en/language.generators.syntax.php */
 class YieldTest extends EmittingTest {
 
@@ -11,7 +12,7 @@ class YieldTest extends EmittingTest {
         yield;
       }
     }');
-    $this->assertEquals([null, null], iterator_to_array($r));
+    Assert::equals([null, null], iterator_to_array($r));
   }
 
   #[@test]
@@ -23,7 +24,7 @@ class YieldTest extends EmittingTest {
         yield 3;
       }
     }');
-    $this->assertEquals([1, 2, 3], iterator_to_array($r));
+    Assert::equals([1, 2, 3], iterator_to_array($r));
   }
 
   #[@test]
@@ -34,7 +35,7 @@ class YieldTest extends EmittingTest {
         yield "price" => 12.99;
       }
     }');
-    $this->assertEquals(['color' => 'orange', 'price' => 12.99], iterator_to_array($r));
+    Assert::equals(['color' => 'orange', 'price' => 12.99], iterator_to_array($r));
   }
 
   #[@test]
@@ -44,7 +45,7 @@ class YieldTest extends EmittingTest {
         yield from [1, 2, 3];
       }
     }');
-    $this->assertEquals([1, 2, 3], iterator_to_array($r));
+    Assert::equals([1, 2, 3], iterator_to_array($r));
   }
 
   #[@test]
@@ -60,7 +61,7 @@ class YieldTest extends EmittingTest {
         yield from $this->values();
       }
     }');
-    $this->assertEquals([1, 2, 3], iterator_to_array($r));
+    Assert::equals([1, 2, 3], iterator_to_array($r));
   }
 
   #[@test]
@@ -72,6 +73,6 @@ class YieldTest extends EmittingTest {
         yield 4;
       }
     }');
-    $this->assertEquals([1, 2, 3, 4], iterator_to_array($r, false));
+    Assert::equals([1, 2, 3, 4], iterator_to_array($r, false));
   }
 }

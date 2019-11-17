@@ -1,8 +1,9 @@
 <?php namespace lang\ast\unittest;
 
 use lang\ast\Scope;
+use unittest\Assert;
 
-class ScopeTest extends \unittest\TestCase {
+class ScopeTest {
 
   #[@test]
   public function can_create() {
@@ -14,14 +15,14 @@ class ScopeTest extends \unittest\TestCase {
     $s= new Scope();
     $s->package('test');
 
-    $this->assertEquals('\\test', $s->package);
+    Assert::equals('\\test', $s->package);
   }
 
   #[@test]
   public function resolve_in_global_scope() {
     $s= new Scope();
 
-    $this->assertEquals('\\Parse', $s->resolve('Parse'));
+    Assert::equals('\\Parse', $s->resolve('Parse'));
   }
 
   #[@test]
@@ -29,7 +30,7 @@ class ScopeTest extends \unittest\TestCase {
     $s= new Scope();
     $s->package('test');
 
-    $this->assertEquals('\\test\\Parse', $s->resolve('Parse'));
+    Assert::equals('\\test\\Parse', $s->resolve('Parse'));
   }
 
   #[@test]
@@ -37,7 +38,7 @@ class ScopeTest extends \unittest\TestCase {
     $s= new Scope();
     $s->package('test');
 
-    $this->assertEquals('\\test\\ast\\Parse', $s->resolve('ast\\Parse'));
+    Assert::equals('\\test\\ast\\Parse', $s->resolve('ast\\Parse'));
   }
 
   #[@test]
@@ -46,7 +47,7 @@ class ScopeTest extends \unittest\TestCase {
     $s->package('test');
     $s->import('lang\\ast\\Parse');
 
-    $this->assertEquals('\\lang\\ast\\Parse', $s->resolve('Parse'));
+    Assert::equals('\\lang\\ast\\Parse', $s->resolve('Parse'));
   }
 
   #[@test]
@@ -54,7 +55,7 @@ class ScopeTest extends \unittest\TestCase {
     $s= new Scope();
     $s->import('lang\\ast\\Parse');
 
-    $this->assertEquals('\\lang\\ast\\Parse', $s->resolve('Parse'));
+    Assert::equals('\\lang\\ast\\Parse', $s->resolve('Parse'));
   }
 
   #[@test]
@@ -62,7 +63,7 @@ class ScopeTest extends \unittest\TestCase {
     $s= new Scope();
     $s->package('test');
 
-    $this->assertEquals('\\test\\Parse', (new Scope($s))->resolve('Parse'));
+    Assert::equals('\\test\\Parse', (new Scope($s))->resolve('Parse'));
   }
 
   #[@test]
@@ -70,6 +71,6 @@ class ScopeTest extends \unittest\TestCase {
     $s= new Scope();
     $s->import('lang\\ast\\Parse');
 
-    $this->assertEquals('\\lang\\ast\\Parse', (new Scope($s))->resolve('Parse'));
+    Assert::equals('\\lang\\ast\\Parse', (new Scope($s))->resolve('Parse'));
   }
 }

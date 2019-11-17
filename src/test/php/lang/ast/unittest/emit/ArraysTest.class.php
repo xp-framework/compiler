@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class ArraysTest extends EmittingTest {
 
   #[@test]
@@ -10,7 +12,7 @@ class ArraysTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals([1, 2, 3], $r);
+    Assert::equals([1, 2, 3], $r);
   }
 
   #[@test]
@@ -21,7 +23,7 @@ class ArraysTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(['a' => 1, 'b' => 2], $r);
+    Assert::equals(['a' => 1, 'b' => 2], $r);
   }
 
   #[@test]
@@ -34,7 +36,7 @@ class ArraysTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals([1, 2, 3], $r);
+    Assert::equals([1, 2, 3], $r);
   }
 
   #[@test]
@@ -46,7 +48,7 @@ class ArraysTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals([1, 2], $r);
+    Assert::equals([1, 2], $r);
   }
 
   #[@test]
@@ -58,7 +60,7 @@ class ArraysTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(['key' => 'value'], $r);
+    Assert::equals(['key' => 'value'], $r);
   }
 
   #[@test]
@@ -70,6 +72,6 @@ class ArraysTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(['key' => 'value'], $r);
+    Assert::equals(['key' => 'value'], $r);
   }
 }

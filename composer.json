@@ -12,7 +12,7 @@
     "php" : ">=5.6.0"
   },
   "require-dev" : {
-    "xp-framework/unittest": "^9.3"
+    "xp-framework/unittest": "^10.1"
   },
   "bin": ["bin/xp.xp-framework.compiler.compile", "bin/xp.xp-framework.compiler.ast"],
   "autoload" : {

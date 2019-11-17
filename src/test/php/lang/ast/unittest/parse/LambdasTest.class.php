@@ -8,11 +8,13 @@ use lang\ast\nodes\Parameter;
 use lang\ast\nodes\ReturnStatement;
 use lang\ast\nodes\Signature;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 class LambdasTest extends ParseTest {
   private $expression;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->expression= new BinaryExpression(new Variable('a', self::LINE), '+', new Literal('1', self::LINE), self::LINE);
   }

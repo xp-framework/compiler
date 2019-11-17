@@ -11,40 +11,35 @@ use lang\ast\Parse;
 use lang\ast\Result;
 use lang\ast\Tokens;
 use text\StringTokenizer;
+use unittest\Assert;
 use unittest\TestCase;
 use util\cmd\Console;
 
-abstract class EmittingTest extends TestCase {
-  private static $cl, $language, $emitter;
+abstract class EmittingTest {
   private static $id= 0;
-  private $output;
+  private $cl, $language, $emitter, $output;
   private $transformations= [];
-
-  #[@beforeClass]
-  public static function setupCompiler() {
-    self::$cl= DynamicClassLoader::instanceFor(self::class);
-    self::$language= Language::named('PHP');
-    self::$emitter= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
-    foreach (self::$language->extensions() as $extension) {
-      $extension->setup(self::$language, self::$emitter);
-    }
-  }
 
   /**
    * Constructor
    *
-   * @param  string $name
    * @param  ?string $output E.g. `ast,code` to dump both AST and emitted code
    */
-  public function __construct($name, $output= null) {
-    parent::__construct($name);
+  public function __construct($output= null) {
     $this->output= $output ? array_flip(explode(',', $output)) : [];
+    $this->cl= DynamicClassLoader::instanceFor(self::class);
+    $this->language= Language::named('PHP');
+    $this->emitter= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    foreach ($this->language->extensions() as $extension) {
+      $extension->setup($this->language, $this->emitter);
+    }
   }
 
   /** @return void */
+  #[@after]
   public function tearDown() {
     foreach ($this->transformations as $transformation) {
-      self::$emitter->remove($transformation);
+      $this->emitter->remove($transformation);
     }
   }
 
@@ -56,7 +51,7 @@ abstract class EmittingTest extends TestCase {
    * @return void
    */
   protected function transform($type, $function) {
-    $this->transformations[]= self::$emitter->transform($type, $function);
+    $this->transformations[]= $this->emitter->transform($type, $function);
   }
 
   /**
@@ -69,23 +64,23 @@ abstract class EmittingTest extends TestCase {
     $name= 'T'.(self::$id++);
     $out= new MemoryOutputStream();
 
-    $parse= new Parse(self::$language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), $this->getName());
+    $parse= new Parse($this->language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), static::class);
     $ast= iterator_to_array($parse->execute());
     if (isset($this->output['ast'])) {
       Console::writeLine();
-      Console::writeLine('=== ', $this->name, ' ===');
+      Console::writeLine('=== ', static::class, ' ===');
       Console::writeLine($ast);
     }
 
-    self::$emitter->emitAll(new Result(new StringWriter($out)), $ast);
+    $this->emitter->emitAll(new Result(new StringWriter($out)), $ast);
     if (isset($this->output['code'])) {
       Console::writeLine();
-      Console::writeLine('=== ', $this->name, ' ===');
+      Console::writeLine('=== ', static::class, ' ===');
       Console::writeLine($out->getBytes());
     }
 
-    self::$cl->setClassBytes($name, $out->getBytes());
-    return self::$cl->loadClass($name);
+    $this->cl->setClassBytes($name, $out->getBytes());
+    return $this->cl->loadClass($name);
   }
 
   /**

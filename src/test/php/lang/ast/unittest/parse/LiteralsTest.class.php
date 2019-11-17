@@ -2,6 +2,7 @@
 
 use lang\ast\nodes\ArrayLiteral;
 use lang\ast\nodes\Literal;
+use unittest\Assert;
 
 class LiteralsTest extends ParseTest {
 

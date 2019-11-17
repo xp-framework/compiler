@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
 use unittest\actions\RuntimeVersion;
 
 class NullCoalesceTest extends EmittingTest {
@@ -12,7 +13,7 @@ class NullCoalesceTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -23,7 +24,7 @@ class NullCoalesceTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -35,6 +36,6 @@ class NullCoalesceTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(['key' => true], $r);
+    Assert::equals(['key' => true], $r);
   }
 }

@@ -2,13 +2,14 @@
 
 use lang\XPClass;
 use lang\reflect\Modifiers;
+use unittest\Assert;
 
 class TypeDeclarationTest extends EmittingTest {
 
   #[@test, @values(['class', 'interface', 'trait'])]
   public function empty_type($kind) {
     $t= $this->type($kind.' <T> { }');
-    $this->assertEquals(
+    Assert::equals(
       ['const' => [], 'fields' => [], 'methods' => []],
       ['const' => $t->getConstants(), 'fields' => $t->getFields(), 'methods' => $t->getMethods()]
     );
@@ -16,22 +17,22 @@ class TypeDeclarationTest extends EmittingTest {
 
   #[@test]
   public function abstract_class_type() {
-    $this->assertTrue(Modifiers::isAbstract($this->type('abstract class <T> { }')->getModifiers()));
+    Assert::true(Modifiers::isAbstract($this->type('abstract class <T> { }')->getModifiers()));
   }
 
   #[@test]
   public function final_class_type() {
-    $this->assertTrue(Modifiers::isFinal($this->type('final class <T> { }')->getModifiers()));
+    Assert::true(Modifiers::isFinal($this->type('final class <T> { }')->getModifiers()));
   }
 
   #[@test]
   public function class_without_parent() {
-    $this->assertNull($this->type('class <T> { }')->getParentclass());
+    Assert::null($this->type('class <T> { }')->getParentclass());
   }
 
   #[@test]
   public function class_with_parent() {
-    $this->assertEquals(
+    Assert::equals(
       new XPClass(EmittingTest::class),
       $this->type('class <T> extends \\lang\\ast\\unittest\\emit\\EmittingTest { }')->getParentclass()
     );
@@ -39,18 +40,18 @@ class TypeDeclarationTest extends EmittingTest {
 
   #[@test]
   public function trait_type() {
-    $this->assertTrue($this->type('trait <T> { }')->isTrait());
+    Assert::true($this->type('trait <T> { }')->isTrait());
   }
 
   #[@test]
   public function interface_type() {
-    $this->assertTrue($this->type('interface <T> { }')->isInterface());
+    Assert::true($this->type('interface <T> { }')->isInterface());
   }
 
   #[@test, @values(['public', 'private', 'protected'])]
   public function constant($modifiers) {
     $c= $this->type('class <T> { '.$modifiers.' const test = 1; }')->getConstant('test');
-    $this->assertEquals(1, $c);
+    Assert::equals(1, $c);
   }
 
   #[@test, @values([
@@ -60,7 +61,7 @@ class TypeDeclarationTest extends EmittingTest {
   public function field($modifiers) {
     $f= $this->type('class <T> { '.$modifiers.' $test; }')->getField('test');
     $n= implode(' ', Modifiers::namesOf($f->getModifiers()));
-    $this->assertEquals(
+    Assert::equals(
       ['name' => 'test', 'type' => 'var', 'modifiers' => $modifiers],
       ['name' => $f->getName(), 'type' => $f->getTypeName(), 'modifiers' => $n]
     );
@@ -74,7 +75,7 @@ class TypeDeclarationTest extends EmittingTest {
   public function method($modifiers) {
     $m= $this->type('class <T> { '.$modifiers.' function test() { } }')->getMethod('test');
     $n= implode(' ', Modifiers::namesOf($m->getModifiers()));
-    $this->assertEquals(
+    Assert::equals(
       ['name' => 'test', 'type' => 'var', 'modifiers' => $modifiers],
       ['name' => $m->getName(), 'type' => $m->getReturnTypeName(), 'modifiers' => $n]
     );
@@ -83,7 +84,7 @@ class TypeDeclarationTest extends EmittingTest {
   #[@test]
   public function abstract_method() {
     $m= $this->type('abstract class <T> { abstract function test(); }')->getMethod('test');
-    $this->assertTrue(Modifiers::isAbstract($m->getModifiers()));
+    Assert::true(Modifiers::isAbstract($m->getModifiers()));
   }
 
   #[@test]
@@ -105,6 +106,6 @@ class TypeDeclarationTest extends EmittingTest {
         return self::new($values)->forEach(function($a) { return $a * 2; });
       }
     }');
-    $this->assertEquals([2, 4, 6], $t->getMethod('run')->invoke(null, [[1, 2, 3]]));
+    Assert::equals([2, 4, 6], $t->getMethod('run')->invoke(null, [[1, 2, 3]]));
   }
 }

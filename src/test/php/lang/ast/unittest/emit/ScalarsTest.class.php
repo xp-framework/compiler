@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class ScalarsTest extends EmittingTest {
 
   #[@test, @values([
@@ -12,7 +14,7 @@ class ScalarsTest extends EmittingTest {
   #  ['-1.5', -1.5],
   #])]
   public function numbers($literal, $result) {
-    $this->assertEquals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
   }
 
   #[@test, @values([
@@ -23,7 +25,7 @@ class ScalarsTest extends EmittingTest {
   #  ['0137_041', 48673],
   #])]
   public function numeric_literal_separator($literal, $result) {
-    $this->assertEquals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
   }
 
   #[@test, @values([
@@ -31,7 +33,7 @@ class ScalarsTest extends EmittingTest {
   #  ['"Test"', 'Test'],
   #])]
   public function strings($literal, $result) {
-    $this->assertEquals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
   }
 
   #[@test, @values([
@@ -40,6 +42,6 @@ class ScalarsTest extends EmittingTest {
   #  ['null', null],
   #])]
   public function constants($literal, $result) {
-    $this->assertEquals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
   }
 }

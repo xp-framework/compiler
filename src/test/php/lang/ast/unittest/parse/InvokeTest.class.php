@@ -4,6 +4,7 @@ use lang\ast\nodes\InstanceExpression;
 use lang\ast\nodes\InvokeExpression;
 use lang\ast\nodes\Literal;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 /**
  * Invocation expressions

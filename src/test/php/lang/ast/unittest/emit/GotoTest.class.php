@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class GotoTest extends EmittingTest {
 
   #[@test]
@@ -12,7 +14,7 @@ class GotoTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -28,6 +30,6 @@ class GotoTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 }

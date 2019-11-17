@@ -3,6 +3,7 @@
 use lang\ast\nodes\Block;
 use lang\ast\nodes\InvokeExpression;
 use lang\ast\nodes\Literal;
+use unittest\Assert;
 
 class BlocksTest extends ParseTest {
 

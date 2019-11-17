@@ -6,11 +6,13 @@ use lang\ast\nodes\InvokeExpression;
 use lang\ast\nodes\Literal;
 use lang\ast\nodes\SwitchStatement;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 class ConditionalTest extends ParseTest {
   private $blocks;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->blocks= [
       1 => [new InvokeExpression(new Literal('action1', self::LINE), [], self::LINE)],

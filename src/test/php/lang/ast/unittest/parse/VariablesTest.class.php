@@ -4,6 +4,7 @@ use lang\ast\nodes\Literal;
 use lang\ast\nodes\OffsetExpression;
 use lang\ast\nodes\StaticLocals;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 class VariablesTest extends ParseTest {
 

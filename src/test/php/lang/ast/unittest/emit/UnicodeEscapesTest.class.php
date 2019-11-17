@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class UnicodeEscapesTest extends EmittingTest {
 
   #[@test]
@@ -10,7 +12,7 @@ class UnicodeEscapesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('mañana', $r);
+    Assert::equals('mañana', $r);
   }
 
   #[@test]
@@ -21,6 +23,6 @@ class UnicodeEscapesTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Smile! 😂', $r);
+    Assert::equals('Smile! 😂', $r);
   }
 }

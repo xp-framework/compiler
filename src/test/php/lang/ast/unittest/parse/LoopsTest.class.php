@@ -14,11 +14,13 @@ use lang\ast\nodes\Literal;
 use lang\ast\nodes\UnaryExpression;
 use lang\ast\nodes\Variable;
 use lang\ast\nodes\WhileLoop;
+use unittest\Assert;
 
 class LoopsTest extends ParseTest {
   private $loop;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->loop= new InvokeExpression(new Literal('loop', self::LINE), [], self::LINE);
   }

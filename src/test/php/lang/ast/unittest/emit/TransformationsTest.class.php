@@ -4,11 +4,12 @@ use lang\ast\Code;
 use lang\ast\Type;
 use lang\ast\nodes\Method;
 use lang\ast\nodes\Signature;
+use unittest\Assert;
 
 class TransformationsTest extends EmittingTest {
 
-  /** @return void */
-  public function setUp() {
+  #[@before]
+  public function transformations() {
     $this->transform('class', function($codegen, $class) {
       if ($class->annotation('repr')) {
         $class->inject(new Method(
@@ -44,7 +45,7 @@ class TransformationsTest extends EmittingTest {
         $this->id= $id;
       }
     }');
-    $this->assertFalse($t->hasMethod('id'));
+    Assert::false($t->hasMethod('id'));
   }
 
   #[@test]
@@ -56,8 +57,8 @@ class TransformationsTest extends EmittingTest {
         $this->id= $id;
       }
     }');
-    $this->assertTrue($t->hasMethod('toString'));
-    $this->assertEquals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
+    Assert::true($t->hasMethod('toString'));
+    Assert::equals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
   }
 
   #[@test, @values([['id', 1], ['name', 'Test']])]
@@ -71,8 +72,8 @@ class TransformationsTest extends EmittingTest {
         $this->name= $name;
       }
     }');
-    $this->assertTrue($t->hasMethod($name));
-    $this->assertEquals($expected, $t->getMethod($name)->invoke($t->newInstance(1, 'Test')));
+    Assert::true($t->hasMethod($name));
+    Assert::equals($expected, $t->getMethod($name)->invoke($t->newInstance(1, 'Test')));
   }
 
   #[@test]
@@ -84,7 +85,7 @@ class TransformationsTest extends EmittingTest {
         $this->id= $id;
       }
     }');
-    $this->assertEquals(1, $t->getMethod('id')->invoke($t->newInstance(1)));
-    $this->assertEquals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
+    Assert::equals(1, $t->getMethod('id')->invoke($t->newInstance(1)));
+    Assert::equals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
   }
 }

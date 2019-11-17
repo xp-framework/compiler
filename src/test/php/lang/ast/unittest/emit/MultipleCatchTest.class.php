@@ -2,6 +2,7 @@
 
 use lang\IllegalArgumentException;
 use lang\IllegalStateException;
+use unittest\Assert;
 
 /**
  * Multiple catch
@@ -25,6 +26,6 @@ class MultipleCatchTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('caught '.$type, $t->newInstance()->run($type));
+    Assert::equals('caught '.$type, $t->newInstance()->run($type));
   }
 }

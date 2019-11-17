@@ -15,6 +15,7 @@ use lang\ast\nodes\ScopeExpression;
 use lang\ast\nodes\TernaryExpression;
 use lang\ast\nodes\UnaryExpression;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 class OperatorTest extends ParseTest {
 

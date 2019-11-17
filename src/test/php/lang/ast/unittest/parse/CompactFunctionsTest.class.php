@@ -5,11 +5,13 @@ use lang\ast\nodes\Literal;
 use lang\ast\nodes\Method;
 use lang\ast\nodes\ReturnStatement;
 use lang\ast\nodes\Signature;
+use unittest\Assert;
 
 class CompactFunctionsTest extends ParseTest {
   private $return;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->return= new ReturnStatement(new Literal('null', self::LINE), self::LINE);
   }

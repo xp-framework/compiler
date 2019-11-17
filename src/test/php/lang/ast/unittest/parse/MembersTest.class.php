@@ -11,6 +11,7 @@ use lang\ast\nodes\Property;
 use lang\ast\nodes\ScopeExpression;
 use lang\ast\nodes\Signature;
 use lang\ast\nodes\Variable;
+use unittest\Assert;
 
 class MembersTest extends ParseTest {
 

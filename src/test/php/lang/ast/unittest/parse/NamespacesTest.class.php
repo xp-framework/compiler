@@ -2,6 +2,7 @@
 
 use lang\ast\nodes\NamespaceDeclaration;
 use lang\ast\nodes\UseStatement;
+use unittest\Assert;
 
 class NamespacesTest extends ParseTest {
 

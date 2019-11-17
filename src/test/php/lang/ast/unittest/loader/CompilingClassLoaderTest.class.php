@@ -7,9 +7,10 @@ use lang\ClassFormatException;
 use lang\ClassLoader;
 use lang\Environment;
 use lang\ast\CompilingClassLoader;
+use unittest\Assert;
 use unittest\TestCase;
 
-class CompilingClassLoaderTest extends TestCase {
+class CompilingClassLoaderTest {
   private static $runtime;
 
   static function __static() {
@@ -47,7 +48,7 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test]
   public function load_class() {
-    $this->assertEquals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
+    Assert::equals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
   }
 
   #[@test, @expect(
@@ -67,7 +68,7 @@ class CompilingClassLoaderTest extends TestCase {
     }');
 
     $t->newInstance()->trigger();
-    $this->assertNotEquals(false, strpos(
+    Assert::notEquals(false, strpos(
       preg_replace('#^.+://#', '', key(\xp::$errors)),
       strtr($t->getName(), '.', DIRECTORY_SEPARATOR).'.php'
     ));

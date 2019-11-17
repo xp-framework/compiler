@@ -2,6 +2,7 @@
 
 use lang\FunctionType;
 use lang\Primitive;
+use unittest\Assert;
 
 /**
  * Function types
@@ -17,7 +18,7 @@ class FunctionTypesTest extends EmittingTest {
       private (function(): string) $test;
     }');
 
-    $this->assertEquals(
+    Assert::equals(
       new FunctionType([], Primitive::$STRING),
       $t->getField('test')->getType()
     );
@@ -29,7 +30,7 @@ class FunctionTypesTest extends EmittingTest {
       private (function(int, string): string) $test;
     }');
 
-    $this->assertEquals(
+    Assert::equals(
       new FunctionType([Primitive::$INT, Primitive::$STRING], Primitive::$STRING),
       $t->getField('test')->getType()
     );
