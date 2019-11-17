@@ -1,6 +1,5 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\FormatException;
 use lang\IllegalArgumentException;
 
 /**
