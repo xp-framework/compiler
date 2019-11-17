@@ -1007,7 +1007,7 @@ class PHP extends Language {
   }
 
   private function meta($parse, $context) {
-    $annotations= [DETAIL_ANNOTATIONS => [], DETAIL_TARGET_ANNO => []];
+    $meta= [DETAIL_ANNOTATIONS => [], DETAIL_TARGET_ANNO => []];
     do {
       $parse->expecting('@', $context);
 
@@ -1015,9 +1015,9 @@ class PHP extends Language {
         $param= $parse->token->value;
         $parse->forward();
         $parse->expecting(':', $context);
-        $a= &$annotations[DETAIL_TARGET_ANNO][$param];
+        $a= &$meta[DETAIL_TARGET_ANNO][$param];
       } else {
-        $a= &$annotations[DETAIL_ANNOTATIONS];
+        $a= &$meta[DETAIL_ANNOTATIONS];
       }
 
       $name= $parse->token->value;
@@ -1042,7 +1042,7 @@ class PHP extends Language {
     } while (null !== $parse->token->value);
 
     $parse->expecting(']', $context);
-    return $annotations;
+    return $meta;
   }
 
   private function parameters($parse) {
