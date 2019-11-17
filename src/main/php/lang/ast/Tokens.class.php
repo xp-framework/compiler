@@ -100,7 +100,10 @@ class Tokens implements \IteratorAggregate {
           }
           $this->source->pushBack($next);
         } else if ('#' === $token) {
-          $this->source->nextToken("\r\n");
+          $next= $this->source->nextToken("\r\n");
+          if (0 === strncmp($next, '[@', 2)) {
+            throw new FormatException('XP style annotations are not supported at line '.$line);
+          }
           continue;
         }
 

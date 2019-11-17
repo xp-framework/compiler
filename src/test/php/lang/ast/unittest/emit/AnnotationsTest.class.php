@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\FormatException;
 use lang\IllegalArgumentException;
 
 /**
@@ -95,5 +96,13 @@ class AnnotationsTest extends EmittingTest {
   public function multiple_member_annotations() {
     $t= $this->type('class <T> { <<test, values([1, 2, 3])>> public function fixture() { } }');
     $this->assertEquals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
+  }
+
+  #[@test, @expect(class= FormatException::class, withMessage= 'XP style annotations are not supported at line 2')]
+  public function xpstyle_annotations_are_not_supported() {
+    $this->type('
+      #[@test]
+      class <T> { }'
+    );
   }
 }
