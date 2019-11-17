@@ -55,14 +55,12 @@ class Tokens implements \IteratorAggregate {
             throw new FormatException('Unclosed string literal starting at line '.$line);
           } else if ('\\' === $t) {
             $string.= $t.$this->source->nextToken($end);
-          } else if ($token === $t) {
-            break;
           } else {
             $string.= $t;
           }
-        } while (true);
+        } while ($token !== $t);
 
-        yield 'string' => [$string.$token, $line];
+        yield 'string' => [$string, $line];
         $line+= substr_count($string, "\n");
       } else if (0 === strcspn($token, " \r\n\t")) {
         $line+= substr_count($token, "\n");
