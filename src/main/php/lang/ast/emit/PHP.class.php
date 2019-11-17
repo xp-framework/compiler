@@ -377,7 +377,7 @@ abstract class PHP extends Emitter {
   protected function emitProperty($result, $property) {
     $result->meta[0][self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
-      DETAIL_ANNOTATIONS => $property->annotations ? $property->annotations : [],
+      DETAIL_ANNOTATIONS => isset($property->annotations[DETAIL_ANNOTATIONS]) ? $property->annotations[DETAIL_ANNOTATIONS] : [],
       DETAIL_COMMENT     => $property->comment,
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
@@ -396,9 +396,9 @@ abstract class PHP extends Emitter {
     $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
-      DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
+      DETAIL_ANNOTATIONS => isset($method->annotations[DETAIL_ANNOTATIONS]) ? $method->annotations[DETAIL_ANNOTATIONS] : [],
       DETAIL_COMMENT     => $method->comment,
-      DETAIL_TARGET_ANNO => [],
+      DETAIL_TARGET_ANNO => isset($method->annotations[DETAIL_TARGET_ANNO]) ? $method->annotations[DETAIL_TARGET_ANNO] : [],
       DETAIL_ARGUMENTS   => []
     ];
 
@@ -415,7 +415,9 @@ abstract class PHP extends Emitter {
           DETAIL_ARGUMENTS   => []
         ];
       }
-      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
+      foreach ($param->annotations as $name => $value) {
+        $meta[DETAIL_TARGET_ANNO][$param->name][$name]= $value;
+      }
       $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
     }
     $result->out->write($declare);

@@ -106,7 +106,10 @@ class MembersTest extends ParseTest {
 
   #[@test]
   public function method_with_annotation() {
-    $annotations= ['test' => null];
+    $annotations= [
+      DETAIL_ANNOTATIONS => ['test' => null],
+      DETAIL_TARGET_ANNO => []
+    ];
     $body= [
       'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
     ];
@@ -118,7 +121,10 @@ class MembersTest extends ParseTest {
 
   #[@test]
   public function method_with_annotations() {
-    $annotations= ['test' => null, 'ignore' => new Literal('"Not implemented"', self::LINE)];
+    $annotations= [
+      DETAIL_ANNOTATIONS => ['test' => null, 'ignore' => new Literal('"Not implemented"', self::LINE)],
+      DETAIL_TARGET_ANNO => []
+    ];
     $body= [
       'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
     ];

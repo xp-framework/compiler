@@ -699,7 +699,7 @@ class PHP extends Language {
     });
 
     $this->stmt('#[', function($parse, $token) {
-      $parse->scope->annotations= $this->meta($parse, 'annotations');
+      $parse->scope->annotations= $this->meta($parse, 'annotations')[DETAIL_ANNOTATIONS];
 
       return new Annotations($parse->scope->annotations, $token->line);
     });
@@ -1007,18 +1007,28 @@ class PHP extends Language {
   }
 
   private function meta($parse, $context) {
-    $annotations= [];
+    $annotations= [DETAIL_ANNOTATIONS => [], DETAIL_TARGET_ANNO => []];
     do {
       $parse->expecting('@', $context);
+
+      if ('variable' === $parse->token->kind) {
+        $param= $parse->token->value;
+        $parse->forward();
+        $parse->expecting(':', $context);
+        $a= &$annotations[DETAIL_TARGET_ANNO][$param];
+      } else {
+        $a= &$annotations[DETAIL_ANNOTATIONS];
+      }
+
       $name= $parse->token->value;
       $parse->forward();
 
       if ('(' === $parse->token->value) {
         $parse->expecting('(', $context);
-        $annotations[$name]= $this->expression($parse, 0);
+        $a[$name]= $this->expression($parse, 0);
         $parse->expecting(')', $context);
       } else {
-        $annotations[$name]= null;
+        $a[$name]= null;
       }
 
       if (',' === $parse->token->value) {
@@ -1110,7 +1120,7 @@ class PHP extends Language {
 
     $body= [];
     $modifiers= [];
-    $annotations= [];
+    $meta= [];
     while ('}' !== $parse->token->value) {
       if (isset($modifier[$parse->token->value])) {
         $modifiers[]= $parse->token->value;
@@ -1119,18 +1129,19 @@ class PHP extends Language {
         ? ($f= $this->body[$k])
         : (isset($this->body[$k= '@'.$parse->token->kind]) ? ($f= $this->body[$k]) : null)
       ) {
-        $f($parse, $body, $annotations, $modifiers);
+        $f($parse, $body, $meta, $modifiers);
         $modifiers= [];
-        $annotations= [];
+        $meta= [];
       } else if ('<<' === $parse->token->value) {
         $parse->forward();
-        $annotations= $this->annotations($parse, 'member annotations');
+        $meta= [DETAIL_ANNOTATIONS => $this->annotations($parse, 'member annotations'), DETAIL_TARGET_ANNO => []];
       } else if ('#[' === $parse->token->value) {
         $parse->forward();
-        $annotations= $this->meta($parse, 'member annotations');
+        $meta= $this->meta($parse, 'member annotations');
       } else if ($type= $this->type($parse)) {
-        $this->properties($parse, $body, $annotations, $modifiers, $type);
+        $this->properties($parse, $body, $meta, $modifiers, $type);
         $modifiers= [];
+        $meta= [];
       } else {
         $parse->raise(sprintf(
           'Expected a type, modifier, property, annotation, method or "}", have "%s"',

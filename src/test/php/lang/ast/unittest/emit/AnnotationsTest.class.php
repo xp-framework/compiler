@@ -149,4 +149,17 @@ class AnnotationsTest extends EmittingTest {
     $this->assertEquals(['test' => null, 'expect' => IllegalArgumentException::class], $t->getMethod('fails')->getAnnotations());
     $this->assertEquals(['test' => null, 'values' => [[1, 2, 3]]], $t->getMethod('cases')->getAnnotations());
   }
+
+  #[@test]
+  public function xp_param_annotation() {
+    $t= $this->type('
+      class <T> {
+
+        #[@test, @$arg: inject("conn")]
+        public function fixture($arg) { }
+      }'
+    );
+    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getAnnotations());
+    $this->assertEquals(['inject' => 'conn'], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
+  }
 }
