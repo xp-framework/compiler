@@ -98,9 +98,20 @@ class Tokens implements \IteratorAggregate {
           }
           $this->source->pushBack($next);
         } else if ('#' === $token) {
-          $next= $this->source->nextToken("\r\n");
-          if (0 === strncmp($next, '[@', 2)) {
-            throw new FormatException('XP style annotations are not supported at line '.$line);
+          $comment= $this->source->nextToken("\r\n").$this->source->nextToken("\r\n");
+          $next= '#';
+          do {
+            $s= strspn($next, ' ');
+            if ('#' !== $next[$s]) break;
+            $line++;
+            $comment.= substr($next, $s + 1);
+            $next= $this->source->nextToken("\r\n").$this->source->nextToken("\r\n");
+          } while ($this->source->hasMoreTokens());
+          if (0 === strncmp($comment, '[@', 2)) {
+            $this->source->pushBack(substr($comment, 1).$next);
+            yield 'operator' => ['#[', $line];
+          } else {
+            $this->source->pushBack($next);
           }
           continue;
         }

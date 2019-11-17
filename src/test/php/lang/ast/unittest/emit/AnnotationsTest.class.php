@@ -98,11 +98,55 @@ class AnnotationsTest extends EmittingTest {
     $this->assertEquals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
   }
 
-  #[@test, @expect(class= FormatException::class, withMessage= 'XP style annotations are not supported at line 2')]
-  public function xpstyle_annotations_are_not_supported() {
-    $this->type('
+  #[@test]
+  public function xp_type_annotation() {
+    $t= $this->type('
       #[@test]
       class <T> { }'
     );
+    $this->assertEquals(['test' => null], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function xp_type_annotations() {
+    $t= $this->type('
+      #[@resource("/"), @authenticated]
+      class <T> { }'
+    );
+    $this->assertEquals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function xp_type_multiline() {
+    $t= $this->type('
+      #[@verify(function($arg) {
+      #  return $arg;
+      #})]
+      class <T> { }'
+    );
+    $f= $t->getAnnotation('verify');
+    $this->assertEquals('test', $f('test'));
+  }
+
+  #[@test]
+  public function xp_method_annotations() {
+    $t= $this->type('
+      class <T> {
+
+        #[@test]
+        public function succeeds() { }
+
+        #[@test, @expect(\lang\IllegalArgumentException::class)]
+        public function fails() { }
+
+        #[@test, @values([
+        #  [1, 2, 3],
+        #])]
+        public function cases() { }
+      }'
+    );
+    $this->assertEquals(['test' => null], $t->getMethod('succeeds')->getAnnotations());
+    $this->assertEquals(['test' => null, 'expect' => IllegalArgumentException::class], $t->getMethod('fails')->getAnnotations());
+    $this->assertEquals(['test' => null, 'values' => [[1, 2, 3]]], $t->getMethod('cases')->getAnnotations());
   }
 }
