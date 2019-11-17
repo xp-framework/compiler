@@ -99,6 +99,9 @@ class Tokens implements \IteratorAggregate {
             continue;
           }
           $this->source->pushBack($next);
+        } else if ('#' === $token) {
+          $this->source->nextToken("\r\n");
+          continue;
         }
 
         if (isset(self::$operators[$token])) {
