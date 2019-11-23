@@ -1037,7 +1037,38 @@ class PHP extends Language {
 
       if ('(' === $parse->token->value) {
         $parse->expecting('(', $context);
-        $a[$name]= $this->expression($parse, 0);
+
+        if ('name' === $parse->token->kind) {
+          $token= $parse->token;
+          $parse->forward();
+          $pairs= '=' === $parse->token->value;
+
+          $parse->queue[]= $parse->token;
+          $parse->token= $token;
+
+          if ($pairs) {
+            $line= $parse->token->line;
+            $values= [];
+            do {
+              $key= $parse->token->value;
+              $parse->forward();
+              $parse->expecting('=', $context);
+
+              $values[]= [new Literal("'".$key."'"), $this->expression($parse, 0)];
+
+              if (',' === $parse->token->value) {
+                $parse->forward();
+                continue;
+              }
+              break;
+            } while (null !== $parse->token->value); 
+            $a[$name]= new ArrayLiteral($values, $line);
+          } else {
+            $a[$name]= $this->expression($parse, 0);
+          }
+        } else {
+          $a[$name]= $this->expression($parse, 0);
+        }
         $parse->expecting(')', $context);
       } else {
         $a[$name]= null;

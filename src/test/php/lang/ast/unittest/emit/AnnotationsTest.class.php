@@ -107,6 +107,15 @@ class AnnotationsTest extends EmittingTest {
   }
 
   #[@test]
+  public function xp_type_annotation_with_named_pairs() {
+    $t= $this->type('
+      #[@resource(path= "/", authenticated= true)]
+      class <T> { }'
+    );
+    $this->assertEquals(['resource' => ['path' => '/', 'authenticated' => true]], $t->getAnnotations());
+  }
+
+  #[@test]
   public function xp_type_annotations() {
     $t= $this->type('
       #[@resource("/"), @authenticated]
