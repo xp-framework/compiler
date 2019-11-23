@@ -96,4 +96,80 @@ class AnnotationsTest extends EmittingTest {
     $t= $this->type('class <T> { <<test, values([1, 2, 3])>> public function fixture() { } }');
     $this->assertEquals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
   }
+
+  #[@test]
+  public function xp_type_annotation() {
+    $t= $this->type('
+      #[@test]
+      class <T> { }'
+    );
+    $this->assertEquals(['test' => null], $t->getAnnotations());
+  }
+
+  /** @deprecated */
+  #[@test]
+  public function xp_type_annotation_with_named_pairs() {
+    $t= $this->type('
+      #[@resource(path= "/", authenticated= true)]
+      class <T> { }'
+    );
+    $this->assertEquals(['resource' => ['path' => '/', 'authenticated' => true]], $t->getAnnotations());
+    \xp::gc();
+  }
+
+  #[@test]
+  public function xp_type_annotations() {
+    $t= $this->type('
+      #[@resource("/"), @authenticated]
+      class <T> { }'
+    );
+    $this->assertEquals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
+  }
+
+  #[@test]
+  public function xp_type_multiline() {
+    $t= $this->type('
+      #[@verify(function($arg) {
+      #  return $arg;
+      #})]
+      class <T> { }'
+    );
+    $f= $t->getAnnotation('verify');
+    $this->assertEquals('test', $f('test'));
+  }
+
+  #[@test]
+  public function xp_method_annotations() {
+    $t= $this->type('
+      class <T> {
+
+        #[@test]
+        public function succeeds() { }
+
+        #[@test, @expect(\lang\IllegalArgumentException::class)]
+        public function fails() { }
+
+        #[@test, @values([
+        #  [1, 2, 3],
+        #])]
+        public function cases() { }
+      }'
+    );
+    $this->assertEquals(['test' => null], $t->getMethod('succeeds')->getAnnotations());
+    $this->assertEquals(['test' => null, 'expect' => IllegalArgumentException::class], $t->getMethod('fails')->getAnnotations());
+    $this->assertEquals(['test' => null, 'values' => [[1, 2, 3]]], $t->getMethod('cases')->getAnnotations());
+  }
+
+  #[@test]
+  public function xp_param_annotation() {
+    $t= $this->type('
+      class <T> {
+
+        #[@test, @$arg: inject("conn")]
+        public function fixture($arg) { }
+      }'
+    );
+    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getAnnotations());
+    $this->assertEquals(['inject' => 'conn'], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
+  }
 }

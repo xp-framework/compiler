@@ -377,7 +377,7 @@ abstract class PHP extends Emitter {
   protected function emitProperty($result, $property) {
     $result->meta[0][self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
-      DETAIL_ANNOTATIONS => $property->annotations ? $property->annotations : [],
+      DETAIL_ANNOTATIONS => $property->annotations,
       DETAIL_COMMENT     => $property->comment,
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
@@ -396,7 +396,7 @@ abstract class PHP extends Emitter {
     $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
-      DETAIL_ANNOTATIONS => isset($method->annotations) ? $method->annotations : [],
+      DETAIL_ANNOTATIONS => $method->annotations,
       DETAIL_COMMENT     => $method->comment,
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []

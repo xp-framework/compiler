@@ -55,14 +55,12 @@ class Tokens implements \IteratorAggregate {
             throw new FormatException('Unclosed string literal starting at line '.$line);
           } else if ('\\' === $t) {
             $string.= $t.$this->source->nextToken($end);
-          } else if ($token === $t) {
-            break;
           } else {
             $string.= $t;
           }
-        } while (true);
+        } while ($token !== $t);
 
-        yield 'string' => [$string.$token, $line];
+        yield 'string' => [$string, $line];
         $line+= substr_count($string, "\n");
       } else if (0 === strcspn($token, " \r\n\t")) {
         $line+= substr_count($token, "\n");
@@ -99,6 +97,23 @@ class Tokens implements \IteratorAggregate {
             continue;
           }
           $this->source->pushBack($next);
+        } else if ('#' === $token) {
+          $comment= $this->source->nextToken("\r\n").$this->source->nextToken("\r\n");
+          $next= '#';
+          do {
+            $s= strspn($next, ' ');
+            if ('#' !== $next[$s]) break;
+            $line++;
+            $comment.= substr($next, $s + 1);
+            $next= $this->source->nextToken("\r\n").$this->source->nextToken("\r\n");
+          } while ($this->source->hasMoreTokens());
+          if (0 === strncmp($comment, '[@', 2)) {
+            $this->source->pushBack(substr($comment, 1).$next);
+            yield 'operator' => ['#[', $line];
+          } else {
+            $this->source->pushBack($next);
+          }
+          continue;
         }
 
         if (isset(self::$operators[$token])) {
