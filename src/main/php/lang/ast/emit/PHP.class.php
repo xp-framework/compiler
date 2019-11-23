@@ -528,7 +528,7 @@ abstract class PHP extends Emitter {
       } else {
         $result->out->write('default:');
       }
-      $this->emitOne($result, $case->body);
+      $this->emitAll($result, $case->body);
     }
     $result->out->write('}');
   }

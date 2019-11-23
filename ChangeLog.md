@@ -5,6 +5,7 @@ XP Compiler ChangeLog
 
 ## 4.3.0 / ????-??-??
 
+* Fixed emitting `switch` statements - @thekid
 * Fixed an operator precedence problem causing incorrect nesting in the
   parsed AST for unary prefix operators.
   (@thekid)
