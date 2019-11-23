@@ -129,7 +129,7 @@ class PHP extends Language {
       }
     });
 
-    $this->infix('->', 80, function($parse, $token, $left) {
+    $this->infix('->', 100, function($parse, $token, $left) {
       if ('{' === $parse->token->value) {
         $parse->forward();
         $expr= $this->expression($parse, 0);
@@ -142,7 +142,7 @@ class PHP extends Language {
       return new InstanceExpression($left, $expr, $token->line);
     });
 
-    $this->infix('::', 80, function($parse, $token, $left) {
+    $this->infix('::', 100, function($parse, $token, $left) {
       $scope= $parse->scope->resolve($left->expression);
 
       if ('variable' === $parse->token->kind) {
@@ -158,13 +158,13 @@ class PHP extends Language {
       return new ScopeExpression($scope, $expr, $token->line);
     });
 
-    $this->infix('(', 80, function($parse, $token, $left) {
+    $this->infix('(', 100, function($parse, $token, $left) {
       $arguments= $this->expressions($parse);
       $parse->expecting(')', 'invoke expression');
       return new InvokeExpression($left, $arguments, $token->line);
     });
 
-    $this->infix('[', 80, function($parse, $token, $left) {
+    $this->infix('[', 100, function($parse, $token, $left) {
       if (']' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -176,7 +176,7 @@ class PHP extends Language {
       return new OffsetExpression($left, $expr, $token->line);
     });
 
-    $this->infix('{', 80, function($parse, $token, $left) {
+    $this->infix('{', 100, function($parse, $token, $left) {
       $expr= $this->expression($parse, 0);
       $parse->expecting('}', 'offset');
       return new OffsetExpression($left, $expr, $token->line);
@@ -189,15 +189,15 @@ class PHP extends Language {
       return new TernaryExpression($left, $when, $else, $token->line);
     });
 
-    $this->prefix('@', 100);
-    $this->prefix('&', 100);
-    $this->prefix('!', 100);
-    $this->prefix('~', 100);
-    $this->prefix('+', 100);
-    $this->prefix('-', 100);
-    $this->prefix('++', 100);
-    $this->prefix('--', 100);
-    $this->prefix('clone', 100);
+    $this->prefix('@', 90);
+    $this->prefix('&', 90);
+    $this->prefix('!', 90);
+    $this->prefix('~', 90);
+    $this->prefix('+', 90);
+    $this->prefix('-', 90);
+    $this->prefix('++', 90);
+    $this->prefix('--', 90);
+    $this->prefix('clone', 90);
 
     $this->assignment('=');
     $this->assignment('&=');

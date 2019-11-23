@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 4.3.0 / ????-??-??
 
+* Fixed an operator precedence problem causing incorrect nesting in the
+  parsed AST for unary prefix operators.
+  (@thekid)
 * Merged PR #77: Add support for #-style comments including support for
   XP style annotations
   (@thekid)
