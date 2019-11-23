@@ -988,6 +988,7 @@ class PHP extends Language {
     $parse->expecting(';', 'field declaration');
   }
 
+  /** Parses Hacklang-style annotations (<<test>>) */
   private function annotations($parse, $context) {
     $annotations= [];
     do {
@@ -1016,6 +1017,7 @@ class PHP extends Language {
     return $annotations;
   }
 
+  /** Parses XP-style annotations (#[@test]) */
   private function meta($parse, $context) {
     $meta= [DETAIL_ANNOTATIONS => [], DETAIL_TARGET_ANNO => []];
     do {
