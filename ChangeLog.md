@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.3.0 / ????-??-??
+
+* Merged PR #77: Add support for #-style comments including support for
+  XP style annotations
+  (@thekid)
+
 ## 4.2.1 / 2019-10-05
 
 * Fixed parser to allow "extending" final and abstract types - @thekid
