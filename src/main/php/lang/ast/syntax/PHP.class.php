@@ -412,21 +412,30 @@ class PHP extends Language {
       return new GotoStatement($label, $token->line);
     });
 
-    $this->prefix('(name)', 0, function($parse, $token) {
-      if (':' === $parse->token->value) {
-        $parse->token= new Token($this->symbol(';'));
-        return new Label($token->value, $token->line);
-      } else {
-        return new Literal($token->value, $token->line);
-      }
-    });
-
     $this->prefix('(variable)', 0, function($parse, $token) {
       return new Variable($token->value, $token->line);
     });
 
     $this->prefix('(literal)', 0, function($parse, $token) {
       return new Literal($token->value, $token->line);
+    });
+
+    $this->prefix('(name)', 0, function($parse, $token) {
+      return new Literal($token->value, $token->line);
+    });
+
+    $this->stmt('(name)', function($parse, $token) {
+
+      // Solve ambiguity between goto-labels and other statements
+      if (':' === $parse->token->value) {
+        $node= new Label($token->value, $token->line);
+      } else {
+        $parse->queue[]= $parse->token;
+        $parse->token= $token;
+        $node= $this->expression($parse, 0);
+      }
+      $parse->forward();
+      return $node;
     });
 
     $this->stmt('<?', function($parse, $token) {
