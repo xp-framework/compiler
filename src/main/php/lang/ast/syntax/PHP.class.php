@@ -177,6 +177,7 @@ class PHP extends Language {
     });
 
     $this->infix('{', 80, function($parse, $token, $left) {
+      $parse->warn('Deprecated curly braces use as offset');
       $expr= $this->expression($parse, 0);
       $parse->expecting('}', 'offset');
       return new OffsetExpression($left, $expr, $token->line);

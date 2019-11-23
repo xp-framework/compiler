@@ -178,12 +178,17 @@ class LambdasTest extends EmittingTest {
     $this->assertEquals(2, $r());
   }
 
-  #[@test, @expect(Errors::class)]
+  #[@test]
   public function no_longer_supports_hacklang_variant() {
-    $this->run('class <T> {
-      public function run() {
-        $func= ($arg) ==> { return 1; };
-      }
-    }');
+    try {
+      $this->run('class <T> {
+        public function run() {
+          $func= ($arg) ==> { return 1; };
+        }
+      }');
+      $this->fail('No errors raised', null, Errors::class);
+    } catch (Errors $expected) {
+      \xp::gc();
+    }
   }
 }
