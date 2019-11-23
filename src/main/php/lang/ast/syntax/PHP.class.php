@@ -537,7 +537,13 @@ class PHP extends Language {
           $cases[]= new CaseLabel(null, [], $parse->token->line);
         } else if ('case' === $parse->token->value) {
           $parse->forward();
-          $expr= $this->expression($parse, 0);
+
+          if ('name' === $parse->token->kind) {
+            $expr= new Literal($parse->token->value, $parse->token->line);
+            $parse->forward();
+          } else {
+            $expr= $this->expression($parse, 0);
+          }
           $parse->expecting(':', 'switch');
           $cases[]= new CaseLabel($expr, [], $parse->token->line);
         } else {

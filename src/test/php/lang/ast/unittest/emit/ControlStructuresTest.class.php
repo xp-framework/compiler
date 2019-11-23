@@ -43,4 +43,20 @@ class ControlStructuresTest extends EmittingTest {
 
     $this->assertEquals($expected, $r);
   }
+
+  #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
+  public function switch_case_goto_label_ambiguity($whence, $expected) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        $position= 1;
+        switch ($arg) {
+          case SEEK_SET: $position= 10; break;
+          case SEEK_CUR: $position+= 10; break;
+        }
+        return $position;
+      }
+    }', $whence);
+
+    $this->assertEquals($expected, $r);
+  }
 }
