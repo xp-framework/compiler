@@ -1051,6 +1051,7 @@ class PHP extends Language {
             $values= [];
             do {
               $key= $parse->token->value;
+              $parse->warn('Use of deprecated annotation key/value pair "'.$key.'"', $context);
               $parse->forward();
               $parse->expecting('=', $context);
 

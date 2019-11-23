@@ -106,6 +106,7 @@ class AnnotationsTest extends EmittingTest {
     $this->assertEquals(['test' => null], $t->getAnnotations());
   }
 
+  /** @deprecated */
   #[@test]
   public function xp_type_annotation_with_named_pairs() {
     $t= $this->type('
@@ -113,6 +114,7 @@ class AnnotationsTest extends EmittingTest {
       class <T> { }'
     );
     $this->assertEquals(['resource' => ['path' => '/', 'authenticated' => true]], $t->getAnnotations());
+    \xp::gc();
   }
 
   #[@test]
