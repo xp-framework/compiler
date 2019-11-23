@@ -106,12 +106,8 @@ class MembersTest extends ParseTest {
 
   #[@test]
   public function method_with_annotation() {
-    $annotations= [
-      DETAIL_ANNOTATIONS => ['test' => null],
-      DETAIL_TARGET_ANNO => []
-    ];
     $body= [
-      'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
+      'a()' => new Method(['public'], 'a', new Signature([], null), [], ['test' => null], null, self::LINE)
     ];
     $this->assertParsed(
       [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
@@ -121,10 +117,7 @@ class MembersTest extends ParseTest {
 
   #[@test]
   public function method_with_annotations() {
-    $annotations= [
-      DETAIL_ANNOTATIONS => ['test' => null, 'ignore' => new Literal('"Not implemented"', self::LINE)],
-      DETAIL_TARGET_ANNO => []
-    ];
+    $annotations= ['test' => null, 'ignore' => new Literal('"Not implemented"', self::LINE)];
     $body= [
       'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
     ];
