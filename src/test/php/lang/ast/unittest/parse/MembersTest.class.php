@@ -106,8 +106,9 @@ class MembersTest extends ParseTest {
 
   #[@test]
   public function method_with_annotation() {
+    $annotations= ['test' => null];
     $body= [
-      'a()' => new Method(['public'], 'a', new Signature([], null), [], ['test' => null], null, self::LINE)
+      'a()' => new Method(['public'], 'a', new Signature([], null), [], $annotations, null, self::LINE)
     ];
     $this->assertParsed(
       [new ClassDeclaration([], '\\A', null, [], $body, [], null, self::LINE)],
