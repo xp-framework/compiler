@@ -50,10 +50,10 @@ class CompilingClassLoaderTest extends TestCase {
     $this->assertEquals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
   }
 
-  #[@test, @expect(
-  #  class= ClassFormatException::class,
-  #  withMessage= 'Compiler error: Expected "{", have "(end)"'
-  #)]
+  #[@test, @expect([
+  #  'class' => ClassFormatException::class,
+  #  'withMessage' => 'Compiler error: Expected "{", have "(end)"'
+  #])]
   public function load_class_with_syntax_errors() {
     $this->load('Errors', "<?php\nclass");
   }
