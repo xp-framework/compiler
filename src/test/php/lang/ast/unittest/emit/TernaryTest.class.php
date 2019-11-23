@@ -2,7 +2,7 @@
 
 class TernaryTest extends EmittingTest {
 
-  #[@test, @values(map= [true => "OK", false => "Fail"])]
+  #[@test, @values(['map' => [true => 'OK', false => 'Fail']])]
   public function ternary($value, $result) {
     $this->assertEquals($result, $this->run(
       'class <T> {
@@ -14,7 +14,7 @@ class TernaryTest extends EmittingTest {
     ));
   }
 
-  #[@test, @values(map= ["OK" => "OK", null => "Fail"])]
+  #[@test, @values(['map' => ['OK' => 'OK', null => 'Fail']])]
   public function short_ternary($value, $result) {
     $this->assertEquals($result, $this->run(
       'class <T> {
