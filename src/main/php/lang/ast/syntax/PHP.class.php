@@ -1144,7 +1144,7 @@ class PHP extends Language {
         $meta= [];
       } else if ('<<' === $parse->token->value) {
         $parse->forward();
-        $meta= [DETAIL_ANNOTATIONS => $this->annotations($parse, 'member annotations'), DETAIL_TARGET_ANNO => []];
+        $meta= [DETAIL_ANNOTATIONS => $this->annotations($parse, 'member annotations')];
       } else if ('#[' === $parse->token->value) {
         $parse->forward();
         $meta= $this->meta($parse, 'member annotations');
