@@ -3,7 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 4.3.0 / ????-??-??
+## 4.3.0 / 2019-11-24
 
 * Fixed global constants in ternaries being ambiguous with goto labels
   (@thekid)
