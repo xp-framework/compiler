@@ -42,8 +42,7 @@ class Tokens implements \IteratorAggregate {
   /** @return php.Iterator */
   public function getIterator() {
     $line= 1;
-    while ($this->source->hasMoreTokens()) {
-      $token= $this->source->nextToken();
+    while (null !== ($token= $this->source->nextToken())) {
       if ('$' === $token) {
         yield 'variable' => [$this->source->nextToken(), $line];
       } else if ('"' === $token || "'" === $token) {
@@ -62,9 +61,10 @@ class Tokens implements \IteratorAggregate {
 
         yield 'string' => [$string, $line];
         $line+= substr_count($string, "\n");
-      } else if (0 === strcspn($token, " \r\n\t")) {
-        $line+= substr_count($token, "\n");
-        continue;
+      } else if ("\n" === $token) {
+        $line++;
+      } else if ("\r" === $token || "\t" === $token || ' ' === $token) {
+        // Skip
       } else if (0 === strcspn($token, '0123456789')) {
         if ('.' === ($next= $this->source->nextToken())) {
           yield 'decimal' => [str_replace('_', '', $token.$next.$this->source->nextToken()), $line];
