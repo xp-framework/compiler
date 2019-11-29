@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\IllegalArgumentException;
-use lang\IllegalStateException;
+use lang\{IllegalArgumentException, IllegalStateException};
 
 /**
  * Multiple catch

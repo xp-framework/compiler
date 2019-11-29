@@ -1,10 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\Signature;
+use lang\ast\nodes\{ClassDeclaration, Literal, Method, ReturnStatement, Signature};
 
 class CompactFunctionsTest extends ParseTest {
   private $return;

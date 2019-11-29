@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\FunctionType;
-use lang\Primitive;
+use lang\{FunctionType, Primitive};
 
 /**
  * Function types

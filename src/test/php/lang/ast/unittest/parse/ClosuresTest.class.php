@@ -1,14 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\FunctionType;
-use lang\ast\Type;
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\ClosureExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\Variable;
+use lang\ast\{FunctionType, Type};
+use lang\ast\nodes\{BinaryExpression, ClosureExpression, Literal, Parameter, ReturnStatement, Signature, Variable};
 
 class ClosuresTest extends ParseTest {
   private $returns;

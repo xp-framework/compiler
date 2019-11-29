@@ -1,11 +1,7 @@
 <?php namespace lang\ast\unittest\loader;
 
-use io\File;
-use io\FileUtil;
-use io\Folder;
-use lang\ClassFormatException;
-use lang\ClassLoader;
-use lang\Environment;
+use io\{File, FileUtil, Folder};
+use lang\{ClassFormatException, ClassLoader, Environment};
 use lang\ast\CompilingClassLoader;
 use unittest\TestCase;
 
@@ -13,7 +9,7 @@ class CompilingClassLoaderTest extends TestCase {
   private static $runtime;
 
   static function __static() {
-    self::$runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    self::$runtime= 'PHP.'.PHP_VERSION;
   }
 
   /**

@@ -1,9 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{InstanceExpression, InvokeExpression, Literal, Variable};
 
 /**
  * Invocation expressions

@@ -1,64 +1,60 @@
 <?php namespace lang\ast\syntax;
 
-use lang\ast\ArrayType;
-use lang\ast\FunctionType;
-use lang\ast\Language;
-use lang\ast\MapType;
-use lang\ast\Token;
-use lang\ast\Type;
-use lang\ast\UnionType;
-use lang\ast\nodes\Annotations;
-use lang\ast\nodes\ArrayLiteral;
-use lang\ast\nodes\Block;
-use lang\ast\nodes\Braced;
-use lang\ast\nodes\BreakStatement;
-use lang\ast\nodes\CaseLabel;
-use lang\ast\nodes\CastExpression;
-use lang\ast\nodes\CatchStatement;
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\ClosureExpression;
-use lang\ast\nodes\Constant;
-use lang\ast\nodes\ContinueStatement;
-use lang\ast\nodes\DoLoop;
-use lang\ast\nodes\EchoStatement;
-use lang\ast\nodes\ForLoop;
-use lang\ast\nodes\ForeachLoop;
-use lang\ast\nodes\FunctionDeclaration;
-use lang\ast\nodes\GotoStatement;
-use lang\ast\nodes\IfStatement;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InstanceOfExpression;
-use lang\ast\nodes\InterfaceDeclaration;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Label;
-use lang\ast\nodes\LambdaExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\NamespaceDeclaration;
-use lang\ast\nodes\NewClassExpression;
-use lang\ast\nodes\NewExpression;
-use lang\ast\nodes\NullSafeInstanceExpression;
-use lang\ast\nodes\OffsetExpression;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\Property;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\ScopeExpression;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\Start;
-use lang\ast\nodes\StaticLocals;
-use lang\ast\nodes\SwitchStatement;
-use lang\ast\nodes\TernaryExpression;
-use lang\ast\nodes\ThrowExpression;
-use lang\ast\nodes\ThrowStatement;
-use lang\ast\nodes\TraitDeclaration;
-use lang\ast\nodes\TryStatement;
-use lang\ast\nodes\UnpackExpression;
-use lang\ast\nodes\UseExpression;
-use lang\ast\nodes\UseStatement;
-use lang\ast\nodes\Variable;
-use lang\ast\nodes\WhileLoop;
-use lang\ast\nodes\YieldExpression;
-use lang\ast\nodes\YieldFromExpression;
+use lang\ast\nodes\{
+  Annotations,
+  ArrayLiteral,
+  Block,
+  Braced,
+  BreakStatement,
+  CaseLabel,
+  CastExpression,
+  CatchStatement,
+  ClassDeclaration,
+  ClosureExpression,
+  Constant,
+  ContinueStatement,
+  DoLoop,
+  EchoStatement,
+  ForLoop,
+  ForeachLoop,
+  FunctionDeclaration,
+  GotoStatement,
+  IfStatement,
+  InstanceExpression,
+  InstanceOfExpression,
+  InterfaceDeclaration,
+  InvokeExpression,
+  Label,
+  LambdaExpression,
+  Literal,
+  Method,
+  NamespaceDeclaration,
+  NewClassExpression,
+  NewExpression,
+  NullSafeInstanceExpression,
+  OffsetExpression,
+  Parameter,
+  Property,
+  ReturnStatement,
+  ScopeExpression,
+  Signature,
+  Start,
+  StaticLocals,
+  SwitchStatement,
+  TernaryExpression,
+  ThrowExpression,
+  ThrowStatement,
+  TraitDeclaration,
+  TryStatement,
+  UnpackExpression,
+  UseExpression,
+  UseStatement,
+  Variable,
+  WhileLoop,
+  YieldExpression,
+  YieldFromExpression
+};
+use lang\ast\{ArrayType, FunctionType, Language, MapType, Token, Type, UnionType};
 
 /**
  * PHP language
@@ -1184,10 +1180,7 @@ class PHP extends Language {
       if (isset($modifier[$parse->token->value])) {
         $modifiers[]= $parse->token->value;
         $parse->forward();
-      } else if (isset($this->body[$k= $parse->token->value])
-        ? ($f= $this->body[$k])
-        : (isset($this->body[$k= '@'.$parse->token->kind]) ? ($f= $this->body[$k]) : null)
-      ) {
+      } else if ($f= $this->body[$parse->token->value] ?? $this->body['@'.$parse->token->kind] ?? null) {
         $f($parse, $body, $meta, $modifiers);
         $modifiers= [];
         $meta= [];

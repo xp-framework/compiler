@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\Closeable;
-use lang\IllegalArgumentException;
+use lang\{Closeable, IllegalArgumentException};
 
 /** Used by `UsingTest` */
 class FileInput implements Closeable {

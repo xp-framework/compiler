@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.0.0 / ????-??-??
+
+* Added support for XP 10 and newer versions of library dependencies
+  (@thekid)
+* Implemented xp-framework/rfc#334: Drop PHP 5.6. The minimum required
+  PHP version is now 7.0.0!
+
 ## 4.3.0 / 2019-11-24
 
 * Fixed global constants in ternaries being ambiguous with goto labels

@@ -2,13 +2,7 @@
 
 use io\Path;
 use lang\Runtime;
-use lang\ast\CompilingClassloader;
-use lang\ast\Emitter;
-use lang\ast\Errors;
-use lang\ast\Language;
-use lang\ast\Parse;
-use lang\ast\Result;
-use lang\ast\Tokens;
+use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Parse, Result, Tokens};
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -32,9 +26,9 @@ use util\profiling\Timer;
  *   ```sh
  *   $ xp compile -n src/main/php/
  *   ```
- * - Target PHP 5.6 (default target is current PHP version)
+ * - Target PHP 7.0 (default target is current PHP version)
  *   ```sh
- *   $ xp compile -t PHP.5.6 HelloWorld.php HelloWorld.class.php
+ *   $ xp compile -t PHP.7.0 HelloWorld.php HelloWorld.class.php
  *   ```
  *
  * The *-o* and *-n* options accept multiple input sources following them.
@@ -47,7 +41,7 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $target= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    $target= 'PHP.'.PHP_VERSION;
     $in= $out= '-';
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
@@ -62,7 +56,7 @@ class CompileRunner {
         break;
       } else {
         $in= $args[$i];
-        $out= isset($args[$i + 1]) ? $args[$i + 1] : '-';
+        $out= $args[$i + 1] ?? '-';
         break;
       }
     }

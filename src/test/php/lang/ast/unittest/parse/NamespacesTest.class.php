@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\NamespaceDeclaration;
-use lang\ast\nodes\UseStatement;
+use lang\ast\nodes\{NamespaceDeclaration, UseStatement};
 
 class NamespacesTest extends ParseTest {
 

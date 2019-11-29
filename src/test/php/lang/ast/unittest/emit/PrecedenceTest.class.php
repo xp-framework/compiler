@@ -27,7 +27,7 @@ class PrecedenceTest extends EmittingTest {
         }
       }'
     );
-    $this->assertEquals('('.$t->getName().')', $t->newinstance()->run());
+    $this->assertEquals('('.$t->getName().')', $t->newInstance()->run());
   }
 
   #[@test]

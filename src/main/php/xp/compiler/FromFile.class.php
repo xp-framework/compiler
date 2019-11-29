@@ -1,7 +1,6 @@
 <?php namespace xp\compiler;
 
-use io\File;
-use io\Path;
+use io\{File, Path};
 
 /** A single source file */
 class FromFile extends Input {
