@@ -72,16 +72,20 @@ abstract class PHP extends Emitter {
     // NOOP
   }
 
+  protected function emitOperator($result, $operator) {
+    // NOOP
+  }
+
+  protected function emitName($result, $name) {
+    // NOOP
+  }
+
   protected function emitCode($result, $code) {
     $result->out->write($code->value);
   }
 
   protected function emitLiteral($result, $literal) {
     $result->out->write($literal->expression);
-  }
-
-  protected function emitName($result, $name) {
-    $result->out->write($name);
   }
 
   protected function emitEcho($result, $echo) {
@@ -291,7 +295,11 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitMeta($result, $name, $annotations, $comment) {
-    $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+    if (null === $name) {
+      $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
+    } else {
+      $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+    }
     $result->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->emitAnnotations($result, $annotations);
     $result->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');
@@ -368,7 +376,7 @@ abstract class PHP extends Emitter {
   protected function emitProperty($result, $property) {
     $result->meta[0][self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
-      DETAIL_ANNOTATIONS => $property->annotations ? $property->annotations : [],
+      DETAIL_ANNOTATIONS => $property->annotations,
       DETAIL_COMMENT     => $property->comment,
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
@@ -387,7 +395,7 @@ abstract class PHP extends Emitter {
     $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
-      DETAIL_ANNOTATIONS => $method->annotations ?? [],
+      DETAIL_ANNOTATIONS => $method->annotations,
       DETAIL_COMMENT     => $method->comment,
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => []
@@ -519,7 +527,7 @@ abstract class PHP extends Emitter {
       } else {
         $result->out->write('default:');
       }
-      $this->emitOne($result, $case->body);
+      $this->emitAll($result, $case->body);
     }
     $result->out->write('}');
   }
@@ -660,18 +668,23 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNewClass($result, $new) {
-    $result->out->write('new class(');
+    array_unshift($result->meta, []);
+
+    $result->out->write('(new class(');
     $this->emitArguments($result, $new->arguments);
     $result->out->write(')');
 
     $new->definition->parent && $result->out->write(' extends '.$new->definition->parent);
     $new->definition->implements && $result->out->write(' implements '.implode(', ', $new->definition->implements));
     $result->out->write('{');
+
     foreach ($new->definition->body as $member) {
       $this->emitOne($result, $member);
       $result->out->write("\n");
     }
-    $result->out->write('}');
+    $result->out->write('function __new() {');
+    $this->emitMeta($result, null, [], null);
+    $result->out->write('return $this; }})->__new()');
   }
 
   protected function emitInvoke($result, $invoke) {

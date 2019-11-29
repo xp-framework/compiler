@@ -42,8 +42,7 @@ class Tokens implements \IteratorAggregate {
   /** @return php.Iterator */
   public function getIterator() {
     $line= 1;
-    while ($this->source->hasMoreTokens()) {
-      $token= $this->source->nextToken();
+    while (null !== ($token= $this->source->nextToken())) {
       if ('$' === $token) {
         yield 'variable' => [$this->source->nextToken(), $line];
       } else if ('"' === $token || "'" === $token) {
@@ -55,18 +54,17 @@ class Tokens implements \IteratorAggregate {
             throw new FormatException('Unclosed string literal starting at line '.$line);
           } else if ('\\' === $t) {
             $string.= $t.$this->source->nextToken($end);
-          } else if ($token === $t) {
-            break;
           } else {
             $string.= $t;
           }
-        } while (true);
+        } while ($token !== $t);
 
-        yield 'string' => [$string.$token, $line];
+        yield 'string' => [$string, $line];
         $line+= substr_count($string, "\n");
-      } else if (0 === strcspn($token, " \r\n\t")) {
-        $line+= substr_count($token, "\n");
-        continue;
+      } else if ("\n" === $token) {
+        $line++;
+      } else if ("\r" === $token || "\t" === $token || ' ' === $token) {
+        // Skip
       } else if (0 === strcspn($token, '0123456789')) {
         if ('.' === ($next= $this->source->nextToken())) {
           yield 'decimal' => [str_replace('_', '', $token.$next.$this->source->nextToken()), $line];
@@ -99,6 +97,23 @@ class Tokens implements \IteratorAggregate {
             continue;
           }
           $this->source->pushBack($next);
+        } else if ('#' === $token) {
+          $comment= $this->source->nextToken("\r\n").$this->source->nextToken("\r\n");
+          $next= '#';
+          do {
+            $s= strspn($next, ' ');
+            if ('#' !== $next[$s]) break;
+            $line++;
+            $comment.= substr($next, $s + 1);
+            $next= $this->source->nextToken("\r\n").$this->source->nextToken("\r\n");
+          } while ($this->source->hasMoreTokens());
+          if (0 === strncmp($comment, '[@', 2)) {
+            $this->source->pushBack(substr($comment, 1).$next);
+            yield 'operator' => ['#[', $line];
+          } else {
+            $this->source->pushBack($next);
+          }
+          continue;
         }
 
         if (isset(self::$operators[$token])) {

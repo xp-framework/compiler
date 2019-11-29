@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\ast\Errors;
 use unittest\actions\RuntimeVersion;
 
 /**
@@ -175,5 +176,14 @@ class LambdasTest extends EmittingTest {
     }');
 
     $this->assertEquals(2, $r());
+  }
+
+  #[@test, @expect(Errors::class)]
+  public function no_longer_supports_hacklang_variant() {
+    $this->run('class <T> {
+      public function run() {
+        $func= ($arg) ==> { return 1; };
+      }
+    }');
   }
 }

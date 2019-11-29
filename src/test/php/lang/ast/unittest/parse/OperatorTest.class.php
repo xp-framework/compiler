@@ -1,6 +1,23 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\{ArrayLiteral, Assignment, BinaryExpression, Braced, ClassDeclaration, InstanceExpression, InstanceOfExpression, Literal, NewClassExpression, NewExpression, OffsetExpression, ScopeExpression, TernaryExpression, UnaryExpression, Variable};
+use lang\ast\nodes\{
+  ArrayLiteral,
+  Assignment,
+  BinaryExpression,
+  Braced,
+  ClassDeclaration,
+  InstanceExpression,
+  InstanceOfExpression,
+  InvokeExpression,
+  Literal,
+  NewClassExpression,
+  NewExpression,
+  OffsetExpression,
+  ScopeExpression,
+  TernaryExpression,
+  UnaryExpression,
+  Variable
+};
 
 class OperatorTest extends ParseTest {
 
@@ -45,11 +62,11 @@ class OperatorTest extends ParseTest {
     );
   }
 
-  #[@test, @values(['!', '~', '-', '+', '++', '--'])]
+  #[@test, @values(['!', '~', '-', '+', '++', '--', '@', '&'])]
   public function prefix($operator) {
     $this->assertParsed(
       [new UnaryExpression('prefix', new Variable('a', self::LINE), $operator, self::LINE)],
-      ''.$operator.'$a;'
+      $operator.'$a;'
     );
   }
 
@@ -166,7 +183,15 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
-  public function precedence_of_object_operator() {
+  public function scope_resolution_operator() {
+    $this->assertParsed(
+      [new ScopeExpression('\\Objects', new Literal('ID', self::LINE), self::LINE)],
+      'Objects::ID;'
+    );
+  }
+
+  #[@test]
+  public function precedence_of_object_operator_binary() {
     $this->assertParsed(
       [new BinaryExpression(
         new InstanceExpression(new Variable('this', self::LINE), new Literal('a', self::LINE), self::LINE),
@@ -179,7 +204,20 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
-  public function precedence_of_scope_resolution_operator() {
+  public function precedence_of_object_operator_unary() {
+    $this->assertParsed(
+      [new UnaryExpression(
+        'prefix',
+        new InstanceExpression(new Variable('this', self::LINE), new Literal('a', self::LINE), self::LINE),
+        '!',
+        self::LINE
+      )],
+      '!$this->a;'
+    );
+  }
+
+  #[@test]
+  public function precedence_of_scope_resolution_operator_binary() {
     $this->assertParsed(
       [new BinaryExpression(
         new ScopeExpression('self', new Literal('class', self::LINE), self::LINE),
@@ -188,6 +226,19 @@ class OperatorTest extends ParseTest {
         self::LINE
       )],
       'self::class."test";'
+    );
+  }
+
+  #[@test]
+  public function precedence_of_scope_resolution_operator_unary() {
+    $this->assertParsed(
+      [new UnaryExpression(
+        'prefix',
+        new ScopeExpression('\\Objects', new Literal('ID', self::LINE), self::LINE),
+        '!',
+        self::LINE
+      )],
+      '!Objects::ID;'
     );
   }
 
@@ -214,6 +265,32 @@ class OperatorTest extends ParseTest {
         self::LINE
       )],
       $operator.'2 === $value;'
+    );
+  }
+
+  #[@test]
+  public function precedence_of_braces_unary() {
+    $this->assertParsed(
+      [new UnaryExpression(
+        'prefix',
+        new InvokeExpression(new Variable('a', self::LINE), [], self::LINE),
+        '!',
+        self::LINE
+      )],
+      '!$a();'
+    );
+  }
+
+  #[@test, @values(['!$a[0];', '!$a{0};'])]
+  public function precedence_of_offset_unary($input) {
+    $this->assertParsed(
+      [new UnaryExpression(
+        'prefix',
+        new OffsetExpression(new Variable('a', self::LINE), new Literal('0', self::LINE), self::LINE),
+        '!',
+        self::LINE
+      )],
+      $input
     );
   }
 }
