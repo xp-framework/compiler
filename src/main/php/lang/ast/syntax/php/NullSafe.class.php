@@ -1,12 +1,6 @@
 <?php namespace lang\ast\syntax\php;
 
-use lang\ast\nodes\Assignment;
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\Braced;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\TernaryExpression;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{Assignment, BinaryExpression, Braced, InstanceExpression, Literal, TernaryExpression, Variable};
 use lang\ast\syntax\Extension;
 
 /**

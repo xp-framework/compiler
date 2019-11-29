@@ -1,16 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\FunctionType;
-use lang\ast\Type;
-use lang\ast\nodes\ArrayLiteral;
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\FunctionDeclaration;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\YieldExpression;
-use lang\ast\nodes\YieldFromExpression;
+use lang\ast\{FunctionType, Type};
+use lang\ast\nodes\{ArrayLiteral, BinaryExpression, FunctionDeclaration, Literal, Parameter, ReturnStatement, Signature, YieldExpression, YieldFromExpression};
 
 class FunctionsTest extends ParseTest {
 

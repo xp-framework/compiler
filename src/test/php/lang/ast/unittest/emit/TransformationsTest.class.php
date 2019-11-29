@@ -1,9 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ast\Code;
-use lang\ast\Type;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\Signature;
+use lang\ast\{Code, Type};
+use lang\ast\nodes\{Method, Signature};
 
 class TransformationsTest extends EmittingTest {
 

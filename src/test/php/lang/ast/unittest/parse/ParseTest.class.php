@@ -1,9 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\Language;
-use lang\ast\Node;
-use lang\ast\Parse;
-use lang\ast\Tokens;
+use lang\ast\{Language, Node, Parse, Tokens};
 use lang\ast\nodes\Value;
 use text\StringTokenizer;
 use unittest\TestCase;

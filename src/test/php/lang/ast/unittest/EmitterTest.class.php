@@ -2,15 +2,13 @@
 
 use io\streams\MemoryOutputStream;
 use lang\IllegalStateException;
-use lang\ast\Emitter;
-use lang\ast\Node;
-use lang\ast\Result;
+use lang\ast\{Emitter, Node, Result};
 use unittest\TestCase;
 
 class EmitterTest extends TestCase {
 
   private function newEmitter() {
-    return Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    return Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
   }
 
   #[@test]
@@ -56,8 +54,8 @@ class EmitterTest extends TestCase {
 
   #[@test, @expect(IllegalStateException::class)]
   public function emit_node_without_kind() {
-    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), newinstance(Node::class, [], [
-      'kind' => null
-    ]));
+    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), new class() extends Node {
+      public $kind= null;
+    });
   }
 }

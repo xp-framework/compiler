@@ -1,11 +1,6 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\CaseLabel;
-use lang\ast\nodes\IfStatement;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\SwitchStatement;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{CaseLabel, IfStatement, InvokeExpression, Literal, SwitchStatement, Variable};
 
 class ConditionalTest extends ParseTest {
   private $blocks;

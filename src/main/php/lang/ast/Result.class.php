@@ -1,7 +1,6 @@
 <?php namespace lang\ast;
 
-use io\streams\MemoryOutputStream;
-use io\streams\StringWriter;
+use io\streams\{MemoryOutputStream, StringWriter};
 
 class Result {
   public $out;

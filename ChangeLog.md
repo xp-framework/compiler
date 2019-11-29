@@ -3,8 +3,22 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 4.3.0 / ????-??-??
+## 5.0.0 / ????-??-??
 
+* Added support for XP 10 and newer versions of library dependencies
+  (@thekid)
+* Implemented xp-framework/rfc#334: Drop PHP 5.6. The minimum required
+  PHP version is now 7.0.0!
+
+## 4.3.0 / 2019-11-24
+
+* Fixed global constants in ternaries being ambiguous with goto labels
+  (@thekid)
+* Fixed emitting `switch` statements and case labels' ambiguity w/ goto
+  (@thekid)
+* Fixed an operator precedence problem causing incorrect nesting in the
+  parsed AST for unary prefix operators.
+  (@thekid)
 * Merged PR #77: Add support for #-style comments including support for
   XP style annotations
   (@thekid)

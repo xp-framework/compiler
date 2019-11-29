@@ -1,64 +1,60 @@
 <?php namespace lang\ast\syntax;
 
-use lang\ast\ArrayType;
-use lang\ast\FunctionType;
-use lang\ast\Language;
-use lang\ast\MapType;
-use lang\ast\Token;
-use lang\ast\Type;
-use lang\ast\UnionType;
-use lang\ast\nodes\Annotations;
-use lang\ast\nodes\ArrayLiteral;
-use lang\ast\nodes\Block;
-use lang\ast\nodes\Braced;
-use lang\ast\nodes\BreakStatement;
-use lang\ast\nodes\CaseLabel;
-use lang\ast\nodes\CastExpression;
-use lang\ast\nodes\CatchStatement;
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\ClosureExpression;
-use lang\ast\nodes\Constant;
-use lang\ast\nodes\ContinueStatement;
-use lang\ast\nodes\DoLoop;
-use lang\ast\nodes\EchoStatement;
-use lang\ast\nodes\ForLoop;
-use lang\ast\nodes\ForeachLoop;
-use lang\ast\nodes\FunctionDeclaration;
-use lang\ast\nodes\GotoStatement;
-use lang\ast\nodes\IfStatement;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InstanceOfExpression;
-use lang\ast\nodes\InterfaceDeclaration;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Label;
-use lang\ast\nodes\LambdaExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\NamespaceDeclaration;
-use lang\ast\nodes\NewClassExpression;
-use lang\ast\nodes\NewExpression;
-use lang\ast\nodes\NullSafeInstanceExpression;
-use lang\ast\nodes\OffsetExpression;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\Property;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\ScopeExpression;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\Start;
-use lang\ast\nodes\StaticLocals;
-use lang\ast\nodes\SwitchStatement;
-use lang\ast\nodes\TernaryExpression;
-use lang\ast\nodes\ThrowExpression;
-use lang\ast\nodes\ThrowStatement;
-use lang\ast\nodes\TraitDeclaration;
-use lang\ast\nodes\TryStatement;
-use lang\ast\nodes\UnpackExpression;
-use lang\ast\nodes\UseExpression;
-use lang\ast\nodes\UseStatement;
-use lang\ast\nodes\Variable;
-use lang\ast\nodes\WhileLoop;
-use lang\ast\nodes\YieldExpression;
-use lang\ast\nodes\YieldFromExpression;
+use lang\ast\nodes\{
+  Annotations,
+  ArrayLiteral,
+  Block,
+  Braced,
+  BreakStatement,
+  CaseLabel,
+  CastExpression,
+  CatchStatement,
+  ClassDeclaration,
+  ClosureExpression,
+  Constant,
+  ContinueStatement,
+  DoLoop,
+  EchoStatement,
+  ForLoop,
+  ForeachLoop,
+  FunctionDeclaration,
+  GotoStatement,
+  IfStatement,
+  InstanceExpression,
+  InstanceOfExpression,
+  InterfaceDeclaration,
+  InvokeExpression,
+  Label,
+  LambdaExpression,
+  Literal,
+  Method,
+  NamespaceDeclaration,
+  NewClassExpression,
+  NewExpression,
+  NullSafeInstanceExpression,
+  OffsetExpression,
+  Parameter,
+  Property,
+  ReturnStatement,
+  ScopeExpression,
+  Signature,
+  Start,
+  StaticLocals,
+  SwitchStatement,
+  TernaryExpression,
+  ThrowExpression,
+  ThrowStatement,
+  TraitDeclaration,
+  TryStatement,
+  UnpackExpression,
+  UseExpression,
+  UseStatement,
+  Variable,
+  WhileLoop,
+  YieldExpression,
+  YieldFromExpression
+};
+use lang\ast\{ArrayType, FunctionType, Language, MapType, Token, Type, UnionType};
 
 /**
  * PHP language
@@ -129,7 +125,7 @@ class PHP extends Language {
       }
     });
 
-    $this->infix('->', 80, function($parse, $token, $left) {
+    $this->infix('->', 100, function($parse, $token, $left) {
       if ('{' === $parse->token->value) {
         $parse->forward();
         $expr= $this->expression($parse, 0);
@@ -142,7 +138,7 @@ class PHP extends Language {
       return new InstanceExpression($left, $expr, $token->line);
     });
 
-    $this->infix('::', 80, function($parse, $token, $left) {
+    $this->infix('::', 100, function($parse, $token, $left) {
       $scope= $parse->scope->resolve($left->expression);
 
       if ('variable' === $parse->token->kind) {
@@ -158,13 +154,13 @@ class PHP extends Language {
       return new ScopeExpression($scope, $expr, $token->line);
     });
 
-    $this->infix('(', 80, function($parse, $token, $left) {
+    $this->infix('(', 100, function($parse, $token, $left) {
       $arguments= $this->expressions($parse);
       $parse->expecting(')', 'invoke expression');
       return new InvokeExpression($left, $arguments, $token->line);
     });
 
-    $this->infix('[', 80, function($parse, $token, $left) {
+    $this->infix('[', 100, function($parse, $token, $left) {
       if (']' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -176,7 +172,7 @@ class PHP extends Language {
       return new OffsetExpression($left, $expr, $token->line);
     });
 
-    $this->infix('{', 80, function($parse, $token, $left) {
+    $this->infix('{', 100, function($parse, $token, $left) {
       $parse->warn('Deprecated curly braces use as offset');
       $expr= $this->expression($parse, 0);
       $parse->expecting('}', 'offset');
@@ -190,15 +186,15 @@ class PHP extends Language {
       return new TernaryExpression($left, $when, $else, $token->line);
     });
 
-    $this->prefix('@', 100);
-    $this->prefix('&', 100);
-    $this->prefix('!', 100);
-    $this->prefix('~', 100);
-    $this->prefix('+', 100);
-    $this->prefix('-', 100);
-    $this->prefix('++', 100);
-    $this->prefix('--', 100);
-    $this->prefix('clone', 100);
+    $this->prefix('@', 90);
+    $this->prefix('&', 90);
+    $this->prefix('!', 90);
+    $this->prefix('~', 90);
+    $this->prefix('+', 90);
+    $this->prefix('-', 90);
+    $this->prefix('++', 90);
+    $this->prefix('--', 90);
+    $this->prefix('clone', 90);
 
     $this->assignment('=');
     $this->assignment('&=');
@@ -413,21 +409,30 @@ class PHP extends Language {
       return new GotoStatement($label, $token->line);
     });
 
-    $this->prefix('(name)', 0, function($parse, $token) {
-      if (':' === $parse->token->value) {
-        $parse->token= new Token($this->symbol(';'));
-        return new Label($token->value, $token->line);
-      } else {
-        return new Literal($token->value, $token->line);
-      }
-    });
-
     $this->prefix('(variable)', 0, function($parse, $token) {
       return new Variable($token->value, $token->line);
     });
 
     $this->prefix('(literal)', 0, function($parse, $token) {
       return new Literal($token->value, $token->line);
+    });
+
+    $this->prefix('(name)', 0, function($parse, $token) {
+      return new Literal($token->value, $token->line);
+    });
+
+    $this->stmt('(name)', function($parse, $token) {
+
+      // Solve ambiguity between goto-labels and other statements
+      if (':' === $parse->token->value) {
+        $node= new Label($token->value, $token->line);
+      } else {
+        $parse->queue[]= $parse->token;
+        $parse->token= $token;
+        $node= $this->expression($parse, 0);
+      }
+      $parse->forward();
+      return $node;
     });
 
     $this->stmt('<?', function($parse, $token) {
@@ -538,7 +543,13 @@ class PHP extends Language {
           $cases[]= new CaseLabel(null, [], $parse->token->line);
         } else if ('case' === $parse->token->value) {
           $parse->forward();
-          $expr= $this->expression($parse, 0);
+
+          if ('name' === $parse->token->kind) {
+            $expr= new Literal($parse->token->value, $parse->token->line);
+            $parse->forward();
+          } else {
+            $expr= $this->expression($parse, 0);
+          }
           $parse->expecting(':', 'switch');
           $cases[]= new CaseLabel($expr, [], $parse->token->line);
         } else {
@@ -1170,10 +1181,7 @@ class PHP extends Language {
       if (isset($modifier[$parse->token->value])) {
         $modifiers[]= $parse->token->value;
         $parse->forward();
-      } else if (isset($this->body[$k= $parse->token->value])
-        ? ($f= $this->body[$k])
-        : (isset($this->body[$k= '@'.$parse->token->kind]) ? ($f= $this->body[$k]) : null)
-      ) {
+      } else if ($f= $this->body[$parse->token->value] ?? $this->body['@'.$parse->token->kind] ?? null) {
         $f($parse, $body, $meta, $modifiers);
         $modifiers= [];
         $meta= [];

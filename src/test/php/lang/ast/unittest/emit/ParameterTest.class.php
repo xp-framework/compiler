@@ -1,11 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\Type;
-use lang\Value;
-use lang\XPClass;
-use lang\Primitive;
-use lang\ArrayType;
-use lang\MapType;
+use lang\{ArrayType, MapType, Primitive, Type, Value, XPClass};
 
 class ParameterTest extends EmittingTest {
 

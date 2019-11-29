@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\TypeUnion;
-use lang\Primitive;
+use lang\{Primitive, TypeUnion};
 
 /**
  * Function types

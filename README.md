@@ -4,7 +4,6 @@ XP Compiler
 [![Build Status on TravisCI](https://secure.travis-ci.org/xp-forge/sequence.svg)](http://travis-ci.org/xp-framework/compiler)
 [![XP Framework Module](https://raw.githubusercontent.com/xp-framework/web/master/static/xp-framework-badge.png)](https://github.com/xp-framework/core)
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
-[![Required PHP 5.6+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-5_6plus.png)](http://php.net/)
 [![Supports PHP 7.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_0plus.png)](http://php.net/)
 [![Latest Stable Version](https://poser.pugx.org/xp-framework/compiler/version.png)](https://packagist.org/packages/xp-framework/compiler)
 
@@ -16,7 +15,7 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 5.6. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 7.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"

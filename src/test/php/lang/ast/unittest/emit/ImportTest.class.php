@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use util\Date;
 use lang\XPClass;
+use util\Date;
 
 class ImportTest extends EmittingTest {
 

@@ -1,14 +1,6 @@
 <?php namespace lang\ast\syntax\php;
 
-use lang\ast\nodes\Assignment;
-use lang\ast\nodes\IfStatement;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InstanceOfExpression;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\TryStatement;
-use lang\ast\nodes\UsingStatement;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{Assignment, IfStatement, InstanceExpression, InstanceOfExpression, InvokeExpression, Literal, TryStatement, UsingStatement, Variable};
 use lang\ast\syntax\Extension;
 
 /**

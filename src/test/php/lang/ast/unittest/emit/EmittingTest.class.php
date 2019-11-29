@@ -1,15 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
-use io\streams\MemoryOutputStream;
-use io\streams\StringWriter;
+use io\streams\{MemoryOutputStream, StringWriter};
 use lang\DynamicClassLoader;
-use lang\ast\CompilingClassLoader;
-use lang\ast\Emitter;
-use lang\ast\Language;
-use lang\ast\Node;
-use lang\ast\Parse;
-use lang\ast\Result;
-use lang\ast\Tokens;
+use lang\ast\{CompilingClassLoader, Emitter, Language, Node, Parse, Result, Tokens};
 use text\StringTokenizer;
 use unittest\TestCase;
 use util\cmd\Console;
@@ -24,7 +17,7 @@ abstract class EmittingTest extends TestCase {
   public static function setupCompiler() {
     self::$cl= DynamicClassLoader::instanceFor(self::class);
     self::$language= Language::named('PHP');
-    self::$emitter= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    self::$emitter= Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
     foreach (self::$language->extensions() as $extension) {
       $extension->setup(self::$language, self::$emitter);
     }

@@ -1,7 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Emitter;
-use lang\ast\Node;
+use lang\ast\{Emitter, Node};
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
@@ -528,7 +527,7 @@ abstract class PHP extends Emitter {
       } else {
         $result->out->write('default:');
       }
-      $this->emitOne($result, $case->body);
+      $this->emitAll($result, $case->body);
     }
     $result->out->write('}');
   }
