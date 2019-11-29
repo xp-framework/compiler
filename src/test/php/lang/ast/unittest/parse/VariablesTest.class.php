@@ -36,11 +36,13 @@ class VariablesTest extends ParseTest {
     );
   }
 
+  /** @deprecated */
   #[@test]
   public function string_offset() {
     $this->assertParsed(
       [new OffsetExpression(new Variable('a', self::LINE), new Literal('0', self::LINE), self::LINE)],
       '$a{0};'
     );
+    \xp::gc();
   }
 }

@@ -281,8 +281,8 @@ class OperatorTest extends ParseTest {
     );
   }
 
-  #[@test, @values(['!$a[0];', '!$a{0};'])]
-  public function precedence_of_offset_unary($input) {
+  #[@test]
+  public function precedence_of_offset_unary() {
     $this->assertParsed(
       [new UnaryExpression(
         'prefix',
@@ -290,7 +290,7 @@ class OperatorTest extends ParseTest {
         '!',
         self::LINE
       )],
-      $input
+      '!$a[0];'
     );
   }
 }
