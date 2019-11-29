@@ -5,10 +5,14 @@ XP Compiler ChangeLog
 
 ## 5.0.0 / ????-??-??
 
+* Merged PR #78: Deprecate curly brace syntax for offsets; consistent
+  with PHP 7.4
+  (@thekid)
 * Added support for XP 10 and newer versions of library dependencies
   (@thekid)
 * Implemented xp-framework/rfc#334: Drop PHP 5.6. The minimum required
   PHP version is now 7.0.0!
+  (@thekid)
 
 ## 4.3.0 / 2019-11-24
 
