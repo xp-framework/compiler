@@ -16,7 +16,7 @@ class EchoTest extends EmittingTest {
     ob_start();
     try {
       $this->run('class <T> {
-        private fn hello() => "Hello";
+        private function hello() { return "Hello"; }
         public function run() { '.$statement.' }
       }');
       Assert::equals($expected, ob_get_contents());

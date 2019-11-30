@@ -52,7 +52,6 @@ Usage: xp compile <in> [<out>]
 
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
 lang.ast.syntax.TransformationApi
-lang.ast.syntax.php.CompactMethods
 lang.ast.syntax.php.NullSafe
 lang.ast.syntax.php.ThrowExpressions
 lang.ast.syntax.php.Using

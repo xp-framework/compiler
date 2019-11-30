@@ -7,7 +7,9 @@ class VarargsTest extends EmittingTest {
   #[@test]
   public function vsprintf() {
     $r= $this->run('class <T> {
-      private fn format(string $format, ... $args) => vsprintf($format, $args);
+      private function format(string $format, ... $args) {
+        return vsprintf($format, $args);
+      }
 
       public function run() {
         return $this->format("Hello %s", "Test");
@@ -20,7 +22,9 @@ class VarargsTest extends EmittingTest {
   #[@test]
   public function list_of() {
     $r= $this->run('class <T> {
-      private fn listOf(string... $args) => $args;
+      private function listOf(string... $args) {
+        return $args;
+      }
 
       public function run() {
         return $this->listOf("Hello", "Test");

@@ -122,13 +122,12 @@ class ExceptionsTest extends EmittingTest {
 
   #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda() {
-    $t= $this->type('class <T> {
+    $this->run('use lang\IllegalArgumentException; class <T> {
       public function run() {
-        $f= fn() => throw new \\lang\\IllegalArgumentException("test");
+        $f= fn() => throw new IllegalArgumentException("test");
         $f();
       }
     }');
-    $t->newInstance()->run();
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
@@ -144,31 +143,22 @@ class ExceptionsTest extends EmittingTest {
 
   #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda_capturing_variable() {
-    $t= $this->type('class <T> {
+    $this->run('use lang\IllegalArgumentException; class <T> {
       public function run() {
-        $f= fn($message) => throw new \\lang\\IllegalArgumentException($message);
+        $f= fn($message) => throw new IllegalArgumentException($message);
         $f("test");
       }
     }');
-    $t->newInstance()->run();
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda_capturing_parameter() {
-    $t= $this->type('class <T> {
+    $t= $this->type('use lang\IllegalArgumentException; class <T> {
       public function run($message) {
-        $f= fn() => throw new \\lang\\IllegalArgumentException($message);
+        $f= fn() => throw new IllegalArgumentException($message);
         $f();
       }
     }');
     $t->newInstance()->run('Test');
-  }
-
-  #[@test, @expect(IllegalArgumentException::class)]
-  public function throw_expression_with_compact_method() {
-    $t= $this->type('class <T> {
-      public fn run() => throw new \\lang\\IllegalArgumentException("test");
-    }');
-    $t->newInstance()->run();
   }
 }
