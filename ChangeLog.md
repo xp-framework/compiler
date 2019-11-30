@@ -3,7 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 5.0.0 / ????-??-??
+## 5.0.0 / 2019-11-30
 
 * Merged PR #70: Extract compact methods; to use these, require the
   library https://github.com/xp-lang/php-compact-methods
