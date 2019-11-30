@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.3.1 / 2019-11-30
+
+* Added compatibility with XP 10, see xp-framework/rfc#333 - @thekid
+
 ## 4.3.0 / 2019-11-24
 
 * Fixed global constants in ternaries being ambiguous with goto labels
