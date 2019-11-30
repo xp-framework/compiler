@@ -1,18 +1,13 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\LambdaExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{BinaryExpression, InvokeExpression, LambdaExpression, Literal, Parameter, ReturnStatement, Signature, Variable};
+use unittest\Assert;
 
 class LambdasTest extends ParseTest {
   private $expression;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->expression= new BinaryExpression(new Variable('a', self::LINE), '+', new Literal('1', self::LINE), self::LINE);
   }

@@ -1,11 +1,7 @@
 <?php namespace lang\ast;
 
-use lang\ast\nodes\Assignment;
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\UnaryExpression;
-use lang\ast\syntax\Extension;
-use lang\ast\syntax\TransformationApi;
+use lang\ast\nodes\{Assignment, BinaryExpression, Literal, UnaryExpression};
+use lang\ast\syntax\{Extension, TransformationApi};
 use lang\reflect\Package;
 
 /**

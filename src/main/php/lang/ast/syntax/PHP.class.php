@@ -1,64 +1,60 @@
 <?php namespace lang\ast\syntax;
 
-use lang\ast\ArrayType;
-use lang\ast\FunctionType;
-use lang\ast\Language;
-use lang\ast\MapType;
-use lang\ast\Token;
-use lang\ast\Type;
-use lang\ast\UnionType;
-use lang\ast\nodes\Annotations;
-use lang\ast\nodes\ArrayLiteral;
-use lang\ast\nodes\Block;
-use lang\ast\nodes\Braced;
-use lang\ast\nodes\BreakStatement;
-use lang\ast\nodes\CaseLabel;
-use lang\ast\nodes\CastExpression;
-use lang\ast\nodes\CatchStatement;
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\ClosureExpression;
-use lang\ast\nodes\Constant;
-use lang\ast\nodes\ContinueStatement;
-use lang\ast\nodes\DoLoop;
-use lang\ast\nodes\EchoStatement;
-use lang\ast\nodes\ForLoop;
-use lang\ast\nodes\ForeachLoop;
-use lang\ast\nodes\FunctionDeclaration;
-use lang\ast\nodes\GotoStatement;
-use lang\ast\nodes\IfStatement;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InstanceOfExpression;
-use lang\ast\nodes\InterfaceDeclaration;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Label;
-use lang\ast\nodes\LambdaExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\NamespaceDeclaration;
-use lang\ast\nodes\NewClassExpression;
-use lang\ast\nodes\NewExpression;
-use lang\ast\nodes\NullSafeInstanceExpression;
-use lang\ast\nodes\OffsetExpression;
-use lang\ast\nodes\Parameter;
-use lang\ast\nodes\Property;
-use lang\ast\nodes\ReturnStatement;
-use lang\ast\nodes\ScopeExpression;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\Start;
-use lang\ast\nodes\StaticLocals;
-use lang\ast\nodes\SwitchStatement;
-use lang\ast\nodes\TernaryExpression;
-use lang\ast\nodes\ThrowExpression;
-use lang\ast\nodes\ThrowStatement;
-use lang\ast\nodes\TraitDeclaration;
-use lang\ast\nodes\TryStatement;
-use lang\ast\nodes\UnpackExpression;
-use lang\ast\nodes\UseExpression;
-use lang\ast\nodes\UseStatement;
-use lang\ast\nodes\Variable;
-use lang\ast\nodes\WhileLoop;
-use lang\ast\nodes\YieldExpression;
-use lang\ast\nodes\YieldFromExpression;
+use lang\ast\nodes\{
+  Annotations,
+  ArrayLiteral,
+  Block,
+  Braced,
+  BreakStatement,
+  CaseLabel,
+  CastExpression,
+  CatchStatement,
+  ClassDeclaration,
+  ClosureExpression,
+  Constant,
+  ContinueStatement,
+  DoLoop,
+  EchoStatement,
+  ForLoop,
+  ForeachLoop,
+  FunctionDeclaration,
+  GotoStatement,
+  IfStatement,
+  InstanceExpression,
+  InstanceOfExpression,
+  InterfaceDeclaration,
+  InvokeExpression,
+  Label,
+  LambdaExpression,
+  Literal,
+  Method,
+  NamespaceDeclaration,
+  NewClassExpression,
+  NewExpression,
+  NullSafeInstanceExpression,
+  OffsetExpression,
+  Parameter,
+  Property,
+  ReturnStatement,
+  ScopeExpression,
+  Signature,
+  Start,
+  StaticLocals,
+  SwitchStatement,
+  TernaryExpression,
+  ThrowExpression,
+  ThrowStatement,
+  TraitDeclaration,
+  TryStatement,
+  UnpackExpression,
+  UseExpression,
+  UseStatement,
+  Variable,
+  WhileLoop,
+  YieldExpression,
+  YieldFromExpression
+};
+use lang\ast\{ArrayType, FunctionType, Language, MapType, Token, Type, UnionType};
 
 /**
  * PHP language
@@ -129,7 +125,7 @@ class PHP extends Language {
       }
     });
 
-    $this->infix('->', 80, function($parse, $token, $left) {
+    $this->infix('->', 100, function($parse, $token, $left) {
       if ('{' === $parse->token->value) {
         $parse->forward();
         $expr= $this->expression($parse, 0);
@@ -142,7 +138,7 @@ class PHP extends Language {
       return new InstanceExpression($left, $expr, $token->line);
     });
 
-    $this->infix('::', 80, function($parse, $token, $left) {
+    $this->infix('::', 100, function($parse, $token, $left) {
       $scope= $parse->scope->resolve($left->expression);
 
       if ('variable' === $parse->token->kind) {
@@ -158,13 +154,13 @@ class PHP extends Language {
       return new ScopeExpression($scope, $expr, $token->line);
     });
 
-    $this->infix('(', 80, function($parse, $token, $left) {
+    $this->infix('(', 100, function($parse, $token, $left) {
       $arguments= $this->expressions($parse);
       $parse->expecting(')', 'invoke expression');
       return new InvokeExpression($left, $arguments, $token->line);
     });
 
-    $this->infix('[', 80, function($parse, $token, $left) {
+    $this->infix('[', 100, function($parse, $token, $left) {
       if (']' === $parse->token->value) {
         $expr= null;
         $parse->forward();
@@ -176,9 +172,10 @@ class PHP extends Language {
       return new OffsetExpression($left, $expr, $token->line);
     });
 
-    $this->infix('{', 80, function($parse, $token, $left) {
+    $this->infix('{', 100, function($parse, $token, $left) {
+      $parse->warn('Deprecated curly braces use as offset');
       $expr= $this->expression($parse, 0);
-      $parse->expecting('}', 'dynamic member');
+      $parse->expecting('}', 'offset');
       return new OffsetExpression($left, $expr, $token->line);
     });
 
@@ -189,15 +186,15 @@ class PHP extends Language {
       return new TernaryExpression($left, $when, $else, $token->line);
     });
 
-    $this->prefix('@', 100);
-    $this->prefix('&', 100);
-    $this->prefix('!', 100);
-    $this->prefix('~', 100);
-    $this->prefix('+', 100);
-    $this->prefix('-', 100);
-    $this->prefix('++', 100);
-    $this->prefix('--', 100);
-    $this->prefix('clone', 100);
+    $this->prefix('@', 90);
+    $this->prefix('&', 90);
+    $this->prefix('!', 90);
+    $this->prefix('~', 90);
+    $this->prefix('+', 90);
+    $this->prefix('-', 90);
+    $this->prefix('++', 90);
+    $this->prefix('--', 90);
+    $this->prefix('clone', 90);
 
     $this->assignment('=');
     $this->assignment('&=');
@@ -412,22 +409,30 @@ class PHP extends Language {
       return new GotoStatement($label, $token->line);
     });
 
-    $this->prefix('(name)', 0, function($parse, $token) {
-      if (':' === $parse->token->value) {
-        $parse->token= new Token($this->symbol(';'));
-        return new Label($token->value, $token->line);
-      } else {
-        return new Literal($token->value, $token->line);
-      }
-    });
-
     $this->prefix('(variable)', 0, function($parse, $token) {
       return new Variable($token->value, $token->line);
     });
 
-
     $this->prefix('(literal)', 0, function($parse, $token) {
       return new Literal($token->value, $token->line);
+    });
+
+    $this->prefix('(name)', 0, function($parse, $token) {
+      return new Literal($token->value, $token->line);
+    });
+
+    $this->stmt('(name)', function($parse, $token) {
+
+      // Solve ambiguity between goto-labels and other statements
+      if (':' === $parse->token->value) {
+        $node= new Label($token->value, $token->line);
+      } else {
+        $parse->queue[]= $parse->token;
+        $parse->token= $token;
+        $node= $this->expression($parse, 0);
+      }
+      $parse->forward();
+      return $node;
     });
 
     $this->stmt('<?', function($parse, $token) {
@@ -538,7 +543,13 @@ class PHP extends Language {
           $cases[]= new CaseLabel(null, [], $parse->token->line);
         } else if ('case' === $parse->token->value) {
           $parse->forward();
-          $expr= $this->expression($parse, 0);
+
+          if ('name' === $parse->token->kind) {
+            $expr= new Literal($parse->token->value, $parse->token->line);
+            $parse->forward();
+          } else {
+            $expr= $this->expression($parse, 0);
+          }
           $parse->expecting(':', 'switch');
           $cases[]= new CaseLabel($expr, [], $parse->token->line);
         } else {
@@ -682,46 +693,27 @@ class PHP extends Language {
     });
 
     $this->stmt('abstract', function($parse, $token) {
-      $parse->forward();
-      $type= $parse->scope->resolve($parse->token->value);
-      $parse->forward();
-      return $this->clazz($parse, $type, ['abstract']);
+      $type= $this->statement($parse);
+      $type->modifiers[]= 'abstract';
+      return $type;
     });
 
     $this->stmt('final', function($parse, $token) {
-      $parse->forward();
-      $type= $parse->scope->resolve($parse->token->value);
-      $parse->forward();
-      return $this->clazz($parse, $type, ['final']);
+      $type= $this->statement($parse);
+      $type->modifiers[]= 'final';
+      return $type;
     });
 
     $this->stmt('<<', function($parse, $token) {
-      $values= [];
-      do {
-        $name= $parse->token->value;
-        $parse->forward();
+      $parse->scope->annotations= $this->annotations($parse, 'annotations');
 
-        if ('(' === $parse->token->value) {
-          $parse->forward();
-          $values[$name]= $parse->scope->annotations[$name]= $this->expression($parse, 0);
-          $parse->expecting(')', 'annotations');
-        } else {
-          $values[$name]= $parse->scope->annotations[$name]= null;
-        }
+      return new Annotations($parse->scope->annotations, $token->line);
+    });
 
-        if (',' === $parse->token->value) {
-          $parse->forward();
-          continue;
-        } else if ('>>' === $parse->token->value) {
-          break;
-        } else {
-          $parse->expecting(', or >>', 'annotation');
-          break;
-        }
-      } while (null !== $parse->token->value);
+    $this->stmt('#[', function($parse, $token) {
+      $parse->scope->annotations= $this->meta($parse, 'annotations')[DETAIL_ANNOTATIONS];
 
-      $parse->forward();
-      return new Annotations($values, $token->line);
+      return new Annotations($parse->scope->annotations, $token->line);
     });
 
     $this->stmt('class', function($parse, $token) {
@@ -854,11 +846,11 @@ class PHP extends Language {
       $parse->expecting(';', 'constant declaration');
     });
 
-    $this->body('@variable', function($parse, &$body, $annotations, $modifiers) {
-      $this->properties($parse, $body, $annotations, $modifiers, null);
+    $this->body('@variable', function($parse, &$body, $meta, $modifiers) {
+      $this->properties($parse, $body, $meta, $modifiers, null);
     });
 
-    $this->body('function', function($parse, &$body, $annotations, $modifiers) {
+    $this->body('function', function($parse, &$body, $meta, $modifiers) {
       $line= $parse->token->line;
       $comment= $parse->comment;
       $parse->comment= null;
@@ -871,7 +863,7 @@ class PHP extends Language {
       }
 
       $parse->forward();
-      $signature= $this->signature($parse);
+      $signature= $this->signature($parse, isset($meta[DETAIL_TARGET_ANNO]) ? $meta[DETAIL_TARGET_ANNO] : []);
 
       if ('{' === $parse->token->value) {          // Regular body
         $parse->forward();
@@ -884,7 +876,15 @@ class PHP extends Language {
         $parse->expecting('{ or ;', 'method declaration');
       }
 
-      $body[$lookup]= new Method($modifiers, $name, $signature, $statements, $annotations, $comment, $line);
+      $body[$lookup]= new Method(
+        $modifiers,
+        $name,
+        $signature,
+        $statements,
+        isset($meta[DETAIL_ANNOTATIONS]) ? $meta[DETAIL_ANNOTATIONS] : [],
+        $comment,
+        $line
+      );
     });
   }
 
@@ -963,9 +963,10 @@ class PHP extends Language {
     }
   }
 
-  private function properties($parse, &$body, $annotations, $modifiers, $type) {
+  private function properties($parse, &$body, $meta, $modifiers, $type) {
     $comment= $parse->comment;
     $parse->comment= null;
+    $annotations= isset($meta[DETAIL_ANNOTATIONS]) ? $meta[DETAIL_ANNOTATIONS] : [];
 
     while (';' !== $parse->token->value) {
       $line= $parse->token->line;
@@ -986,10 +987,11 @@ class PHP extends Language {
       $parse->forward();
       if ('=' === $parse->token->value) {
         $parse->forward();
-        $body[$lookup]= new Property($modifiers, $name, $type, $this->expression($parse, 0), $annotations, $comment, $line);
+        $expr= $this->expression($parse, 0);
       } else {
-        $body[$lookup]= new Property($modifiers, $name, $type, null, $annotations, $comment, $line);
+        $expr= null;
       }
+      $body[$lookup]= new Property($modifiers, $name, $type, $expr, $annotations, $comment, $line);
 
       if (',' === $parse->token->value) {
         $parse->forward();
@@ -998,36 +1000,117 @@ class PHP extends Language {
     $parse->expecting(';', 'field declaration');
   }
 
-  private function parameters($parse) {
+  /** Parses Hacklang-style annotations (<<test>>) */
+  private function annotations($parse, $context) {
+    $annotations= [];
+    do {
+      $name= $parse->token->value;
+      $parse->forward();
+
+      if ('(' === $parse->token->value) {
+        $parse->expecting('(', $context);
+        $annotations[$name]= $this->expression($parse, 0);
+        $parse->expecting(')', $context);
+      } else {
+        $annotations[$name]= null;
+      }
+
+      if (',' === $parse->token->value) {
+        $parse->forward();
+        continue;
+      } else if ('>>' === $parse->token->value) {
+        break;
+      } else {
+        $parse->expecting(', or >>', $context);
+      }
+    } while (null !== $parse->token->value);
+
+    $parse->expecting('>>', $context);
+    return $annotations;
+  }
+
+  /** Parses XP-style annotations (#[@test]) */
+  private function meta($parse, $context) {
+    $meta= [DETAIL_ANNOTATIONS => [], DETAIL_TARGET_ANNO => []];
+    do {
+      $parse->expecting('@', $context);
+
+      if ('variable' === $parse->token->kind) {
+        $param= $parse->token->value;
+        $parse->forward();
+        $parse->expecting(':', $context);
+        $a= &$meta[DETAIL_TARGET_ANNO][$param];
+      } else {
+        $a= &$meta[DETAIL_ANNOTATIONS];
+      }
+
+      $name= $parse->token->value;
+      $parse->forward();
+
+      if ('(' === $parse->token->value) {
+        $parse->expecting('(', $context);
+
+        if ('name' === $parse->token->kind) {
+          $token= $parse->token;
+          $parse->forward();
+          $pairs= '=' === $parse->token->value;
+
+          $parse->queue[]= $parse->token;
+          $parse->token= $token;
+
+          if ($pairs) {
+            $line= $parse->token->line;
+            $values= [];
+            do {
+              $key= $parse->token->value;
+              $parse->warn('Use of deprecated annotation key/value pair "'.$key.'"', $context);
+              $parse->forward();
+              $parse->expecting('=', $context);
+
+              $values[]= [new Literal("'".$key."'"), $this->expression($parse, 0)];
+
+              if (',' === $parse->token->value) {
+                $parse->forward();
+                continue;
+              }
+              break;
+            } while (null !== $parse->token->value); 
+            $a[$name]= new ArrayLiteral($values, $line);
+          } else {
+            $a[$name]= $this->expression($parse, 0);
+          }
+        } else {
+          $a[$name]= $this->expression($parse, 0);
+        }
+        $parse->expecting(')', $context);
+      } else {
+        $a[$name]= null;
+      }
+
+      if (',' === $parse->token->value) {
+        $parse->forward();
+        continue;
+      } else if (']' === $parse->token->value) {
+        break;
+      } else {
+        $parse->expecting(', or ]', $context);
+      }
+    } while (null !== $parse->token->value);
+
+    $parse->expecting(']', $context);
+    return $meta;
+  }
+
+  private function parameters($parse, $target) {
     static $promotion= ['private' => true, 'protected' => true, 'public' => true];
 
     $parameters= [];
-    $annotations= [];
     while (')' !== $parse->token->value) {
       if ('<<' === $parse->token->value) {
-        do {
-          $parse->forward();
-
-          $name= $parse->token->value;
-          $parse->forward();
-
-          if ('(' === $parse->token->value) {
-            $parse->expecting('(', 'parameters');
-            $annotations[$name]= $this->expression($parse, 0);
-            $parse->expecting(')', 'parameters');
-          } else {
-            $annotations[$name]= null;
-          }
-
-          if (',' === $parse->token->value) {
-            continue;
-          } else if ('>>' === $parse->token->value) {
-            break;
-          } else {
-            $parse->expecting(', or >>', 'parameter annotation');
-          }
-        } while (null !== $parse->token->value);
-        $parse->expecting('>>', 'parameter annotation');
+        $parse->forward();
+        $annotations= $this->annotations($parse, 'parameter annotation');
+      } else {
+        $annotations= [];
       }
 
       if ('name' === $parse->token->kind && isset($promotion[$parse->token->value])) {
@@ -1054,6 +1137,7 @@ class PHP extends Language {
       }
 
       $name= $parse->token->value;
+      if (isset($target[$name])) $annotations= array_merge($annotations, $target[$name]);
       $parse->forward();
 
       $default= null;
@@ -1062,7 +1146,6 @@ class PHP extends Language {
         $default= $this->expression($parse, 0);
       }
       $parameters[]= new Parameter($name, $type, $default, $byref, $variadic, $promote, $annotations);
-      $annotations= [];
 
       if (')' === $parse->token->value) {
         break;
@@ -1093,45 +1176,25 @@ class PHP extends Language {
 
     $body= [];
     $modifiers= [];
-    $annotations= [];
+    $meta= [];
     while ('}' !== $parse->token->value) {
       if (isset($modifier[$parse->token->value])) {
         $modifiers[]= $parse->token->value;
         $parse->forward();
-      } else if (isset($this->body[$k= $parse->token->value])
-        ? ($f= $this->body[$k])
-        : (isset($this->body[$k= '@'.$parse->token->kind]) ? ($f= $this->body[$k]) : null)
-      ) {
-        $f($parse, $body, $annotations, $modifiers);
+      } else if ($f= $this->body[$parse->token->value] ?? $this->body['@'.$parse->token->kind] ?? null) {
+        $f($parse, $body, $meta, $modifiers);
         $modifiers= [];
-        $annotations= [];
-      } else if ('<<' === $parse->token->symbol->id) {
-        do {
-          $parse->forward();
-
-          $name= $parse->token->value;
-          $parse->forward();
-
-          if ('(' === $parse->token->value) {
-            $parse->forward();
-            $annotations[$name]= $this->expression($parse, 0);
-            $parse->expecting(')', 'annotations');
-          } else {
-            $annotations[$name]= null;
-          }
-
-          if (',' === $parse->token->value) {
-            continue;
-          } else if ('>>' === $parse->token->value) {
-            break;
-          } else {
-            $parse->expecting(', or >>', 'annotations');
-          }
-        } while (null !== $parse->token->value);
+        $meta= [];
+      } else if ('<<' === $parse->token->value) {
         $parse->forward();
+        $meta= [DETAIL_ANNOTATIONS => $this->annotations($parse, 'member annotations')];
+      } else if ('#[' === $parse->token->value) {
+        $parse->forward();
+        $meta= $this->meta($parse, 'member annotations');
       } else if ($type= $this->type($parse)) {
-        $this->properties($parse, $body, $annotations, $modifiers, $type);
+        $this->properties($parse, $body, $meta, $modifiers, $type);
         $modifiers= [];
+        $meta= [];
       } else {
         $parse->raise(sprintf(
           'Expected a type, modifier, property, annotation, method or "}", have "%s"',
@@ -1144,9 +1207,9 @@ class PHP extends Language {
     return $body;
   }
 
-  public function signature($parse) {
+  public function signature($parse, $annotations= []) {
     $parse->expecting('(', 'signature');
-    $parameters= $this->parameters($parse);
+    $parameters= $this->parameters($parse, $annotations);
     $parse->expecting(')', 'signature');
 
     if (':' === $parse->token->value) {

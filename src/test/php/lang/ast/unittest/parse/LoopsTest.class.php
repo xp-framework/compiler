@@ -1,24 +1,13 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\Assignment;
-use lang\ast\nodes\BinaryExpression;
-use lang\ast\nodes\BreakStatement;
-use lang\ast\nodes\ContinueStatement;
-use lang\ast\nodes\DoLoop;
-use lang\ast\nodes\ForLoop;
-use lang\ast\nodes\ForeachLoop;
-use lang\ast\nodes\GotoStatement;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Label;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\UnaryExpression;
-use lang\ast\nodes\Variable;
-use lang\ast\nodes\WhileLoop;
+use lang\ast\nodes\{Assignment, BinaryExpression, BreakStatement, ContinueStatement, DoLoop, ForLoop, ForeachLoop, GotoStatement, InvokeExpression, Label, Literal, UnaryExpression, Variable, WhileLoop};
+use unittest\Assert;
 
 class LoopsTest extends ParseTest {
   private $loop;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->loop= new InvokeExpression(new Literal('loop', self::LINE), [], self::LINE);
   }

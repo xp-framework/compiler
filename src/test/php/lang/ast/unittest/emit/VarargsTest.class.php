@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class VarargsTest extends EmittingTest {
 
   #[@test]
@@ -14,7 +16,7 @@ class VarargsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Hello Test', $r);
+    Assert::equals('Hello Test', $r);
   }
 
   #[@test]
@@ -29,6 +31,6 @@ class VarargsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(['Hello', 'Test'], $r);
+    Assert::equals(['Hello', 'Test'], $r);
   }
 }

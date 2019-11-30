@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
+use unittest\Assert;
 
 class ExceptionsTest extends EmittingTest {
 
@@ -16,7 +17,7 @@ class ExceptionsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(IllegalArgumentException::class, $t->newInstance()->run());
+    Assert::equals(IllegalArgumentException::class, $t->newInstance()->run());
   }
 
   #[@test]
@@ -31,7 +32,7 @@ class ExceptionsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(4, $t->newInstance()->run());
+    Assert::equals(4, $t->newInstance()->run());
   }
 
   #[@test]
@@ -46,7 +47,7 @@ class ExceptionsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(IllegalArgumentException::class, $t->newInstance()->run());
+    Assert::equals(IllegalArgumentException::class, $t->newInstance()->run());
   }
 
   #[@test]
@@ -64,7 +65,7 @@ class ExceptionsTest extends EmittingTest {
 
     $instance= $t->newInstance();
     $instance->run();
-    $this->assertTrue($instance->closed);
+    Assert::true($instance->closed);
   }
 
   #[@test]
@@ -85,7 +86,7 @@ class ExceptionsTest extends EmittingTest {
       $instance->run();
       $this->fail('Expected exception not caught', null, IllegalArgumentException::class);
     } catch (IllegalArgumentException $expected) {
-      $this->assertTrue($instance->closed);
+      Assert::true($instance->closed);
     }
   }
 
@@ -100,7 +101,7 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
-  public function throw_expression_with_ternary() {
+  public function throw_expression_with_short_ternary() {
     $t= $this->type('class <T> {
       public function run($user) {
         return $user ?: throw new \\lang\\IllegalArgumentException("test");
@@ -110,7 +111,7 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
-  public function throw_expression_with_short_ternary() {
+  public function throw_expression_with_normal_ternary() {
     $t= $this->type('class <T> {
       public function run($user) {
         return $user ? new User($user) : throw new \\lang\\IllegalArgumentException("test");

@@ -1,7 +1,6 @@
 <?php namespace lang\ast;
 
-use lang\IllegalArgumentException;
-use lang\IllegalStateException;
+use lang\{IllegalArgumentException, IllegalStateException};
 use lang\ast\Node;
 use lang\reflect\Package;
 

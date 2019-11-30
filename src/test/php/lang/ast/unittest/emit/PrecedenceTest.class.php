@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class PrecedenceTest extends EmittingTest {
 
   #[@test, @values([
@@ -9,7 +11,7 @@ class PrecedenceTest extends EmittingTest {
   #  ['2 + 5 % 2', 3],
   #])]
   public function mathematical($input, $result) {
-    $this->assertEquals($result, $this->run(
+    Assert::equals($result, $this->run(
       'class <T> {
         public function run() {
           return '.$input.';
@@ -27,6 +29,20 @@ class PrecedenceTest extends EmittingTest {
         }
       }'
     );
-    $this->assertEquals('('.$t->getName().')', $t->newinstance()->run());
+    Assert::equals('('.$t->getName().')', $t->newInstance()->run());
+  }
+
+  #[@test]
+  public function plusplus() {
+    $t= $this->type(
+      'class <T> {
+        private $number= 1;
+
+        public function run() {
+          return ++$this->number;
+        }
+      }'
+    );
+    Assert::equals(2, $t->newinstance()->run());
   }
 }

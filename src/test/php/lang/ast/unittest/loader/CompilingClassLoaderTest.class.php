@@ -1,19 +1,16 @@
 <?php namespace lang\ast\unittest\loader;
 
-use io\File;
-use io\FileUtil;
-use io\Folder;
-use lang\ClassFormatException;
-use lang\ClassLoader;
-use lang\Environment;
+use io\{File, FileUtil, Folder};
 use lang\ast\CompilingClassLoader;
+use lang\{ClassFormatException, ClassLoader, Environment};
+use unittest\Assert;
 use unittest\TestCase;
 
-class CompilingClassLoaderTest extends TestCase {
+class CompilingClassLoaderTest {
   private static $runtime;
 
   static function __static() {
-    self::$runtime= defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION;
+    self::$runtime= 'PHP.'.PHP_VERSION;
   }
 
   /**
@@ -47,13 +44,13 @@ class CompilingClassLoaderTest extends TestCase {
 
   #[@test]
   public function load_class() {
-    $this->assertEquals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
+    Assert::equals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
   }
 
-  #[@test, @expect(
-  #  class= ClassFormatException::class,
-  #  withMessage= 'Compiler error: Expected "{", have "(end)"'
-  #)]
+  #[@test, @expect([
+  #  'class' => ClassFormatException::class,
+  #  'withMessage' => 'Compiler error: Expected "{", have "(end)"'
+  #])]
   public function load_class_with_syntax_errors() {
     $this->load('Errors', "<?php\nclass");
   }
@@ -67,7 +64,7 @@ class CompilingClassLoaderTest extends TestCase {
     }');
 
     $t->newInstance()->trigger();
-    $this->assertNotEquals(false, strpos(
+    Assert::notEquals(false, strpos(
       preg_replace('#^.+://#', '', key(\xp::$errors)),
       strtr($t->getName(), '.', DIRECTORY_SEPARATOR).'.php'
     ));

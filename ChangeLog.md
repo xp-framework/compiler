@@ -3,6 +3,51 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.0.0 / ????-??-??
+
+* Merged PR #79: Convert testsuite to baseless tests - @thekid
+* Merged PR #78: Deprecate curly brace syntax for offsets; consistent
+  with PHP 7.4
+  (@thekid)
+* Added support for XP 10 and newer versions of library dependencies
+  (@thekid)
+* Implemented xp-framework/rfc#334: Drop PHP 5.6. The minimum required
+  PHP version is now 7.0.0!
+  (@thekid)
+
+## 4.3.1 / 2019-11-30
+
+* Added compatibility with XP 10, see xp-framework/rfc#333 - @thekid
+
+## 4.3.0 / 2019-11-24
+
+* Fixed global constants in ternaries being ambiguous with goto labels
+  (@thekid)
+* Fixed emitting `switch` statements and case labels' ambiguity w/ goto
+  (@thekid)
+* Fixed an operator precedence problem causing incorrect nesting in the
+  parsed AST for unary prefix operators.
+  (@thekid)
+* Merged PR #77: Add support for #-style comments including support for
+  XP style annotations
+  (@thekid)
+
+## 4.2.1 / 2019-10-05
+
+* Fixed parser to allow "extending" final and abstract types - @thekid
+
+## 4.2.0 / 2019-10-04
+
+* Fixed issue #74: No longer shadow compiler errors in certain cases
+  (@thekid)
+* Merged PR #75: Add "ast" subcommand to display the abstract syntax tree
+  (@thekid)
+
+## 4.1.0 / 2019-10-01
+
+* Merged PR #73: Add support for annotations in anonymous classes
+  (@thekid)
+
 ## 4.0.0 / 2019-09-09
 
 * Merged PR #69: Remove support for Hack arrow functions - @thekid

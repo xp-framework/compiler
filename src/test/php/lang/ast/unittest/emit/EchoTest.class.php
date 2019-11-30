@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class EchoTest extends EmittingTest {
 
   /**
@@ -17,7 +19,7 @@ class EchoTest extends EmittingTest {
         private function hello() { return "Hello"; }
         public function run() { '.$statement.' }
       }');
-      $this->assertEquals($expected, ob_get_contents());
+      Assert::equals($expected, ob_get_contents());
     } finally {
       ob_end_clean();
     }

@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
 /**
  * Property types
  *
@@ -14,7 +15,7 @@ class PropertyTypesTest extends EmittingTest {
       private int $test;
     }');
 
-    $this->assertEquals('int', $t->getField('test')->getTypeName());
+    Assert::equals('int', $t->getField('test')->getTypeName());
   }
 
   #[@test]
@@ -23,7 +24,7 @@ class PropertyTypesTest extends EmittingTest {
       private static self $instance;
     }');
 
-    $this->assertEquals('self', $t->getField('instance')->getTypeName());
+    Assert::equals('self', $t->getField('instance')->getTypeName());
   }
 
   #[@test]
@@ -32,6 +33,6 @@ class PropertyTypesTest extends EmittingTest {
       private \\lang\\Value $value;
     }');
 
-    $this->assertEquals('lang.Value', $t->getField('value')->getTypeName());
+    Assert::equals('lang.Value', $t->getField('value')->getTypeName());
   }
 }

@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\Errors;
+use unittest\Assert;
 
 class ErrorsTest extends ParseTest {
 
@@ -16,7 +17,7 @@ class ErrorsTest extends ParseTest {
       iterator_to_array($parse);
       $this->fail('No exception raised', null, Errors::class);
     } catch (Errors $expected) {
-      $this->assertEquals($message, $expected->getMessage());
+      Assert::equals($message, $expected->getMessage());
     }
   }
 
@@ -71,7 +72,7 @@ class ErrorsTest extends ParseTest {
   #[@test]
   public function unclosed_annotation() {
     $this->assertError(
-      'Expected ", or >>", have "(end)" in annotation',
+      'Expected ", or >>", have "(end)" in annotations',
       $this->parse('<<annotation')
     );
   }

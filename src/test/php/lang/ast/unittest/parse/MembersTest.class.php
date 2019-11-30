@@ -1,16 +1,8 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\Type;
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\nodes\Constant;
-use lang\ast\nodes\InstanceExpression;
-use lang\ast\nodes\InvokeExpression;
-use lang\ast\nodes\Literal;
-use lang\ast\nodes\Method;
-use lang\ast\nodes\Property;
-use lang\ast\nodes\ScopeExpression;
-use lang\ast\nodes\Signature;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{ClassDeclaration, Constant, InstanceExpression, InvokeExpression, Literal, Method, Property, ScopeExpression, Signature, Variable};
+use unittest\Assert;
 
 class MembersTest extends ParseTest {
 

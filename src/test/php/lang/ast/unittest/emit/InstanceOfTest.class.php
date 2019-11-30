@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class InstanceOfTest extends EmittingTest {
 
   #[@test]
@@ -10,7 +12,7 @@ class InstanceOfTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -21,7 +23,7 @@ class InstanceOfTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -32,7 +34,7 @@ class InstanceOfTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -43,7 +45,7 @@ class InstanceOfTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -54,6 +56,6 @@ class InstanceOfTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 }

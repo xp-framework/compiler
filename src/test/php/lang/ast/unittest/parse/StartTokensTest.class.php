@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\nodes\NamespaceDeclaration;
-use lang\ast\nodes\Start;
+use lang\ast\nodes\{NamespaceDeclaration, Start};
+use unittest\Assert;
 
 class StartTokensTest extends ParseTest {
 

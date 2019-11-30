@@ -1,7 +1,6 @@
 <?php namespace xp\compiler;
 
-use io\File;
-use io\Folder;
+use io\{File, Folder};
 
 class ToFolder extends ToFileSystem {
   private $folder;

@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class ReturnTest extends EmittingTest {
 
   #[@test]
@@ -9,7 +11,7 @@ class ReturnTest extends EmittingTest {
         return "Test";
       }
     }');
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -21,7 +23,7 @@ class ReturnTest extends EmittingTest {
         return $this->member;
       }
     }');
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -31,6 +33,6 @@ class ReturnTest extends EmittingTest {
         return;
       }
     }');
-    $this->assertEquals(null, $r);
+    Assert::equals(null, $r);
   }
 }

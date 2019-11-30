@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Runnable;
+use unittest\Assert;
 use util\AbstractDeferredInvokationHandler;
 
 /**
@@ -20,7 +21,7 @@ class AnonymousClassTest extends EmittingTest {
         };
       }
     }');
-    $this->assertEquals('test', $r->id());
+    Assert::equals('test', $r->id());
   }
 
   #[@test]
@@ -34,7 +35,7 @@ class AnonymousClassTest extends EmittingTest {
         };
       }
     }');
-    $this->assertInstanceOf(AbstractDeferredInvokationHandler::class, $r);
+    Assert::instance(AbstractDeferredInvokationHandler::class, $r);
   }
 
   #[@test]
@@ -48,6 +49,21 @@ class AnonymousClassTest extends EmittingTest {
         };
       }
     }');
-    $this->assertInstanceOf(Runnable::class, $r);
+    Assert::instance(Runnable::class, $r);
+  }
+
+  #[@test]
+  public function method_annotations() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return new class() {
+
+          <<inside>>
+          public function fixture() { }
+        };
+      }
+    }');
+
+    Assert::equals(['inside' => null], typeof($r)->getMethod('fixture')->getAnnotations());
   }
 }

@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\TypeUnion;
-use lang\Primitive;
+use lang\{Primitive, TypeUnion};
+use unittest\Assert;
 
 /**
  * Function types
@@ -16,7 +16,7 @@ class UnionTypesTest extends EmittingTest {
       private int|string $test;
     }');
 
-    $this->assertEquals(
+    Assert::equals(
       new TypeUnion([Primitive::$INT, Primitive::$STRING]),
       $t->getField('test')->getType()
     );
@@ -28,7 +28,7 @@ class UnionTypesTest extends EmittingTest {
       public function test(int|string $arg) { }
     }');
 
-    $this->assertEquals(
+    Assert::equals(
       new TypeUnion([Primitive::$INT, Primitive::$STRING]),
       $t->getMethod('test')->getParameter(0)->getType()
     );
@@ -40,7 +40,7 @@ class UnionTypesTest extends EmittingTest {
       public function test(): int|string { }
     }');
 
-    $this->assertEquals(
+    Assert::equals(
       new TypeUnion([Primitive::$INT, Primitive::$STRING]),
       $t->getMethod('test')->getReturnType()
     );
