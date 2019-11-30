@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 5.0.0 / ????-??-??
 
+* Merged PR #70: Extract compact methods; to use these, require the
+  library https://github.com/xp-lang/php-compact-methods
+  (@thekid)
 * Merged PR #79: Convert testsuite to baseless tests - @thekid
 * Merged PR #78: Deprecate curly brace syntax for offsets; consistent
   with PHP 7.4
