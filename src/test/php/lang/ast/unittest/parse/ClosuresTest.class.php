@@ -1,12 +1,14 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\{FunctionType, Type};
 use lang\ast\nodes\{BinaryExpression, ClosureExpression, Literal, Parameter, ReturnStatement, Signature, Variable};
+use lang\ast\{FunctionType, Type};
+use unittest\Assert;
 
 class ClosuresTest extends ParseTest {
   private $returns;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->returns= new ReturnStatement(
       new BinaryExpression(

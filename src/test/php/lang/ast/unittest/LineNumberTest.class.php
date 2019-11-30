@@ -2,8 +2,9 @@
 
 use lang\ast\Tokens;
 use text\StringTokenizer;
+use unittest\Assert;
 
-class LineNumberTest extends \unittest\TestCase {
+class LineNumberTest {
 
   /**
    * Assertion helper
@@ -18,7 +19,7 @@ class LineNumberTest extends \unittest\TestCase {
     foreach ($tokens as $type => $value) {
       $actual[]= [$value[0] => $value[1]];
     }
-    $this->assertEquals($expected, $actual);
+    Assert::equals($expected, $actual);
   }
 
   #[@test]

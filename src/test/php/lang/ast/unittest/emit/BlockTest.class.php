@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class BlockTest extends EmittingTest {
 
   #[@test]
@@ -12,7 +14,7 @@ class BlockTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -26,6 +28,6 @@ class BlockTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 }

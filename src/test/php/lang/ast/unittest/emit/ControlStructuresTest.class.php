@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class ControlStructuresTest extends EmittingTest {
 
   #[@test, @values([
@@ -21,7 +23,7 @@ class ControlStructuresTest extends EmittingTest {
       }
     }', $input);
 
-    $this->assertEquals($expected, $r);
+    Assert::equals($expected, $r);
   }
 
   #[@test, @values([
@@ -41,7 +43,7 @@ class ControlStructuresTest extends EmittingTest {
       }
     }', $input);
 
-    $this->assertEquals($expected, $r);
+    Assert::equals($expected, $r);
   }
 
   #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
@@ -57,6 +59,6 @@ class ControlStructuresTest extends EmittingTest {
       }
     }', $whence);
 
-    $this->assertEquals($expected, $r);
+    Assert::equals($expected, $r);
   }
 }

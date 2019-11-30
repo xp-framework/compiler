@@ -2,6 +2,7 @@
 
 use lang\ast\Errors;
 use lang\ast\nodes\{ClassDeclaration, InterfaceDeclaration, NamespaceDeclaration, TraitDeclaration, UseExpression};
+use unittest\Assert;
 
 class TypesTest extends ParseTest {
 

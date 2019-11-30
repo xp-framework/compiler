@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Primitive;
+use unittest\Assert;
 
 /**
  * Argument unpacking
@@ -20,7 +21,7 @@ class ArgumentUnpackingTest extends EmittingTest {
         return $this->fixture(...$args);
       }
     }');
-    $this->assertEquals([1, 2, 3], $r);
+    Assert::equals([1, 2, 3], $r);
   }
 
   #[@test]
@@ -31,7 +32,7 @@ class ArgumentUnpackingTest extends EmittingTest {
         return [1, 2, ...$args];
       }
     }');
-    $this->assertEquals([1, 2, 3, 4], $r);
+    Assert::equals([1, 2, 3, 4], $r);
   }
 
   #[@test]
@@ -41,7 +42,7 @@ class ArgumentUnpackingTest extends EmittingTest {
         return [1, 2, ...[3, 4]];
       }
     }');
-    $this->assertEquals([1, 2, 3, 4], $r);
+    Assert::equals([1, 2, 3, 4], $r);
   }
 
   #[@test]
@@ -52,7 +53,7 @@ class ArgumentUnpackingTest extends EmittingTest {
         return ["color" => "red", ...$args, "year" => 2002];
       }
     }');
-    $this->assertEquals(['color' => 'red', 'type' => 'car', 'year' => 2002], $r);
+    Assert::equals(['color' => 'red', 'type' => 'car', 'year' => 2002], $r);
   }
 
   #[@test]
@@ -67,7 +68,7 @@ class ArgumentUnpackingTest extends EmittingTest {
         return [...$this->items()];
       }
     }');
-    $this->assertEquals([1, 2], $r);
+    Assert::equals([1, 2], $r);
   }
 
   #[@test]
@@ -81,6 +82,6 @@ class ArgumentUnpackingTest extends EmittingTest {
         return [...$this->items()];
       }
     }');
-    $this->assertEquals([1, 2], $r);
+    Assert::equals([1, 2], $r);
   }
 }

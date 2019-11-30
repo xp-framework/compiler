@@ -3,8 +3,9 @@
 use lang\FormatException;
 use lang\ast\Tokens;
 use text\StringTokenizer;
+use unittest\Assert;
 
-class TokensTest extends \unittest\TestCase {
+class TokensTest {
 
   /**
    * Assertion helper
@@ -19,7 +20,7 @@ class TokensTest extends \unittest\TestCase {
     foreach ($tokens as $type => $value) {
       $actual[]= [$type => $value[0]];
     }
-    $this->assertEquals($expected, $actual);
+    Assert::equals($expected, $actual);
   }
 
   #[@test]

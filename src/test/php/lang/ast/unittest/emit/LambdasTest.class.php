@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\Errors;
+use unittest\Assert;
 use unittest\actions\RuntimeVersion;
 
 /**
@@ -18,7 +19,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(2, $r(1));
+    Assert::equals(2, $r(1));
   }
 
   #[@test]
@@ -29,7 +30,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1, 2));
+    Assert::equals(3, $r(1, 2));
   }
 
   #[@test]
@@ -42,7 +43,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -54,7 +55,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -69,7 +70,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -82,7 +83,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -94,7 +95,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -105,7 +106,7 @@ class LambdasTest extends EmittingTest {
       }
     }', 2);
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -117,7 +118,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(3, $r(1));
+    Assert::equals(3, $r(1));
   }
 
   #[@test]
@@ -128,7 +129,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('lang.Value', typeof($r)->signature()[0]->getName());
+    Assert::equals('lang.Value', typeof($r)->signature()[0]->getName());
   }
 
   #[@test, @action(new RuntimeVersion('>=7.0'))]
@@ -139,7 +140,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('lang.Value', typeof($r)->returns()->getName());
+    Assert::equals('lang.Value', typeof($r)->returns()->getName());
   }
 
   #[@test]
@@ -150,7 +151,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(1, $r());
+    Assert::equals(1, $r());
   }
 
   #[@test]
@@ -161,7 +162,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('IIFE', $r);
+    Assert::equals('IIFE', $r);
   }
 
   #[@test]
@@ -175,7 +176,7 @@ class LambdasTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals(2, $r());
+    Assert::equals(2, $r());
   }
 
   #[@test]

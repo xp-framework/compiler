@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\nodes\{InstanceExpression, InvokeExpression, Literal, Variable};
+use unittest\Assert;
 
 /**
  * Invocation expressions

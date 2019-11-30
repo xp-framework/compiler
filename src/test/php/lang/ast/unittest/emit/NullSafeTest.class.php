@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
+use unittest\Assert;
 
 /**
  * Annotations support
@@ -20,7 +21,7 @@ class NullSafeTest extends EmittingTest {
       }
     }');
 
-    $this->assertNull($r);
+    Assert::null($r);
   }
 
   #[@test]
@@ -34,7 +35,7 @@ class NullSafeTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -46,7 +47,7 @@ class NullSafeTest extends EmittingTest {
       }
     }');
 
-    $this->assertNull($r);
+    Assert::null($r);
   }
 
   #[@test]
@@ -60,7 +61,7 @@ class NullSafeTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 
   #[@test]
@@ -81,7 +82,7 @@ class NullSafeTest extends EmittingTest {
       }
     ');
 
-    $this->assertEquals([null, ['outer', 'inner']], $r);
+    Assert::equals([null, ['outer', 'inner']], $r);
   }
 
   #[@test]
@@ -98,6 +99,6 @@ class NullSafeTest extends EmittingTest {
       }
     }');
 
-    $this->assertTrue($r);
+    Assert::true($r);
   }
 }
