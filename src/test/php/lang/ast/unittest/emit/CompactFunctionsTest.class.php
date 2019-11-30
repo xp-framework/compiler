@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
 /**
  * Compact functions syntax
  *
@@ -13,7 +14,7 @@ class CompactFunctionsTest extends EmittingTest {
     $r= $this->run('class <T> {
       public fn run() => "test";
     }');
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 
   #[@test]
@@ -23,7 +24,7 @@ class CompactFunctionsTest extends EmittingTest {
 
       public fn run() => $this->id;
     }');
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 
   #[@test]
@@ -36,6 +37,6 @@ class CompactFunctionsTest extends EmittingTest {
         return $this->withId("test")->id();
       }
     }');
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 }

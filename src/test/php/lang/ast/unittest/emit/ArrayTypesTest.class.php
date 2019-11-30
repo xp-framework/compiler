@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
 /**
  * Array types
  *
@@ -13,7 +14,7 @@ class ArrayTypesTest extends EmittingTest {
       private array<int> $test;
     }');
 
-    $this->assertEquals('int[]', $t->getField('test')->getType()->getName());
+    Assert::equals('int[]', $t->getField('test')->getType()->getName());
   }
 
   #[@test]
@@ -22,7 +23,7 @@ class ArrayTypesTest extends EmittingTest {
       private array<string, int> $test;
     }');
 
-    $this->assertEquals('[:int]', $t->getField('test')->getType()->getName());
+    Assert::equals('[:int]', $t->getField('test')->getType()->getName());
   }
 
   #[@test]
@@ -31,7 +32,7 @@ class ArrayTypesTest extends EmittingTest {
       private array<string, array<int>> $test;
     }');
 
-    $this->assertEquals('[:int[]]', $t->getField('test')->getType()->getName());
+    Assert::equals('[:int[]]', $t->getField('test')->getType()->getName());
   }
 
   #[@test]
@@ -40,6 +41,6 @@ class ArrayTypesTest extends EmittingTest {
       private array<string, mixed> $test;
     }');
 
-    $this->assertEquals('[:var]', $t->getField('test')->getType()->getName());
+    Assert::equals('[:var]', $t->getField('test')->getType()->getName());
   }
 }

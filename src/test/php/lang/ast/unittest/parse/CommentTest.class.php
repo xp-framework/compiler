@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\nodes\Literal;
+use unittest\Assert;
 
 class CommentTest extends ParseTest {
 

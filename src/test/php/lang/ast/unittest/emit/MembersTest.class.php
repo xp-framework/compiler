@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class MembersTest extends EmittingTest {
 
   #[@test]
@@ -12,7 +14,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -25,7 +27,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -38,7 +40,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -51,7 +53,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -68,7 +70,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -81,7 +83,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('MON', $r);
+    Assert::equals('MON', $r);
   }
 
   #[@test]
@@ -93,7 +95,7 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $r);
+    Assert::equals('Test', $r);
   }
 
   #[@test]
@@ -105,6 +107,6 @@ class MembersTest extends EmittingTest {
       }
     }');
 
-    $this->assertNull($r);
+    Assert::null($r);
   }
 }

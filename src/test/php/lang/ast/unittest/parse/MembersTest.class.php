@@ -2,6 +2,7 @@
 
 use lang\ast\Type;
 use lang\ast\nodes\{ClassDeclaration, Constant, InstanceExpression, InvokeExpression, Literal, Method, Property, ScopeExpression, Signature, Variable};
+use unittest\Assert;
 
 class MembersTest extends ParseTest {
 

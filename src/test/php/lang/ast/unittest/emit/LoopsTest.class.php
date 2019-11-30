@@ -1,5 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class LoopsTest extends EmittingTest {
 
   #[@test]
@@ -14,7 +16,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3', $r);
+    Assert::equals('1,2,3', $r);
   }
 
   #[@test]
@@ -29,7 +31,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('a=1,b=2,c=3', $r);
+    Assert::equals('a=1,b=2,c=3', $r);
   }
 
   #[@test]
@@ -42,7 +44,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3', $r);
+    Assert::equals('1,2,3', $r);
   }
 
   #[@test]
@@ -57,7 +59,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3', $r);
+    Assert::equals('1,2,3', $r);
   }
 
   #[@test]
@@ -73,7 +75,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3,4', $r);
+    Assert::equals('1,2,3,4', $r);
   }
 
   #[@test]
@@ -89,7 +91,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('1,2,3,4', $r);
+    Assert::equals('1,2,3,4', $r);
   }
 
   #[@test]
@@ -109,7 +111,7 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals([1, 2, 3], $r);
+    Assert::equals([1, 2, 3], $r);
   }
 
   #[@test]
@@ -129,6 +131,6 @@ class LoopsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals([2, 3, 4], $r);
+    Assert::equals([2, 3, 4], $r);
   }
 }

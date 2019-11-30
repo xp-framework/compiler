@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
 /**
  * Using statement and disposables
  *
@@ -20,7 +21,7 @@ class UsingTest extends EmittingTest {
         return Handle::$called;
       }
     }');
-    $this->assertEquals(['read@1', '__dispose@1'], $r);
+    Assert::equals(['read@1', '__dispose@1'], $r);
   }
 
   #[@test]
@@ -36,7 +37,7 @@ class UsingTest extends EmittingTest {
         return Handle::$called;
       }
     }');
-    $this->assertEquals(['read@1', '__dispose@1', '__dispose@2'], $r);
+    Assert::equals(['read@1', '__dispose@1', '__dispose@2'], $r);
   }
 
   #[@test]
@@ -56,7 +57,7 @@ class UsingTest extends EmittingTest {
         throw new IllegalStateException("No exception caught");
       }
     }');
-    $this->assertEquals(['read@1', '__dispose@1'], $r);
+    Assert::equals(['read@1', '__dispose@1'], $r);
   }
 
   #[@test]
@@ -72,7 +73,7 @@ class UsingTest extends EmittingTest {
         return FileInput::$open;
       }
     }');
-    $this->assertFalse($r);
+    Assert::false($r);
   }
 
   #[@test]
@@ -90,7 +91,7 @@ class UsingTest extends EmittingTest {
         return ["called" => Handle::$called, "returned" => $returned];
       }
     }');
-    $this->assertEquals(['called' => ['read@1', '__dispose@1'], 'returned' => 'test'], $r);
+    Assert::equals(['called' => ['read@1', '__dispose@1'], 'returned' => 'test'], $r);
   }
 
   #[@test]
@@ -103,7 +104,7 @@ class UsingTest extends EmittingTest {
         return isset($x);
       }
     }');
-    $this->assertFalse($r);
+    Assert::false($r);
   }
 
   #[@test]
@@ -117,6 +118,6 @@ class UsingTest extends EmittingTest {
         return isset($x);
       }
     }');
-    $this->assertFalse($r);
+    Assert::false($r);
   }
 }

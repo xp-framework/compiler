@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Primitive;
+use unittest\Assert;
 
 /**
  * Argument promotion
@@ -23,7 +24,7 @@ class ArgumentPromotionTest extends EmittingTest {
         return $this->id;
       }
     }');
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 
   #[@test]
@@ -37,7 +38,7 @@ class ArgumentPromotionTest extends EmittingTest {
         return $this->id;
       }
     }');
-    $this->assertEquals('tested', $r);
+    Assert::equals('tested', $r);
   }
 
   #[@test]
@@ -51,7 +52,7 @@ class ArgumentPromotionTest extends EmittingTest {
         return $this->withId("test")->id;
       }
     }');
-    $this->assertEquals('test', $r);
+    Assert::equals('test', $r);
   }
 
   #[@test]
@@ -60,7 +61,7 @@ class ArgumentPromotionTest extends EmittingTest {
       public function __construct(private int $id, private string $name) {
       }
     }');
-    $this->assertEquals(
+    Assert::equals(
       [Primitive::$INT, Primitive::$STRING],
       [$t->getField('id')->getType(), $t->getField('name')->getType()]
     );

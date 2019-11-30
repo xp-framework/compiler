@@ -1,8 +1,12 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ClassCastException;
+use unittest\Assert;
 
 class CastingTest extends EmittingTest {
+
+  /** @return string */
+  public function test() { return 'Test'; }
 
   #[@test, @values([
   #  0, 1, -1, 0.5, -1.5,
@@ -10,7 +14,7 @@ class CastingTest extends EmittingTest {
   #  true, false
   #])]
   public function string_cast($value) {
-    $this->assertEquals((string)$value, $this->run(
+    Assert::equals((string)$value, $this->run(
       'class <T> {
         public function run($value) {
           return (string)$value;
@@ -28,7 +32,7 @@ class CastingTest extends EmittingTest {
   #  true, false
   #])]
   public function int_cast($value) {
-    $this->assertEquals((int)$value, $this->run(
+    Assert::equals((int)$value, $this->run(
       'class <T> {
         public function run($value) {
           return (int)$value;
@@ -45,7 +49,7 @@ class CastingTest extends EmittingTest {
   #  null, false, true, 1, 1.5, "", "test"
   #])]
   public function array_cast($value) {
-    $this->assertEquals((array)$value, $this->run(
+    Assert::equals((array)$value, $this->run(
       'class <T> {
         public function run($value) {
           return (array)$value;
@@ -57,7 +61,7 @@ class CastingTest extends EmittingTest {
 
   #[@test]
   public function value_cast() {
-    $this->assertEquals($this, $this->run(
+    Assert::equals($this, $this->run(
       'class <T> {
         public function run($value) {
           return (\lang\ast\unittest\emit\CastingTest)$value;
@@ -69,7 +73,7 @@ class CastingTest extends EmittingTest {
 
   #[@test]
   public function int_array_cast() {
-    $this->assertEquals([1, 2, 3], $this->run(
+    Assert::equals([1, 2, 3], $this->run(
       'class <T> {
         public function run($value) {
           return (array<int>)$value;
@@ -90,7 +94,7 @@ class CastingTest extends EmittingTest {
 
   #[@test, @values([null, 'test'])]
   public function nullable_string_cast_of($value) {
-    $this->assertEquals($value, $this->run(
+    Assert::equals($value, $this->run(
       'class <T> {
         public function run($value) {
           return (?string)$value;
@@ -102,7 +106,7 @@ class CastingTest extends EmittingTest {
 
   #[@test]
   public function cast_braced() {
-    $this->assertEquals(['test'], $this->run(
+    Assert::equals(['test'], $this->run(
       'class <T> {
         public function run($value) {
           return (array<string>)($value);
@@ -114,19 +118,19 @@ class CastingTest extends EmittingTest {
 
   #[@test]
   public function cast_to_function_type_and_invoke() {
-    $this->assertEquals($this->getName(), $this->run(
+    Assert::equals($this->test(), $this->run(
       'class <T> {
         public function run($value) {
           return ((function(): string)($value))();
         }
       }',
-      [$this, 'getName']
+      [$this, 'test']
     ));
   }
 
   #[@test]
   public function object_cast_on_literal() {
-    $this->assertEquals((object)['key' => 'value'], $this->run(
+    Assert::equals((object)['key' => 'value'], $this->run(
       'class <T> {
         public function run($value) {
           return (object)["key" => "value"];
@@ -142,7 +146,7 @@ class CastingTest extends EmittingTest {
   #  [null, null]
   #])]
   public function nullable_int($value, $expected) {
-    $this->assertEquals($expected, $this->run(
+    Assert::equals($expected, $this->run(
       'class <T> {
         public function run($value) {
           return (?int)$value;
@@ -154,7 +158,7 @@ class CastingTest extends EmittingTest {
 
   #[@test, @values([new Handle(10), null])]
   public function nullable_value($value) {
-    $this->assertEquals($value, $this->run(
+    Assert::equals($value, $this->run(
       'class <T> {
         public function run($value) {
           return (?\lang\ast\unittest\emit\Handle)$value;

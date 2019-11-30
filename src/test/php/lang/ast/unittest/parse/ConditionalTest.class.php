@@ -1,11 +1,13 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\nodes\{CaseLabel, IfStatement, InvokeExpression, Literal, SwitchStatement, Variable};
+use unittest\Assert;
 
 class ConditionalTest extends ParseTest {
   private $blocks;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->blocks= [
       1 => [new InvokeExpression(new Literal('action1', self::LINE), [], self::LINE)],

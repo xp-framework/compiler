@@ -18,6 +18,7 @@ use lang\ast\nodes\{
   UnaryExpression,
   Variable
 };
+use unittest\Assert;
 
 class OperatorTest extends ParseTest {
 

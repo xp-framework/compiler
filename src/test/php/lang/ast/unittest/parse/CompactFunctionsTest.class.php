@@ -1,11 +1,13 @@
 <?php namespace lang\ast\unittest\parse;
 
 use lang\ast\nodes\{ClassDeclaration, Literal, Method, ReturnStatement, Signature};
+use unittest\Assert;
 
 class CompactFunctionsTest extends ParseTest {
   private $return;
 
   /** @return void */
+  #[@before]
   public function setUp() {
     $this->return= new ReturnStatement(new Literal('null', self::LINE), self::LINE);
   }

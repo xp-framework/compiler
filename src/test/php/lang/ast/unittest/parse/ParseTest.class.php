@@ -1,11 +1,12 @@
 <?php namespace lang\ast\unittest\parse;
 
-use lang\ast\{Language, Node, Parse, Tokens};
 use lang\ast\nodes\Value;
+use lang\ast\{Language, Node, Parse, Tokens};
 use text\StringTokenizer;
+use unittest\Assert;
 use unittest\TestCase;
 
-abstract class ParseTest extends TestCase {
+abstract class ParseTest {
   const LINE = 1;
 
   /**
@@ -15,7 +16,7 @@ abstract class ParseTest extends TestCase {
    * @return iterable
    */
   protected function parse($code) {
-    return (new Parse(Language::named('PHP'), new Tokens(new StringTokenizer($code)), $this->getName()))->execute();
+    return (new Parse(Language::named('PHP'), new Tokens(new StringTokenizer($code)), static::class))->execute();
   }
 
   /**
@@ -31,6 +32,6 @@ abstract class ParseTest extends TestCase {
     foreach ($this->parse($code) as $node) {
       $actual[]= $node;
     }
-    $this->assertEquals($expected, $actual);
+    Assert::equals($expected, $actual);
   }
 }

@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
+use unittest\Assert;
 
 /**
  * Annotations support
@@ -16,70 +17,70 @@ class AnnotationsTest extends EmittingTest {
   #[@test]
   public function without_value() {
     $t= $this->type('<<test>> class <T> { }');
-    $this->assertEquals(['test' => null], $t->getAnnotations());
+    Assert::equals(['test' => null], $t->getAnnotations());
   }
 
   #[@test]
   public function primitive_value() {
     $t= $this->type('<<author("Timm")>> class <T> { }');
-    $this->assertEquals(['author' => 'Timm'], $t->getAnnotations());
+    Assert::equals(['author' => 'Timm'], $t->getAnnotations());
   }
 
   #[@test]
   public function array_value() {
     $t= $this->type('<<authors(["Timm", "Alex"])>> class <T> { }');
-    $this->assertEquals(['authors' => ['Timm', 'Alex']], $t->getAnnotations());
+    Assert::equals(['authors' => ['Timm', 'Alex']], $t->getAnnotations());
   }
 
   #[@test]
   public function map_value() {
     $t= $this->type('<<expect(["class" => \lang\IllegalArgumentException::class])>> class <T> { }');
-    $this->assertEquals(['expect' => ['class' => IllegalArgumentException::class]], $t->getAnnotations());
+    Assert::equals(['expect' => ['class' => IllegalArgumentException::class]], $t->getAnnotations());
   }
 
   #[@test]
   public function closure_value() {
     $t= $this->type('<<verify(function($arg) { return $arg; })>> class <T> { }');
     $f= $t->getAnnotation('verify');
-    $this->assertEquals('test', $f('test'));
+    Assert::equals('test', $f('test'));
   }
 
   #[@test]
   public function arrow_function_value() {
     $t= $this->type('<<verify(fn($arg) => $arg)>> class <T> { }');
     $f= $t->getAnnotation('verify');
-    $this->assertEquals('test', $f('test'));
+    Assert::equals('test', $f('test'));
   }
 
   #[@test]
   public function has_access_to_class() {
     $t= $this->type('<<expect(self::SUCCESS)>> class <T> { const SUCCESS = true; }');
-    $this->assertEquals(['expect' => true], $t->getAnnotations());
+    Assert::equals(['expect' => true], $t->getAnnotations());
   }
 
   #[@test]
   public function method() {
     $t= $this->type('class <T> { <<test>> public function fixture() { } }');
-    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getAnnotations());
+    Assert::equals(['test' => null], $t->getMethod('fixture')->getAnnotations());
   }
 
   #[@test]
   public function field() {
     $t= $this->type('class <T> { <<test>> public $fixture; }');
-    $this->assertEquals(['test' => null], $t->getField('fixture')->getAnnotations());
+    Assert::equals(['test' => null], $t->getField('fixture')->getAnnotations());
   }
 
   #[@test]
   public function param() {
     $t= $this->type('class <T> { public function fixture(<<test>> $param) { } }');
-    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
+    Assert::equals(['test' => null], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
   }
 
   #[@test]
   public function params() {
     $t= $this->type('class <T> { public function fixture(<<inject(["name" => "a"])>> $a, <<inject>> $b) { } }');
     $m=$t->getMethod('fixture');
-    $this->assertEquals(
+    Assert::equals(
       [['inject' => ['name' => 'a']], ['inject' => null]],
       [$m->getParameter(0)->getAnnotations(), $m->getParameter(1)->getAnnotations()]
     );
@@ -88,13 +89,13 @@ class AnnotationsTest extends EmittingTest {
   #[@test]
   public function multiple_class_annotations() {
     $t= $this->type('<<resource("/"), authenticated>> class <T> { }');
-    $this->assertEquals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
+    Assert::equals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
   }
 
   #[@test]
   public function multiple_member_annotations() {
     $t= $this->type('class <T> { <<test, values([1, 2, 3])>> public function fixture() { } }');
-    $this->assertEquals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
+    Assert::equals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
   }
 
   #[@test]
@@ -103,7 +104,7 @@ class AnnotationsTest extends EmittingTest {
       #[@test]
       class <T> { }'
     );
-    $this->assertEquals(['test' => null], $t->getAnnotations());
+    Assert::equals(['test' => null], $t->getAnnotations());
   }
 
   /** @deprecated */
@@ -113,7 +114,7 @@ class AnnotationsTest extends EmittingTest {
       #[@resource(path= "/", authenticated= true)]
       class <T> { }'
     );
-    $this->assertEquals(['resource' => ['path' => '/', 'authenticated' => true]], $t->getAnnotations());
+    Assert::equals(['resource' => ['path' => '/', 'authenticated' => true]], $t->getAnnotations());
     \xp::gc();
   }
 
@@ -123,7 +124,7 @@ class AnnotationsTest extends EmittingTest {
       #[@resource("/"), @authenticated]
       class <T> { }'
     );
-    $this->assertEquals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
+    Assert::equals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
   }
 
   #[@test]
@@ -135,7 +136,7 @@ class AnnotationsTest extends EmittingTest {
       class <T> { }'
     );
     $f= $t->getAnnotation('verify');
-    $this->assertEquals('test', $f('test'));
+    Assert::equals('test', $f('test'));
   }
 
   #[@test]
@@ -155,9 +156,9 @@ class AnnotationsTest extends EmittingTest {
         public function cases() { }
       }'
     );
-    $this->assertEquals(['test' => null], $t->getMethod('succeeds')->getAnnotations());
-    $this->assertEquals(['test' => null, 'expect' => IllegalArgumentException::class], $t->getMethod('fails')->getAnnotations());
-    $this->assertEquals(['test' => null, 'values' => [[1, 2, 3]]], $t->getMethod('cases')->getAnnotations());
+    Assert::equals(['test' => null], $t->getMethod('succeeds')->getAnnotations());
+    Assert::equals(['test' => null, 'expect' => IllegalArgumentException::class], $t->getMethod('fails')->getAnnotations());
+    Assert::equals(['test' => null, 'values' => [[1, 2, 3]]], $t->getMethod('cases')->getAnnotations());
   }
 
   #[@test]
@@ -169,7 +170,7 @@ class AnnotationsTest extends EmittingTest {
         public function fixture($arg) { }
       }'
     );
-    $this->assertEquals(['test' => null], $t->getMethod('fixture')->getAnnotations());
-    $this->assertEquals(['inject' => 'conn'], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
+    Assert::equals(['test' => null], $t->getMethod('fixture')->getAnnotations());
+    Assert::equals(['inject' => 'conn'], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
   }
 }

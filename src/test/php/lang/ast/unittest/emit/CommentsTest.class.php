@@ -1,23 +1,25 @@
 <?php namespace lang\ast\unittest\emit;
 
+use unittest\Assert;
+
 class CommentsTest extends EmittingTest {
 
   #[@test]
   public function on_class() {
     $t= $this->type('/** Test */ class <T> { }');
-    $this->assertEquals('Test', $t->getComment());
+    Assert::equals('Test', $t->getComment());
   }
 
   #[@test]
   public function on_interface() {
     $t= $this->type('/** Test */ interface <T> { }');
-    $this->assertEquals('Test', $t->getComment());
+    Assert::equals('Test', $t->getComment());
   }
 
   #[@test]
   public function on_trait() {
     $t= $this->type('/** Test */ trait <T> { }');
-    $this->assertEquals('Test', $t->getComment());
+    Assert::equals('Test', $t->getComment());
   }
 
   #[@test]
@@ -30,13 +32,13 @@ class CommentsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+    Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 
   #[@test]
   public function comments_are_escaped() {
     $t= $this->type("/** Timm's test */ class <T> { }");
-    $this->assertEquals("Timm's test", $t->getComment());
+    Assert::equals("Timm's test", $t->getComment());
   }
 
   #[@test]
@@ -51,7 +53,7 @@ class CommentsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+    Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 
   #[@test]
@@ -66,7 +68,7 @@ class CommentsTest extends EmittingTest {
       /** Not the right comment */
     }');
 
-    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+    Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 
   #[@test]
@@ -79,6 +81,6 @@ class CommentsTest extends EmittingTest {
       }
     }');
 
-    $this->assertEquals('Test', $t->getMethod('fixture')->getComment());
+    Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 }
