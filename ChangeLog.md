@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #80: Allow `new (<expr>)` as syntax - @thekid
+
 ## 5.0.0 / 2019-11-30
 
 * Merged PR #70: Extract compact methods; to use these, require the
