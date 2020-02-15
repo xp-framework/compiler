@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #81: Allow `instanceof (<expr>)` as syntax - @thekid
 * Merged PR #80: Allow `new (<expr>)` as syntax - @thekid
 
 ## 5.0.0 / 2019-11-30
