@@ -281,19 +281,29 @@ class PHP extends Language {
     });
 
     $this->prefix('new', 0, function($parse, $token) {
-      $type= $parse->token;
-      $parse->forward();
+      if ('(' === $parse->token->value) {
+        $parse->expecting('(', 'new type');
+        $type= $this->expression($parse, 0);
+        $parse->expecting(')', 'new type');
+      } else if ('variable' === $parse->token->kind) {
+        $type= '$'.$parse->token->value;
+        $parse->forward();
+      } else if ('class' === $parse->token->value) {
+        $type= null;
+        $parse->forward();
+      } else {
+        $type= $parse->scope->resolve($parse->token->value);
+        $parse->forward();
+      }
 
       $parse->expecting('(', 'new arguments');
       $arguments= $this->expressions($parse);
       $parse->expecting(')', 'new arguments');
 
-      if ('variable' === $type->kind) {
-        return new NewExpression('$'.$type->value, $arguments, $token->line);
-      } else if ('class' === $type->value) {
+      if (null === $type) {
         return new NewClassExpression($this->clazz($parse, null), $arguments, $token->line);
       } else {
-        return new NewExpression($parse->scope->resolve($type->value), $arguments, $token->line);
+        return new NewExpression($type, $arguments, $token->line);
       }
     });
 

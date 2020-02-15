@@ -158,6 +158,22 @@ class OperatorTest extends ParseTest {
   }
 
   #[@test]
+  public function new_var() {
+    $this->assertParsed(
+      [new NewExpression('$class', [], self::LINE)],
+      'new $class();'
+    );
+  }
+
+  #[@test]
+  public function new_expr() {
+    $this->assertParsed(
+      [new NewExpression(new InvokeExpression(new Literal('factory', self::LINE), [], self::LINE), [], self::LINE)],
+      'new (factory())();'
+    );
+  }
+
+  #[@test]
   public function new_type_with_args() {
     $this->assertParsed(
       [new NewExpression('\\T', [new Variable('a', self::LINE), new Variable('b', self::LINE)], self::LINE)],

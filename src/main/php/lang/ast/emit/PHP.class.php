@@ -662,9 +662,18 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNew($result, $new) {
-    $result->out->write('new '.$new->type.'(');
-    $this->emitArguments($result, $new->arguments);
-    $result->out->write(')');
+    if ($new->type instanceof Node) {
+      $t= $result->temp();
+      $result->out->write('('.$t.'= ');
+      $this->emitOne($result, $new->type);
+      $result->out->write(') ? new '.$t.'(');
+      $this->emitArguments($result, $new->arguments);
+      $result->out->write(') : null');
+    } else {
+      $result->out->write('new '.$new->type.'(');
+      $this->emitArguments($result, $new->arguments);
+      $result->out->write(')');
+    }
   }
 
   protected function emitNewClass($result, $new) {
