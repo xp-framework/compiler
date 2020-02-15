@@ -645,23 +645,24 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitInstanceOf($result, $instanceof) {
+    $type= $instanceof->type;
 
-    // Supported: instanceof T, instanceof $t, instanceof $t DEREF; instanceof T::(NAME | VARIABLE)
+    // Supported: instanceof T, instanceof $t, instanceof $t->MEMBER; instanceof T::MEMBER
     // Unsupported: instanceof EXPR
-    if ($instanceof->type instanceof Variable || $instanceof->type instanceof InstanceExpression || $instanceof->type instanceof ScopeExpression) {
+    if ($type instanceof Variable || $type instanceof InstanceExpression || $type instanceof ScopeExpression) {
       $this->emitOne($result, $instanceof->expression);
       $result->out->write(' instanceof ');
-      $this->emitOne($result, $instanceof->type);
-    } else if ($instanceof->type instanceof Node) {
+      $this->emitOne($result, $type);
+    } else if ($type instanceof Node) {
       $t= $result->temp();
       $result->out->write('('.$t.'= ');
-      $this->emitOne($result, $instanceof->type);
+      $this->emitOne($result, $type);
       $result->out->write(')?');
       $this->emitOne($result, $instanceof->expression);
       $result->out->write(' instanceof '.$t.':null');
     } else {
       $this->emitOne($result, $instanceof->expression);
-      $result->out->write(' instanceof '.$instanceof->type);
+      $result->out->write(' instanceof '.$type);
     }
   }
 
