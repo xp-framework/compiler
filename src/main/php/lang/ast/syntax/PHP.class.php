@@ -116,12 +116,11 @@ class PHP extends Language {
     $this->infixr('>>', 70);
 
     $this->infix('instanceof', 110, function($parse, $token, $left) {
-      if ('name' === $parse->token->kind) {
-        $type= $parse->scope->resolve($parse->token->value);
-        $parse->forward();
-        return new InstanceOfExpression($left, $type, $token->line);
+      $type= $this->expression($parse, 0);
+      if ($type instanceof Literal) {
+        return new InstanceOfExpression($left, $parse->scope->resolve($type->expression), $token->line);
       } else {
-        return new InstanceOfExpression($left, $this->expression($parse, 0), $token->line);
+        return new InstanceOfExpression($left, $type, $token->line);
       }
     });
 

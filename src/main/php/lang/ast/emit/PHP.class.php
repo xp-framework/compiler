@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable};
 use lang\ast\{Emitter, Node};
 
 abstract class PHP extends Emitter {
@@ -644,12 +645,24 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitInstanceOf($result, $instanceof) {
-    $this->emitOne($result, $instanceof->expression);
-    $result->out->write(' instanceof ');
-    if ($instanceof->type instanceof Node) {
-      $this->emitOne($result, $instanceof->type);
+    $type= $instanceof->type;
+
+    // Supported: instanceof T, instanceof $t, instanceof $t->MEMBER; instanceof T::MEMBER
+    // Unsupported: instanceof EXPR
+    if ($type instanceof Variable || $type instanceof InstanceExpression || $type instanceof ScopeExpression) {
+      $this->emitOne($result, $instanceof->expression);
+      $result->out->write(' instanceof ');
+      $this->emitOne($result, $type);
+    } else if ($type instanceof Node) {
+      $t= $result->temp();
+      $result->out->write('('.$t.'= ');
+      $this->emitOne($result, $type);
+      $result->out->write(')?');
+      $this->emitOne($result, $instanceof->expression);
+      $result->out->write(' instanceof '.$t.':null');
     } else {
-      $result->out->write($instanceof->type);
+      $this->emitOne($result, $instanceof->expression);
+      $result->out->write(' instanceof '.$type);
     }
   }
 
