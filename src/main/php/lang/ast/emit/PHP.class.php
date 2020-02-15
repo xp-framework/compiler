@@ -122,7 +122,7 @@ abstract class PHP extends Emitter {
     static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true];
 
     $name= $cast->type->name();
-    if ('?' === $name{0}) {
+    if ('?' === $name[0]) {
       $result->out->write('cast(');
       $this->emitOne($result, $cast->expression);
       $result->out->write(',\''.$name.'\', false)');
