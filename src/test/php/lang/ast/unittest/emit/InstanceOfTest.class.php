@@ -58,4 +58,43 @@ class InstanceOfTest extends EmittingTest {
 
     Assert::true($r);
   }
+
+  #[@test]
+  public function instanceof_instance_expr() {
+    $r= $this->run('class <T> {
+      private $type= self::class;
+
+      public function run() {
+        return $this instanceof $this->type;
+      }
+    }');
+
+    Assert::true($r);
+  }
+
+  #[@test]
+  public function instanceof_scope_expr() {
+    $r= $this->run('class <T> {
+      private static $type= self::class;
+
+      public function run() {
+        return $this instanceof self::$type;
+      }
+    }');
+
+    Assert::true($r);
+  }
+
+  #[@test]
+  public function instanceof_expr() {
+    $r= $this->run('class <T> {
+      private function type() { return self::class; }
+
+      public function run() {
+        return $this instanceof ($this->type());
+      }
+    }');
+
+    Assert::true($r);
+  }
 }
