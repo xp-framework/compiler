@@ -1,5 +1,7 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Node;
+
 /**
  * PHP 8.0 syntax
  *
@@ -11,4 +13,17 @@ class PHP80 extends PHP {
   protected $unsupported= [
     'mixed'    => null,
   ];
+
+  protected function emitNew($result, $new) {
+    if ($new->type instanceof Node) {
+      $result->out->write('new (');
+      $this->emitOne($result, $new->type);
+      $result->out->write(')(');
+    } else {
+      $result->out->write('new '.$new->type.'(');
+    }
+
+    $this->emitArguments($result, $new->arguments);
+    $result->out->write(')');
+  }
 }
