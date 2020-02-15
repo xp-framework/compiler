@@ -31,6 +31,19 @@ class MembersTest extends EmittingTest {
   }
 
   #[@test]
+  public function class_constant() {
+    $r= $this->run('class <T> {
+      private const MEMBER = "Test";
+
+      public function run() {
+        return self::MEMBER;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[@test]
   public function instance_property() {
     $r= $this->run('class <T> {
       private $member= "Test";
