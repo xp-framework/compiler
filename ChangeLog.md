@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.1.0 / 2020-03-28
+
+* Merged PR #82: Allow chaining scope resolution operator `::` - @thekid
 * Merged PR #81: Allow `instanceof (<expr>)` as syntax - @thekid
 * Merged PR #80: Allow `new (<expr>)` as syntax - @thekid
 
