@@ -44,6 +44,48 @@ class MembersTest extends EmittingTest {
   }
 
   #[@test]
+  public function dynamic_class_property() {
+    $r= $this->run('class <T> {
+      private static $MEMBER= "Test";
+
+      public function run() {
+        $class= self::class;
+        return $class::$MEMBER;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[@test]
+  public function dynamic_class_method() {
+    $r= $this->run('class <T> {
+      private static function member() { return "Test"; }
+
+      public function run() {
+        $class= self::class;
+        return $class::member();
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[@test]
+  public function dynamic_class_constant() {
+    $r= $this->run('class <T> {
+      private const MEMBER = "Test";
+
+      public function run() {
+        $class= self::class;
+        return $class::MEMBER;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[@test]
   public function instance_property() {
     $r= $this->run('class <T> {
       private $member= "Test";
@@ -121,5 +163,25 @@ class MembersTest extends EmittingTest {
     }');
 
     Assert::null($r);
+  }
+
+  #[@test]
+  public function chaining_sccope_operators() {
+    $r= $this->run('class <T> {
+      private const TYPE = self::class;
+
+      private const NAME = "Test";
+
+      private static $name = "Test";
+
+      private static function name() { return "Test"; }
+
+      public function run() {
+        $name= "name";
+        return [self::TYPE::NAME, self::TYPE::$name, self::TYPE::name(), self::TYPE::$name()];
+      }
+    }');
+
+    Assert::equals(['Test', 'Test', 'Test', 'Test'], $r);
   }
 }

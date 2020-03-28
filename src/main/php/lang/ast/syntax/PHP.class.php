@@ -138,7 +138,7 @@ class PHP extends Language {
     });
 
     $this->infix('::', 100, function($parse, $token, $left) {
-      $scope= $parse->scope->resolve($left->expression);
+      $scope= $left instanceof Literal ? $parse->scope->resolve($left->expression) : $left;
 
       if ('variable' === $parse->token->kind) {
         $expr= new Variable($parse->token->value, $parse->token->line);
@@ -150,6 +150,13 @@ class PHP extends Language {
       }
 
       $parse->forward();
+      if ('(' === $parse->token->value) {
+        $parse->expecting('(', 'invoke expression');
+        $arguments= $this->expressions($parse);
+        $parse->expecting(')', 'invoke expression');
+        $expr= new InvokeExpression($expr, $arguments, $token->line);
+      }
+
       return new ScopeExpression($scope, $expr, $token->line);
     });
 

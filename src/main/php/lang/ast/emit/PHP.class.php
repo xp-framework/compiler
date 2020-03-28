@@ -717,8 +717,21 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitScope($result, $scope) {
-    $result->out->write($scope->type.'::');
-    $this->emitOne($result, $scope->member);
+    if ($scope->type instanceof Variable) {
+      $this->emitOne($result, $scope->type);
+      $result->out->write('::');
+      $this->emitOne($result, $scope->member);
+    } else if ($scope->type instanceof Node) {
+      $t= $result->temp();
+      $result->out->write('('.$t.'=');
+      $this->emitOne($result, $scope->type);
+      $result->out->write(')?'.$t.'::');
+      $this->emitOne($result, $scope->member);
+      $result->out->write(':null');
+    } else {
+      $result->out->write($scope->type.'::');
+      $this->emitOne($result, $scope->member);
+    }
   }
 
   protected function emitInstance($result, $instance) {

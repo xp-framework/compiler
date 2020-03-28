@@ -188,9 +188,9 @@ class MembersTest extends ParseTest {
   #[@test]
   public function static_method_invocation() {
     $this->assertParsed(
-      [new InvokeExpression(
-        new ScopeExpression('\\A', new Literal('member', self::LINE), self::LINE),
-        [new Literal('1', self::LINE)],
+      [new ScopeExpression(
+        '\\A',
+        new InvokeExpression(new Literal('member', self::LINE), [new Literal('1', self::LINE)], self::LINE),
         self::LINE
       )],
       'A::member(1);'
