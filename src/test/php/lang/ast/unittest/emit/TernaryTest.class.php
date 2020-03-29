@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use io\Path;
 use unittest\Assert;
 
 class TernaryTest extends EmittingTest {
@@ -46,6 +47,18 @@ class TernaryTest extends EmittingTest {
       'class <T> {
         public function run($value) {
           return $value[0] ?? "OK";
+        }
+      }',
+      $value
+    ));
+  }
+
+  #[@test, @values([['.'], [new Path('.')]])]
+  public function with_instanceof($value) {
+    Assert::equals(new Path('.'), $this->run(
+      'class <T> {
+        public function run($value) {
+          return $value instanceof \\io\\Path ? $value : new \\io\\Path($value);
         }
       }',
       $value

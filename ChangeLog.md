@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.1.1 / 2020-03-29
+
+* Fixed ternary and instanceof operators' precedence - @thekid
+
 ## 5.1.0 / 2020-03-28
 
 * Merged PR #82: Allow chaining scope resolution operator `::` - @thekid
