@@ -110,4 +110,13 @@ class ParameterTest extends EmittingTest {
   public function optional_parameters_default_value() {
     Assert::equals(true, $this->param('$param= true')->getDefaultValue());
   }
+
+  #[@test]
+  public function trailing_comma_allowed() {
+    $p= $this->type('class <T> { public function fixture($param, ) { } }')
+      ->getMethod('fixture')
+      ->getParameters()
+    ;
+    Assert::equals(1, sizeof($p), 'number of parameters');
+  }
 }
