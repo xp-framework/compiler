@@ -1138,11 +1138,15 @@ class PHP extends Language {
 
       $type= $this->type($parse);
 
-      if ('...' === $parse->token->value) {
+      if ('...' !== $parse->token->value) {
+        $variadic= false;
+      } else if ($promote) {
+        $parse->raise('Variadic parameters cannot be promoted', 'parameters');
         $variadic= true;
         $parse->forward();
       } else {
-        $variadic= false;
+        $variadic= true;
+        $parse->forward();
       }
 
       if ('&' === $parse->token->value) {

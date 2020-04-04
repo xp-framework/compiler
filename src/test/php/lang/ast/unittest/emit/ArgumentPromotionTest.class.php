@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Primitive;
+use lang\ast\Errors;
 use unittest\Assert;
 
 /**
@@ -65,5 +66,12 @@ class ArgumentPromotionTest extends EmittingTest {
       [Primitive::$INT, Primitive::$STRING],
       [$t->getField('id')->getType(), $t->getField('name')->getType()]
     );
+  }
+
+  #[@test, @expect(['class' => Errors::class, 'withMessage' => 'Variadic parameters cannot be promoted'])]
+  public function variadic_parameters_cannot_be_promoted() {
+    $this->type('class <T> {
+      public function __construct(private string... $in) { }
+    }');
   }
 }
