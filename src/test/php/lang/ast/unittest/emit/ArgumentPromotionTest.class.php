@@ -74,4 +74,15 @@ class ArgumentPromotionTest extends EmittingTest {
       public function __construct(private string... $in) { }
     }');
   }
+
+  #[@test]
+  public function can_be_mixed_with_normal_arguments() {
+    $t= $this->type('class <T> {
+      public function __construct(public string $name, string $initial= null) {
+        if (null !== $initial) $this->name.= " ".$initial.".";
+      }
+    }');
+    Assert::equals(['name'], array_map(function($f) { return $f->getName(); }, $t->getFields()));
+    Assert::equals('Timm J.', $t->newInstance('Timm', 'J')->name);
+  }
 }
