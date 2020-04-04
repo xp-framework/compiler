@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.1.3 / 2020-04-04
+
 * Allowed `::class` on objects (PHP 8.0 forward compatibility) - @thekid
 
 ## 5.1.2 / 2020-04-04
