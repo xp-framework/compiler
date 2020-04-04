@@ -7,7 +7,7 @@
  */
 class PHP72 extends PHP {
   use OmitPropertyTypes;
-  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions;
+  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteClassOnObjects;
 
   protected $unsupported= [
     'mixed'    => null,

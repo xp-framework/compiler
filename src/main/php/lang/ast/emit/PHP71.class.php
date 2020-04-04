@@ -7,7 +7,7 @@
  */
 class PHP71 extends PHP {
   use OmitPropertyTypes;
-  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions;
+  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteClassOnObjects;
 
   protected $unsupported= [
     'object'   => 72,

@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Allowed `::class` on objects (PHP 8.0 forward compatibility) - @thekid
+
 ## 5.1.2 / 2020-04-04
 
 * Fixed promotion for by-reference arguments - @thekid

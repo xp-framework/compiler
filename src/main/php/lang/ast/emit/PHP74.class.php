@@ -6,7 +6,7 @@
  * @see  https://wiki.php.net/rfc#php_74
  */
 class PHP74 extends PHP {
-  use RewriteBlockLambdaExpressions;
+  use RewriteBlockLambdaExpressions, RewriteClassOnObjects;
 
   protected $unsupported= [
     'mixed'    => null,
