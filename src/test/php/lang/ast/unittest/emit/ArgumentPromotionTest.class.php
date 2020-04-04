@@ -117,4 +117,15 @@ class ArgumentPromotionTest extends EmittingTest {
 
     Assert::equals([1, 2, 3, 4], $t->getMethod('test')->invoke(null, []));
   }
+
+  #[@test]
+  public function allows_trailing_comma() {
+    $this->type('class <T> {
+      public function __construct(
+        public float $x = 0.0,
+        public float $y = 0.0,
+        public float $z = 0.0, // <-- Allow this comma.
+      ) { }
+    }');
+  }
 }
