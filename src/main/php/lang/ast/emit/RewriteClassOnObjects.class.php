@@ -1,6 +1,5 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Type;
 use lang\ast\nodes\Literal;
 
 /**
