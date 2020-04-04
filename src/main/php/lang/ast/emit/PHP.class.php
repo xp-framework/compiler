@@ -406,7 +406,7 @@ abstract class PHP extends Emitter {
     foreach ($method->signature->parameters as $param) {
       if (isset($param->promote)) {
         $declare.= $param->promote.' $'.$param->name.';';
-        $promote.= '$this->'.$param->name.'= $'.$param->name.';';
+        $promote.= '$this->'.$param->name.'= '.($param->reference ? '&$' : '$').$param->name.';';
         $result->meta[0][self::PROPERTY][$param->name]= [
           DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
           DETAIL_ANNOTATIONS => [],

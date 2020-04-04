@@ -43,6 +43,22 @@ class ArgumentPromotionTest extends EmittingTest {
   }
 
   #[@test]
+  public function parameter_accessible() {
+    $r= $this->run('class <T> {
+      public function __construct(private $id= "test") {
+        if (null === $id) {
+          throw new \\lang\\IllegalArgumentException("ID not set");
+        }
+      }
+
+      public function run() {
+        return $this->id;
+      }
+    }');
+    Assert::equals('test', $r);
+  }
+
+  #[@test]
   public function in_method() {
     $r= $this->run('class <T> {
       public function withId(private $id) {
@@ -84,5 +100,21 @@ class ArgumentPromotionTest extends EmittingTest {
     }');
     Assert::equals(['name'], array_map(function($f) { return $f->getName(); }, $t->getFields()));
     Assert::equals('Timm J.', $t->newInstance('Timm', 'J')->name);
+  }
+
+  #[@test]
+  public function promoted_by_reference_argument() {
+    $t= $this->type('class <T> {
+      public function __construct(public array &$list) { }
+
+      public static function test() {
+        $list= [1, 2, 3];
+        $self= new self($list);
+        $list[]= 4;
+        return $self->list;
+      }
+    }');
+
+    Assert::equals([1, 2, 3, 4], $t->getMethod('test')->invoke(null, []));
   }
 }

@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.1.2 / 2020-04-04
+
+* Fixed promotion for by-reference arguments - @thekid
+
 ## 5.1.1 / 2020-03-29
 
 * Fixed ternary and instanceof operators' precedence - @thekid
