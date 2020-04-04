@@ -12,7 +12,7 @@ trait RewriteClassOnObjects {
 
   protected function emitScope($result, $scope) {
     if ($scope->member instanceof Literal && 'class' === $scope->member->expression && !is_string($scope->type)) {
-      $result->out->write('get_class(');
+      $result->out->write('\\get_class(');
       $this->emitOne($result, $scope->type);
       $result->out->write(')');
     } else {
