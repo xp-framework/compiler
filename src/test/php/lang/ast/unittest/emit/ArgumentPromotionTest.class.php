@@ -8,7 +8,7 @@ use unittest\Assert;
  *
  * @see  https://github.com/xp-framework/rfc/issues/240
  * @see  https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion
- * @see  https://wiki.php.net/rfc/constructor-promotion (Draft)
+ * @see  https://wiki.php.net/rfc/constructor-promotion (Under Discussion for PHP 8.0)
  * @see  https://wiki.php.net/rfc/automatic_property_initialization (Declined)
  */
 class ArgumentPromotionTest extends EmittingTest {
