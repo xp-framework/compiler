@@ -98,15 +98,20 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
-  public function this_class_constant() {
-    $r= $this->run('class <T> {
-      public function run() {
-        return [get_class($this), $this::class];
-      }
+  #[@test, @values(['variable', 'invocation', 'array'])]
+  public function class_on_objects($via) {
+    $t= $this->type('class <T> {
+      private function this() { return $this; }
+
+      public function variable() { return $this::class; }
+
+      public function invocation() { return $this->this()::class; }
+
+      public function array() { return [$this][0]::class; }
     }');
 
-    Assert::equals($r[0], $r[1]);
+    $fixture= $t->newInstance();
+    Assert::equals(get_class($fixture), $t->getMethod($via)->invoke($fixture));
   }
 
   #[@test]
