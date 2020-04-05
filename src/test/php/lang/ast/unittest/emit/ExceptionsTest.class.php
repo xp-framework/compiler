@@ -121,6 +121,26 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_binary_or() {
+    $t= $this->type('class <T> {
+      public function run($user) {
+        return $user || throw new \\lang\\IllegalArgumentException("test");
+      }
+    }');
+    $t->newInstance()->run(null);
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function throw_expression_with_binary_and() {
+    $t= $this->type('class <T> {
+      public function run($error) {
+        return $error && throw new \\lang\\IllegalArgumentException("test");
+      }
+    }');
+    $t->newInstance()->run(true);
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda() {
     $this->run('use lang\IllegalArgumentException; class <T> {
       public function run() {
