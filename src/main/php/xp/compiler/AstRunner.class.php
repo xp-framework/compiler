@@ -88,8 +88,8 @@ class AstRunner {
       Console::writeLinef("\033[1m══ %s ══%s\033[0m", $file, str_repeat('═', 72 - 6 - strlen($file)));
 
       try {
-        $parse= new Parse($lang, new Tokens(new StreamTokenizer($in)), $file);
-        foreach ($parse->execute() as $node) {
+        $parse= new Parse($lang, new Tokens($in, $file));
+        foreach ($parse->stream() as $node) {
           Console::writeLine(self::stringOf($node));
         }
       } catch (Errors $e) {

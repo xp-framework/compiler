@@ -77,8 +77,8 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= new Parse($lang, new Tokens(new StreamTokenizer($in)), $file);
-        $emit->emitAll(new Result($output->target((string)$path)), $parse->execute());
+        $parse= new Parse($lang, new Tokens($in, $file));
+        $emit->emitAll(new Result($output->target((string)$path)), $parse->stream());
 
         $t->stop();
         Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
