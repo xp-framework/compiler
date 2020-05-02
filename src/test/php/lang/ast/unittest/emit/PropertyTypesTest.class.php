@@ -19,7 +19,7 @@ class PropertyTypesTest extends EmittingTest {
     Assert::equals('int', $t->getField('test')->getTypeName());
   }
 
-  #[@test, @ignore('Resolved to <T> for the moment, resolve() concept needs fixing!')]
+  #[@test]
   public function self_type() {
     $t= $this->type('class <T> {
       private static self $instance;
