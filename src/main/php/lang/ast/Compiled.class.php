@@ -27,8 +27,7 @@ class Compiled implements OutputStream {
     ;
 
     try {
-      $parse= new Parse($language, new Tokens($in, $file));
-      self::$emit[$version]->emitAll(new Result($out), $parse->stream());
+      self::$emit[$version]->emitAll(new Result($out), $language->parse(new Tokens($in, $file))->stream());
       return $out;
     } finally {
       $in->close();
