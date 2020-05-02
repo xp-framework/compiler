@@ -2,7 +2,7 @@
 
 use io\Path;
 use lang\Runtime;
-use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Parse, Result, Tokens};
+use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Result, Tokens};
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -77,7 +77,7 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= new Parse($lang, new Tokens($in, $file));
+        $parse= $lang->parse(new Tokens($in, $file));
         $emit->emitAll(new Result($output->target((string)$path)), $parse->stream());
 
         $t->stop();

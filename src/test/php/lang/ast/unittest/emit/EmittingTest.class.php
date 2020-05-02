@@ -2,7 +2,7 @@
 
 use io\streams\{MemoryOutputStream, StringWriter};
 use lang\DynamicClassLoader;
-use lang\ast\{CompilingClassLoader, Emitter, Language, Node, Parse, Result, Tokens};
+use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
 use unittest\Assert;
 use unittest\TestCase;
 use util\cmd\Console;
@@ -55,7 +55,7 @@ abstract class EmittingTest {
     $name= 'T'.(self::$id++);
     $out= new MemoryOutputStream();
 
-    $parse= new Parse($this->language, new Tokens(str_replace('<T>', $name, $code), static::class));
+    $parse= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class));
     $ast= iterator_to_array($parse->stream());
     if (isset($this->output['ast'])) {
       Console::writeLine();
