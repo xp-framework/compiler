@@ -69,7 +69,7 @@ class AstRunner {
     }
 
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    $emit= Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }
