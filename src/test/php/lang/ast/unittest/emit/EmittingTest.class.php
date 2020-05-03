@@ -66,10 +66,10 @@ abstract class EmittingTest {
     if (isset($this->output['code'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');
-      Console::writeLine($out->getBytes());
+      Console::writeLine($out->bytes());
     }
 
-    $this->cl->setClassBytes($name, $out->getBytes());
+    $this->cl->setClassBytes($name, $out->bytes());
     return $this->cl->loadClass($name);
   }
 
