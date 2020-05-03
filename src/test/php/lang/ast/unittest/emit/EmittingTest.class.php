@@ -55,15 +55,14 @@ abstract class EmittingTest {
     $name= 'T'.(self::$id++);
     $out= new MemoryOutputStream();
 
-    $parse= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class));
-    $ast= iterator_to_array($parse->stream());
+    $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
     if (isset($this->output['ast'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');
-      Console::writeLine($ast);
+      Console::writeLine($tree);
     }
 
-    $this->emitter->emitAll(new Result(new StringWriter($out)), $ast);
+    $this->emitter->emitAll(new Result(new StringWriter($out)), $tree->children());
     if (isset($this->output['code'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');
