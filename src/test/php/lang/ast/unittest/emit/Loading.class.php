@@ -2,6 +2,6 @@
 
 trait Loading {
 
-  public function loaded() { }
+  public function loaded() { return 'Loaded'; }
 
 }

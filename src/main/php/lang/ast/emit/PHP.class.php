@@ -361,7 +361,7 @@ abstract class PHP extends Emitter {
     if ($use->aliases) {
       $result->out->write('{');
       foreach ($use->aliases as $reference => $alias) {
-        $result->out->write($reference.' as '.$alias.';');
+        $result->out->write($reference.' '.key($alias).' '.current($alias).';');
       }
       $result->out->write('}');
     } else {

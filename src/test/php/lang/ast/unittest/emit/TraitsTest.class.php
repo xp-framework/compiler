@@ -48,4 +48,17 @@ class TraitsTest extends EmittingTest {
     }');
     Assert::true($t->hasMethod('hasLoaded'));
   }
+
+  #[@test]
+  public function trait_method_insteadof() {
+    $t= $this->type('use lang\ast\unittest\emit\{Loading, Spinner}; class <T> {
+      use Loading, Spinner {
+        Spinner::loaded as noLongerSpinning;
+        Loading::loaded insteadof Spinner;
+      }
+    }');
+    $instance= $t->newInstance();
+    Assert::equals('Loaded', $t->getMethod('loaded')->invoke($instance));
+    Assert::equals('Not spinning', $t->getMethod('noLongerSpinning')->invoke($instance));
+  }
 }
