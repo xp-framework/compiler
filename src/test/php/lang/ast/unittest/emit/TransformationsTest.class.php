@@ -11,7 +11,7 @@ class TransformationsTest extends EmittingTest {
   public function setUp() {
     $this->transform('class', function($codegen, $class) {
       if ($class->annotation('repr')) {
-        $class->inject(new Method(
+        $class->declare(new Method(
           ['public'],
           'toString',
           new Signature([], new Type('string')),
@@ -23,7 +23,7 @@ class TransformationsTest extends EmittingTest {
     $this->transform('class', function($codegen, $class) {
       if ($class->annotation('getters')) {
         foreach ($class->properties() as $property) {
-          $class->inject(new Method(
+          $class->declare(new Method(
             ['public'],
             $property->name,
             new Signature([], $property->type),
