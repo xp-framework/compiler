@@ -1,13 +1,6 @@
 <?php namespace xp\compiler;
 
-use lang\ast\Emitter;
-use lang\ast\Errors;
-use lang\ast\Language;
-use lang\ast\Node;
-use lang\ast\Parse;
-use lang\ast\Result;
-use lang\ast\Tokens;
-use text\StreamTokenizer;
+use lang\ast\{Emitter, Errors, Language, Node, Result, Tokens};
 use util\Objects;
 use util\cmd\Console;
 /**
@@ -76,7 +69,7 @@ class AstRunner {
     }
 
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime(defined('HHVM_VERSION') ? 'HHVM.'.HHVM_VERSION : 'PHP.'.PHP_VERSION)->newInstance();
+    $emit= Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }
@@ -88,8 +81,7 @@ class AstRunner {
       Console::writeLinef("\033[1m══ %s ══%s\033[0m", $file, str_repeat('═', 72 - 6 - strlen($file)));
 
       try {
-        $parse= new Parse($lang, new Tokens(new StreamTokenizer($in)), $file);
-        foreach ($parse->execute() as $node) {
+        foreach ($lang->parse(new Tokens($in, $file))->stream() as $node) {
           Console::writeLine(self::stringOf($node));
         }
       } catch (Errors $e) {

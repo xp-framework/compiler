@@ -1,11 +1,12 @@
 <?php namespace lang\ast\unittest\emit;
 
 use unittest\Assert;
+
 /**
  * Property types
  *
  * @see  https://docs.hhvm.com/hack/types/type-system
- * @see  https://wiki.php.net/rfc/property_type_hints (Draft)
+ * @see  https://wiki.php.net/rfc/typed_properties_v2
  */
 class PropertyTypesTest extends EmittingTest {
 

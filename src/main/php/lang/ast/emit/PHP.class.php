@@ -1,7 +1,8 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable};
-use lang\ast\{Emitter, Node};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
+use lang\ast\{Emitter, Node, Type};
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
@@ -44,9 +45,9 @@ abstract class PHP extends Emitter {
 
   // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
   protected function propertyType($type) {
-    if (null === $type || $type instanceof UnionType || $type instanceof FunctionType) {
+    if (null === $type || $type instanceof IsUnion || $type instanceof IsFunction) {
       return '';
-    } else if ($type instanceof ArrayType || $type instanceof MapType) {
+    } else if ($type instanceof IsArray || $type instanceof IsMap) {
       return 'array';
     } else if ($type instanceof Type && 'callable' !== $type->literal() && 'void' !== $type->literal()) {
       return $type->literal();

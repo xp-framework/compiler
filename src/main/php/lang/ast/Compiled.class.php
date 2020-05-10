@@ -1,7 +1,6 @@
 <?php namespace lang\ast;
 
 use io\streams\OutputStream;
-use text\StreamTokenizer;
 
 class Compiled implements OutputStream {
   public static $source= [], $emit= [], $lang= [];
@@ -28,8 +27,7 @@ class Compiled implements OutputStream {
     ;
 
     try {
-      $parse= new Parse($language, new Tokens(new StreamTokenizer($in)), $file);
-      self::$emit[$version]->emitAll(new Result($out), $parse->execute());
+      self::$emit[$version]->emitAll(new Result($out), $language->parse(new Tokens($in, $file))->stream());
       return $out;
     } finally {
       $in->close();

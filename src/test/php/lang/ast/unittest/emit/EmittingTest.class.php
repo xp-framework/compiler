@@ -2,8 +2,7 @@
 
 use io\streams\{MemoryOutputStream, StringWriter};
 use lang\DynamicClassLoader;
-use lang\ast\{CompilingClassLoader, Emitter, Language, Node, Parse, Result, Tokens};
-use text\StringTokenizer;
+use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
 use unittest\Assert;
 use unittest\TestCase;
 use util\cmd\Console;
@@ -56,22 +55,21 @@ abstract class EmittingTest {
     $name= 'T'.(self::$id++);
     $out= new MemoryOutputStream();
 
-    $parse= new Parse($this->language, new Tokens(new StringTokenizer(str_replace('<T>', $name, $code))), static::class);
-    $ast= iterator_to_array($parse->execute());
+    $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
     if (isset($this->output['ast'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');
-      Console::writeLine($ast);
+      Console::writeLine($tree);
     }
 
-    $this->emitter->emitAll(new Result(new StringWriter($out)), $ast);
+    $this->emitter->emitAll(new Result(new StringWriter($out)), $tree->children());
     if (isset($this->output['code'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');
-      Console::writeLine($out->getBytes());
+      Console::writeLine($out->bytes());
     }
 
-    $this->cl->setClassBytes($name, $out->getBytes());
+    $this->cl->setClassBytes($name, $out->bytes());
     return $this->cl->loadClass($name);
   }
 
