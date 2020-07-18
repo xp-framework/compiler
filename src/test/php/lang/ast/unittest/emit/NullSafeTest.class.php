@@ -4,11 +4,11 @@ use lang\IllegalArgumentException;
 use unittest\Assert;
 
 /**
- * Annotations support
+ * Nullsafe operator support
  *
  * @see  https://github.com/xp-framework/compiler/issues/9
  * @see  https://docs.hhvm.com/hack/operators/null-safe
- * @see  https://wiki.php.net/rfc/nullsafe_calls (Draft)
+ * @see  https://wiki.php.net/rfc/nullsafe_operator
  */
 class NullSafeTest extends EmittingTest {
 
@@ -100,5 +100,33 @@ class NullSafeTest extends EmittingTest {
     }');
 
     Assert::true($r);
+  }
+
+  #[@test]
+  public function short_circuiting_chain() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $null= null;
+        return $null?->method($undefined->method());
+      }
+    }');
+
+    Assert::null($r);
+  }
+
+  #[@test]
+  public function short_circuiting_parameter() {
+    $r= $this->run('class <T> {
+      private function pass($object) {
+        return $object;
+      }
+
+      public function run() {
+        $null= null;
+        return $this->pass($null?->method());
+      }
+    }');
+
+    Assert::null($r);
   }
 }
