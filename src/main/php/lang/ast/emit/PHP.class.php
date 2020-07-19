@@ -545,6 +545,34 @@ abstract class PHP extends Emitter {
     $result->out->write('}');
   }
 
+  protected function emitMatch($result, $match) {
+    $t= $result->temp();
+    $result->out->write('('.$t.'=');
+    $this->emitOne($result, $match->expression);
+    $result->out->write(')');
+
+    $b= 0;
+    foreach ($match->cases as $case) {
+      foreach ($case->expressions as $expression) {
+        $b && $result->out->write($t);
+        $result->out->write('===');
+        $this->emitOne($result, $expression);
+        $result->out->write('?');
+        $this->emitOne($result, $case->body[0]);
+        $result->out->write(':(');
+        $b++;
+      }
+    }
+
+    // Emit IIFE for raising an error until we have throw expressions
+    if (null === $match->default) {
+      $result->out->write('function() use('.$t.') { throw new \\Error("Unhandled match value of type ".gettype('.$t.')); })(');
+    } else {
+      $this->emitOne($result, $match->default[0]);
+    }
+    $result->out->write(str_repeat(')', $b));
+  }
+
   protected function emitCatch($result, $catch) {
     if (empty($catch->types)) {
       $result->out->write('catch(\\Throwable $'.$catch->variable.') {');

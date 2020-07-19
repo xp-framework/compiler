@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\Throwable;
 use unittest\Assert;
 
 class ControlStructuresTest extends EmittingTest {
@@ -60,5 +61,51 @@ class ControlStructuresTest extends EmittingTest {
     }', $whence);
 
     Assert::equals($expected, $r);
+  }
+
+  #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11], [SEEK_END, 6100]])]
+  public function match($whence, $expected) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        $position= 1;
+        $size= 6100;
+        return match ($arg) {
+          SEEK_SET => 10,
+          SEEK_CUR => $position + 10,
+          SEEK_END => min($size + $position, $size),
+        };
+      }
+    }', $whence);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11], [SEEK_END, 6100]])]
+  public function match_with_default($whence, $expected) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        $position= 1;
+        $size= 6100;
+        return match ($arg) {
+          SEEK_SET => 10,
+          SEEK_CUR => $position + 10,
+          default  => min($size + $position, $size),
+        };
+      }
+    }', $whence);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unhandled match value of type .+/'])]
+  public function unhandled_match() {
+    $this->run('class <T> {
+      public function run($arg) {
+        return match ($arg) {
+          SEEK_SET => 10,
+          SEEK_CUR => $position + 10,
+        };
+      }
+    }', SEEK_END);
   }
 }
