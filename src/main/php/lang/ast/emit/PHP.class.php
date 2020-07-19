@@ -555,9 +555,9 @@ abstract class PHP extends Emitter {
     foreach ($match->cases as $case) {
       foreach ($case->expressions as $expression) {
         $b && $result->out->write($t);
-        $result->out->write('===');
+        $result->out->write('===(');
         $this->emitOne($result, $expression);
-        $result->out->write('?');
+        $result->out->write(')?');
         $this->emitOne($result, $case->body[0]);
         $result->out->write(':(');
         $b++;

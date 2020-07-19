@@ -83,6 +83,27 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
+  #[@test, @values([
+  #  [0, 'no items'],
+  #  [1, 'one item'],
+  #  [5, '5 items'],
+  #  [10, '10+ items'],
+  #])]
+  public function match_with_binary($input, $expected) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        return match (true) {
+          $arg >= 10 => "10+ items",
+          $arg === 1 => "one item",
+          $arg === 0 => "no items",
+          default => $arg." items",
+        };
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
   #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unhandled match value of type .+/'])]
   public function unhandled_match() {
     $this->run('class <T> {
