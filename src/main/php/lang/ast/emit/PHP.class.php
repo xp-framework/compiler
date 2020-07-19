@@ -285,13 +285,24 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitAnnotations($result, $annotations) {
-    foreach ($annotations as $name => $annotation) {
+    foreach ($annotations as $name => $arguments) {
       $result->out->write("'".$name."' => ");
-      if ($annotation) {
-        $this->emitOne($result, $annotation);
+
+      if (empty($arguments)) {
+        $result->out->write('null,');
+      } else if ($arguments instanceof Node) {
+        $this->emitOne($result, $arguments);
+        $result->out->write(',');
+      } else if (1 === sizeof($arguments)) {
+        $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
       } else {
-        $result->out->write('null,');
+        $result->out->write('[');
+        foreach ($arguments as $argument) {
+          $this->emitOne($result, $argument);
+          $result->out->write(',');
+        }
+        $result->out->write('],');
       }
     }
   }
