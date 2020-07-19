@@ -87,6 +87,7 @@ class ControlStructuresTest extends EmittingTest {
   public function unhandled_match() {
     $this->run('class <T> {
       public function run($arg) {
+        $position= 1;
         return match ($arg) {
           SEEK_SET => 10,
           SEEK_CUR => $position + 10,
