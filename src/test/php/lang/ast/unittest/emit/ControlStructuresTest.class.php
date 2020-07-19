@@ -96,7 +96,7 @@ class ControlStructuresTest extends EmittingTest {
           $arg >= 10 => "10+ items",
           $arg === 1 => "one item",
           $arg === 0 => "no items",
-          default => $arg." items",
+          default    => $arg." items",
         };
       }
     }', $input);
@@ -112,6 +112,20 @@ class ControlStructuresTest extends EmittingTest {
         return match ($arg) {
           SEEK_SET => 10,
           SEEK_CUR => $position + 10,
+        };
+      }
+    }', SEEK_END);
+  }
+
+  #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unknown seek mode .+/'])]
+  public function match_with_throw_expression() {
+    $this->run('class <T> {
+      public function run($arg) {
+        $position= 1;
+        return match ($arg) {
+          SEEK_SET => 10,
+          SEEK_CUR => $position + 10,
+          default  => throw new \\lang\\IllegalArgumentException("Unknown seek mode ".$arg)
         };
       }
     }', SEEK_END);
