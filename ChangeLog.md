@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Removed `lang.ast.syntax.php.NullSafe` in favor of builtin support
+  (@thekid)
 * Merged PR #84: Extract parser - @thekid
 
 ## 5.1.3 / 2020-04-04
