@@ -558,7 +558,7 @@ abstract class PHP extends Emitter {
         $result->out->write('===(');
         $this->emitOne($result, $expression);
         $result->out->write(')?');
-        $this->emitOne($result, $case->body[0]);
+        $this->emitOne($result, $case->body);
         $result->out->write(':(');
         $b++;
       }
@@ -568,7 +568,7 @@ abstract class PHP extends Emitter {
     if (null === $match->default) {
       $result->out->write('function() use('.$t.') { throw new \\Error("Unhandled match value of type ".gettype('.$t.')); })(');
     } else {
-      $this->emitOne($result, $match->default[0]);
+      $this->emitOne($result, $match->default);
     }
     $result->out->write(str_repeat(')', $b));
   }
