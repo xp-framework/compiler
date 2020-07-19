@@ -63,36 +63,22 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11], [SEEK_END, 6100]])]
-  public function match($whence, $expected) {
+  #[@test, @values([
+  #  [0, 'no items'],
+  #  [1, 'one item'],
+  #  [2, '2 items'],
+  #  [3, '3 items'],
+  #])]
+  public function match($input, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
-        $position= 1;
-        $size= 6100;
         return match ($arg) {
-          SEEK_SET => 10,
-          SEEK_CUR => $position + 10,
-          SEEK_END => min($size + $position, $size),
+          0 => "no items",
+          1 => "one item",
+          default => $arg." items",
         };
       }
-    }', $whence);
-
-    Assert::equals($expected, $r);
-  }
-
-  #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11], [SEEK_END, 6100]])]
-  public function match_with_default($whence, $expected) {
-    $r= $this->run('class <T> {
-      public function run($arg) {
-        $position= 1;
-        $size= 6100;
-        return match ($arg) {
-          SEEK_SET => 10,
-          SEEK_CUR => $position + 10,
-          default  => min($size + $position, $size),
-        };
-      }
-    }', $whence);
+    }', $input);
 
     Assert::equals($expected, $r);
   }
