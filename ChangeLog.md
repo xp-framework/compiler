@@ -3,7 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.2.0 / 2020-07-20
+
 * Merged PR #87: Add support for match expression - @thekid
+* Implemented first step of #86: Support PHP 8 attributes - @thekid
 * Removed `lang.ast.syntax.php.NullSafe` in favor of builtin support
   (@thekid)
 * Merged PR #84: Extract parser - @thekid
