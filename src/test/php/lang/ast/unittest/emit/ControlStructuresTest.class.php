@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\Throwable;
 use unittest\Assert;
 
 class ControlStructuresTest extends EmittingTest {
@@ -60,5 +61,73 @@ class ControlStructuresTest extends EmittingTest {
     }', $whence);
 
     Assert::equals($expected, $r);
+  }
+
+  #[@test, @values([
+  #  [0, 'no items'],
+  #  [1, 'one item'],
+  #  [2, '2 items'],
+  #  [3, '3 items'],
+  #])]
+  public function match($input, $expected) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        return match ($arg) {
+          0 => "no items",
+          1 => "one item",
+          default => $arg." items",
+        };
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[@test, @values([
+  #  [0, 'no items'],
+  #  [1, 'one item'],
+  #  [5, '5 items'],
+  #  [10, '10+ items'],
+  #])]
+  public function match_with_binary($input, $expected) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        return match (true) {
+          $arg >= 10 => "10+ items",
+          $arg === 1 => "one item",
+          $arg === 0 => "no items",
+          default    => $arg." items",
+        };
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unhandled match value of type .+/'])]
+  public function unhandled_match() {
+    $this->run('class <T> {
+      public function run($arg) {
+        $position= 1;
+        return match ($arg) {
+          SEEK_SET => 10,
+          SEEK_CUR => $position + 10,
+        };
+      }
+    }', SEEK_END);
+  }
+
+  #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unknown seek mode .+/'])]
+  public function match_with_throw_expression() {
+    $this->run('class <T> {
+      public function run($arg) {
+        $position= 1;
+        return match ($arg) {
+          SEEK_SET => 10,
+          SEEK_CUR => $position + 10,
+          default  => throw new \\lang\\IllegalArgumentException("Unknown seek mode ".$arg)
+        };
+      }
+    }', SEEK_END);
   }
 }

@@ -26,4 +26,29 @@ class PHP80 extends PHP {
     $this->emitArguments($result, $new->arguments);
     $result->out->write(')');
   }
+
+  protected function emitMatch($result, $match) {
+    $result->out->write('match (');
+    $this->emitOne($result, $match->expression);
+    $result->out->write(') {');
+
+    foreach ($match->cases as $case) {
+      $b= 0;
+      foreach ($case->expressions as $expression) {
+        $b && $result->out->write(',');
+        $this->emitOne($result, $expression);
+        $b++;
+      }
+      $result->out->write('=>');
+      $this->emitOne($result, $case->body);
+      $result->out->write(',');
+    }
+
+    if ($match->default) {
+      $result->out->write('default=>');
+      $this->emitOne($result, $match->default);
+    }
+
+    $result->out->write('}');
+  }
 }
