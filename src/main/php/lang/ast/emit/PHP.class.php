@@ -290,9 +290,6 @@ abstract class PHP extends Emitter {
 
       if (empty($arguments)) {
         $result->out->write('null,');
-      } else if ($arguments instanceof Node) {
-        $this->emitOne($result, $arguments);
-        $result->out->write(',');
       } else if (1 === sizeof($arguments)) {
         $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
