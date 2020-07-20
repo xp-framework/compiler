@@ -10,9 +10,7 @@ use lang\ast\Node;
 class PHP80 extends PHP {
   use RewriteBlockLambdaExpressions;
 
-  protected $unsupported= [
-    'mixed'    => null,
-  ];
+  protected $unsupported= [];
 
   protected function emitNew($result, $new) {
     if ($new->type instanceof Node) {
