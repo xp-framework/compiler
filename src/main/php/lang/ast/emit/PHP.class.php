@@ -70,10 +70,6 @@ abstract class PHP extends Emitter {
     }
   }
 
-  protected function emitAnnotation($result, $annotations) {
-    // NOOP
-  }
-
   protected function emitOperator($result, $operator) {
     // NOOP
   }
