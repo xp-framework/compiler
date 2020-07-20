@@ -10,11 +10,11 @@ php:
   - 7.2
   - 7.3
   - 7.4
-  - master
+  - nightly
 
 matrix:
   allow_failures:
-    - php: master
+    - php: nightly
 
 before_script:
   - curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run
