@@ -3,6 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #87: Add support for match expression - @thekid
 * Removed `lang.ast.syntax.php.NullSafe` in favor of builtin support
   (@thekid)
 * Merged PR #84: Extract parser - @thekid
