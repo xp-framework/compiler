@@ -300,6 +300,16 @@ abstract class PHP extends Emitter {
     }
   }
 
+  private function comment($comment) {
+    if (0 === strlen($comment)) {
+      return 'null';
+    } else if ('/' === $comment[0]) {
+      return "'".str_replace("'", "\\'", trim(preg_replace('/\n\s+\* ?/', "\n", substr($comment, 3, -2))))."'";
+    } else {
+      return "'".str_replace("'", "\\'", $comment)."'";
+    }
+  }
+
   protected function emitMeta($result, $name, $annotations, $comment) {
     if (null === $name) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
@@ -308,7 +318,7 @@ abstract class PHP extends Emitter {
     }
     $result->out->write('"class" => [DETAIL_ANNOTATIONS => [');
     $this->emitAnnotations($result, $annotations);
-    $result->out->write('], DETAIL_COMMENT => \''.str_replace("'", "\\'", $comment).'\'],');
+    $result->out->write('], DETAIL_COMMENT => '.$this->comment($comment).'],');
 
     foreach (array_shift($result->meta) as $type => $lookup) {
       $result->out->write($type.' => [');
@@ -322,7 +332,7 @@ abstract class PHP extends Emitter {
           $result->out->write('],');
         }
         $result->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
-        $result->out->write(', DETAIL_COMMENT => \''.str_replace("'", "\\'", $meta[DETAIL_COMMENT]).'\'');
+        $result->out->write(', DETAIL_COMMENT => '.$this->comment($meta[DETAIL_COMMENT]));
         $result->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
       }
       $result->out->write('],');
