@@ -300,6 +300,7 @@ abstract class PHP extends Emitter {
     }
   }
 
+  /** Removes leading, intermediate and trailing stars from apidoc comments */
   private function comment($comment) {
     if (0 === strlen($comment)) {
       return 'null';
