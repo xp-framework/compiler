@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.2.1 / 2020-09-09
+
+* Adjusted to `xp-framework/ast` yielding comments as-is, transform
+  them to the form XP meta information expects.
+  (@thekid)
+
 ## 5.2.0 / 2020-07-20
 
 * Merged PR #87: Add support for match expression - @thekid
