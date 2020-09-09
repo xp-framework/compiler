@@ -20,16 +20,16 @@ The following code uses PHP 8.0, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 
 ```php
 <?php // In a file "HelloWorld.php"
 
-use util\cmd\Console;
 use lang\Type;
+use util\cmd\Console;
 
-<<author('Timm Friebe')>>
+#[Author('Timm Friebe')]
 class HelloWorld {
   public const GREETING = 'Hello';
 
   public static function main(array<string> $args): void {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
-    $author= Type::forName(self::class)->getAnnotation('author');
+    $author= Type::forName(self::class)->getAnnotation(Author::class);
 
     Console::writeLine($greet($args[0] ?? 'World', $author));
   }
