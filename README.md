@@ -31,7 +31,7 @@ class HelloWorld {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
     $author= Type::forName(self::class)->getAnnotation(Author::class);
 
-    Console::writeLine($greet($args[0] ?? 'World', $author));
+    Console::writeLine($greet($args[0] ?? 'World', from: $author));
   }
 }
 ```
