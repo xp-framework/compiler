@@ -12,6 +12,16 @@ class PHP80 extends PHP {
 
   protected $unsupported= [];
 
+  protected function emitArguments($result, $arguments) {
+    $s= sizeof($arguments) - 1;
+    $i= 0;
+    foreach ($arguments as $name => $argument) {
+      if (is_string($name)) $result->out->write($name.':');
+      $this->emitOne($result, $argument);
+      if ($i++ < $s) $result->out->write(', ');
+    }
+  }
+
   protected function emitNew($result, $new) {
     if ($new->type instanceof Node) {
       $result->out->write('new (');
