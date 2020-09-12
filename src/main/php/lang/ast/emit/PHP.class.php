@@ -712,9 +712,10 @@ abstract class PHP extends Emitter {
 
   protected function emitArguments($result, $arguments) {
     $s= sizeof($arguments) - 1;
-    foreach ($arguments as $i => $argument) {
+    $i= 0;
+    foreach ($arguments as $argument) {
       $this->emitOne($result, $argument);
-      if ($i < $s) $result->out->write(', ');
+      if ($i++ < $s) $result->out->write(', ');
     }
   }
 
