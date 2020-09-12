@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use unittest\Assert;
+use unittest\actions\RuntimeVersion;
 
 class InvocationTest extends EmittingTest {
 
@@ -98,6 +99,59 @@ class InvocationTest extends EmittingTest {
 
         public function run() {
           return fixture();
+        }
+      }'
+    ));
+  }
+
+  #[@test, @values([
+  #  '"html(<) = &lt;", flags: ENT_HTML5',
+  #  '"html(<) = &lt;", ENT_HTML5, double: true',
+  #  'string: "html(<) = &lt;", flags: ENT_HTML5',
+  #  'string: "html(<) = &lt;", flags: ENT_HTML5, double: true',
+  #])]
+  public function named_arguments_in_exact_order($arguments) {
+    Assert::equals('html(&lt;) = &amp;lt;', $this->run(
+      'class <T> {
+
+        public function escape($string, $flags= ENT_HTML5, $double= true) {
+          return htmlspecialchars($string, $flags, null, $double);
+        }
+
+        public function run() {
+          return $this->escape('.$arguments.');
+        }
+      }'
+    ));
+  }
+
+  #[@test, @action(new RuntimeVersion('>=8.0'))]
+  public function named_arguments_in_reverse_order() {
+    Assert::equals('html(&lt;) = &amp;lt;', $this->run(
+      'class <T> {
+
+        public function escape($string, $flags= ENT_HTML5, $double= true) {
+          return htmlspecialchars($string, $flags, null, $double);
+        }
+
+        public function run() {
+          return $this->escape(flags: ENT_HTML5, string: "html(<) = &lt;");
+        }
+      }'
+    ));
+  }
+
+  #[@test, @action(new RuntimeVersion('>=8.0'))]
+  public function named_arguments_omitting_one() {
+    Assert::equals('html(&lt;) = &lt;', $this->run(
+      'class <T> {
+
+        public function escape($string, $flags= ENT_HTML5, $double= true) {
+          return htmlspecialchars($string, $flags, null, $double);
+        }
+
+        public function run() {
+          return $this->escape("html(<) = &lt;", double: false);
         }
       }'
     ));

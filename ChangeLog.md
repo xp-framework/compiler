@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.3.0 / 2020-09-12
+
+* Merged PR #88: Emit named arguments for PHP 8 - @thekid
+
 ## 5.2.1 / 2020-09-09
 
 * Adjusted to `xp-framework/ast` yielding comments as-is, transform
