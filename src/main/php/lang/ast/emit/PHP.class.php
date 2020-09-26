@@ -314,6 +314,7 @@ abstract class PHP extends Emitter {
     }
   }
 
+  /** Emit meta information so that the reflection API won't have to parse it */
   protected function emitMeta($result, $name, $annotations, $comment) {
     if (null === $name) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
