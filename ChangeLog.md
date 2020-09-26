@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed PHP 8 attributes to be emitted in XP meta information without
+  namespaces, and with their first characters lowercased. This way, code
+  using annotations will continue to work.
+  (@thekid)
+
 ## 5.3.0 / 2020-09-12
 
 * Merged PR #88: Emit named arguments for PHP 8 - @thekid

@@ -280,18 +280,21 @@ abstract class PHP extends Emitter {
     $result->out->write('}} '.$class->name.'::__init();');
   }
 
+  /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
   protected function emitAnnotations($result, $annotations) {
     foreach ($annotations as $name => $arguments) {
-      $result->out->write("'".$name."' => ");
+      $p= strrpos($name, '\\');
+      $result->out->write("'".lcfirst(false === $p ? $name : substr($name, $p + 1))."' => ");
 
       if (empty($arguments)) {
         $result->out->write('null,');
-      } else if (1 === sizeof($arguments)) {
+      } else if (1 === sizeof($arguments) && isset($arguments[0])) {
         $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
       } else {
         $result->out->write('[');
-        foreach ($arguments as $argument) {
+        foreach ($arguments as $name => $argument) {
+          is_string($name) && $result->out->write("'".$name."' => ");
           $this->emitOne($result, $argument);
           $result->out->write(',');
         }
