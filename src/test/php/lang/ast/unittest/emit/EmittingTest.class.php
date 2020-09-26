@@ -69,8 +69,9 @@ abstract class EmittingTest {
       Console::writeLine($out->bytes());
     }
 
-    $this->cl->setClassBytes($name, $out->bytes());
-    return $this->cl->loadClass($name);
+    $class= ($package= $tree->scope()->package) ? strtr(substr($package, 1), '\\', '.').'.'.$name : $name;
+    $this->cl->setClassBytes($class, $out->bytes());
+    return $this->cl->loadClass($class);
   }
 
   /**
