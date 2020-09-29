@@ -58,7 +58,7 @@ class AnonymousClassTest extends EmittingTest {
       public function run() {
         return new class() {
 
-          <<inside>>
+          #[Inside]
           public function fixture() { }
         };
       }

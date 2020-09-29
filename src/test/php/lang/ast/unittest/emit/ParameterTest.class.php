@@ -80,19 +80,19 @@ class ParameterTest extends EmittingTest {
 
   #[@test]
   public function simple_annotation() {
-    Assert::equals(['inject' => null], $this->param('<<inject>> $param')->getAnnotations());
+    Assert::equals(['inject' => null], $this->param('#[Inject] $param')->getAnnotations());
   }
 
   #[@test]
   public function annotation_with_value() {
-    Assert::equals(['inject' => 'dsn'], $this->param('<<inject("dsn")>> $param')->getAnnotations());
+    Assert::equals(['inject' => 'dsn'], $this->param('#[Inject("dsn")] $param')->getAnnotations());
   }
 
   #[@test]
   public function multiple_annotations() {
     Assert::equals(
       ['inject' => null, 'name' => 'dsn'],
-      $this->param('<<inject, name("dsn")>> $param')->getAnnotations()
+      $this->param('#[Inject, Name("dsn")] $param')->getAnnotations()
     );
   }
 

@@ -10,7 +10,7 @@ class TransformationsTest extends EmittingTest {
   #[@before]
   public function setUp() {
     $this->transform('class', function($codegen, $class) {
-      if ($class->annotation('repr')) {
+      if ($class->annotation('Repr')) {
         $class->declare(new Method(
           ['public'],
           'toString',
@@ -21,7 +21,7 @@ class TransformationsTest extends EmittingTest {
       return $class;
     });
     $this->transform('class', function($codegen, $class) {
-      if ($class->annotation('getters')) {
+      if ($class->annotation('Getters')) {
         foreach ($class->properties() as $property) {
           $class->declare(new Method(
             ['public'],
@@ -49,7 +49,7 @@ class TransformationsTest extends EmittingTest {
 
   #[@test]
   public function generates_string_representation() {
-    $t= $this->type('<<repr>> class <T> {
+    $t= $this->type('#[Repr] class <T> {
       private int $id;
 
       public function __construct(int $id) {
@@ -62,7 +62,7 @@ class TransformationsTest extends EmittingTest {
 
   #[@test, @values([['id', 1], ['name', 'Test']])]
   public function generates_accessor($name, $expected) {
-    $t= $this->type('<<getters>> class <T> {
+    $t= $this->type('#[Getters] class <T> {
       private int $id;
       private string $name;
 
@@ -77,7 +77,7 @@ class TransformationsTest extends EmittingTest {
 
   #[@test]
   public function generates_both() {
-    $t= $this->type('<<repr, getters>> class <T> {
+    $t= $this->type('#[Repr, Getters] class <T> {
       private int $id;
 
       public function __construct(int $id) {
