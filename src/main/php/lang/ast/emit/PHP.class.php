@@ -281,10 +281,13 @@ abstract class PHP extends Emitter {
   }
 
   /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
-  protected function emitAnnotations($result, $annotations) {
+  protected function annotations($result, $annotations) {
+    $lookup= [];
     foreach ($annotations as $name => $arguments) {
       $p= strrpos($name, '\\');
-      $result->out->write("'".lcfirst(false === $p ? $name : substr($name, $p + 1))."' => ");
+      $key= lcfirst(false === $p ? $name : substr($name, $p + 1));
+      $result->out->write("'".$key."' => ");
+      $name === $key || $lookup[$key]= $name;
 
       if (empty($arguments)) {
         $result->out->write('null,');
@@ -301,6 +304,25 @@ abstract class PHP extends Emitter {
         $result->out->write('],');
       }
     }
+    return $lookup;
+  }
+
+  /** Emits annotations in XP format - and mappings for their names */
+  protected function attributes($result, $annotations, $target) {
+    $result->out->write('DETAIL_ANNOTATIONS => [');
+    $lookup= $this->annotations($result, $annotations);
+    $result->out->write('], DETAIL_TARGET_ANNO => [');
+    foreach ($target as $name => $annotations) {
+      $result->out->write("'$".$name."' => [");
+      foreach ($this->annotations($result, $annotations) as $key => $value) {
+        $lookup[$key]= $value;
+      }
+      $result->out->write('],');
+    }
+    foreach ($lookup as $key => $value) {
+      $result->out->write("'".$key."' => '".$value."',");
+    }
+    $result->out->write(']');
   }
 
   /** Removes leading, intermediate and trailing stars from apidoc comments */
@@ -314,28 +336,23 @@ abstract class PHP extends Emitter {
     }
   }
 
+  /** Emit meta information so that the reflection API won't have to parse it */
   protected function emitMeta($result, $name, $annotations, $comment) {
     if (null === $name) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
     } else {
       $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
     }
-    $result->out->write('"class" => [DETAIL_ANNOTATIONS => [');
-    $this->emitAnnotations($result, $annotations);
-    $result->out->write('], DETAIL_COMMENT => '.$this->comment($comment).'],');
+    $result->out->write('"class" => [');
+    $this->attributes($result, $annotations, []);
+    $result->out->write(', DETAIL_COMMENT => '.$this->comment($comment).'],');
 
     foreach (array_shift($result->meta) as $type => $lookup) {
       $result->out->write($type.' => [');
       foreach ($lookup as $key => $meta) {
-        $result->out->write("'".$key."' => [DETAIL_ANNOTATIONS => [");
-        $this->emitAnnotations($result, $meta[DETAIL_ANNOTATIONS]);
-        $result->out->write('], DETAIL_TARGET_ANNO => [');
-        foreach ($meta[DETAIL_TARGET_ANNO] as $target => $annotations) {
-          $result->out->write("'$".$target."' => [");
-          $this->emitAnnotations($result, $annotations);
-          $result->out->write('],');
-        }
-        $result->out->write('], DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
+        $result->out->write("'".$key."' => [");
+        $this->attributes($result, $meta[DETAIL_ANNOTATIONS], $meta[DETAIL_TARGET_ANNO]);
+        $result->out->write(', DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
         $result->out->write(', DETAIL_COMMENT => '.$this->comment($meta[DETAIL_COMMENT]));
         $result->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
       }
