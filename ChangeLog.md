@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.4.0 / 2020-09-12
+
+* Merged PR #89: Add annotation type mappings to `TARGET_ANNO` detail
+  (@thekid)
 * Changed PHP 8 attributes to be emitted in XP meta information without
   namespaces, and with their first characters lowercased. This way, code
   using annotations will continue to work, see xp-framework/rfc#336.
