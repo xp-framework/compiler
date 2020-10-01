@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 /**
  * Array types
  *
@@ -8,7 +8,7 @@ use unittest\Assert;
  */
 class ArrayTypesTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function int_array_type() {
     $t= $this->type('class <T> {
       private array<int> $test;
@@ -17,7 +17,7 @@ class ArrayTypesTest extends EmittingTest {
     Assert::equals('int[]', $t->getField('test')->getType()->getName());
   }
 
-  #[@test]
+  #[Test]
   public function int_map_type() {
     $t= $this->type('class <T> {
       private array<string, int> $test;
@@ -26,7 +26,7 @@ class ArrayTypesTest extends EmittingTest {
     Assert::equals('[:int]', $t->getField('test')->getType()->getName());
   }
 
-  #[@test]
+  #[Test]
   public function nested_map_type() {
     $t= $this->type('class <T> {
       private array<string, array<int>> $test;
@@ -35,7 +35,7 @@ class ArrayTypesTest extends EmittingTest {
     Assert::equals('[:int[]]', $t->getField('test')->getType()->getName());
   }
 
-  #[@test]
+  #[Test]
   public function var_map_type() {
     $t= $this->type('class <T> {
       private array<string, mixed> $test;

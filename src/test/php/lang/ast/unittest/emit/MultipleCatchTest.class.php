@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{IllegalArgumentException, IllegalStateException};
-use unittest\Assert;
+use unittest\{Assert, Test, Values};
 
 /**
  * Multiple catch
@@ -10,10 +10,7 @@ use unittest\Assert;
  */
 class MultipleCatchTest extends EmittingTest {
 
-  #[@test, @values([
-  #  IllegalArgumentException::class,
-  #  IllegalStateException::class
-  #])]
+  #[Test, Values([IllegalArgumentException::class, IllegalStateException::class])]
   public function catch_both($type) {
     $t= $this->type('class <T> {
       public function run($t) {

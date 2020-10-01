@@ -1,28 +1,28 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class CommentsTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function on_class() {
     $t= $this->type('/** Test */ class <T> { }');
     Assert::equals('Test', $t->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function on_interface() {
     $t= $this->type('/** Test */ interface <T> { }');
     Assert::equals('Test', $t->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function on_trait() {
     $t= $this->type('/** Test */ trait <T> { }');
     Assert::equals('Test', $t->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function on_method() {
     $t= $this->type('class <T> {
 
@@ -35,13 +35,13 @@ class CommentsTest extends EmittingTest {
     Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function comments_are_escaped() {
     $t= $this->type("/** Timm's test */ class <T> { }");
     Assert::equals("Timm's test", $t->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function only_last_comment_is_considered() {
     $t= $this->type('class <T> {
 
@@ -56,7 +56,7 @@ class CommentsTest extends EmittingTest {
     Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function next_comment_is_not_considered() {
     $t= $this->type('class <T> {
 
@@ -71,7 +71,7 @@ class CommentsTest extends EmittingTest {
     Assert::equals('Test', $t->getMethod('fixture')->getComment());
   }
 
-  #[@test]
+  #[Test]
   public function inline_apidoc_comment_is_not_considered() {
     $t= $this->type('class <T> {
 

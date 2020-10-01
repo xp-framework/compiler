@@ -3,8 +3,7 @@
 use io\streams\MemoryOutputStream;
 use lang\IllegalStateException;
 use lang\ast\{Emitter, Node, Result};
-use unittest\Assert;
-use unittest\TestCase;
+use unittest\{Assert, Expect, Test, TestCase};
 
 class EmitterTest {
 
@@ -12,17 +11,17 @@ class EmitterTest {
     return Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
   }
 
-  #[@test]
+  #[Test]
   public function can_create() {
     $this->newEmitter();
   }
 
-  #[@test]
+  #[Test]
   public function transformations_initially_empty() {
     Assert::equals([], $this->newEmitter()->transformations());
   }
 
-  #[@test]
+  #[Test]
   public function transform() {
     $function= function($class) { return $class; };
 
@@ -31,7 +30,7 @@ class EmitterTest {
     Assert::equals(['class' => [$function]], $fixture->transformations());
   }
 
-  #[@test]
+  #[Test]
   public function remove() {
     $first= function($class) { return $class; };
     $second= function($class) { $class->annotations['author']= 'Test'; return $class; };
@@ -43,7 +42,7 @@ class EmitterTest {
     Assert::equals(['class' => [$second]], $fixture->transformations());
   }
 
-  #[@test]
+  #[Test]
   public function remove_unsets_empty_kind() {
     $function= function($class) { return $class; };
 
@@ -53,7 +52,7 @@ class EmitterTest {
     Assert::equals([], $fixture->transformations());
   }
 
-  #[@test, @expect(IllegalStateException::class)]
+  #[Test, Expect(IllegalStateException::class)]
   public function emit_node_without_kind() {
     $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), new class() extends Node {
       public $kind= null;

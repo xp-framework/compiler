@@ -2,12 +2,12 @@
 
 use lang\ast\nodes\{Method, Signature};
 use lang\ast\{Code, Type};
-use unittest\Assert;
+use unittest\{Assert, Before, Test, Values};
 
 class TransformationsTest extends EmittingTest {
 
   /** @return void */
-  #[@before]
+  #[Before]
   public function setUp() {
     $this->transform('class', function($codegen, $class) {
       if ($class->annotation('Repr')) {
@@ -35,7 +35,7 @@ class TransformationsTest extends EmittingTest {
     });
   }
 
-  #[@test]
+  #[Test]
   public function leaves_class_without_annotations() {
     $t= $this->type('class <T> {
       private int $id;
@@ -47,7 +47,7 @@ class TransformationsTest extends EmittingTest {
     Assert::false($t->hasMethod('id'));
   }
 
-  #[@test]
+  #[Test]
   public function generates_string_representation() {
     $t= $this->type('#[Repr] class <T> {
       private int $id;
@@ -60,7 +60,7 @@ class TransformationsTest extends EmittingTest {
     Assert::equals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
   }
 
-  #[@test, @values([['id', 1], ['name', 'Test']])]
+  #[Test, Values([['id', 1], ['name', 'Test']])]
   public function generates_accessor($name, $expected) {
     $t= $this->type('#[Getters] class <T> {
       private int $id;
@@ -75,7 +75,7 @@ class TransformationsTest extends EmittingTest {
     Assert::equals($expected, $t->getMethod($name)->invoke($t->newInstance(1, 'Test')));
   }
 
-  #[@test]
+  #[Test]
   public function generates_both() {
     $t= $this->type('#[Repr, Getters] class <T> {
       private int $id;

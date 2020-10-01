@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class ArraysTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function array_literal() {
     $r= $this->run('class <T> {
       public function run() {
@@ -15,7 +15,7 @@ class ArraysTest extends EmittingTest {
     Assert::equals([1, 2, 3], $r);
   }
 
-  #[@test]
+  #[Test]
   public function map_literal() {
     $r= $this->run('class <T> {
       public function run() {
@@ -26,7 +26,7 @@ class ArraysTest extends EmittingTest {
     Assert::equals(['a' => 1, 'b' => 2], $r);
   }
 
-  #[@test]
+  #[Test]
   public function append() {
     $r= $this->run('class <T> {
       public function run() {
@@ -39,7 +39,7 @@ class ArraysTest extends EmittingTest {
     Assert::equals([1, 2, 3], $r);
   }
 
-  #[@test]
+  #[Test]
   public function destructuring() {
     $r= $this->run('class <T> {
       public function run() {
@@ -51,7 +51,7 @@ class ArraysTest extends EmittingTest {
     Assert::equals([1, 2], $r);
   }
 
-  #[@test]
+  #[Test]
   public function init_with_variable() {
     $r= $this->run('class <T> {
       public function run() {
@@ -63,7 +63,7 @@ class ArraysTest extends EmittingTest {
     Assert::equals(['key' => 'value'], $r);
   }
 
-  #[@test]
+  #[Test]
   public function init_with_member_variable() {
     $r= $this->run('class <T> {
       private static $KEY= "key";

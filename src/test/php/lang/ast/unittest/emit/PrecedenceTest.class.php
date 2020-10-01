@@ -1,15 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test, Values};
 
 class PrecedenceTest extends EmittingTest {
 
-  #[@test, @values([
-  #  ['2 + 3 * 4', 14],
-  #  ['2 + 8 / 4', 4],
-  #  ['2 + 3 ** 2', 11],
-  #  ['2 + 5 % 2', 3],
-  #])]
+  #[Test, Values([['2 + 3 * 4', 14], ['2 + 8 / 4', 4], ['2 + 3 ** 2', 11], ['2 + 5 % 2', 3],])]
   public function mathematical($input, $result) {
     Assert::equals($result, $this->run(
       'class <T> {
@@ -20,7 +15,7 @@ class PrecedenceTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function concatenation() {
     $t= $this->type(
       'class <T> {
@@ -32,7 +27,7 @@ class PrecedenceTest extends EmittingTest {
     Assert::equals('('.$t->getName().')', $t->newInstance()->run());
   }
 
-  #[@test]
+  #[Test]
   public function plusplus() {
     $t= $this->type(
       'class <T> {

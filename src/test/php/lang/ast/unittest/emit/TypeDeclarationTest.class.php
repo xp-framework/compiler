@@ -2,11 +2,11 @@
 
 use lang\XPClass;
 use lang\reflect\Modifiers;
-use unittest\Assert;
+use unittest\{Assert, Test, Values};
 
 class TypeDeclarationTest extends EmittingTest {
 
-  #[@test, @values(['class', 'interface', 'trait'])]
+  #[Test, Values(['class', 'interface', 'trait'])]
   public function empty_type($kind) {
     $t= $this->type($kind.' <T> { }');
     Assert::equals(
@@ -15,22 +15,22 @@ class TypeDeclarationTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function abstract_class_type() {
     Assert::true(Modifiers::isAbstract($this->type('abstract class <T> { }')->getModifiers()));
   }
 
-  #[@test]
+  #[Test]
   public function final_class_type() {
     Assert::true(Modifiers::isFinal($this->type('final class <T> { }')->getModifiers()));
   }
 
-  #[@test]
+  #[Test]
   public function class_without_parent() {
     Assert::null($this->type('class <T> { }')->getParentclass());
   }
 
-  #[@test]
+  #[Test]
   public function class_with_parent() {
     Assert::equals(
       new XPClass(EmittingTest::class),
@@ -38,26 +38,23 @@ class TypeDeclarationTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function trait_type() {
     Assert::true($this->type('trait <T> { }')->isTrait());
   }
 
-  #[@test]
+  #[Test]
   public function interface_type() {
     Assert::true($this->type('interface <T> { }')->isInterface());
   }
 
-  #[@test, @values(['public', 'private', 'protected'])]
+  #[Test, Values(['public', 'private', 'protected'])]
   public function constant($modifiers) {
     $c= $this->type('class <T> { '.$modifiers.' const test = 1; }')->getConstant('test');
     Assert::equals(1, $c);
   }
 
-  #[@test, @values([
-  #  'public', 'private', 'protected',
-  #  'public static', 'private static', 'protected static'
-  #])]
+  #[Test, Values(['public', 'private', 'protected', 'public static', 'private static', 'protected static'])]
   public function field($modifiers) {
     $f= $this->type('class <T> { '.$modifiers.' $test; }')->getField('test');
     $n= implode(' ', Modifiers::namesOf($f->getModifiers()));
@@ -67,11 +64,7 @@ class TypeDeclarationTest extends EmittingTest {
     );
   }
 
-  #[@test, @values([
-  #  'public', 'protected', 'private',
-  #  'public final', 'protected final',
-  #  'public static', 'protected static', 'private static'
-  #])]
+  #[Test, Values(['public', 'protected', 'private', 'public final', 'protected final', 'public static', 'protected static', 'private static'])]
   public function method($modifiers) {
     $m= $this->type('class <T> { '.$modifiers.' function test() { } }')->getMethod('test');
     $n= implode(' ', Modifiers::namesOf($m->getModifiers()));
@@ -81,13 +74,13 @@ class TypeDeclarationTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function abstract_method() {
     $m= $this->type('abstract class <T> { abstract function test(); }')->getMethod('test');
     Assert::true(Modifiers::isAbstract($m->getModifiers()));
   }
 
-  #[@test]
+  #[Test]
   public function method_with_keyword() {
     $t= $this->type('class <T> {
       private $items;

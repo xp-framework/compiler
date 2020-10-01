@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class GotoTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function skip_forward() {
     $r= $this->run('class <T> {
       public function run() {
@@ -17,7 +17,7 @@ class GotoTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function skip_backward() {
     $r= $this->run('class <T> {
       public function run() {

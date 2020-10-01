@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class UnicodeEscapesTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function spanish_ñ() {
     $r= $this->run('class <T> {
       public function run() {
@@ -15,7 +15,7 @@ class UnicodeEscapesTest extends EmittingTest {
     Assert::equals('mañana', $r);
   }
 
-  #[@test]
+  #[Test]
   public function emoji() {
     $r= $this->run('class <T> {
       public function run() {

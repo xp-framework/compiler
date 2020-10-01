@@ -1,16 +1,16 @@
 <?php namespace lang\ast\unittest;
 
 use lang\ast\Scope;
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class ScopeTest {
 
-  #[@test]
+  #[Test]
   public function can_create() {
     new Scope();
   }
 
-  #[@test]
+  #[Test]
   public function package() {
     $s= new Scope();
     $s->package('test');
@@ -18,14 +18,14 @@ class ScopeTest {
     Assert::equals('\\test', $s->package);
   }
 
-  #[@test]
+  #[Test]
   public function resolve_in_global_scope() {
     $s= new Scope();
 
     Assert::equals('\\Parse', $s->resolve('Parse'));
   }
 
-  #[@test]
+  #[Test]
   public function resolve_in_package() {
     $s= new Scope();
     $s->package('test');
@@ -33,7 +33,7 @@ class ScopeTest {
     Assert::equals('\\test\\Parse', $s->resolve('Parse'));
   }
 
-  #[@test]
+  #[Test]
   public function resolve_relative_in_package() {
     $s= new Scope();
     $s->package('test');
@@ -41,7 +41,7 @@ class ScopeTest {
     Assert::equals('\\test\\ast\\Parse', $s->resolve('ast\\Parse'));
   }
 
-  #[@test]
+  #[Test]
   public function resolve_imported_in_package() {
     $s= new Scope();
     $s->package('test');
@@ -50,7 +50,7 @@ class ScopeTest {
     Assert::equals('\\lang\\ast\\Parse', $s->resolve('Parse'));
   }
 
-  #[@test]
+  #[Test]
   public function resolve_imported_in_global_scope() {
     $s= new Scope();
     $s->import('lang\\ast\\Parse');
@@ -58,7 +58,7 @@ class ScopeTest {
     Assert::equals('\\lang\\ast\\Parse', $s->resolve('Parse'));
   }
 
-  #[@test]
+  #[Test]
   public function package_inherited_from_parent() {
     $s= new Scope();
     $s->package('test');
@@ -66,7 +66,7 @@ class ScopeTest {
     Assert::equals('\\test\\Parse', (new Scope($s))->resolve('Parse'));
   }
 
-  #[@test]
+  #[Test]
   public function import_inherited_from_parent() {
     $s= new Scope();
     $s->import('lang\\ast\\Parse');

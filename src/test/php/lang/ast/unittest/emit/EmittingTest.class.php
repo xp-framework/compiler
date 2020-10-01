@@ -3,8 +3,7 @@
 use io\streams\{MemoryOutputStream, StringWriter};
 use lang\DynamicClassLoader;
 use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
-use unittest\Assert;
-use unittest\TestCase;
+use unittest\{After, Assert, TestCase};
 use util\cmd\Console;
 
 abstract class EmittingTest {
@@ -27,7 +26,7 @@ abstract class EmittingTest {
     }
   }
 
-  #[@after]
+  #[After]
   public function tearDown() {
     foreach ($this->transformations as $transformation) {
       $this->emitter->remove($transformation);

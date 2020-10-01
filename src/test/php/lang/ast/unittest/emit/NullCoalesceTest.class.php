@@ -1,11 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
-use unittest\actions\RuntimeVersion;
+use unittest\{Action, Assert, Test};
 
 class NullCoalesceTest extends EmittingTest {
 
-  #[@test, @action(new RuntimeVersion('>=7.0'))]
+  #[Test]
   public function on_null() {
     $r= $this->run('class <T> {
       public function run() {
@@ -16,7 +15,7 @@ class NullCoalesceTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function on_unset_array_key() {
     $r= $this->run('class <T> {
       public function run() {
@@ -27,7 +26,7 @@ class NullCoalesceTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function assignment_operator() {
     $r= $this->run('class <T> {
       public function run() {

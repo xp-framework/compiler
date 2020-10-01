@@ -1,16 +1,11 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Throwable;
-use unittest\Assert;
+use unittest\{Assert, Expect, Test, Values};
 
 class ControlStructuresTest extends EmittingTest {
 
-  #[@test, @values([
-  #  [0, 'no items'],
-  #  [1, 'one item'],
-  #  [2, '2 items'],
-  #  [3, '3 items'],
-  #])]
+  #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items'],])]
   public function if_else_cascade($input, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
@@ -27,12 +22,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test, @values([
-  #  [0, 'no items'],
-  #  [1, 'one item'],
-  #  [2, '2 items'],
-  #  [3, '3 items'],
-  #])]
+  #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items'],])]
   public function switch_case($input, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
@@ -47,7 +37,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test, @values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
+  #[Test, Values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
   public function switch_case_goto_label_ambiguity($whence, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
@@ -63,12 +53,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test, @values([
-  #  [0, 'no items'],
-  #  [1, 'one item'],
-  #  [2, '2 items'],
-  #  [3, '3 items'],
-  #])]
+  #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items'],])]
   public function match($input, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
@@ -83,12 +68,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test, @values([
-  #  [0, 'no items'],
-  #  [1, 'one item'],
-  #  [5, '5 items'],
-  #  [10, '10+ items'],
-  #])]
+  #[Test, Values([[0, 'no items'], [1, 'one item'], [5, '5 items'], [10, '10+ items'],])]
   public function match_with_binary($input, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
@@ -104,7 +84,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unhandled match value of type .+/'])]
+  #[Test, Expect(['class' => Throwable::class, 'withMessage' => '/Unhandled match value of type .+/'])]
   public function unhandled_match() {
     $this->run('class <T> {
       public function run($arg) {
@@ -117,7 +97,7 @@ class ControlStructuresTest extends EmittingTest {
     }', SEEK_END);
   }
 
-  #[@test, @expect(['class' => Throwable::class, 'withMessage' => '/Unknown seek mode .+/'])]
+  #[Test, Expect(['class' => Throwable::class, 'withMessage' => '/Unknown seek mode .+/'])]
   public function match_with_throw_expression() {
     $this->run('class <T> {
       public function run($arg) {

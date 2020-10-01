@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class InstanceOfTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function this_is_instanceof_self() {
     $r= $this->run('class <T> {
       public function run() {
@@ -15,7 +15,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function new_self_is_instanceof_this() {
     $r= $this->run('class <T> {
       public function run() {
@@ -26,7 +26,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function instanceof_qualified_type() {
     $r= $this->run('class <T> {
       public function run() {
@@ -37,7 +37,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function instanceof_imported_type() {
     $r= $this->run('use util\Date; class <T> {
       public function run() {
@@ -48,7 +48,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function instanceof_aliased_type() {
     $r= $this->run('use util\Date as D; class <T> {
       public function run() {
@@ -59,7 +59,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function instanceof_instance_expr() {
     $r= $this->run('class <T> {
       private $type= self::class;
@@ -72,7 +72,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function instanceof_scope_expr() {
     $r= $this->run('class <T> {
       private static $type= self::class;
@@ -85,7 +85,7 @@ class InstanceOfTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function instanceof_expr() {
     $r= $this->run('class <T> {
       private function type() { return self::class; }

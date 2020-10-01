@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class VarargsTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function vsprintf() {
     $r= $this->run('class <T> {
       private function format(string $format, ... $args) {
@@ -19,7 +19,7 @@ class VarargsTest extends EmittingTest {
     Assert::equals('Hello Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function list_of() {
     $r= $this->run('class <T> {
       private function listOf(string... $args) {

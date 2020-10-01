@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{ArrayType, MapType, Primitive, Type, Value, XPClass};
-use unittest\Assert;
+use unittest\{Assert, Test, Values};
 
 class ParameterTest extends EmittingTest {
 
@@ -18,77 +18,80 @@ class ParameterTest extends EmittingTest {
     ;
   }
 
-  #[@test]
+  /** @return iterable */
+  private function special() {
+    yield ['array $param', Type::$ARRAY];
+    yield ['callable $param', Type::$CALLABLE];
+    yield ['iterable $param', Type::$ITERABLE];
+    yield ['object $param', Type::$OBJECT];
+  }
+
+  #[Test]
   public function name() {
     Assert::equals('param', $this->param('$param')->getName());
   }
 
-  #[@test]
+  #[Test]
   public function without_type() {
     Assert::equals(Type::$VAR, $this->param('$param')->getType());
   }
 
-  #[@test, @values([
-  #  ['array $param', Type::$ARRAY],
-  #  ['callable $param', Type::$CALLABLE],
-  #  ['iterable $param', Type::$ITERABLE],
-  #  ['object $param', Type::$OBJECT],
-  #])]
+  #[Test, Values('special')]
   public function with_special_type($declaration, $type) {
     Assert::equals($type, $this->param($declaration)->getType());
   }
 
-  #[@test]
+  #[Test]
   public function value_typed() {
     Assert::equals(new XPClass(Value::class), $this->param('Value $param')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function value_type_with_null() {
     Assert::equals(new XPClass(Value::class), $this->param('Value $param= null')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function nullable_value_type() {
     Assert::equals(new XPClass(Value::class), $this->param('?Value $param')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function string_typed() {
     Assert::equals(Primitive::$STRING, $this->param('string $param')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function string_typed_with_null() {
     Assert::equals(Primitive::$STRING, $this->param('string $param= null')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function nullable_string_type() {
     Assert::equals(Primitive::$STRING, $this->param('?string $param')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function array_typed() {
     Assert::equals(new ArrayType(Primitive::$INT), $this->param('array<int> $param')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function map_typed() {
     Assert::equals(new MapType(Primitive::$INT), $this->param('array<string, int> $param')->getType());
   }
 
-  #[@test]
+  #[Test]
   public function simple_annotation() {
     Assert::equals(['inject' => null], $this->param('#[Inject] $param')->getAnnotations());
   }
 
-  #[@test]
+  #[Test]
   public function annotation_with_value() {
     Assert::equals(['inject' => 'dsn'], $this->param('#[Inject("dsn")] $param')->getAnnotations());
   }
 
-  #[@test]
+  #[Test]
   public function multiple_annotations() {
     Assert::equals(
       ['inject' => null, 'name' => 'dsn'],
@@ -96,22 +99,22 @@ class ParameterTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function required_parameter() {
     Assert::equals(false, $this->param('$param')->isOptional());
   }
 
-  #[@test]
+  #[Test]
   public function optional_parameter() {
     Assert::equals(true, $this->param('$param= true')->isOptional());
   }
 
-  #[@test]
+  #[Test]
   public function optional_parameters_default_value() {
     Assert::equals(true, $this->param('$param= true')->getDefaultValue());
   }
 
-  #[@test]
+  #[Test]
   public function trailing_comma_allowed() {
     $p= $this->type('class <T> { public function fixture($param, ) { } }')
       ->getMethod('fixture')

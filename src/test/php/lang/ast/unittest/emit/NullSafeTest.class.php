@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 /**
  * Nullsafe operator support
@@ -12,7 +12,7 @@ use unittest\Assert;
  */
 class NullSafeTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function method_call_on_null() {
     $r= $this->run('class <T> {
       public function run() {
@@ -24,7 +24,7 @@ class NullSafeTest extends EmittingTest {
     Assert::null($r);
   }
 
-  #[@test]
+  #[Test]
   public function method_call_on_object() {
     $r= $this->run('class <T> {
       public function run() {
@@ -38,7 +38,7 @@ class NullSafeTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function member_access_on_null() {
     $r= $this->run('class <T> {
       public function run() {
@@ -50,7 +50,7 @@ class NullSafeTest extends EmittingTest {
     Assert::null($r);
   }
 
-  #[@test]
+  #[Test]
   public function member_access_on_object() {
     $r= $this->run('class <T> {
       public function run() {
@@ -64,7 +64,7 @@ class NullSafeTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function chained_method_call() {
     $r= $this->run('
       class <T>Invocation {
@@ -85,7 +85,7 @@ class NullSafeTest extends EmittingTest {
     Assert::equals([null, ['outer', 'inner']], $r);
   }
 
-  #[@test]
+  #[Test]
   public function dynamic_member_access_on_object() {
     $r= $this->run('class <T> {
       public function run() {
@@ -102,7 +102,7 @@ class NullSafeTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function short_circuiting_chain() {
     $r= $this->run('class <T> {
       public function run() {
@@ -114,7 +114,7 @@ class NullSafeTest extends EmittingTest {
     Assert::null($r);
   }
 
-  #[@test]
+  #[Test]
   public function short_circuiting_parameter() {
     $r= $this->run('class <T> {
       private function pass($object) {

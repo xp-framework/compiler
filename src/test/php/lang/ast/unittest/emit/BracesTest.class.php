@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test, Values};
 
 class BracesTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function inc() {
     $r= $this->run('class <T> {
       private $id= 0;
@@ -17,7 +17,7 @@ class BracesTest extends EmittingTest {
     Assert::equals('test1', $r);
   }
 
-  #[@test]
+  #[Test]
   public function braces_around_new() {
     $r= $this->run('class <T> {
       public function run() {
@@ -28,7 +28,7 @@ class BracesTest extends EmittingTest {
     Assert::equals(250905600, $r);
   }
 
-  #[@test]
+  #[Test]
   public function no_braces_necessary_around_new() {
     $r= $this->run('class <T> {
       public function run() {
@@ -39,7 +39,7 @@ class BracesTest extends EmittingTest {
     Assert::equals(250905600, $r);
   }
 
-  #[@test]
+  #[Test]
   public function property_vs_method_ambiguity() {
     $r= $this->run('class <T> {
       private $f;
@@ -56,7 +56,7 @@ class BracesTest extends EmittingTest {
     Assert::equals('test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function nested_braces() {
     $r= $this->run('class <T> {
       private function test() { return "test"; }
@@ -69,7 +69,7 @@ class BracesTest extends EmittingTest {
     Assert::equals('test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function braced_expression_not_confused_with_cast() {
     $r= $this->run('class <T> {
       const WIDTH = 640;
@@ -82,11 +82,7 @@ class BracesTest extends EmittingTest {
     Assert::equals(320, $r);
   }
 
-  #[@test, @values(['map' => [
-  #  '(__LINE__)."test"' => '3test',
-  #  '(__LINE__) + 1'    => 4,
-  #  '(__LINE__) - 1'    => 2,
-  #]])]
+  #[Test, Values(['map' => ['(__LINE__)."test"' => '3test', '(__LINE__) + 1'    => 4, '(__LINE__) - 1'    => 2,]])]
   public function global_constant_in_braces_not_confused_with_cast($input, $expected) {
     $r= $this->run('class <T> {
       public function run() {
@@ -97,7 +93,7 @@ class BracesTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[@test]
+  #[Test]
   public function invoke_on_braced_null_coalesce() {
     $r= $this->run('class <T> {
       public function __invoke() { return "OK"; }

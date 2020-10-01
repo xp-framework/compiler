@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class BlockTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function empty_block() {
     $r= $this->run('class <T> {
       public function run() {
@@ -17,7 +17,7 @@ class BlockTest extends EmittingTest {
     Assert::true($r);
   }
 
-  #[@test]
+  #[Test]
   public function block_with_assignment() {
     $r= $this->run('class <T> {
       public function run() {

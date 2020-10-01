@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{FunctionType, Primitive};
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 /**
  * Function types
@@ -11,7 +11,7 @@ use unittest\Assert;
  */
 class FunctionTypesTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function function_without_parameters() {
     $t= $this->type('class <T> {
       private (function(): string) $test;
@@ -23,7 +23,7 @@ class FunctionTypesTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function function_with_parameters() {
     $t= $this->type('class <T> {
       private (function(int, string): string) $test;

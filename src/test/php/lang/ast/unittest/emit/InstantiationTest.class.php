@@ -1,11 +1,11 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 use util\Date;
 
 class InstantiationTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function new_type() {
     $r= $this->run('class <T> {
       public function run() {
@@ -15,7 +15,7 @@ class InstantiationTest extends EmittingTest {
     Assert::instance(Date::class, $r);
   }
 
-  #[@test]
+  #[Test]
   public function new_var() {
     $r= $this->run('class <T> {
       public function run() {
@@ -26,7 +26,7 @@ class InstantiationTest extends EmittingTest {
     Assert::instance(Date::class, $r);
   }
 
-  #[@test]
+  #[Test]
   public function new_expr() {
     $r= $this->run('class <T> {
       private function factory() { return \\util\\Date::class; }
@@ -38,7 +38,7 @@ class InstantiationTest extends EmittingTest {
     Assert::instance(Date::class, $r);
   }
 
-  #[@test]
+  #[Test]
   public function passing_argument() {
     $r= $this->run('class <T> {
       public $value;

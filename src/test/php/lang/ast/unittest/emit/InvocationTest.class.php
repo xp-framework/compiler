@@ -1,11 +1,11 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
 use unittest\actions\RuntimeVersion;
+use unittest\{Action, Assert, Test, Values};
 
 class InvocationTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function instance_method() {
     Assert::equals('instance', $this->run(
       'class <T> {
@@ -19,7 +19,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function instance_method_dynamic_variable() {
     Assert::equals('instance', $this->run(
       'class <T> {
@@ -34,7 +34,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function instance_method_dynamic_expression() {
     Assert::equals('instance', $this->run(
       'class <T> {
@@ -49,7 +49,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function static_method() {
     Assert::equals('static', $this->run(
       'class <T> {
@@ -63,7 +63,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function static_method_dynamic() {
     Assert::equals('static', $this->run(
       'class <T> {
@@ -78,7 +78,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function closure() {
     Assert::equals('closure', $this->run(
       'class <T> {
@@ -91,7 +91,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function global_function() {
     Assert::equals('function', $this->run(
       'function fixture() { return "function"; }
@@ -104,12 +104,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test, @values([
-  #  '"html(<) = &lt;", flags: ENT_HTML5',
-  #  '"html(<) = &lt;", ENT_HTML5, double: true',
-  #  'string: "html(<) = &lt;", flags: ENT_HTML5',
-  #  'string: "html(<) = &lt;", flags: ENT_HTML5, double: true',
-  #])]
+  #[Test, Values(['"html(<) = &lt;", flags: ENT_HTML5', '"html(<) = &lt;", ENT_HTML5, double: true', 'string: "html(<) = &lt;", flags: ENT_HTML5', 'string: "html(<) = &lt;", flags: ENT_HTML5, double: true',])]
   public function named_arguments_in_exact_order($arguments) {
     Assert::equals('html(&lt;) = &amp;lt;', $this->run(
       'class <T> {
@@ -125,7 +120,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test, @action(new RuntimeVersion('>=8.0'))]
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
   public function named_arguments_in_reverse_order() {
     Assert::equals('html(&lt;) = &amp;lt;', $this->run(
       'class <T> {
@@ -141,7 +136,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[@test, @action(new RuntimeVersion('>=8.0'))]
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
   public function named_arguments_omitting_one() {
     Assert::equals('html(&lt;) = &lt;', $this->run(
       'class <T> {

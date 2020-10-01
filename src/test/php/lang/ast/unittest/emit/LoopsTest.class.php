@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class LoopsTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function foreach_with_value() {
     $r= $this->run('class <T> {
       public function run() {
@@ -19,7 +19,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals('1,2,3', $r);
   }
 
-  #[@test]
+  #[Test]
   public function foreach_with_key_and_value() {
     $r= $this->run('class <T> {
       public function run() {
@@ -34,7 +34,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals('a=1,b=2,c=3', $r);
   }
 
-  #[@test]
+  #[Test]
   public function foreach_with_single_expression() {
     $r= $this->run('class <T> {
       public function run() {
@@ -47,7 +47,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals('1,2,3', $r);
   }
 
-  #[@test]
+  #[Test]
   public function for_loop() {
     $r= $this->run('class <T> {
       public function run() {
@@ -62,7 +62,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals('1,2,3', $r);
   }
 
-  #[@test]
+  #[Test]
   public function while_loop() {
     $r= $this->run('class <T> {
       public function run() {
@@ -78,7 +78,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals('1,2,3,4', $r);
   }
 
-  #[@test]
+  #[Test]
   public function do_loop() {
     $r= $this->run('class <T> {
       public function run() {
@@ -94,7 +94,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals('1,2,3,4', $r);
   }
 
-  #[@test]
+  #[Test]
   public function break_while_loop() {
     $r= $this->run('class <T> {
       public function run() {
@@ -114,7 +114,7 @@ class LoopsTest extends EmittingTest {
     Assert::equals([1, 2, 3], $r);
   }
 
-  #[@test]
+  #[Test]
   public function continue_while_loop() {
     $r= $this->run('class <T> {
       public function run() {

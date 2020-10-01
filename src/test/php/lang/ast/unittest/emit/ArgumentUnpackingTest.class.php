@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Primitive;
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 /**
  * Argument unpacking
@@ -11,7 +11,7 @@ use unittest\Assert;
  */
 class ArgumentUnpackingTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function invoking_method() {
     $r= $this->run('class <T> {
       public function fixture(... $args) { return $args; }
@@ -24,7 +24,7 @@ class ArgumentUnpackingTest extends EmittingTest {
     Assert::equals([1, 2, 3], $r);
   }
 
-  #[@test]
+  #[Test]
   public function in_array_initialization_with_variable() {
     $r= $this->run('class <T> {
       public function run() {
@@ -35,7 +35,7 @@ class ArgumentUnpackingTest extends EmittingTest {
     Assert::equals([1, 2, 3, 4], $r);
   }
 
-  #[@test]
+  #[Test]
   public function in_array_initialization_with_literal() {
     $r= $this->run('class <T> {
       public function run() {
@@ -45,7 +45,7 @@ class ArgumentUnpackingTest extends EmittingTest {
     Assert::equals([1, 2, 3, 4], $r);
   }
 
-  #[@test]
+  #[Test]
   public function in_map_initialization() {
     $r= $this->run('class <T> {
       public function run() {
@@ -56,7 +56,7 @@ class ArgumentUnpackingTest extends EmittingTest {
     Assert::equals(['color' => 'red', 'type' => 'car', 'year' => 2002], $r);
   }
 
-  #[@test]
+  #[Test]
   public function from_generator() {
     $r= $this->run('class <T> {
       private function items() {
@@ -71,7 +71,7 @@ class ArgumentUnpackingTest extends EmittingTest {
     Assert::equals([1, 2], $r);
   }
 
-  #[@test]
+  #[Test]
   public function from_iterator() {
     $r= $this->run('class <T> {
       private function items() {

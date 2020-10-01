@@ -3,8 +3,7 @@
 use io\{File, FileUtil, Folder};
 use lang\ast\CompilingClassLoader;
 use lang\{ClassFormatException, ClassLoader, Environment};
-use unittest\Assert;
-use unittest\TestCase;
+use unittest\{Assert, Expect, Test, TestCase};
 
 class CompilingClassLoaderTest {
   private static $runtime;
@@ -37,25 +36,22 @@ class CompilingClassLoaderTest {
     }
   }
 
-  #[@test]
+  #[Test]
   public function can_create() {
     CompilingClassLoader::instanceFor(self::$runtime);
   }
 
-  #[@test]
+  #[Test]
   public function load_class() {
     Assert::equals('Tests', $this->load('Tests', '<?php namespace %s; class Tests { }')->getSimpleName());
   }
 
-  #[@test, @expect([
-  #  'class' => ClassFormatException::class,
-  #  'withMessage' => 'Compiler error: Expected "{", have "(end)"'
-  #])]
+  #[Test, Expect(['class' => ClassFormatException::class, 'withMessage' => 'Compiler error: Expected "{", have "(end)"'])]
   public function load_class_with_syntax_errors() {
     $this->load('Errors', "<?php\nclass");
   }
 
-  #[@test]
+  #[Test]
   public function triggered_errors_filename() {
     $t= $this->load('Triggers', '<?php namespace %s; class Triggers { 
       public function trigger() {

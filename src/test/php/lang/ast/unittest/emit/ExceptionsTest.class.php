@@ -1,11 +1,11 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
-use unittest\Assert;
+use unittest\{Assert, Expect, Test};
 
 class ExceptionsTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function catch_exception() {
     $t= $this->type('class <T> {
       public function run() {
@@ -20,7 +20,7 @@ class ExceptionsTest extends EmittingTest {
     Assert::equals(IllegalArgumentException::class, $t->newInstance()->run());
   }
 
-  #[@test]
+  #[Test]
   public function line_number_matches() {
     $t= $this->type('class <T> {
       public function run() {
@@ -35,7 +35,7 @@ class ExceptionsTest extends EmittingTest {
     Assert::equals(4, $t->newInstance()->run());
   }
 
-  #[@test]
+  #[Test]
   public function catch_without_type() {
     $t= $this->type('class <T> {
       public function run() {
@@ -50,7 +50,7 @@ class ExceptionsTest extends EmittingTest {
     Assert::equals(IllegalArgumentException::class, $t->newInstance()->run());
   }
 
-  #[@test]
+  #[Test]
   public function finally_without_exception() {
     $t= $this->type('class <T> {
       public $closed= false;
@@ -68,7 +68,7 @@ class ExceptionsTest extends EmittingTest {
     Assert::true($instance->closed);
   }
 
-  #[@test]
+  #[Test]
   public function finally_with_exception() {
     $t= $this->type('class <T> {
       public $closed= false;
@@ -90,7 +90,7 @@ class ExceptionsTest extends EmittingTest {
     }
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_null_coalesce() {
     $t= $this->type('class <T> {
       public function run($user) {
@@ -100,7 +100,7 @@ class ExceptionsTest extends EmittingTest {
     $t->newInstance()->run(null);
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_short_ternary() {
     $t= $this->type('class <T> {
       public function run($user) {
@@ -110,7 +110,7 @@ class ExceptionsTest extends EmittingTest {
     $t->newInstance()->run(null);
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_normal_ternary() {
     $t= $this->type('class <T> {
       public function run($user) {
@@ -120,7 +120,7 @@ class ExceptionsTest extends EmittingTest {
     $t->newInstance()->run(null);
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_binary_or() {
     $t= $this->type('class <T> {
       public function run($user) {
@@ -130,7 +130,7 @@ class ExceptionsTest extends EmittingTest {
     $t->newInstance()->run(null);
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_binary_and() {
     $t= $this->type('class <T> {
       public function run($error) {
@@ -140,7 +140,7 @@ class ExceptionsTest extends EmittingTest {
     $t->newInstance()->run(true);
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda() {
     $this->run('use lang\IllegalArgumentException; class <T> {
       public function run() {
@@ -150,7 +150,7 @@ class ExceptionsTest extends EmittingTest {
     }');
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda_throwing_variable() {
     $t= $this->type('class <T> {
       public function run($e) {
@@ -161,7 +161,7 @@ class ExceptionsTest extends EmittingTest {
     $t->newInstance()->run(new IllegalArgumentException('Test'));
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda_capturing_variable() {
     $this->run('use lang\IllegalArgumentException; class <T> {
       public function run() {
@@ -171,7 +171,7 @@ class ExceptionsTest extends EmittingTest {
     }');
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_lambda_capturing_parameter() {
     $t= $this->type('use lang\IllegalArgumentException; class <T> {
       public function run($message) {

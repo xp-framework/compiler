@@ -1,8 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\Errors;
-use unittest\Assert;
-use unittest\actions\RuntimeVersion;
+use unittest\{Action, Assert, Test};
 
 /**
  * Lambdas (a.k.a. arrow functions) support
@@ -11,7 +10,7 @@ use unittest\actions\RuntimeVersion;
  */
 class LambdasTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function inc() {
     $r= $this->run('class <T> {
       public function run() {
@@ -22,7 +21,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(2, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function add() {
     $r= $this->run('class <T> {
       public function run() {
@@ -33,7 +32,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1, 2));
   }
 
-  #[@test]
+  #[Test]
   public function captures_this() {
     $r= $this->run('class <T> {
       private $addend= 2;
@@ -46,7 +45,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function captures_local() {
     $r= $this->run('class <T> {
       public function run() {
@@ -58,7 +57,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function captures_local_from_use_list() {
     $r= $this->run('class <T> {
       public function run() {
@@ -73,7 +72,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function captures_local_from_lambda() {
     $r= $this->run('class <T> {
       public function run() {
@@ -86,7 +85,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function captures_local_assigned_via_list() {
     $r= $this->run('class <T> {
       public function run() {
@@ -98,7 +97,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function captures_param() {
     $r= $this->run('class <T> {
       public function run($addend) {
@@ -109,7 +108,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function captures_braced_local() {
     $r= $this->run('class <T> {
       public function run() {
@@ -121,7 +120,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[@test]
+  #[Test]
   public function typed_parameters() {
     $r= $this->run('class <T> {
       public function run() {
@@ -132,7 +131,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals('lang.Value', typeof($r)->signature()[0]->getName());
   }
 
-  #[@test, @action(new RuntimeVersion('>=7.0'))]
+  #[Test]
   public function typed_return() {
     $r= $this->run('class <T> {
       public function run() {
@@ -143,7 +142,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals('lang.Value', typeof($r)->returns()->getName());
   }
 
-  #[@test]
+  #[Test]
   public function without_params() {
     $r= $this->run('class <T> {
       public function run() {
@@ -154,7 +153,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(1, $r());
   }
 
-  #[@test]
+  #[Test]
   public function immediately_invoked_function_expression() {
     $r= $this->run('class <T> {
       public function run() {
@@ -165,7 +164,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals('IIFE', $r);
   }
 
-  #[@test]
+  #[Test]
   public function with_block() {
     $r= $this->run('class <T> {
       public function run() {
@@ -179,7 +178,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(2, $r());
   }
 
-  #[@test]
+  #[Test]
   public function no_longer_supports_hacklang_variant() {
     try {
       $this->run('class <T> {

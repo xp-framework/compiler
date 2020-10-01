@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class ReturnTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function return_literal() {
     $r= $this->run('class <T> {
       public function run() {
@@ -14,7 +14,7 @@ class ReturnTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function return_member() {
     $r= $this->run('class <T> {
       private $member= "Test";
@@ -26,7 +26,7 @@ class ReturnTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function return_without_expression() {
     $r= $this->run('class <T> {
       public function run() {

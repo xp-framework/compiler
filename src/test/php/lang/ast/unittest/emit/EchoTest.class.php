@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 class EchoTest extends EmittingTest {
 
@@ -25,22 +25,22 @@ class EchoTest extends EmittingTest {
     }
   }
 
-  #[@test]
+  #[Test]
   public function echo_literal() {
     $this->assertEchoes('Hello', 'echo "Hello";');
   }
 
-  #[@test]
+  #[Test]
   public function echo_variable() {
     $this->assertEchoes('Hello', '$a= "Hello"; echo $a;');
   }
 
-  #[@test]
+  #[Test]
   public function echo_call() {
     $this->assertEchoes('Hello', 'echo $this->hello();');
   }
 
-  #[@test]
+  #[Test]
   public function echo_with_multiple_arguments() {
     $this->assertEchoes('Hello World', 'echo "Hello", " ", "World";');
   }

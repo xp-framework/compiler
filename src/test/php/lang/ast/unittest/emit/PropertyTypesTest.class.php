@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 /**
  * Property types
@@ -10,7 +10,7 @@ use unittest\Assert;
  */
 class PropertyTypesTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function int_type() {
     $t= $this->type('class <T> {
       private int $test;
@@ -19,7 +19,7 @@ class PropertyTypesTest extends EmittingTest {
     Assert::equals('int', $t->getField('test')->getTypeName());
   }
 
-  #[@test]
+  #[Test]
   public function self_type() {
     $t= $this->type('class <T> {
       private static self $instance;
@@ -28,7 +28,7 @@ class PropertyTypesTest extends EmittingTest {
     Assert::equals('self', $t->getField('instance')->getTypeName());
   }
 
-  #[@test]
+  #[Test]
   public function interface_type() {
     $t= $this->type('class <T> {
       private \\lang\\Value $value;

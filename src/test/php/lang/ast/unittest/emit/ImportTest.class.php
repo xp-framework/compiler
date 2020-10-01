@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\XPClass;
-use unittest\Assert;
+use unittest\{Assert, Test};
 use util\Date;
 
 class ImportTest extends EmittingTest {
@@ -10,7 +10,7 @@ class ImportTest extends EmittingTest {
     require((new XPClass(self::class))->getClassLoader()->getResourceAsStream('lang/ast/unittest/emit/import.php')->getURI());
   }
 
-  #[@test]
+  #[Test]
   public function import_type() {
     Assert::equals(Date::class, $this->run('
       use util\Date;
@@ -21,7 +21,7 @@ class ImportTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function import_type_as_alias() {
     Assert::equals(Date::class, $this->run('
       use util\Date as D;
@@ -32,7 +32,7 @@ class ImportTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function import_const() {
     Assert::equals('imported', $this->run('
       use const lang\ast\unittest\emit\FIXTURE;
@@ -43,7 +43,7 @@ class ImportTest extends EmittingTest {
     ));
   }
 
-  #[@test]
+  #[Test]
   public function import_function() {
     Assert::equals('imported', $this->run('
       use function lang\ast\unittest\emit\fixture;

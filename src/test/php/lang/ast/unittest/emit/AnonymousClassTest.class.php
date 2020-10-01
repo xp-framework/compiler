@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Runnable;
-use unittest\Assert;
+use unittest\{Assert, Test};
 use util\AbstractDeferredInvokationHandler;
 
 /**
@@ -12,7 +12,7 @@ use util\AbstractDeferredInvokationHandler;
  */
 class AnonymousClassTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function parentless() {
     $r= $this->run('class <T> {
       public function run() {
@@ -24,7 +24,7 @@ class AnonymousClassTest extends EmittingTest {
     Assert::equals('test', $r->id());
   }
 
-  #[@test]
+  #[Test]
   public function extending_base_class() {
     $r= $this->run('class <T> {
       public function run() {
@@ -38,7 +38,7 @@ class AnonymousClassTest extends EmittingTest {
     Assert::instance(AbstractDeferredInvokationHandler::class, $r);
   }
 
-  #[@test]
+  #[Test]
   public function implementing_interface() {
     $r= $this->run('class <T> {
       public function run() {
@@ -52,7 +52,7 @@ class AnonymousClassTest extends EmittingTest {
     Assert::instance(Runnable::class, $r);
   }
 
-  #[@test]
+  #[Test]
   public function method_annotations() {
     $r= $this->run('class <T> {
       public function run() {

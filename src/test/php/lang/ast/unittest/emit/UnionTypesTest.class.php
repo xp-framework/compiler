@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{Primitive, TypeUnion};
-use unittest\Assert;
+use unittest\{Assert, Test};
 
 /**
  * Function types
@@ -10,7 +10,7 @@ use unittest\Assert;
  */
 class UnionTypesTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function field_type() {
     $t= $this->type('class <T> {
       private int|string $test;
@@ -22,7 +22,7 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function parameter_type() {
     $t= $this->type('class <T> {
       public function test(int|string $arg) { }
@@ -34,7 +34,7 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
-  #[@test]
+  #[Test]
   public function return_type() {
     $t= $this->type('class <T> {
       public function test(): int|string { }

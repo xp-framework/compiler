@@ -2,7 +2,7 @@
 
 use lang\Primitive;
 use lang\ast\Errors;
-use unittest\Assert;
+use unittest\{Assert, Expect, Test};
 
 /**
  * Argument promotion
@@ -14,7 +14,7 @@ use unittest\Assert;
  */
 class ArgumentPromotionTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function in_constructor() {
     $r= $this->run('class <T> {
       public function __construct(private $id= "test") {
@@ -28,7 +28,7 @@ class ArgumentPromotionTest extends EmittingTest {
     Assert::equals('test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function can_be_used_in_constructor() {
     $r= $this->run('class <T> {
       public function __construct(private $id= "test") {
@@ -42,7 +42,7 @@ class ArgumentPromotionTest extends EmittingTest {
     Assert::equals('tested', $r);
   }
 
-  #[@test]
+  #[Test]
   public function parameter_accessible() {
     $r= $this->run('class <T> {
       public function __construct(private $id= "test") {
@@ -58,7 +58,7 @@ class ArgumentPromotionTest extends EmittingTest {
     Assert::equals('test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function in_method() {
     $r= $this->run('class <T> {
       public function withId(private $id) {
@@ -72,7 +72,7 @@ class ArgumentPromotionTest extends EmittingTest {
     Assert::equals('test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function type_information() {
     $t= $this->type('class <T> {
       public function __construct(private int $id, private string $name) {
@@ -84,14 +84,14 @@ class ArgumentPromotionTest extends EmittingTest {
     );
   }
 
-  #[@test, @expect(['class' => Errors::class, 'withMessage' => 'Variadic parameters cannot be promoted'])]
+  #[Test, Expect(['class' => Errors::class, 'withMessage' => 'Variadic parameters cannot be promoted'])]
   public function variadic_parameters_cannot_be_promoted() {
     $this->type('class <T> {
       public function __construct(private string... $in) { }
     }');
   }
 
-  #[@test]
+  #[Test]
   public function can_be_mixed_with_normal_arguments() {
     $t= $this->type('class <T> {
       public function __construct(public string $name, string $initial= null) {
@@ -102,7 +102,7 @@ class ArgumentPromotionTest extends EmittingTest {
     Assert::equals('Timm J.', $t->newInstance('Timm', 'J')->name);
   }
 
-  #[@test]
+  #[Test]
   public function promoted_by_reference_argument() {
     $t= $this->type('class <T> {
       public function __construct(public array &$list) { }
@@ -118,7 +118,7 @@ class ArgumentPromotionTest extends EmittingTest {
     Assert::equals([1, 2, 3, 4], $t->getMethod('test')->invoke(null, []));
   }
 
-  #[@test]
+  #[Test]
   public function allows_trailing_comma() {
     $this->type('class <T> {
       public function __construct(

@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test};
 /**
  * Using statement and disposables
  *
@@ -8,7 +8,7 @@ use unittest\Assert;
  */
 class UsingTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function dispose_called() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
@@ -24,7 +24,7 @@ class UsingTest extends EmittingTest {
     Assert::equals(['read@1', '__dispose@1'], $r);
   }
 
-  #[@test]
+  #[Test]
   public function dispose_called_for_all() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
@@ -40,7 +40,7 @@ class UsingTest extends EmittingTest {
     Assert::equals(['read@1', '__dispose@1', '__dispose@2'], $r);
   }
 
-  #[@test]
+  #[Test]
   public function dispose_called_even_when_exceptions_occur() {
     $r= $this->run('use lang\{IllegalArgumentException, IllegalStateException}; use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
@@ -60,7 +60,7 @@ class UsingTest extends EmittingTest {
     Assert::equals(['read@1', '__dispose@1'], $r);
   }
 
-  #[@test]
+  #[Test]
   public function supports_closeables() {
     $r= $this->run('use lang\ast\unittest\emit\FileInput; class <T> {
       public function run() {
@@ -76,7 +76,7 @@ class UsingTest extends EmittingTest {
     Assert::false($r);
   }
 
-  #[@test]
+  #[Test]
   public function can_return_from_inside_using() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       private function read() {
@@ -94,7 +94,7 @@ class UsingTest extends EmittingTest {
     Assert::equals(['called' => ['read@1', '__dispose@1'], 'returned' => 'test'], $r);
   }
 
-  #[@test]
+  #[Test]
   public function variable_undefined_after_using() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
@@ -107,7 +107,7 @@ class UsingTest extends EmittingTest {
     Assert::false($r);
   }
 
-  #[@test]
+  #[Test]
   public function variable_undefined_after_using_even_if_previously_defined() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {

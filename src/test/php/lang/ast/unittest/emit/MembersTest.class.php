@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\Assert;
+use unittest\{Assert, Test, Values};
 
 class MembersTest extends EmittingTest {
 
-  #[@test]
+  #[Test]
   public function class_property() {
     $r= $this->run('class <T> {
       private static $MEMBER= "Test";
@@ -17,7 +17,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function class_method() {
     $r= $this->run('class <T> {
       private static function member() { return "Test"; }
@@ -30,7 +30,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function class_constant() {
     $r= $this->run('class <T> {
       private const MEMBER = "Test";
@@ -43,7 +43,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function dynamic_class_property() {
     $r= $this->run('class <T> {
       private static $MEMBER= "Test";
@@ -57,7 +57,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function dynamic_class_method() {
     $r= $this->run('class <T> {
       private static function member() { return "Test"; }
@@ -71,7 +71,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function dynamic_class_constant() {
     $r= $this->run('class <T> {
       private const MEMBER = "Test";
@@ -85,7 +85,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function object_class_constant() {
     $r= $this->run('class <T> {
       private const MEMBER = "Test";
@@ -98,7 +98,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test, @values(['variable', 'invocation', 'array'])]
+  #[Test, Values(['variable', 'invocation', 'array'])]
   public function class_on_objects($via) {
     $t= $this->type('class <T> {
       private function this() { return $this; }
@@ -114,7 +114,7 @@ class MembersTest extends EmittingTest {
     Assert::equals(get_class($fixture), $t->getMethod($via)->invoke($fixture));
   }
 
-  #[@test]
+  #[Test]
   public function instance_property() {
     $r= $this->run('class <T> {
       private $member= "Test";
@@ -127,7 +127,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function instance_method() {
     $r= $this->run('class <T> {
       private function member() { return "Test"; }
@@ -140,7 +140,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function static_initializer_run() {
     $r= $this->run('class <T> {
       private static $MEMBER;
@@ -157,7 +157,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function enum_members() {
     $r= $this->run('class <T> extends \lang\Enum {
       public static $MON, $TUE, $WED, $THU, $FRI, $SAT, $SUN;
@@ -170,7 +170,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('MON', $r);
   }
 
-  #[@test]
+  #[Test]
   public function method_with_static() {
     $r= $this->run('class <T> {
       public function run() {
@@ -182,7 +182,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[@test]
+  #[Test]
   public function method_with_static_without_initializer() {
     $r= $this->run('class <T> {
       public function run() {
@@ -194,7 +194,7 @@ class MembersTest extends EmittingTest {
     Assert::null($r);
   }
 
-  #[@test]
+  #[Test]
   public function chaining_sccope_operators() {
     $r= $this->run('class <T> {
       private const TYPE = self::class;
