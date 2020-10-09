@@ -29,7 +29,7 @@ class HelloWorld {
 
   public static function main(array<string> $args): void {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
-    $author= Type::forName(self::class)->getAnnotation(Author::class);
+    $author= Type::forName(self::class)->getAnnotation('author');
 
     Console::writeLine($greet($args[0] ?? 'World', from: $author));
   }
