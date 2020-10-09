@@ -61,7 +61,7 @@ abstract class EmittingTest {
       Console::writeLine($tree);
     }
 
-    $this->emitter->emitAll(new Result(new StringWriter($out)), $tree->children());
+    $this->emitter->emitAll(new Result(new StringWriter($out), ''), $tree->children());
     if (isset($this->output['code'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');

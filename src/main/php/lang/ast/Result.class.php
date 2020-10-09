@@ -11,9 +11,15 @@ class Result {
   public $stack= [];
   public $call= [];
 
-  /** @param io.streams.Writer */
-  public function __construct($out) {
+  /**
+   * Starts an result stream, including a preamble
+   *
+   * @param io.streams.Writer
+   * @param string $preamble
+   */
+  public function __construct($out, $preamble= '<?php ') {
     $this->out= $out;
+    $this->out->write($preamble);
     $this->codegen= new CodeGen();
   }
 
