@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.4.1 / 2020-10-09
+
+* Fixed #90: Namespace declaration statement has to be the very first 
+  statement, which occured with PHP 8.0.0RC1
+  (@thekid)
+
 ## 5.4.0 / 2020-09-12
 
 * Implemented second step for #86: Add an E_DEPRECATED warning to the
