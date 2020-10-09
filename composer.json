@@ -7,8 +7,7 @@
   "keywords": ["module", "xp"],
   "require" : {
     "xp-framework/core": "^10.0 | ^9.0 | ^8.0 | ^7.0",
-    "xp-framework/tokenize": "^9.0 | ^8.1",
-    "xp-framework/ast": "^5.2",
+    "xp-framework/ast": "^6.0 | ^5.2",
     "php" : ">=7.0.0"
   },
   "require-dev" : {
