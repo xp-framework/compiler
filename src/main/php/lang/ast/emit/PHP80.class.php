@@ -27,7 +27,7 @@ class PHP80 extends PHP {
     } else if ($type instanceof IsUnion) {
       $literal= '';
       foreach ($type->components as $component) {
-        $literal.= '|'.$this->paramType($component);
+        $literal.= '|'.$this->literal($component);
       }
       return substr($literal, 1);
     } else {
