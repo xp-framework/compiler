@@ -49,10 +49,10 @@ abstract class PHP extends Emitter {
       return '';
     } else if ($type instanceof IsArray || $type instanceof IsMap) {
       return 'array';
-    } else if ($type instanceof Type && 'callable' !== $type->literal() && 'void' !== $type->literal()) {
-      return $type->literal();
-    } else {
+    } else if ('callable' === $type->literal() || 'void' === $type->literal()) {
       return '';
+    } else {
+      return $type->literal();
     }
   }
 
