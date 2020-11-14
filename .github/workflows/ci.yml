@@ -1,0 +1,60 @@
+.github/workflows/ci.yml
+
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php-versions }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.php-versions == '8.0' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['7.0', '7.1', '7.2', '7.3', '7.4', '8.0']
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Configure git
+      if: runner.os == 'Windows'
+      run: git config --system core.autocrlf false; git config --system core.eol lf
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up PHP ${{ matrix.php-versions }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        ini-values: date.timezone=Europe/Berlin
+
+    - name: Setup Problem Matchers for PHP
+      run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Cache dependencies
+      uses: actions/cache@v2.1.3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Install dependencies
+      run: 
+        - curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run
+        - composer install --prefer-dist
+        - echo "vendor/autoload.php" > composer.pth
+
+    - name: Run test suite
+      run: sh xp-run xp.unittest.TestRunner src/test/php
