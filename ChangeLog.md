@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.5.0 / 2020-11-14
+
 * Emit union types as syntax in PHP 8 - @thekid
 
 ## 5.4.1 / 2020-10-09

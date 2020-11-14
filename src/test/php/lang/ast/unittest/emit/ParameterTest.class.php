@@ -77,8 +77,18 @@ class ParameterTest extends EmittingTest {
   }
 
   #[Test]
+  public function array_typed_restriction() {
+    Assert::equals(Type::$ARRAY, $this->param('array<int> $param')->getTypeRestriction());
+  }
+
+  #[Test]
   public function map_typed() {
     Assert::equals(new MapType(Primitive::$INT), $this->param('array<string, int> $param')->getType());
+  }
+
+  #[Test]
+  public function map_typed_restriction() {
+    Assert::equals(Type::$ARRAY, $this->param('array<string, int> $param')->getTypeRestriction());
   }
 
   #[Test]
