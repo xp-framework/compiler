@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Emit union types as syntax in PHP 8 - @thekid
+
 ## 5.4.1 / 2020-10-09
 
 * Fixed #90: Namespace declaration statement has to be the very first 
