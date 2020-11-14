@@ -49,10 +49,10 @@ jobs:
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Install dependencies
-      run: 
-        - curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run
-        - composer install --prefer-dist
-        - echo "vendor/autoload.php" > composer.pth
+      run: >
+        curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run
+        composer install --prefer-dist
+        echo "vendor/autoload.php" > composer.pth
 
     - name: Run test suite
       run: sh xp-run xp.unittest.TestRunner src/test/php
