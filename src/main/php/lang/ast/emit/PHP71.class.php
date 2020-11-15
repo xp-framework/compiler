@@ -9,7 +9,7 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, Is
  */
 class PHP71 extends PHP {
   use OmitPropertyTypes;
-  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteClassOnObjects;
+  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteClassOnObjects, RewriteExplicitOctals;
 
   /** Sets up type => literal mappings */
   public function __construct() {
