@@ -8,7 +8,7 @@ abstract class PHP extends Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
 
-  protected $unsupported= [];
+  protected $literals= [];
 
   /**
    * Returns the simple name for use in a declaration
@@ -21,38 +21,28 @@ abstract class PHP extends Emitter {
   }
 
   /**
-   * Returns type literal or NULL
+   * Emit type literal or NULL if no type should be emitted
    *
-   * @param  string $name
-   * @return string
+   * @param  ?lang.ast.Type $type
+   * @return ?string
    */
-  protected function type($name) {
-    return (
-      '?' === $name[0] ||                     // nullable
-      0 === strncmp($name, 'function', 8) ||  // function
-      strstr($name, '|') ||                   // union
-      isset($this->unsupported[$name])
-    ) ? null : $name;
+  protected function literal($type) {
+    return null === $type ? null : $this->literals[get_class($type)]($type);
   }
 
-  protected function paramType($type) {
-    return $this->type($type->literal());
-  }
-
-  protected function returnType($type) {
-    return $this->type($type->literal());
-  }
-
-  // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
+  /**
+   * As of PHP 7.4: Property type declarations support all type declarations
+   * supported by PHP with the exception of void and callable.
+   *
+   * @see    https://wiki.php.net/rfc/typed_properties_v2#supported_types
+   * @param  ?lang.ast.Type $type
+   * @return ?string
+   */
   protected function propertyType($type) {
-    if (null === $type || $type instanceof IsUnion || $type instanceof IsFunction) {
-      return '';
-    } else if ($type instanceof IsArray || $type instanceof IsMap) {
-      return 'array';
-    } else if ('callable' === $type->literal() || 'void' === $type->literal()) {
-      return '';
+    if (null === $type || $type instanceof IsFunction || 'callable' === $type->literal()) {
+      return null;
     } else {
-      return $type->literal();
+      return $this->literal($type);
     }
   }
 
@@ -187,7 +177,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
-    if ($parameter->type && $t= $this->paramType($parameter->type)) {
+    if ($parameter->type && $t= $this->literal($parameter->type)) {
       $result->out->write($t.' ');
     }
     if ($parameter->variadic) {
@@ -211,7 +201,7 @@ abstract class PHP extends Emitter {
     }
     $result->out->write(')');
 
-    if ($signature->returns && $t= $this->returnType($signature->returns)) {
+    if ($signature->returns && $t= $this->literal($signature->returns)) {
       $result->out->write(':'.$t);
     }
   }

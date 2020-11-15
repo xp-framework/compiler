@@ -60,6 +60,18 @@ class UnionTypesTest extends EmittingTest {
   }
 
   #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
+  public function parameter_function_type_restriction_with_php8() {
+    $t= $this->type('class <T> {
+      public function test(): string|(function(): string) { }
+    }');
+
+    Assert::equals(
+      new TypeUnion([Primitive::$STRING, Type::$CALLABLE]),
+      $t->getMethod('test')->getReturnTypeRestriction()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
   public function return_type_restriction_with_php8() {
     $t= $this->type('class <T> {
       public function test(): int|string|array<string> { }

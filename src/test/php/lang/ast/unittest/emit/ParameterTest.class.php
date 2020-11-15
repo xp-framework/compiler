@@ -1,7 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{ArrayType, MapType, Primitive, Type, Value, XPClass};
-use unittest\{Assert, Test, Values};
+use unittest\actions\RuntimeVersion;
+use unittest\{Assert, Test, Values, Action};
 
 class ParameterTest extends EmittingTest {
 
@@ -69,6 +70,11 @@ class ParameterTest extends EmittingTest {
   #[Test]
   public function nullable_string_type() {
     Assert::equals(Primitive::$STRING, $this->param('?string $param')->getType());
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  public function nullable_string_type_restriction() {
+    Assert::equals(Primitive::$STRING, $this->param('?string $param')->getTypeRestriction());
   }
 
   #[Test]
