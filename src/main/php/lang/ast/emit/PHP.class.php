@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable};
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable};
 use lang\ast\{Emitter, Node, Type};
 
 abstract class PHP extends Emitter {
@@ -9,6 +9,7 @@ abstract class PHP extends Emitter {
   const METHOD   = 1;
 
   protected $unsupported= [];
+  protected $literals= [];
 
   /**
    * Returns the simple name for use in a declaration
@@ -21,26 +22,13 @@ abstract class PHP extends Emitter {
   }
 
   /**
-   * Returns type literal or NULL
+   * Emit type literal
    *
-   * @param  string $name
+   * @param  ?lang.ast.types.Type $type
    * @return string
    */
-  protected function type($name) {
-    return (
-      '?' === $name[0] ||                     // nullable
-      0 === strncmp($name, 'function', 8) ||  // function
-      strstr($name, '|') ||                   // union
-      isset($this->unsupported[$name])
-    ) ? null : $name;
-  }
-
-  protected function paramType($type) {
-    return $this->type($type->literal());
-  }
-
-  protected function returnType($type) {
-    return $this->type($type->literal());
+  protected function literal($type) {
+    return null === $type ? null : $this->literals[get_class($type)]($type);
   }
 
   // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
@@ -187,7 +175,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
-    if ($parameter->type && $t= $this->paramType($parameter->type)) {
+    if ($parameter->type && $t= $this->literal($parameter->type)) {
       $result->out->write($t.' ');
     }
     if ($parameter->variadic) {
@@ -211,7 +199,7 @@ abstract class PHP extends Emitter {
     }
     $result->out->write(')');
 
-    if ($signature->returns && $t= $this->returnType($signature->returns)) {
+    if ($signature->returns && $t= $this->literal($signature->returns)) {
       $result->out->write(':'.$t);
     }
   }

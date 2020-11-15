@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
 
 /**
  * PHP 8.0 syntax
@@ -11,33 +11,24 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 class PHP80 extends PHP {
   use RewriteBlockLambdaExpressions;
 
-  /**
-   * Rewrite types:
-   *
-   * - No type or function types - emit unchecked
-   * - Array and map types - emit `array` type hint
-   * - Union types - Apply for all components
-   * - Otherwise, simply use type literal as-is
-   */
-  protected function literal($type) {
-    if (null === $type || $type instanceof IsFunction) {
-      return '';
-    } else if ($type instanceof IsArray || $type instanceof IsMap) {
-      return 'array';
-    } else if ($type instanceof IsUnion) {
-      $literal= '';
-      foreach ($type->components as $component) {
-        $literal.= '|'.$this->literal($component);
-      }
-      return substr($literal, 1);
-    } else {
-      return $type->literal();
-    }
+  /** Sets up type => literal mappings */
+  public function __construct() {
+    $this->literals= [
+      IsFunction::class => function($t) { return null; },
+      IsArray::class    => function($t) { return 'array'; },
+      IsMap::class      => function($t) { return 'array'; },
+      IsValue::class    => function($t) { return $t->literal(); },
+      IsNullable::class => function($t) { $l= $this->literal($t->element); return null === $l ? null : '?'.$l; },
+      IsUnion::class    => function($t) {
+        $l= '';
+        foreach ($t->components as $component) {
+          $l.= '|'.$this->literal($component);
+        }
+        return substr($l, 1);
+      },
+      IsLiteral::class  => function($t) { return $t->literal(); }
+    ];
   }
-
-  protected function paramType($type) { return $this->literal($type); }
-
-  protected function returnType($type) { return $this->literal($type); }
 
   protected function emitArguments($result, $arguments) {
     $s= sizeof($arguments) - 1;

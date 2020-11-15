@@ -1,7 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\ast\Code;
 use lang\ast\nodes\{Method, Signature};
-use lang\ast\{Code, Type};
+use lang\ast\types\IsLiteral;
 use unittest\{Assert, Before, Test, Values};
 
 class TransformationsTest extends EmittingTest {
@@ -14,7 +15,7 @@ class TransformationsTest extends EmittingTest {
         $class->declare(new Method(
           ['public'],
           'toString',
-          new Signature([], new Type('string')),
+          new Signature([], new IsLiteral('string')),
           [new Code('return "T@".\util\Objects::stringOf(get_object_vars($this))')]
         ));
       }
