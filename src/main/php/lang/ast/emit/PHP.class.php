@@ -8,7 +8,6 @@ abstract class PHP extends Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
 
-  protected $unsupported= [];
   protected $literals= [];
 
   /**
