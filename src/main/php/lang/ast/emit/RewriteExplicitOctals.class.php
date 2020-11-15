@@ -8,7 +8,7 @@
 trait RewriteExplicitOctals {
 
   protected function emitLiteral($result, $literal) {
-    if (0 === strncasecmp($literal->expression, '0o', 2)) {
+    if ('0' === $literal->expression[0] && ($c= $literal->expression[1] ?? null) && ('o' === $c || 'O' === $c)) {
       $result->out->write('0'.substr($literal->expression, 2));
     } else {
       $result->out->write($literal->expression);
