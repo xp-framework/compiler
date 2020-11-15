@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable};
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
 abstract class PHP extends Emitter {
