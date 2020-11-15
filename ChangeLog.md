@@ -3,9 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 5.5.0 / 2020-11-14
+## 5.5.0 / 2020-11-15
 
-* Emit union types as syntax in PHP 8 - @thekid
+* Changed types emitter implementation:
+  - Emit function types as `callable` in all PHP versions
+  - Emit union types as syntax in PHP 8+
+  (@thekid)
 
 ## 5.4.1 / 2020-10-09
 
