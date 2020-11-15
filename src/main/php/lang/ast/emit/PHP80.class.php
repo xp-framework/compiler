@@ -14,17 +14,18 @@ class PHP80 extends PHP {
   /** Sets up type => literal mappings */
   public function __construct() {
     $this->literals= [
-      IsFunction::class => function($t) { return null; },
       IsArray::class    => function($t) { return 'array'; },
       IsMap::class      => function($t) { return 'array'; },
+      IsFunction::class => function($t) { return 'callable'; },
       IsValue::class    => function($t) { return $t->literal(); },
       IsNullable::class => function($t) { $l= $this->literal($t->element); return null === $l ? null : '?'.$l; },
       IsUnion::class    => function($t) {
-        $l= '';
+        $u= '';
         foreach ($t->components as $component) {
-          $l.= '|'.$this->literal($component);
+          if (null === ($l= $this->literal($component))) return null;
+          $u.= '|'.$l;
         }
-        return substr($l, 1);
+        return substr($u, 1);
       },
       IsLiteral::class  => function($t) { return $t->literal(); }
     ];
