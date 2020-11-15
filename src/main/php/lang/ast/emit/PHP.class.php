@@ -30,16 +30,19 @@ abstract class PHP extends Emitter {
     return null === $type ? null : $this->literals[get_class($type)]($type);
   }
 
-  // See https://wiki.php.net/rfc/typed_properties_v2#supported_types
+  /**
+   * As of PHP 7.4: Property type declarations support all type declarations
+   * supported by PHP with the exception of void and callable.
+   *
+   * @see    https://wiki.php.net/rfc/typed_properties_v2#supported_types
+   * @param  ?lang.ast.Type $type
+   * @return ?string
+   */
   protected function propertyType($type) {
-    if (null === $type || $type instanceof IsUnion || $type instanceof IsFunction) {
-      return '';
-    } else if ($type instanceof IsArray || $type instanceof IsMap) {
-      return 'array';
-    } else if ('callable' === $type->literal() || 'void' === $type->literal()) {
-      return '';
+    if (null === $type || $type instanceof IsFunction || 'callable' === $type->literal()) {
+      return null;
     } else {
-      return $type->literal();
+      return $this->literal($type);
     }
   }
 
