@@ -21,10 +21,10 @@ abstract class PHP extends Emitter {
   }
 
   /**
-   * Emit type literal
+   * Emit type literal or NULL if no type should be emitted
    *
-   * @param  ?lang.ast.types.Type $type
-   * @return string
+   * @param  ?lang.ast.Type $type
+   * @return ?string
    */
   protected function literal($type) {
     return null === $type ? null : $this->literals[get_class($type)]($type);
