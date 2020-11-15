@@ -37,6 +37,29 @@ class HelloWorld {
 }
 ```
 
+Compilation
+-----------
+By default, XP Compiler will hook into the class loading chain and compile files on-demand. This keeps the code-save-reload/rerun development process typical for PHP. However, compilation can also be performed manually by invoking the compiler:
+
+```bash
+# Compile code and write result to a class file
+$ xp compile HelloWorld.php HelloWorld.class.php
+
+# Compile standard input and write to standard output.
+$ echo "<?php ..." | xp compile -
+
+# Compile src/main/php and src/test/php to the dist folder.
+$ xp compile -o dist src/main/php/ src/test/php/
+
+# Compile src/main/php, do not write output
+$ xp compile -n src/main/php/
+
+# Target PHP 7.0 (default target is current PHP version)
+$ xp compile -t PHP.7.0 HelloWorld.php HelloWorld.class.php
+```
+
+The -o and -n options accept multiple input sources following them.
+
 Features supported
 ------------------
 
