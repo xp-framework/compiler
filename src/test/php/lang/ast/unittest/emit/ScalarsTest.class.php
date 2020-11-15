@@ -9,6 +9,11 @@ class ScalarsTest extends EmittingTest {
     Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
   }
 
+  #[Test, Values([['0b0', 0], ['0b10', 2], ['0B10', 2]])]
+  public function binary_numbers($literal, $result) {
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+  }
+
   #[Test, Values([['0x0', 0], ['0xff', 255], ['0xFF', 255], ['0XFF', 255]])]
   public function hexadecimal_numbers($literal, $result) {
     Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
