@@ -2,7 +2,7 @@
 
 use io\{File, FileUtil, Folder};
 use lang\ast\CompilingClassLoader;
-use lang\{ClassFormatException, ClassLoader, Environment};
+use lang\{ClassFormatException, ElementNotFoundException, ClassLoader, Environment};
 use unittest\{Assert, Expect, Test, TestCase};
 
 class CompilingClassLoaderTest {
@@ -34,7 +34,7 @@ class CompilingClassLoaderTest {
 
     $loader= CompilingClassLoader::instanceFor(self::$runtime);
     try {
-      return $callback($loader, $names);
+      return $callback($loader, $names, $cl);
     } finally {
       ClassLoader::removeLoader($cl);
       $folder->unlink();
@@ -44,6 +44,21 @@ class CompilingClassLoaderTest {
   #[Test]
   public function can_create() {
     CompilingClassLoader::instanceFor(self::$runtime);
+  }
+
+  #[Test, Values(['7.0.0', '7.0.1', '7.1.0', '7.2.0', '7.3.0', '7.4.0', '7.4.12', '8.0.0'])]
+  public function supports_php($version) {
+    CompilingClassLoader::instanceFor('PHP.'.$version);
+  }
+
+  #[Test]
+  public function string_representation() {
+    Assert::equals('CompilingCL<PHP70>', CompilingClassLoader::instanceFor('PHP.7.0.0')->toString());
+  }
+
+  #[Test]
+  public function hashcode() {
+    Assert::equals('CPHP70', CompilingClassLoader::instanceFor('PHP.7.0.0')->hashCode());
   }
 
   #[Test]
@@ -78,6 +93,14 @@ class CompilingClassLoaderTest {
     Assert::true((bool)preg_match('/<\?php .+ class Tests/', $code));
   }
 
+  #[Test]
+  public function load_uri() {
+    $class= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types, $temp) {
+      return $loader->loadUri($temp->path.strtr($types['Tests'], '.', DIRECTORY_SEPARATOR).CompilingClassLoader::EXTENSION);
+    });
+    Assert::equals('Tests', $class->getSimpleName());
+  }
+
   #[Test, Expect(['class' => ClassFormatException::class, 'withMessage' => 'Compiler error: Expected "{", have "(end)"'])]
   public function load_class_with_syntax_errors() {
     $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) { return $loader->loadClass($types['Errors']); });
@@ -98,5 +121,30 @@ class CompilingClassLoaderTest {
       strtr($t->getName(), '.', DIRECTORY_SEPARATOR).'.php'
     ));
     \xp::gc();
+  }
+
+  #[Test]
+  public function does_not_provide_non_existant_uri() {
+    Assert::false(CompilingClassLoader::instanceFor(self::$runtime)->providesUri('NotFound.php'));
+  }
+
+  #[Test]
+  public function does_not_provide_non_existant_resource() {
+    Assert::false(CompilingClassLoader::instanceFor(self::$runtime)->providesResource('notfound.md'));
+  }
+
+  #[Test]
+  public function does_not_provide_non_existant_package() {
+    Assert::false(CompilingClassLoader::instanceFor(self::$runtime)->providesPackage('notfound'));
+  }
+
+  #[Test, Expect(ElementNotFoundException::class)]
+  public function loading_non_existant_resource() {
+    CompilingClassLoader::instanceFor(self::$runtime)->getResource('notfound.md');
+  }
+
+  #[Test, Expect(ElementNotFoundException::class)]
+  public function loading_non_existant_resource_as_stream() {
+    CompilingClassLoader::instanceFor(self::$runtime)->getResourceAsStream('notfound.md');
   }
 }
