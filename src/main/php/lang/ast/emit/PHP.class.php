@@ -11,6 +11,16 @@ abstract class PHP extends Emitter {
   protected $literals= [];
 
   /**
+   * Emit type literal or NULL if no type should be emitted
+   *
+   * @param  ?lang.ast.Type $type
+   * @return ?string
+   */
+  public function literal($type) {
+    return null === $type ? null : $this->literals[get_class($type)]($type);
+  }
+
+  /**
    * Returns the simple name for use in a declaration
    *
    * @param  string $name E.g. `\lang\ast\Parse`
@@ -18,16 +28,6 @@ abstract class PHP extends Emitter {
    */
   protected function declaration($name) {
     return substr($name, strrpos($name, '\\') + 1);
-  }
-
-  /**
-   * Emit type literal or NULL if no type should be emitted
-   *
-   * @param  ?lang.ast.Type $type
-   * @return ?string
-   */
-  protected function literal($type) {
-    return null === $type ? null : $this->literals[get_class($type)]($type);
   }
 
   /**
