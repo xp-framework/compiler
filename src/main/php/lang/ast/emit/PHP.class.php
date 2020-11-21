@@ -561,8 +561,12 @@ abstract class PHP extends Emitter {
 
   protected function emitMatch($result, $match) {
     $t= $result->temp();
-    $result->out->write('('.$t.'=');
-    $this->emitOne($result, $match->expression);
+    if (null === $match->expression) {
+      $result->out->write('('.$t.'=true');
+    } else {
+      $result->out->write('('.$t.'=');
+      $this->emitOne($result, $match->expression);
+    }
     $result->out->write(')');
 
     $b= 0;
