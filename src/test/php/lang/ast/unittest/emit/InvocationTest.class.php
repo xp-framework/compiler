@@ -104,6 +104,25 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
+  #[Test]
+  public function function_self_reference() {
+    Assert::equals(13, $this->run(
+      'class <T> {
+
+        public function run() {
+          $fib= function($i) use(&$fib) {
+            if (0 === $i || 1 === $i) {
+              return $i;
+            } else {
+              return $fib($i - 1) + $fib($i - 2);
+            }
+          };
+          return $fib(7);
+        }
+      }'
+    ));
+  }
+
   #[Test, Values(['"html(<) = &lt;", flags: ENT_HTML5', '"html(<) = &lt;", ENT_HTML5, double: true', 'string: "html(<) = &lt;", flags: ENT_HTML5', 'string: "html(<) = &lt;", flags: ENT_HTML5, double: true',])]
   public function named_arguments_in_exact_order($arguments) {
     Assert::equals('html(&lt;) = &amp;lt;', $this->run(
