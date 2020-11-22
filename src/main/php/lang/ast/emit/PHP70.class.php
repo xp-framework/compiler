@@ -17,7 +17,7 @@ class PHP70 extends PHP {
       IsFunction::class => function($t) { return 'callable'; },
       IsArray::class    => function($t) { return 'array'; },
       IsMap::class      => function($t) { return 'array'; },
-      IsValue::class    => function($t) { return $t->literal(); },
+      IsValue::class    => function($t) { $l= $t->literal(); return 'static' === $l ? 'self' : $l; },
       IsNullable::class => function($t) { return null; },
       IsUnion::class    => function($t) { return null; },
       IsLiteral::class  => function($t) {
