@@ -5,6 +5,8 @@ XP Compiler ChangeLog
 
 ## 5.6.0 / 2020-11-22
 
+* Added PHP 8.1-dev to test matrix now that is has been branched
+  (@thekid)
 * Added support for non-capturing catches, see this PHP 8 RFC:
   https://wiki.php.net/rfc/non-capturing_catches
   (@thekid)
