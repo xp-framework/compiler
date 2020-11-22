@@ -54,6 +54,17 @@ class PHP80 extends PHP {
     $result->out->write(')');
   }
 
+  protected function emitCatch($result, $catch) {
+    $capture= $catch->variable ? ' $'.$catch->variable : '';
+    if (empty($catch->types)) {
+      $result->out->write('catch(\\Throwable'.$capture.') {');
+    } else {
+      $result->out->write('catch('.implode('|', $catch->types).$capture.') {');
+    }
+    $this->emitAll($result, $catch->body);
+    $result->out->write('}');
+  }
+
   protected function emitMatch($result, $match) {
     $result->out->write('match (');
     $this->emitOne($result, $match->expression);
