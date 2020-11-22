@@ -65,6 +65,19 @@ class PHP80 extends PHP {
     $result->out->write('}');
   }
 
+  protected function emitNullsafeInstance($result, $instance) {
+    $this->emitOne($result, $instance->expression);
+    $result->out->write('?->');
+
+    if ('literal' === $instance->member->kind) {
+      $result->out->write($instance->member->expression);
+    } else {
+      $result->out->write('{');
+      $this->emitOne($result, $instance->member);
+      $result->out->write('}');
+    }
+  }
+
   protected function emitMatch($result, $match) {
     $result->out->write('match (');
     $this->emitOne($result, $match->expression);
