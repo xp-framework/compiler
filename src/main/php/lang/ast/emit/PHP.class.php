@@ -588,10 +588,11 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitCatch($result, $catch) {
+    $capture= $catch->variable ? '$'.$catch->variable : $result->temp();
     if (empty($catch->types)) {
-      $result->out->write('catch(\\Throwable $'.$catch->variable.') {');
+      $result->out->write('catch(\\Throwable '.$capture.') {');
     } else {
-      $result->out->write('catch('.implode('|', $catch->types).' $'.$catch->variable.') {');
+      $result->out->write('catch('.implode('|', $catch->types).' '.$capture.') {');
     }
     $this->emitAll($result, $catch->body);
     $result->out->write('}');

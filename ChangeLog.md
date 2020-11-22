@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.6.0 / 2020-11-22
+
+* Added support for non-capturing catches, see this PHP 8 RFC:
+  https://wiki.php.net/rfc/non-capturing_catches
+  (@thekid)
+
 ## 5.5.0 / 2020-11-15
 
 * Merged PR #91 - Refactor rewriting type literals:

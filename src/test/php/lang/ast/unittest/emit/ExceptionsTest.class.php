@@ -51,6 +51,21 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[Test]
+  public function non_capturing_catch() {
+    $t= $this->type('class <T> {
+      public function run() {
+        try {
+          throw new \\lang\\IllegalArgumentException("test");
+        } catch (\\lang\\IllegalArgumentException) {
+          return "Expected";
+        }
+      }
+    }');
+
+    Assert::equals('Expected', $t->newInstance()->run());
+  }
+
+  #[Test]
   public function finally_without_exception() {
     $t= $this->type('class <T> {
       public $closed= false;
