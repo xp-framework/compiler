@@ -22,6 +22,10 @@ use util\profiling\Timer;
  *   ```sh
  *   $ xp compile -o dist src/main/php/ src/test/php/
  *   ```
+ * - Compile `src/main/php` and `src/test/php` to the `dist.xar` archive.
+ *   ```sh
+ *   $ xp compile -o dist.xar src/main/php/ src/test/php/
+ *   ```
  * - Compile `src/main/php`, do not write output
  *   ```sh
  *   $ xp compile -n src/main/php/
@@ -73,12 +77,13 @@ class CompileRunner {
     $t= new Timer();
     $total= $errors= 0;
     $time= 0.0;
-    foreach ($input as $path => $in) {
+    foreach ($input as $path => $source) {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= $lang->parse(new Tokens($in, $file));
-        $emit->emitAll(new Result($output->target((string)$path)), $parse->stream());
+        $parse= $lang->parse(new Tokens($source, $file));
+        $target= $output->target((string)$path);
+        $emit->emitAll(new Result($target), $parse->stream());
 
         $t->stop();
         Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
@@ -89,10 +94,12 @@ class CompileRunner {
       } finally {
         $total++;
         $time+= $t->elapsedTime();
-        $in->close();
+        $source->close();
+        $target->close();
       }
     }
 
+    $output->close();
     Console::$err->writeLine();
     Console::$err->writeLinef(
       "%s Compiled %d file(s) to %s using %s, %d error(s) occurred\033[0m",
