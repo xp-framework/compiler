@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\ArrayType;
 use unittest\{Assert, Test, Values};
 
 class MembersTest extends EmittingTest {
@@ -212,5 +213,30 @@ class MembersTest extends EmittingTest {
     }');
 
     Assert::equals(['Test', 'Test', 'Test', 'Test'], $r);
+  }
+
+  #[Test]
+  public function self_return_type() {
+    $t= $this->type('
+      class <T> { public function run(): self { return $this; } }
+    ');
+    Assert::equals($t, $t->getMethod('run')->getReturnType());
+  }
+
+  #[Test]
+  public function static_return_type() {
+    $t= $this->type('
+      class <T>Base { public function run(): static { return $this; } }
+      class <T> extends <T>Base { }
+    ');
+    Assert::equals($t, $t->getMethod('run')->getReturnType());
+  }
+
+  #[Test]
+  public function array_of_self_return_type() {
+    $t= $this->type('
+      class <T> { public function run(): array<self> { return [$this]; } }
+    ');
+    Assert::equals(new ArrayType($t), $t->getMethod('run')->getReturnType());
   }
 }
