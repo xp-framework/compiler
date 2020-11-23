@@ -50,7 +50,7 @@ jobs:
 
     - name: Install dependencies
       run: >
-        curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run &&
+        curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.2.0.sh > xp-run &&
         composer install --prefer-dist &&
         echo "vendor/autoload.php" > composer.pth
 
