@@ -4,6 +4,7 @@ use io\File;
 use io\streams\OutputStream;
 use lang\archive\Archive;
 
+/** Writes compiled files to a .XAR archive */
 class ToArchive extends Output {
   private $archive;
 
@@ -22,7 +23,6 @@ class ToArchive extends Output {
   public function target($name) {
     return new class($this->archive, $name) implements OutputStream {
       private static $replace= [DIRECTORY_SEPARATOR => '/', '.php' => \xp::CLASS_FILE_EXT];
-
       private $bytes= '';
       private $archive, $name;
 
