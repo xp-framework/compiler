@@ -17,6 +17,8 @@ abstract class Output {
       return new ToStream(Console::$out->getStream());
     } else if (strstr($arg, '.php')) {
       return new ToFile($arg);
+    } else if (strstr($arg, '.xar')) {
+      return new ToArchive($arg);
     } else {
       return new ToFolder($arg);
     }
@@ -30,4 +32,8 @@ abstract class Output {
    */
   public abstract function target($name);
 
+  /** @return void */
+  public function close() {
+    // NOOP
+  }
 }
