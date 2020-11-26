@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.7.0 / 2020-11-26
+
+* Verified full PHP 8 support now that PHP 8.0.0 has been released,
+  see https://www.php.net/archive/2020.php#2020-11-26-3
+  (@thekid)
+* Merged PR #95: Support compiling to XAR archives - @thekid
+
 ## 5.6.0 / 2020-11-22
 
 * Merged PR #94: Add support for `static` return type - @thekid
