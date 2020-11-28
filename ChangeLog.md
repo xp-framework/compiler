@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.0.0 / ????-??-??
+
+* Removed support for legacy XP and Hack language annotations, see #86
+  (@thekid)
 * Merged PR #96: Enclose blocks where PHP only allows expressions. This
   not only allows `fn() => { ... }` but also using blocks in `match`.
   (@thekid)
