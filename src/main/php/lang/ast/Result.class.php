@@ -7,7 +7,6 @@ class Result {
   public $meta= [];
   public $locals= [];
   public $stack= [];
-  public $call= [];
 
   /**
    * Starts an result stream, including a preamble
