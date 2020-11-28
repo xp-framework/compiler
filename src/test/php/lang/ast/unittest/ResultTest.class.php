@@ -18,7 +18,7 @@ class ResultTest {
   }
 
   #[Test]
-  public function writes_php_open_tag_as_default_preable() {
+  public function writes_php_open_tag_as_default_preamble() {
     $out= new MemoryOutputStream();
     $r= new Result(new StringWriter($out));
     Assert::equals('<?php ', $out->bytes());
@@ -29,5 +29,13 @@ class ResultTest {
     $out= new MemoryOutputStream();
     $r= new Result(new StringWriter($out), $preamble);
     Assert::equals($preamble, $out->bytes());
+  }
+
+  #[Test]
+  public function write() {
+    $out= new MemoryOutputStream();
+    $r= new Result(new StringWriter($out));
+    $r->out->write('echo "Hello";');
+    Assert::equals('<?php echo "Hello";', $out->bytes());
   }
 }
