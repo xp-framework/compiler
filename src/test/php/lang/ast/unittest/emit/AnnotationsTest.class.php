@@ -94,7 +94,7 @@ class AnnotationsTest extends EmittingTest {
 
   #[Test]
   public function params() {
-    $t= $this->type('class <T> { public function fixture(#[inject(["name" => "a"])] $a, #[inject] $b) { } }');
+    $t= $this->type('class <T> { public function fixture(#[Inject(["name" => "a"])] $a, #[Inject] $b) { } }');
     $m=$t->getMethod('fixture');
     Assert::equals(
       [['inject' => ['name' => 'a']], ['inject' => null]],
@@ -104,7 +104,7 @@ class AnnotationsTest extends EmittingTest {
 
   #[Test]
   public function multiple_class_annotations() {
-    $t= $this->type('#[Resource("/"), authenticated] class <T> { }');
+    $t= $this->type('#[Resource("/"), Authenticated] class <T> { }');
     Assert::equals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
   }
 
