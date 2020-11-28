@@ -9,9 +9,9 @@ class Result {
   public $stack= [];
 
   /**
-   * Starts an result stream, including a preamble
+   * Starts a result stream, including a preamble
    *
-   * @param io.streams.Writer
+   * @param io.streams.Writer $out
    * @param string $preamble
    */
   public function __construct($out, $preamble= '<?php ') {
