@@ -30,15 +30,4 @@ class ResultTest {
     $r= new Result(new StringWriter($out), $preamble);
     Assert::equals($preamble, $out->bytes());
   }
-
-  #[Test]
-  public function writing_via_buffer_does_not_affect_underlying_output() {
-    $out= new MemoryOutputStream();
-    $r= new Result(new StringWriter($out));
-    $r->buffer(function($r) {
-      $r->out->write('namespace test;');
-      $r->out->write('use unittest\Assert;');
-    });
-    Assert::equals('<?php ', $out->bytes());
-  }
 }
