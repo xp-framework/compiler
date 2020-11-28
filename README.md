@@ -53,6 +53,9 @@ $ echo "<?php ..." | xp compile -
 # Compile src/main/php and src/test/php to the dist folder.
 $ xp compile -o dist src/main/php/ src/test/php/
 
+# Compile src/main/php to the dist.xar archive
+$ xp compile -o dist.xar src/main/php/
+
 # Compile src/main/php, do not write output
 $ xp compile -n src/main/php/
 
@@ -61,6 +64,7 @@ $ xp compile -t PHP.7.0 HelloWorld.php HelloWorld.class.php
 ```
 
 The -o and -n options accept multiple input sources following them.
+The -q option suppresses all diagnostic output except for errors.
 
 Features supported
 ------------------

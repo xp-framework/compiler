@@ -22,9 +22,9 @@ use util\profiling\Timer;
  *   ```sh
  *   $ xp compile -o dist src/main/php/ src/test/php/
  *   ```
- * - Compile `src/main/php` and `src/test/php` to the `dist.xar` archive.
+ * - Compile `src/main/php` to the `dist.xar` archive.
  *   ```sh
- *   $ xp compile -o dist.xar src/main/php/ src/test/php/
+ *   $ xp compile -o dist.xar src/main/php/
  *   ```
  * - Compile `src/main/php`, do not write output
  *   ```sh
