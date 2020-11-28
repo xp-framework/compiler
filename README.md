@@ -17,7 +17,7 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses PHP 8.1, 8.0, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 7.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.1, 8.0, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 7.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
