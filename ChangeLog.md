@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 6.0.0 / ????-??-??
 
+* Merged PR #92: Add support for explicit octal integer literal notation
+  See https://wiki.php.net/rfc/explicit_octal_notation (PHP 8.1)
+  (@thekid)
 * Merged PR #93: Allow match without expression: `match { ... }`. See
   https://wiki.php.net/rfc/match_expression_v2#allow_dropping_true
   (@thekid)
