@@ -13,8 +13,6 @@ trait RewriteLambdaExpressions {
     $this->enclose($result, $lambda, $lambda->signature, function($result, $lambda) {
       if ($lambda->body instanceof Block) {
         $this->emitAll($result, $lambda->body->statements);
-      } else if (is_array($lambda->body)) { // BC for xp-framework/ast <= 7.0
-        $this->emitAll($result, $lambda->body);
       } else {
         $result->out->write('return ');
         $this->emitOne($result, $lambda->body);
