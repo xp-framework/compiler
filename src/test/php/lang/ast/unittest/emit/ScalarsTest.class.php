@@ -4,8 +4,23 @@ use unittest\{Assert, Test, Values};
 
 class ScalarsTest extends EmittingTest {
 
-  #[Test, Values([['0', 0], ['1', 1], ['-1', -1], ['0xff', 255], ['0755', 493], ['1.5', 1.5], ['-1.5', -1.5],])]
+  #[Test, Values([['0', 0], ['1', 1], ['-1', -1], ['1.5', 1.5], ['-1.5', -1.5],])]
   public function numbers($literal, $result) {
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+  }
+
+  #[Test, Values([['0b0', 0], ['0b10', 2], ['0B10', 2]])]
+  public function binary_numbers($literal, $result) {
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+  }
+
+  #[Test, Values([['0x0', 0], ['0xff', 255], ['0xFF', 255], ['0XFF', 255]])]
+  public function hexadecimal_numbers($literal, $result) {
+    Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
+  }
+
+  #[Test, Values([['0755', 493], ['0o16', 14], ['0O16', 14]])]
+  public function octal_numbers($literal, $result) {
     Assert::equals($result, $this->run('class <T> { public function run() { return '.$literal.'; } }'));
   }
 
