@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 6.0.0 / ????-??-??
 
+* Merged PR #93: Allow match without expression: `match { ... }`. See
+  https://wiki.php.net/rfc/match_expression_v2#allow_dropping_true
+  (@thekid)
 * Removed support for legacy XP and Hack language annotations, see #86
   (@thekid)
 * Merged PR #96: Enclose blocks where PHP only allows expressions. This
