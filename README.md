@@ -80,9 +80,6 @@ $ composer require xp-lang/php-is-operator
 $ xp compile
 Usage: xp compile <in> [<out>]
 
-@FileSystemCL<./vendor/xp-framework/ast/src/main/php
-lang.ast.syntax.TransformationApi
-
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
 lang.ast.syntax.php.Using
 
