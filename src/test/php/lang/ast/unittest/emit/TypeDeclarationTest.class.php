@@ -44,8 +44,18 @@ class TypeDeclarationTest extends EmittingTest {
   }
 
   #[Test]
+  public function trait_type_with_method() {
+    Assert::true($this->type('trait <T> { public function name() { return "Test"; }}')->isTrait());
+  }
+
+  #[Test]
   public function interface_type() {
     Assert::true($this->type('interface <T> { }')->isInterface());
+  }
+
+  #[Test]
+  public function interface_type_with_method() {
+    Assert::true($this->type('interface <T> { public function name(); }')->isInterface());
   }
 
   #[Test, Values(['public', 'private', 'protected'])]

@@ -8,13 +8,14 @@ on:
 
 jobs:
   tests:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
     name: PHP ${{ matrix.php-versions }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.php-versions == '8.0' }}
+    continue-on-error: ${{ matrix.php-versions == '8.1' }}
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.0', '7.1', '7.2', '7.3', '7.4', '8.0']
+        php-versions: ['7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
         os: [ubuntu-latest, windows-latest]
 
     steps:
@@ -50,7 +51,7 @@ jobs:
 
     - name: Install dependencies
       run: >
-        curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run &&
+        curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.2.0.sh > xp-run &&
         composer install --prefer-dist &&
         echo "vendor/autoload.php" > composer.pth
 

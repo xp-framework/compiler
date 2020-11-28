@@ -32,12 +32,11 @@ class PHP80 extends PHP {
   }
 
   protected function emitArguments($result, $arguments) {
-    $s= sizeof($arguments) - 1;
     $i= 0;
     foreach ($arguments as $name => $argument) {
+      if ($i++) $result->out->write(',');
       if (is_string($name)) $result->out->write($name.':');
       $this->emitOne($result, $argument);
-      if ($i++ < $s) $result->out->write(', ');
     }
   }
 
@@ -52,6 +51,35 @@ class PHP80 extends PHP {
 
     $this->emitArguments($result, $new->arguments);
     $result->out->write(')');
+  }
+
+  protected function emitThrowExpression($result, $throw) {
+    $result->out->write('throw ');
+    $this->emitOne($result, $throw->expression);
+  }
+
+  protected function emitCatch($result, $catch) {
+    $capture= $catch->variable ? ' $'.$catch->variable : '';
+    if (empty($catch->types)) {
+      $result->out->write('catch(\\Throwable'.$capture.') {');
+    } else {
+      $result->out->write('catch('.implode('|', $catch->types).$capture.') {');
+    }
+    $this->emitAll($result, $catch->body);
+    $result->out->write('}');
+  }
+
+  protected function emitNullsafeInstance($result, $instance) {
+    $this->emitOne($result, $instance->expression);
+    $result->out->write('?->');
+
+    if ('literal' === $instance->member->kind) {
+      $result->out->write($instance->member->expression);
+    } else {
+      $result->out->write('{');
+      $this->emitOne($result, $instance->member);
+      $result->out->write('}');
+    }
   }
 
   protected function emitMatch($result, $match) {
@@ -71,13 +99,13 @@ class PHP80 extends PHP {
         $b++;
       }
       $result->out->write('=>');
-      $this->emitOne($result, $case->body);
+      $this->emitAsExpression($result, $case->body);
       $result->out->write(',');
     }
 
     if ($match->default) {
       $result->out->write('default=>');
-      $this->emitOne($result, $match->default);
+      $this->emitAsExpression($result, $match->default);
     }
 
     $result->out->write('}');

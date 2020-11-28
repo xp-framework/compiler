@@ -1,5 +1,7 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\nodes\Block;
+
 /**
  * Rewrites lambda expressions (or "arrow functions") to regular closures.
  *
@@ -8,40 +10,14 @@
 trait RewriteLambdaExpressions {
 
   protected function emitLambda($result, $lambda) {
-    $capture= [];
-    foreach ($result->codegen->search($lambda, 'variable') as $var) {
-      if (isset($result->locals[$var->name])) {
-        $capture[$var->name]= true;
+    $this->enclose($result, $lambda, $lambda->signature, function($result, $lambda) {
+      if ($lambda->body instanceof Block) {
+        $this->emitAll($result, $lambda->body->statements);
+      } else {
+        $result->out->write('return ');
+        $this->emitOne($result, $lambda->body);
+        $result->out->write(';');
       }
-    }
-    unset($capture['this']);
-
-    $result->stack[]= $result->locals;
-    $result->locals= [];
-
-    $result->out->write('function');
-    $this->emitSignature($result, $lambda->signature);
-    foreach ($lambda->signature->parameters as $param) {
-      unset($capture[$param->name]);
-    }
-
-    if ($capture) {
-      $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
-      foreach ($capture as $name => $_) {
-        $result->locals[$name]= true;
-      }
-    }
-
-    if (is_array($lambda->body)) {
-      $result->out->write('{');
-      $this->emitAll($result, $lambda->body);
-      $result->out->write('}');
-    } else {
-      $result->out->write('{ return ');
-      $this->emitOne($result, $lambda->body);
-      $result->out->write('; }');
-    }
-
-    $result->locals= array_pop($result->stack);
+    });
   }
 }
