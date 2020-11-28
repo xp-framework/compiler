@@ -36,6 +36,7 @@ use util\profiling\Timer;
  *   ```
  *
  * The *-o* and *-n* options accept multiple input sources following them.
+ * The *-q* option suppresses all diagnostic output except for errors.
  * 
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
@@ -47,9 +48,12 @@ class CompileRunner {
 
     $target= 'PHP.'.PHP_VERSION;
     $in= $out= '-';
+    $quiet= false;
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
+      } else if ('-q' === $args[$i]) {
+        $quiet= true;
       } else if ('-o' === $args[$i]) {
         $out= $args[++$i];
         $in= array_slice($args, $i + 1);
@@ -86,7 +90,7 @@ class CompileRunner {
         $emit->emitAll(new Result($target), $parse->stream());
 
         $t->stop();
-        Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
+        $quiet || Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
       } catch (Errors $e) {
         $t->stop();
         Console::$err->writeLinef('! %s: %s ', $file, $e->diagnostics('  '));
@@ -99,22 +103,25 @@ class CompileRunner {
       }
     }
 
+    if (!$quiet) {
+      Console::$err->writeLine();
+      Console::$err->writeLinef(
+        "%s Compiled %d file(s) to %s using %s, %d error(s) occurred\033[0m",
+        $errors ? "\033[41;1;37m×" : "\033[42;1;37m♥",
+        $total,
+        $out,
+        typeof($emit)->getName(),
+        $errors
+      );
+      Console::$err->writeLinef(
+        "Memory used: %.2f kB (%.2f kB peak)\nTime taken: %.3f seconds",
+        Runtime::getInstance()->memoryUsage() / 1024,
+        Runtime::getInstance()->peakMemoryUsage() / 1024,
+        $time
+      );
+    }
+
     $output->close();
-    Console::$err->writeLine();
-    Console::$err->writeLinef(
-      "%s Compiled %d file(s) to %s using %s, %d error(s) occurred\033[0m",
-      $errors ? "\033[41;1;37m×" : "\033[42;1;37m♥",
-      $total,
-      $out,
-      typeof($emit)->getName(),
-      $errors
-    );
-    Console::$err->writeLinef(
-      "Memory used: %.2f kB (%.2f kB peak)\nTime taken: %.3f seconds",
-      Runtime::getInstance()->memoryUsage() / 1024,
-      Runtime::getInstance()->peakMemoryUsage() / 1024,
-      $time
-    );
     return $errors ? 1 : 0;
   }
 }

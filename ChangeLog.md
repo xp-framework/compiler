@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 6.0.0 / ????-??-??
 
+* Added `-q` command line option which suppresses all diagnostic output
+  from the compiler except for errors
+  (@thekid)
 * Removed support for using curly braces as offset (e.g. `$value{0}`)
   (@thekid)
 * Merged PR #92: Add support for explicit octal integer literal notation
