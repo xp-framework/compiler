@@ -120,6 +120,22 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
+  #[Test]
+  public function match_allows_dropping_true() {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        return match {
+          $arg >= 10 => "10+ items",
+          $arg === 1 => "one item",
+          $arg === 0 => "no items",
+          default    => $arg." items",
+        };
+      }
+    }', 10);
+
+    Assert::equals('10+ items', $r);
+  }
+
   #[Test, Expect(['class' => Throwable::class, 'withMessage' => '/Unhandled match value of type .+/'])]
   public function unhandled_match() {
     $this->run('class <T> {

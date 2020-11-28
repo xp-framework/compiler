@@ -83,9 +83,13 @@ class PHP80 extends PHP {
   }
 
   protected function emitMatch($result, $match) {
-    $result->out->write('match (');
-    $this->emitOne($result, $match->expression);
-    $result->out->write(') {');
+    if (null === $match->expression) {
+      $result->out->write('match (true) {');
+    } else {
+      $result->out->write('match (');
+      $this->emitOne($result, $match->expression);
+      $result->out->write(') {');
+    }
 
     foreach ($match->cases as $case) {
       $b= 0;
