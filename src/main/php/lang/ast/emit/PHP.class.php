@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable, Block};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -46,6 +46,68 @@ abstract class PHP extends Emitter {
     }
   }
 
+  /**
+   * Enclose a node inside a closure
+   *
+   * @param  lang.ast.Result $result
+   * @param  lang.ast.Node $node
+   * @param  ?lang.ast.nodes.Signature $signature
+   * @param  function(lang.ast.Result, lang.ast.Node): void $emit
+   */
+  protected function enclose($result, $node, $signature, $emit) {
+    $capture= [];
+    foreach ($result->codegen->search($node, 'variable') as $var) {
+      if (isset($result->locals[$var->name])) {
+        $capture[$var->name]= true;
+      }
+    }
+    unset($capture['this']);
+
+    $result->stack[]= $result->locals;
+    $result->locals= [];
+    if ($signature) {
+      $result->out->write('function');
+      $this->emitSignature($result, $signature);
+      foreach ($signature->parameters as $param) {
+        unset($capture[$param->name]);
+      }
+    } else {
+      $result->out->write('function()');
+    }
+
+    if ($capture) {
+      $result->out->write('use($'.implode(', $', array_keys($capture)).')');
+      foreach ($capture as $name => $_) {
+        $result->locals[$name]= true;
+      }
+    }
+
+    $result->out->write('{');
+    $emit($result, $node);
+    $result->out->write('}');
+    $result->locals= array_pop($result->stack);
+  }
+
+  /**
+   * Convert blocks to IIFEs to allow a list of statements where PHP syntactically
+   * doesn't, e.g. `fn`-style lambdas or match expressions.
+   *
+   * @param  lang.ast.Result $result
+   * @param  lang.ast.Node $expression
+   * @return void
+   */
+  protected function emitAsExpression($result, $expression) {
+    if ($expression instanceof Block) {
+      $result->out->write('(');
+      $this->enclose($result, $expression, null, function($result, $expression) {
+        $this->emitAll($result, $expression->statements);
+      });
+      $result->out->write(')()');
+    } else {
+      $this->emitOne($result, $expression);
+    }
+  }
+
   protected function emitStart($result, $start) {
     // NOOP
   }
@@ -78,10 +140,9 @@ abstract class PHP extends Emitter {
 
   protected function emitEcho($result, $echo) {
     $result->out->write('echo ');
-    $s= sizeof($echo->expressions) - 1;
     foreach ($echo->expressions as $i => $expr) {
+      if ($i++) $result->out->write(',');
       $this->emitOne($result, $expr);
-      if ($i < $s) $result->out->write(',');
     }
   }
 
@@ -194,10 +255,9 @@ abstract class PHP extends Emitter {
 
   protected function emitSignature($result, $signature) {
     $result->out->write('(');
-    $s= sizeof($signature->parameters) - 1;
     foreach ($signature->parameters as $i => $parameter) {
+      if ($i++) $result->out->write(',');
       $this->emitParameter($result, $parameter);
-      if ($i < $s) $result->out->write(', ');
     }
     $result->out->write(')');
 
@@ -244,14 +304,7 @@ abstract class PHP extends Emitter {
     $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
-
-    if (is_array($lambda->body)) {
-      $result->out->write('{');
-      $this->emitAll($result, $lambda->body);
-      $result->out->write('}');
-    } else {
-      $this->emitOne($result, $lambda->body);
-    }
+    $this->emitOne($result, $lambda->body);
   }
 
   protected function emitClass($result, $class) {
@@ -572,7 +625,7 @@ abstract class PHP extends Emitter {
         $result->out->write('===(');
         $this->emitOne($result, $expression);
         $result->out->write(')?');
-        $this->emitOne($result, $case->body);
+        $this->emitAsExpression($result, $case->body);
         $result->out->write(':(');
         $b++;
       }
@@ -582,7 +635,7 @@ abstract class PHP extends Emitter {
     if (null === $match->default) {
       $result->out->write('function() use('.$t.') { throw new \\Error("Unhandled match value of type ".gettype('.$t.')); })(');
     } else {
-      $this->emitOne($result, $match->default);
+      $this->emitAsExpression($result, $match->default);
     }
     $result->out->write(str_repeat(')', $b));
   }
@@ -621,19 +674,13 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitThrowExpression($result, $throw) {
-    $capture= [];
-    foreach ($result->codegen->search($throw->expression, 'variable') as $var) {
-      if (isset($result->locals[$var->name])) {
-        $capture[$var->name]= true;
-      }
-    }
-    unset($capture['this']);
-
-    $result->out->write('(function()');
-    $capture && $result->out->write(' use($'.implode(', $', array_keys($capture)).')');
-    $result->out->write('{ throw ');
-    $this->emitOne($result, $throw->expression);
-    $result->out->write('; })()');
+    $result->out->write('(');
+    $this->enclose($result, $throw->expression, null, function($result, $expression) {
+      $result->out->write('throw ');
+      $this->emitOne($result, $expression);
+      $result->out->write(';');
+    });
+    $result->out->write(')()');
   }
 
   protected function emitForeach($result, $foreach) {
@@ -722,11 +769,10 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitArguments($result, $arguments) {
-    $s= sizeof($arguments) - 1;
     $i= 0;
     foreach ($arguments as $argument) {
+      if ($i++) $result->out->write(',');
       $this->emitOne($result, $argument);
-      if ($i++ < $s) $result->out->write(', ');
     }
   }
 

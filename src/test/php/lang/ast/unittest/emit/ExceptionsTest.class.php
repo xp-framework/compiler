@@ -106,6 +106,16 @@ class ExceptionsTest extends EmittingTest {
   }
 
   #[Test, Expect(IllegalArgumentException::class)]
+  public function throw_expression_with_this() {
+    $this->run('class <T> {
+      private $message= "test";
+      public function run($user= null) {
+        return $user ?? throw new \\lang\\IllegalArgumentException($this->message);
+      }
+    }');
+  }
+
+  #[Test, Expect(IllegalArgumentException::class)]
   public function throw_expression_with_null_coalesce() {
     $t= $this->type('class <T> {
       public function run($user) {
