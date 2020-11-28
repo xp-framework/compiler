@@ -108,10 +108,6 @@ abstract class PHP extends Emitter {
     }
   }
 
-  protected function emitStart($result, $start) {
-    // NOOP
-  }
-
   protected function emitNamespace($result, $declaration) {
     $result->out->write('namespace '.$declaration->name);
   }
