@@ -118,14 +118,6 @@ abstract class PHP extends Emitter {
     }
   }
 
-  protected function emitOperator($result, $operator) {
-    // NOOP
-  }
-
-  protected function emitName($result, $name) {
-    // NOOP
-  }
-
   protected function emitCode($result, $code) {
     $result->out->write($code->value);
   }
