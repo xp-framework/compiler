@@ -69,13 +69,34 @@ class ControlStructuresTest extends EmittingTest {
   }
 
   #[Test, Values([[200, 'OK'], [302, 'Redirect'], [404, 'Error #404']])]
-  public function match_with_multiple($input, $expected) {
+  public function match_with_multiple_cases($input, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
         return match ($arg) {
           200, 201, 202, 203, 204 => "OK",
           300, 301, 302, 303, 307 => "Redirect",
           default => "Error #$arg",
+        };
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[Test, Values([['PING', '+PONG'], ['MSG', '+OK Re: Test'], ['XFER', '-ERR Unknown XFER']])]
+  public function match_with_multiple_statements($input, $expected) {
+    $r= $this->run('class <T> {
+      public function run($type) {
+        $value= "Test";
+        return match ($type) {
+          "PING" => "+PONG",
+          "MSG"  => {
+            $reply= "Re: ".$value;
+            return "+OK $reply";
+          },
+          default => {
+            return "-ERR Unknown ".$type;
+          }
         };
       }
     }', $input);
