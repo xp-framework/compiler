@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #96: Enclose blocks where PHP only allows expressions. This
+  not only allows `fn() => { ... }` but also using blocks in `match`.
+  (@thekid)
+
 ## 5.7.0 / 2020-11-26
 
 * Verified full PHP 8 support now that PHP 8.0.0 has been released,
