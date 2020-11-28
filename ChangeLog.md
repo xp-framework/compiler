@@ -3,7 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 6.0.0 / ????-??-??
+## 6.0.0 / 2020-11-28
 
 * Added `-q` command line option which suppresses all diagnostic output
   from the compiler except for errors
