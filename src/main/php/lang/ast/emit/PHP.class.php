@@ -63,6 +63,8 @@ abstract class PHP extends Emitter {
     }
     unset($capture['this']);
 
+    $result->stack[]= $result->locals;
+    $result->locals= [];
     if ($signature) {
       $result->out->write('function');
       $this->emitSignature($result, $signature);
@@ -73,8 +75,6 @@ abstract class PHP extends Emitter {
       $result->out->write('function()');
     }
 
-    $result->stack[]= $result->locals;
-    $result->locals= [];
     if ($capture) {
       $result->out->write('use($'.implode(', $', array_keys($capture)).')');
       foreach ($capture as $name => $_) {
