@@ -5,6 +5,7 @@ use lang\reflect\Package;
 use util\cmd\Console;
 
 class Usage {
+  const RUNTIME = 'PHP';
 
   /** @return int */
   public static function main(array $args) {
@@ -18,15 +19,21 @@ class Usage {
       }
     };
 
-    $default= Emitter::forRuntime('PHP.'.PHP_VERSION);
+    $emitter= Emitter::forRuntime(self::RUNTIME.'.'.PHP_VERSION);
     foreach (Package::forName('lang.ast.emit')->getClasses() as $class) {
       if ($class->isSubclassOf(Emitter::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
-        $impl->add($class, $class->equals($default));
+        $impl->add($class, $class->equals($emitter));
       }
     }
 
-    foreach (Language::named('PHP')->extensions() as $extension) {
-      $impl->add(typeof($extension), true);
+    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
+      if ($class->isSubclassOf(Language::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
+        $impl->add($class, self::RUNTIME === $class->getSimpleName());
+      }
+    }
+
+    foreach (Language::named(self::RUNTIME)->extensions() as $extension) {
+      $impl->add(typeof($extension), 'true');
     }
 
     // Show implementations sorted by class loader
