@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Included emitters in `xp compile` output - @thekid
+
 ## 6.0.0 / 2020-11-28
 
 * Added `-q` command line option which suppresses all diagnostic output
