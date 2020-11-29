@@ -75,8 +75,7 @@ class ArgumentPromotionTest extends EmittingTest {
   #[Test]
   public function type_information() {
     $t= $this->type('class <T> {
-      public function __construct(private int $id, private string $name) {
-      }
+      public function __construct(private int $id, private string $name) { }
     }');
     Assert::equals(
       [Primitive::$INT, Primitive::$STRING],

@@ -17,11 +17,11 @@ class MultipleCatchTest extends EmittingTest {
         try {
           throw new $t("test");
         } catch (\\lang\\IllegalArgumentException | \\lang\\IllegalStateException $e) {
-          return "caught ".get_class($e);
+          return "Caught ".get_class($e);
         }
       }
     }');
 
-    Assert::equals('caught '.$type, $t->newInstance()->run($type));
+    Assert::equals('Caught '.$type, $t->newInstance()->run($type));
   }
 }

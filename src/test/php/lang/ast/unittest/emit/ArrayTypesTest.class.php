@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use unittest\{Assert, Test};
+
 /**
  * Array types
  *

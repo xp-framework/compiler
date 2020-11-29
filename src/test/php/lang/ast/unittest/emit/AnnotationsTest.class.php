@@ -95,7 +95,7 @@ class AnnotationsTest extends EmittingTest {
   #[Test]
   public function params() {
     $t= $this->type('class <T> { public function fixture(#[Inject(["name" => "a"])] $a, #[Inject] $b) { } }');
-    $m=$t->getMethod('fixture');
+    $m= $t->getMethod('fixture');
     Assert::equals(
       [['inject' => ['name' => 'a']], ['inject' => null]],
       [$m->getParameter(0)->getAnnotations(), $m->getParameter(1)->getAnnotations()]

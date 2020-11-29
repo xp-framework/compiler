@@ -4,7 +4,7 @@ use unittest\{Assert, Test, Values};
 
 class PrecedenceTest extends EmittingTest {
 
-  #[Test, Values([['2 + 3 * 4', 14], ['2 + 8 / 4', 4], ['2 + 3 ** 2', 11], ['2 + 5 % 2', 3],])]
+  #[Test, Values([['2 + 3 * 4', 14], ['2 + 8 / 4', 4], ['2 + 3 ** 2', 11], ['2 + 5 % 2', 3]])]
   public function mathematical($input, $result) {
     Assert::equals($result, $this->run(
       'class <T> {
@@ -24,7 +24,7 @@ class PrecedenceTest extends EmittingTest {
         }
       }'
     );
-    Assert::equals('('.$t->getName().')', $t->newInstance()->run());
+    Assert::equals('('.$t->literal().')', $t->newInstance()->run());
   }
 
   #[Test]
@@ -38,6 +38,6 @@ class PrecedenceTest extends EmittingTest {
         }
       }'
     );
-    Assert::equals(2, $t->newinstance()->run());
+    Assert::equals(2, $t->newInstance()->run());
   }
 }

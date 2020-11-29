@@ -1,6 +1,5 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\Primitive;
 use unittest\{Assert, Test};
 
 /**

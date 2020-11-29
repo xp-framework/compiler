@@ -8,7 +8,7 @@ class CastingTest extends EmittingTest {
   /** @return string */
   public function test() { return 'Test'; }
 
-  #[Test, Values([0, 1, -1, 0.5, -1.5, "", "test", true, false])]
+  #[Test, Values([0, 1, -1, 0.5, -1.5, '', 'test', true, false])]
   public function string_cast($value) {
     Assert::equals((string)$value, $this->run(
       'class <T> {
@@ -20,7 +20,7 @@ class CastingTest extends EmittingTest {
     ));
   }
 
-  #[Test, Values(["0", "1", "-1", "6100", "", 0.5, -1.5, 0, 1, -1, true, false])]
+  #[Test, Values(['0', '1', '-1', '6100', '', 0.5, -1.5, 0, 1, -1, true, false])]
   public function int_cast($value) {
     Assert::equals((int)$value, $this->run(
       'class <T> {
@@ -32,7 +32,7 @@ class CastingTest extends EmittingTest {
     ));
   }
 
-  #[Test, Values([[[]], [[0, 1, 2]], [['key' => 'value']], null, false, true, 1, 1.5, "", "test"])]
+  #[Test, Values([[[]], [[0, 1, 2]], [['key' => 'value']], null, false, true, 1, 1.5, '', 'test'])]
   public function array_cast($value) {
     Assert::equals((array)$value, $this->run(
       'class <T> {
