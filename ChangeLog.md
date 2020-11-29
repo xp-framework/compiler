@@ -3,7 +3,7 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Included emitters in `xp compile` output - @thekid
+* Included languages and emitters in `xp compile` output - @thekid
 
 ## 6.0.0 / 2020-11-28
 
