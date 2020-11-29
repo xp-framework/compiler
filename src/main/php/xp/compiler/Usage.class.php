@@ -26,13 +26,14 @@ class Usage {
       }
     }
 
+    $language= Language::named(self::RUNTIME);
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
       if ($class->isSubclassOf(Language::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
-        $impl->add($class, self::RUNTIME === $class->getSimpleName());
+        $impl->add($class, $class->isInstance($language));
       }
     }
 
-    foreach (Language::named(self::RUNTIME)->extensions() as $extension) {
+    foreach ($language->extensions() as $extension) {
       $impl->add(typeof($extension), 'true');
     }
 
