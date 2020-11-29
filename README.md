@@ -59,8 +59,8 @@ $ xp compile -o dist.xar src/main/php/
 # Compile src/main/php, do not write output
 $ xp compile -n src/main/php/
 
-# Target PHP 7.0 (default target is current PHP version)
-$ xp compile -t PHP.7.0 HelloWorld.php HelloWorld.class.php
+# Target PHP 7.4 (default target is current PHP version)
+$ xp compile -t PHP.7.4 HelloWorld.php HelloWorld.class.php
 ```
 
 The -o and -n options accept multiple input sources following them.
@@ -81,7 +81,12 @@ $ xp compile
 Usage: xp compile <in> [<out>]
 
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
-lang.ast.syntax.php.Using
+lang.ast.emit.PHP70
+lang.ast.emit.PHP71
+lang.ast.emit.PHP72
+lang.ast.emit.PHP74
+lang.ast.emit.PHP80 [*]
+lang.ast.syntax.php.Using [*]
 
 @FileSystemCL<./vendor/xp-lang/php-is-operator/src/main/php>
 lang.ast.syntax.php.IsOperator
