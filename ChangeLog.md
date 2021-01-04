@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.1.0 / 2021-01-04
+
 * Included languages and emitters in `xp compile` output - @thekid
 
 ## 6.0.0 / 2020-11-28

@@ -94,6 +94,18 @@ class BracesTest extends EmittingTest {
   }
 
   #[Test]
+  public function function_call_in_braces() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $e= STDOUT;
+        return false !== (fstat(STDOUT));
+      }
+    }');
+
+    Assert::true($r);
+  }
+
+  #[Test]
   public function invoke_on_braced_null_coalesce() {
     $r= $this->run('class <T> {
       public function __invoke() { return "OK"; }
