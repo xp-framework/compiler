@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.1.1 / 2021-01-04
+
+* Fixed issue #102: Call to a member function children()... - @thekid
 * Fixed issue #102: PHP 8.1 compatiblity - @thekid
 * Fixed issue #103: Nullable types - @thekid
 
