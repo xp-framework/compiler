@@ -162,4 +162,35 @@ class ControlStructuresTest extends EmittingTest {
       }
     }', SEEK_END);
   }
+
+  #[Test]
+  public function match_without_arg_inside_fn() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return fn($arg) => match {
+          $arg >= 10 => "10+ items",
+          $arg === 1 => "one item",
+          $arg === 0 => "no items",
+          default    => $arg." items",
+        };
+      }
+    }');
+
+    Assert::equals('10+ items', $r(10));
+  }
+
+  #[Test]
+  public function match_with_arg_inside_fn() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return fn($arg) => match ($arg) {
+          0 => "no items",
+          1 => "one item",
+          default => $arg." items",
+        };
+      }
+    }');
+
+    Assert::equals('one item', $r(1));
+  }
 }
