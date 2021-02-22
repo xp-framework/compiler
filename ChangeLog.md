@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #103: Nullable types - @thekid
+
 ## 6.1.0 / 2021-01-04
 
 * Included languages and emitters in `xp compile` output - @thekid

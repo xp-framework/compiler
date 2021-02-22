@@ -5,6 +5,7 @@ use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Test, Values, Action};
 
 class ParameterTest extends EmittingTest {
+  use NullableSupport;
 
   /**
    * Helper to declare a type and return a parameter reflection object
@@ -49,12 +50,12 @@ class ParameterTest extends EmittingTest {
 
   #[Test]
   public function value_type_with_null() {
-    Assert::equals(new XPClass(Value::class), $this->param('Value $param= null')->getType());
+    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('Value $param= null')->getType());
   }
 
   #[Test]
   public function nullable_value_type() {
-    Assert::equals(new XPClass(Value::class), $this->param('?Value $param')->getType());
+    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('?Value $param')->getType());
   }
 
   #[Test]
@@ -64,17 +65,17 @@ class ParameterTest extends EmittingTest {
 
   #[Test]
   public function string_typed_with_null() {
-    Assert::equals(Primitive::$STRING, $this->param('string $param= null')->getType());
+    Assert::equals($this->nullable(Primitive::$STRING), $this->param('string $param= null')->getType());
   }
 
   #[Test]
   public function nullable_string_type() {
-    Assert::equals(Primitive::$STRING, $this->param('?string $param')->getType());
+    Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->getType());
   }
 
   #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
   public function nullable_string_type_restriction() {
-    Assert::equals(Primitive::$STRING, $this->param('?string $param')->getTypeRestriction());
+    Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->getTypeRestriction());
   }
 
   #[Test]
