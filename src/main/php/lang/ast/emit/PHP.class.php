@@ -358,7 +358,7 @@ abstract class PHP extends Emitter {
 
   /** Removes leading, intermediate and trailing stars from apidoc comments */
   private function comment($comment) {
-    if (0 === strlen($comment)) {
+    if (null === $comment || '' === $comment) {
       return 'null';
     } else if ('/' === $comment[0]) {
       return "'".str_replace("'", "\\'", trim(preg_replace('/\n\s+\* ?/', "\n", substr($comment, 3, -2))))."'";
