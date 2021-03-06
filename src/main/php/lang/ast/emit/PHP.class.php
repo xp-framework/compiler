@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable, Literal, ArrayLiteral, Block};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, Variable, Literal, ArrayLiteral, Block};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -37,8 +37,9 @@ abstract class PHP extends Emitter {
    * - Any literal
    * - Arrays where all members are literals
    * - Scope expressions with literal members (self::class, T::const)
+   * - Binary expression where left- and right hand side are literals
    *
-   * @see    https://wiki.php.net/rfc/new_in_initializers
+   * @see    https://wiki.php.net/rfc/const_scalar_exprs
    * @param  lang.ast.Node $node
    * @return bool
    */
@@ -52,6 +53,8 @@ abstract class PHP extends Emitter {
       return true;
     } else if ($node instanceof ScopeExpression) {
       return $node->member instanceof Literal;
+    } else if ($node instanceof BinaryExpression) {
+      return $this->isConstant($node->left) && $this->isConstant($node->right);
     }
     return false;
   }

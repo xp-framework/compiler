@@ -8,6 +8,7 @@ use unittest\{Assert, Test, Values};
  *
  * @see  https://github.com/xp-framework/compiler/pull/104
  * @see  https://wiki.php.net/rfc/new_in_initializers
+ * @see  https://wiki.php.net/rfc/const_scalar_exprs
  * @see  https://wiki.php.net/rfc/calls_in_constant_expressions
  */
 class InitializeWithExpressionsTest extends EmittingTest {
