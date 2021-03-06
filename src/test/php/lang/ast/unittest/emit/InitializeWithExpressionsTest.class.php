@@ -65,6 +65,19 @@ class InitializeWithExpressionsTest extends EmittingTest {
   }
 
   #[Test]
+  public function using_new_referencing_this() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      private $id= 1;
+      private $h= new Handle($this->id);
+
+      public function run() {
+        return $this->h;
+      }
+    }');
+    Assert::equals(new Handle(1), $r);
+  }
+
+  #[Test]
   public function using_anonymous_classes() {
     $r= $this->run('class <T> {
       private $h= new class() { public function pipe($h) { return $h->redirect(1); } };
