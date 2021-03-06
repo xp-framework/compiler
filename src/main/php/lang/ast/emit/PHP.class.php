@@ -1,6 +1,7 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Variable, Block};
+use lang\ast\Code;
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, Variable, Literal, ArrayLiteral, Block};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -28,6 +29,34 @@ abstract class PHP extends Emitter {
    */
   protected function declaration($name) {
     return substr($name, strrpos($name, '\\') + 1);
+  }
+
+  /**
+   * Returns whether a given node is a constant expression:
+   *
+   * - Any literal
+   * - Arrays where all members are literals
+   * - Scope expressions with literal members (self::class, T::const)
+   * - Binary expression where left- and right hand side are literals
+   *
+   * @see    https://wiki.php.net/rfc/const_scalar_exprs
+   * @param  lang.ast.Node $node
+   * @return bool
+   */
+  protected function isConstant($node) {
+    if ($node instanceof Literal) {
+      return true;
+    } else if ($node instanceof ArrayLiteral) {
+      foreach ($node->values as $node) {
+        if (!$this->isConstant($node)) return false;
+      }
+      return true;
+    } else if ($node instanceof ScopeExpression) {
+      return $node->member instanceof Literal;
+    } else if ($node instanceof BinaryExpression) {
+      return $this->isConstant($node->left) && $this->isConstant($node->right);
+    }
+    return false;
   }
 
   /**
@@ -89,6 +118,21 @@ abstract class PHP extends Emitter {
   }
 
   /**
+   * Emits local initializations
+   *
+   * @param  lang.ast.Result $result
+   * @param  [:lang.ast.Node] $init
+   * @return void
+   */
+  protected function emitInitializations($result, $init) {
+    foreach ($init as $assign => $expression) {
+      $result->out->write($assign.'=');
+      $this->emitOne($result, $expression);
+      $result->out->write(';');
+    }
+  }
+
+  /**
    * Convert blocks to IIFEs to allow a list of statements where PHP syntactically
    * doesn't, e.g. `fn`-style lambdas or match expressions.
    *
@@ -144,8 +188,13 @@ abstract class PHP extends Emitter {
     foreach ($static->initializations as $variable => $initial) {
       $result->out->write('static $'.$variable);
       if ($initial) {
-        $result->out->write('=');
-        $this->emitOne($result, $initial);
+        if ($this->isConstant($initial)) {
+          $result->out->write('=');
+          $this->emitOne($result, $initial);
+        } else {
+          $result->out->write('= null; null === $'.$variable.' && $'.$variable.'= ');
+          $this->emitOne($result, $initial);
+        }
       }
       $result->out->write(';');
     }
@@ -235,8 +284,13 @@ abstract class PHP extends Emitter {
       $result->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
     }
     if ($parameter->default) {
-      $result->out->write('=');
-      $this->emitOne($result, $parameter->default);
+      if ($this->isConstant($parameter->default)) {
+        $result->out->write('=');
+        $this->emitOne($result, $parameter->default);
+      } else {
+        $result->out->write('=null');
+        $result->locals[1]['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
+      }
     }
     $result->locals[$parameter->name]= true;
   }
@@ -297,6 +351,7 @@ abstract class PHP extends Emitter {
 
   protected function emitClass($result, $class) {
     array_unshift($result->meta, []);
+    $result->locals= [[], []];
 
     $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
     $class->parent && $result->out->write(' extends '.$class->parent);
@@ -306,7 +361,16 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $member);
     }
 
+    // Create constructor for property initializations to non-static scalars
+    // which have not already been emitted inside constructor
+    if ($result->locals[1]) {
+      $result->out->write('public function __construct() {');
+      $this->emitInitializations($result, $result->locals[1]);
+      $result->out->write('}');
+    }
+
     $result->out->write('static function __init() {');
+    $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name.'::__init();');
   }
@@ -452,15 +516,31 @@ abstract class PHP extends Emitter {
 
     $result->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
     if (isset($property->expression)) {
-      $result->out->write('=');
-      $this->emitOne($result, $property->expression);
+      if ($this->isConstant($property->expression)) {
+        $result->out->write('=');
+        $this->emitOne($result, $property->expression);
+      } else if (in_array('static', $property->modifiers)) {
+        $result->locals[0]['self::$'.$property->name]= $property->expression;
+      } else {
+        $result->locals[1]['$this->'.$property->name]= $property->expression;
+      }
     }
     $result->out->write(';');
   }
 
   protected function emitMethod($result, $method) {
+
+    // Include non-static initializations for members in constructor, removing
+    // them to signal emitClass() no constructor needs to be generated.
+    if ('__construct' === $method->name && isset($result->locals[1])) {
+      $locals= ['this' => true, 1 => $result->locals[1]];
+      $result->locals[1]= [];
+    } else {
+      $locals= ['this' => true, 1 => []];
+    }
     $result->stack[]= $result->locals;
-    $result->locals= ['this' => true];
+    $result->locals= $locals;
+
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => $method->annotations,
@@ -469,11 +549,17 @@ abstract class PHP extends Emitter {
       DETAIL_ARGUMENTS   => []
     ];
 
-    $declare= $promote= $params= '';
+    $result->out->write(implode(' ', $method->modifiers).' function '.$method->name);
+    $this->emitSignature($result, $method->signature);
+
+    $promoted= '';
     foreach ($method->signature->parameters as $param) {
+      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
+      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
+
       if (isset($param->promote)) {
-        $declare.= $param->promote.' $'.$param->name.';';
-        $promote.= '$this->'.$param->name.'= '.($param->reference ? '&$' : '$').$param->name.';';
+        $promoted.= $param->promote.' $'.$param->name.';';
+        $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
         $result->meta[0][self::PROPERTY][$param->name]= [
           DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
           DETAIL_ANNOTATIONS => [],
@@ -482,21 +568,22 @@ abstract class PHP extends Emitter {
           DETAIL_ARGUMENTS   => []
         ];
       }
-      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
-      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
+
+      if (isset($param->default) && !$this->isConstant($param->default)) {
+        $meta[DETAIL_TARGET_ANNO][$param->name]['default']= [$param->default];
+      }
     }
-    $result->out->write($declare);
-    $result->out->write(implode(' ', $method->modifiers).' function '.$method->name);
-    $this->emitSignature($result, $method->signature);
 
     if (null === $method->body) {
       $result->out->write(';');
     } else {
-      $result->out->write(' {'.$promote);
+      $result->out->write(' {');
+      $this->emitInitializations($result, $result->locals[1]);
       $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
 
+    $result->out->write($promoted);
     $result->meta[0][self::METHOD][$method->name]= $meta;
     $result->locals= array_pop($result->stack);
   }
