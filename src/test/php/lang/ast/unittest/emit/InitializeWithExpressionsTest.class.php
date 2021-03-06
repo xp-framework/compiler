@@ -1,13 +1,14 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
-use unittest\{Assert, Expect, Test, Values};
+use unittest\{Assert, Test, Values};
 
 /**
  * Initialize parameters and properties with arbitrary expressions
  *
  * @see  https://github.com/xp-framework/compiler/pull/104
  * @see  https://wiki.php.net/rfc/new_in_initializers
+ * @see  https://wiki.php.net/rfc/calls_in_constant_expressions
  */
 class InitializeWithExpressionsTest extends EmittingTest {
 
@@ -15,6 +16,8 @@ class InitializeWithExpressionsTest extends EmittingTest {
   private function expressions() {
     yield ['"test"', 'test'];
     yield ['[1, 2, 3]', [1, 2, 3]];
+    yield ['1 << 2', 1 << 2];
+    yield ['strlen("Test")', strlen('Test')];
     yield ['MODIFIER_PUBLIC', MODIFIER_PUBLIC];
     yield ['self::INITIAL', 'initial'];
     yield ['Handle::$DEFAULT', Handle::$DEFAULT];
@@ -32,6 +35,18 @@ class InitializeWithExpressionsTest extends EmittingTest {
         return $this->h;
       }
     }', $code)));
+  }
+
+  #[Test]
+  public function using_functions() {
+    $r= $this->run('class <T> {
+      private $h= fn($arg) => $arg->redirect(1);
+
+      public function run() {
+        return $this->h;
+      }
+    }');
+    Assert::equals(new Handle(1), $r(new Handle(0)));
   }
 
   #[Test]

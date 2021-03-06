@@ -16,6 +16,7 @@ class Handle implements \IDisposable {
 
   public function redirect($id) {
     $this->id= $id;
+    return $this;
   }
 
   public function read($bytes= 8192) {
