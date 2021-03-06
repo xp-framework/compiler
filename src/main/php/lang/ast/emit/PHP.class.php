@@ -289,7 +289,7 @@ abstract class PHP extends Emitter {
         $this->emitOne($result, $parameter->default);
       } else {
         $result->out->write('=null');
-        $result->locals['$']['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
+        $result->locals[1]['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
       }
     }
     $result->locals[$parameter->name]= true;
@@ -351,7 +351,7 @@ abstract class PHP extends Emitter {
 
   protected function emitClass($result, $class) {
     array_unshift($result->meta, []);
-    $result->locals= ['$' => [], '@' => []];
+    $result->locals= [[], []];
 
     $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
     $class->parent && $result->out->write(' extends '.$class->parent);
@@ -363,14 +363,14 @@ abstract class PHP extends Emitter {
 
     // Create constructor for property initializations to non-static scalars
     // which have not already been emitted inside constructor
-    if ($result->locals['$']) {
+    if ($result->locals[1]) {
       $result->out->write('public function __construct() {');
-      $this->emitInitializations($result, $result->locals['$']);
+      $this->emitInitializations($result, $result->locals[1]);
       $result->out->write('}');
     }
 
     $result->out->write('static function __init() {');
-    $this->emitInitializations($result, $result->locals['@']);
+    $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name.'::__init();');
   }
@@ -520,9 +520,9 @@ abstract class PHP extends Emitter {
         $result->out->write('=');
         $this->emitOne($result, $property->expression);
       } else if (in_array('static', $property->modifiers)) {
-        $result->locals['@']['self::$'.$property->name]= $property->expression;
+        $result->locals[0]['self::$'.$property->name]= $property->expression;
       } else {
-        $result->locals['$']['$this->'.$property->name]= $property->expression;
+        $result->locals[1]['$this->'.$property->name]= $property->expression;
       }
     }
     $result->out->write(';');
@@ -532,11 +532,11 @@ abstract class PHP extends Emitter {
 
     // Include non-static initializations for members in constructor, removing
     // them to signal emitClass() no constructor needs to be generated.
-    if ('__construct' === $method->name && isset($result->locals['$'])) {
-      $locals= ['this' => true, '$' => $result->locals['$']];
-      $result->locals['$']= [];
+    if ('__construct' === $method->name && isset($result->locals[1])) {
+      $locals= ['this' => true, 1 => $result->locals[1]];
+      $result->locals[1]= [];
     } else {
-      $locals= ['this' => true, '$' => []];
+      $locals= ['this' => true, 1 => []];
     }
     $result->stack[]= $result->locals;
     $result->locals= $locals;
@@ -556,7 +556,7 @@ abstract class PHP extends Emitter {
     foreach ($method->signature->parameters as $param) {
       if (isset($param->promote)) {
         $promoted.= $param->promote.' $'.$param->name.';';
-        $result->locals['$']['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
+        $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
         $result->meta[0][self::PROPERTY][$param->name]= [
           DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
           DETAIL_ANNOTATIONS => [],
@@ -573,7 +573,7 @@ abstract class PHP extends Emitter {
       $result->out->write(';');
     } else {
       $result->out->write(' {');
-      $this->emitInitializations($result, $result->locals['$']);
+      $this->emitInitializations($result, $result->locals[1]);
       $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
