@@ -27,7 +27,7 @@ class InitializeWithExpressionsTest extends EmittingTest {
   }
 
   #[Test, Values('expressions')]
-  public function property($code, $expected) {
+  public function property($declaration, $expected) {
     Assert::equals($expected, $this->run(sprintf('use lang\ast\unittest\emit\Handle; class <T> {
       const INITIAL= "initial";
       private $h= %s;
@@ -35,18 +35,18 @@ class InitializeWithExpressionsTest extends EmittingTest {
       public function run() {
         return $this->h;
       }
-    }', $code)));
+    }', $declaration)));
   }
 
-  #[Test]
-  public function using_functions() {
-    $r= $this->run('class <T> {
-      private $h= fn($arg) => $arg->redirect(1);
+  #[Test, Values(['fn($arg) => $arg->redirect(1)', 'function($arg) { return $arg->redirect(1); }'])]
+  public function using_closures($declaration) {
+    $r= $this->run(sprintf('class <T> {
+      private $h= %s;
 
       public function run() {
         return $this->h;
       }
-    }');
+    }', $declaration));
     Assert::equals(new Handle(1), $r(new Handle(0)));
   }
 
@@ -61,7 +61,6 @@ class InitializeWithExpressionsTest extends EmittingTest {
     }');
     Assert::equals(new Handle(1), $r->pipe(new Handle(0)));
   }
-
 
   #[Test]
   public function property_initialization_accessible_inside_constructor() {
