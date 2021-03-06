@@ -150,6 +150,16 @@ class InitializeWithExpressionsTest extends EmittingTest {
   }
 
   #[Test]
+  public function parameter_default_reflective_access() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run($h= new Handle(0)) {
+        return typeof($this)->getMethod("run")->getParameter(0)->getDefaultValue();
+      }
+    }');
+    Assert::equals(new Handle(0), $r);
+  }
+
+  #[Test]
   public function property_reference_as_parameter_default() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       private static $h= new Handle(0);

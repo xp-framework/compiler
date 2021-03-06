@@ -554,6 +554,9 @@ abstract class PHP extends Emitter {
 
     $promoted= '';
     foreach ($method->signature->parameters as $param) {
+      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
+      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
+
       if (isset($param->promote)) {
         $promoted.= $param->promote.' $'.$param->name.';';
         $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
@@ -565,8 +568,10 @@ abstract class PHP extends Emitter {
           DETAIL_ARGUMENTS   => []
         ];
       }
-      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
-      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
+
+      if (isset($param->default) && !$this->isConstant($param->default)) {
+        $meta[DETAIL_TARGET_ANNO][$param->name]['default']= [$param->default];
+      }
     }
 
     if (null === $method->body) {
