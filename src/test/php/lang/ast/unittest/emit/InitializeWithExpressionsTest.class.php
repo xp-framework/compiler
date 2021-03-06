@@ -23,12 +23,13 @@ class InitializeWithExpressionsTest extends EmittingTest {
     yield ['self::INITIAL', 'initial'];
     yield ['Handle::$DEFAULT', Handle::$DEFAULT];
     yield ['new Handle(0)', new Handle(0)];
+    yield ['new FileInput(new Handle(0))', new FileInput(new Handle(0))];
     yield ['[new Handle(0)]', [new Handle(0)]];
   }
 
   #[Test, Values('expressions')]
   public function property($declaration, $expected) {
-    Assert::equals($expected, $this->run(sprintf('use lang\ast\unittest\emit\Handle; class <T> {
+    Assert::equals($expected, $this->run(sprintf('use lang\ast\unittest\emit\{FileInput, Handle}; class <T> {
       const INITIAL= "initial";
       private $h= %s;
 
