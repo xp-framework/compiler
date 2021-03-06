@@ -103,4 +103,16 @@ class InitializeWithNewTest extends EmittingTest {
     }');
     Assert::equals(new Handle(0), $r);
   }
+
+  #[Test]
+  public function static_variable() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run() {
+        static $h= new Handle(0);
+
+        return $h;
+      }
+    }');
+    Assert::equals(new Handle(0), $r);
+  }
 }
