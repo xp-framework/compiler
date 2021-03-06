@@ -51,6 +51,19 @@ class InitializeWithExpressionsTest extends EmittingTest {
   }
 
   #[Test]
+  public function using_anonymous_classes() {
+    $r= $this->run('class <T> {
+      private $h= new class() { public function pipe($h) { return $h->redirect(1); } };
+
+      public function run() {
+        return $this->h;
+      }
+    }');
+    Assert::equals(new Handle(1), $r->pipe(new Handle(0)));
+  }
+
+
+  #[Test]
   public function property_initialization_accessible_inside_constructor() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       private $h= new Handle(0);
