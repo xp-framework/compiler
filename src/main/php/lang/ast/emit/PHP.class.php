@@ -32,7 +32,7 @@ abstract class PHP extends Emitter {
   }
 
   /**
-   * Returns whether a given node is a so-called "static scalar" expression:
+   * Returns whether a given node is a constant expression:
    *
    * - Any literal
    * - Arrays where all members are literals
@@ -42,12 +42,12 @@ abstract class PHP extends Emitter {
    * @param  lang.ast.Node $node
    * @return bool
    */
-  protected function staticScalar($node) {
+  protected function isConstant($node) {
     if ($node instanceof Literal) {
       return true;
     } else if ($node instanceof ArrayLiteral) {
       foreach ($node->values as $node) {
-        if (!$this->staticScalar($node)) return false;
+        if (!$this->isConstant($node)) return false;
       }
       return true;
     } else if ($node instanceof ScopeExpression) {
@@ -185,7 +185,7 @@ abstract class PHP extends Emitter {
     foreach ($static->initializations as $variable => $initial) {
       $result->out->write('static $'.$variable);
       if ($initial) {
-        if ($this->staticScalar($initial)) {
+        if ($this->isConstant($initial)) {
           $result->out->write('=');
           $this->emitOne($result, $initial);
         } else {
@@ -281,7 +281,7 @@ abstract class PHP extends Emitter {
       $result->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
     }
     if ($parameter->default) {
-      if ($this->staticScalar($parameter->default)) {
+      if ($this->isConstant($parameter->default)) {
         $result->out->write('=');
         $this->emitOne($result, $parameter->default);
       } else {
@@ -513,7 +513,7 @@ abstract class PHP extends Emitter {
 
     $result->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
     if (isset($property->expression)) {
-      if ($this->staticScalar($property->expression)) {
+      if ($this->isConstant($property->expression)) {
         $result->out->write('=');
         $this->emitOne($result, $property->expression);
       } else if (in_array('static', $property->modifiers)) {
