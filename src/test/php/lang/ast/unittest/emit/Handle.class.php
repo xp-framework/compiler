@@ -9,6 +9,10 @@ class Handle implements \IDisposable {
 
   public function __construct($id) { $this->id= $id; }
 
+  public function redirect($id) {
+    $this->id= $id;
+  }
+
   public function read($bytes= 8192) {
     self::$called[]= 'read@'.$this->id;
 
