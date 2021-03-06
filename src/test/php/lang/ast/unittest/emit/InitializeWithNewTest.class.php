@@ -81,4 +81,26 @@ class InitializeWithNewTest extends EmittingTest {
     }');
     Assert::equals(new Handle(0), $r);
   }
+
+  #[Test]
+  public function typed_proprety() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      private Handle $h= new Handle(0);
+
+      public function run() {
+        return $this->h;
+      }
+    }');
+    Assert::equals(new Handle(0), $r);
+  }
+
+  #[Test]
+  public function typed_parameter() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run(Handle $h= new Handle(0)) {
+        return $h;
+      }
+    }');
+    Assert::equals(new Handle(0), $r);
+  }
 }
