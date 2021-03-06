@@ -39,6 +39,18 @@ class InitializeWithExpressionsTest extends EmittingTest {
     }', $declaration)));
   }
 
+  #[Test, Values('expressions')]
+  public function reflective_access_to_property($declaration, $expected) {
+    Assert::equals($expected, $this->run(sprintf('use lang\ast\unittest\emit\{FileInput, Handle}; class <T> {
+      const INITIAL= "initial";
+      private $h= %s;
+
+      public function run() {
+        return typeof($this)->getField("h")->get($this);
+      }
+    }', $declaration)));
+  }
+
   #[Test, Values(['fn($arg) => $arg->redirect(1)', 'function($arg) { return $arg->redirect(1); }'])]
   public function using_closures($declaration) {
     $r= $this->run(sprintf('class <T> {
