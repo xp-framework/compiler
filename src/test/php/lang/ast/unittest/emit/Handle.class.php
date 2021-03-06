@@ -4,8 +4,13 @@ use lang\IllegalArgumentException;
 
 /** Used by `UsingTest` */
 class Handle implements \IDisposable {
+  public static $DEFAULT;
   public static $called= [];
   private $id;
+
+  static function __static() {
+    self::$DEFAULT= new Handle(0);
+  }
 
   public function __construct($id) { $this->id= $id; }
 
