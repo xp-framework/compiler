@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.2.0 / 2021-03-06
+
+* Merged PR #104: Support arbitrary expressions in property initializations
+  and parameter defaults
+  (@thekid)
+
 ## 6.1.1 / 2021-01-04
 
 * Fixed issue #102: Call to a member function children()... - @thekid
