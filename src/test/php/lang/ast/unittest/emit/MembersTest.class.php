@@ -172,6 +172,19 @@ class MembersTest extends EmittingTest {
   }
 
   #[Test]
+  public function allow_constant_syntax_for_members() {
+    $r= $this->run('use lang\{Enum, CommandLine}; class <T> extends Enum {
+      public static $MON, $TUE, $WED, $THU, $FRI, $SAT, $SUN;
+
+      public function run() {
+        return [self::MON->name(), <T>::TUE->name(), CommandLine::WINDOWS->name()];
+      }
+    }');
+
+    Assert::equals(['MON', 'TUE', 'WINDOWS'], $r);
+  }
+
+  #[Test]
   public function method_with_static() {
     $r= $this->run('class <T> {
       public function run() {

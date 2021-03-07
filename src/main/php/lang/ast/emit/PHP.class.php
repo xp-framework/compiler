@@ -350,6 +350,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitClass($result, $class) {
+    array_unshift($result->type, $class);
     array_unshift($result->meta, []);
     $result->locals= [[], []];
 
@@ -373,6 +374,7 @@ abstract class PHP extends Emitter {
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name.'::__init();');
+    array_shift($result->type);
   }
 
   /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
@@ -909,6 +911,8 @@ abstract class PHP extends Emitter {
       $result->out->write(')?'.$t.'::');
       $this->emitOne($result, $scope->member);
       $result->out->write(':null');
+    } else if ($scope->member instanceof Literal && '$enum' === $result->lookup($scope->type)->kind()) {
+      $result->out->write($scope->type.'::$'.$scope->member->expression);
     } else {
       $result->out->write($scope->type.'::');
       $this->emitOne($result, $scope->member);
