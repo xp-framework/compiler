@@ -50,4 +50,39 @@ class EnumTest extends EmittingTest {
 
     Assert::equals('ASC', $t->getMethod('run')->invoke(null));
   }
+
+  #[Test]
+  public function enum_values() {
+    $t= $this->type('use lang\Enum; enum <T> {
+      case Hearts;
+      case Diamonds;
+      case Clubs;
+      case Spades;
+
+      public static function run() {
+        return Enum::valuesOf(self::class);
+      }
+    }');
+
+    Assert::equals(
+      ['Hearts', 'Diamonds', 'Clubs', 'Spades'],
+      array_map(function($suit) { return $suit->name; }, $t->getMethod('run')->invoke(null))
+    );
+  }
+
+  #[Test]
+  public function enum_value() {
+    $t= $this->type('use lang\Enum; enum <T> {
+      case Hearts;
+      case Diamonds;
+      case Clubs;
+      case Spades;
+
+      public static function run() {
+        return Enum::valueOf(self::class, "Hearts")->name;
+      }
+    }');
+
+    Assert::equals('Hearts', $t->getMethod('run')->invoke(null));
+  }
 }
