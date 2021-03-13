@@ -363,7 +363,7 @@ abstract class PHP extends Emitter {
     array_unshift($result->meta, []);
     $result->locals= [[], []];
 
-    $result->out->write('final class '.$this->declaration($enum->name).' implements \UnitEnum');
+    $result->out->write('final class '.$this->declaration($enum->name).' implements \\'.($enum->base ? 'BackedEnum' : 'UnitEnum'));
     $enum->implements && $result->out->write(', '.implode(', ', $enum->implements));
     $result->out->write('{');
 
@@ -373,8 +373,28 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $member);
     }
 
-    // Name and constructor
-    $result->out->write('public $name; private function __construct($name) { $this->name= $name; }');
+    // Constructors
+    if ($enum->base) {
+      $result->out->write('public $name, $value;');
+      $result->out->write('private static $values= [];');
+      $result->out->write('private function __construct($name, $value) {
+        $this->name= $name;
+        $this->value= $value;
+        self::$values[$value]= $this;
+      }');
+      $result->out->write('public static function tryFrom($value) {
+        return self::$values[$value] ?? null;
+      }');
+      $result->out->write('public static function from($value) {
+        if ($r= self::$values[$value] ?? null) return $r;
+        throw new \ValueError("Not an enum value: ".\util\Objects::stringOf($value));
+      }');
+    } else {
+      $result->out->write('public $name;');
+      $result->out->write('private function __construct($name) {
+        $this->name= $name;
+      }');
+    }
 
     // Enum cases
     $result->out->write('public static function cases() { return [');
@@ -385,8 +405,16 @@ abstract class PHP extends Emitter {
 
     // Initializations
     $result->out->write('static function __init() {');
-    foreach ($cases as $case) {
-      $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
+    if ($enum->base) {
+      foreach ($cases as $case) {
+        $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'", ');
+        $this->emitOne($result, $case->expression);
+        $result->out->write(');');
+      }
+    } else {
+      foreach ($cases as $case) {
+        $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
+      }
     }
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
