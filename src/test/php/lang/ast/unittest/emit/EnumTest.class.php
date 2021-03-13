@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\Enum;
 use unittest\actions\VerifyThat;
 use unittest\{Assert, Action, Test};
 
@@ -66,6 +67,20 @@ class EnumTest extends EmittingTest {
     }');
 
     Assert::equals('ASC', $t->getMethod('run')->invoke(null));
+  }
+
+  #[Test]
+  public function overwritten_parameter_default_value() {
+    $t= $this->type('enum <T> {
+      case ASC;
+      case DESC;
+
+      public static function run($order= self::ASC) {
+        return $order->name;
+      }
+    }');
+
+    Assert::equals('DESC', $t->getMethod('run')->invoke(null, [Enum::valueOf($t, 'DESC')]));
   }
 
   #[Test]
@@ -148,36 +163,28 @@ class EnumTest extends EmittingTest {
 
   #[Test]
   public function enum_values() {
-    $t= $this->type('use lang\Enum; enum <T> {
+    $t= $this->type('enum <T> {
       case Hearts;
       case Diamonds;
       case Clubs;
       case Spades;
-
-      public static function run() {
-        return Enum::valuesOf(self::class);
-      }
     }');
 
     Assert::equals(
       ['Hearts', 'Diamonds', 'Clubs', 'Spades'],
-      array_map(function($suit) { return $suit->name; }, $t->getMethod('run')->invoke(null))
+      array_map(function($suit) { return $suit->name; }, Enum::valuesOf($t))
     );
   }
 
   #[Test]
   public function enum_value() {
-    $t= $this->type('use lang\Enum; enum <T> {
+    $t= $this->type('enum <T> {
       case Hearts;
       case Diamonds;
       case Clubs;
       case Spades;
-
-      public static function run() {
-        return Enum::valueOf(self::class, "Hearts")->name;
-      }
     }');
 
-    Assert::equals('Hearts', $t->getMethod('run')->invoke(null));
+    Assert::equals('Hearts', Enum::valueOf($t, 'Hearts')->name);
   }
 }
