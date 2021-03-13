@@ -1,6 +1,6 @@
 <?php namespace lang\ast;
 
-use lang\ast\types\{Declaration, Reflection};
+use lang\ast\emit\{Declaration, Reflection};
 
 class Result {
   public $out;
@@ -36,7 +36,7 @@ class Result {
    * Looks up a given type 
    *
    * @param  string $type
-   * @return lang.ast.types.Type
+   * @return lang.ast.emit.Type
    */
   public function lookup($type) {
     if ('self' === $type || 'static' === $type || $type === $this->type[0]->name) {

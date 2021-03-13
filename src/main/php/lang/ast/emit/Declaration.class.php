@@ -1,4 +1,4 @@
-<?php namespace lang\ast\types;
+<?php namespace lang\ast\emit;
 
 use lang\ast\nodes\{EnumCase, Property};
 

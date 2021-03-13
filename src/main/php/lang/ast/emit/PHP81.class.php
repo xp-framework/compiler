@@ -1,7 +1,6 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\types\Type;
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
 
 /**
