@@ -159,6 +159,29 @@ class EnumTest extends EmittingTest {
   }
 
   #[Test]
+  public function declare_method_on_enum() {
+    $t= $this->type('enum <T> {
+      case Hearts;
+      case Diamonds;
+      case Clubs;
+      case Spades;
+
+      public function color() {
+        return match ($this) {
+          self::Hearts, self::Diamonds => "red",
+          self::Clubs, self::Spaces    => "black",
+        };
+      }
+
+      public static function run() {
+        return self::Hearts->color();
+      }
+    }');
+
+    Assert::equals('red', $t->getMethod('run')->invoke(null));
+  }
+
+  #[Test]
   public function enum_values() {
     $t= $this->type('enum <T> {
       case Hearts;
