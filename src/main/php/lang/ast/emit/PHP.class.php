@@ -40,21 +40,26 @@ abstract class PHP extends Emitter {
    * - Binary expression where left- and right hand side are literals
    *
    * @see    https://wiki.php.net/rfc/const_scalar_exprs
+   * @param  lang.ast.Result $result
    * @param  lang.ast.Node $node
    * @return bool
    */
-  protected function isConstant($node) {
+  protected function isConstant($result, $node) {
     if ($node instanceof Literal) {
       return true;
     } else if ($node instanceof ArrayLiteral) {
       foreach ($node->values as $node) {
-        if (!$this->isConstant($node)) return false;
+        if (!$this->isConstant($result, $node)) return false;
       }
       return true;
     } else if ($node instanceof ScopeExpression) {
-      return $node->member instanceof Literal;
+      return (
+        $node->member instanceof Literal &&
+        is_string($node->type) &&
+        !$result->lookup($node->type)->rewriteEnumCase($node->member->expression)
+      );
     } else if ($node instanceof BinaryExpression) {
-      return $this->isConstant($node->left) && $this->isConstant($node->right);
+      return $this->isConstant($result, $node->left) && $this->isConstant($result, $node->right);
     }
     return false;
   }
@@ -188,7 +193,7 @@ abstract class PHP extends Emitter {
     foreach ($static->initializations as $variable => $initial) {
       $result->out->write('static $'.$variable);
       if ($initial) {
-        if ($this->isConstant($initial)) {
+        if ($this->isConstant($result, $initial)) {
           $result->out->write('=');
           $this->emitOne($result, $initial);
         } else {
@@ -284,7 +289,7 @@ abstract class PHP extends Emitter {
       $result->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
     }
     if ($parameter->default) {
-      if ($this->isConstant($parameter->default)) {
+      if ($this->isConstant($result, $parameter->default)) {
         $result->out->write('=');
         $this->emitOne($result, $parameter->default);
       } else {
@@ -349,7 +354,76 @@ abstract class PHP extends Emitter {
     $this->emitOne($result, $lambda->body);
   }
 
+  protected function emitEnumCase($result, $case) {
+    $result->out->write('public static $'.$case->name.';');
+  }
+
+  protected function emitEnum($result, $enum) {
+    array_unshift($result->type, $enum);
+    array_unshift($result->meta, []);
+    $result->locals= [[], []];
+
+    $result->out->write('final class '.$this->declaration($enum->name).' implements \\'.($enum->base ? 'BackedEnum' : 'UnitEnum'));
+    $enum->implements && $result->out->write(', '.implode(', ', $enum->implements));
+    $result->out->write('{');
+
+    $cases= [];
+    foreach ($enum->body as $member) {
+      if ($member->is('enumcase')) $cases[]= $member;
+      $this->emitOne($result, $member);
+    }
+
+    // Constructors
+    if ($enum->base) {
+      $result->out->write('public $name, $value;');
+      $result->out->write('private static $values= [];');
+      $result->out->write('private function __construct($name, $value) {
+        $this->name= $name;
+        $this->value= $value;
+        self::$values[$value]= $this;
+      }');
+      $result->out->write('public static function tryFrom($value) {
+        return self::$values[$value] ?? null;
+      }');
+      $result->out->write('public static function from($value) {
+        if ($r= self::$values[$value] ?? null) return $r;
+        throw new \Error(\util\Objects::stringOf($value)." is not a valid backing value for enum \"".self::class."\"");
+      }');
+    } else {
+      $result->out->write('public $name;');
+      $result->out->write('private function __construct($name) {
+        $this->name= $name;
+      }');
+    }
+
+    // Enum cases
+    $result->out->write('public static function cases() { return [');
+    foreach ($cases as $case) {
+      $result->out->write('self::$'.$case->name.', ');
+    }
+    $result->out->write(']; }');
+
+    // Initializations
+    $result->out->write('static function __init() {');
+    if ($enum->base) {
+      foreach ($cases as $case) {
+        $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'", ');
+        $this->emitOne($result, $case->expression);
+        $result->out->write(');');
+      }
+    } else {
+      foreach ($cases as $case) {
+        $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
+      }
+    }
+    $this->emitInitializations($result, $result->locals[0]);
+    $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
+    $result->out->write('}} '.$enum->name.'::__init();');
+    array_shift($result->type);
+  }
+
   protected function emitClass($result, $class) {
+    array_unshift($result->type, $class);
     array_unshift($result->meta, []);
     $result->locals= [[], []];
 
@@ -373,6 +447,7 @@ abstract class PHP extends Emitter {
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name.'::__init();');
+    array_shift($result->type);
   }
 
   /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
@@ -516,7 +591,7 @@ abstract class PHP extends Emitter {
 
     $result->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
     if (isset($property->expression)) {
-      if ($this->isConstant($property->expression)) {
+      if ($this->isConstant($result, $property->expression)) {
         $result->out->write('=');
         $this->emitOne($result, $property->expression);
       } else if (in_array('static', $property->modifiers)) {
@@ -569,7 +644,7 @@ abstract class PHP extends Emitter {
         ];
       }
 
-      if (isset($param->default) && !$this->isConstant($param->default)) {
+      if (isset($param->default) && !$this->isConstant($result, $param->default)) {
         $meta[DETAIL_TARGET_ANNO][$param->name]['default']= [$param->default];
       }
     }
@@ -909,6 +984,8 @@ abstract class PHP extends Emitter {
       $result->out->write(')?'.$t.'::');
       $this->emitOne($result, $scope->member);
       $result->out->write(':null');
+    } else if ($scope->member instanceof Literal && $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)) {
+      $result->out->write($scope->type.'::$'.$scope->member->expression);
     } else {
       $result->out->write($scope->type.'::');
       $this->emitOne($result, $scope->member);
