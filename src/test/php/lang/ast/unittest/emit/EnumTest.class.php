@@ -8,6 +8,11 @@ use unittest\{Assert, Action, Test};
 class EnumTest extends EmittingTest {
 
   #[Test]
+  public function enum_type() {
+    Assert::true($this->type('enum <T> { }')->isEnum());
+  }
+
+  #[Test]
   public function name_property() {
     $t= $this->type('enum <T> {
       case Hearts;
