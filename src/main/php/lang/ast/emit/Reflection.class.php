@@ -4,8 +4,11 @@ use lang\{Enum, ClassNotFoundException};
 
 class Reflection extends Type {
   private $reflect;
+  private static $UNITENUM;
 
-  static function __static() { }
+  static function __static() {
+    self::$UNITENUM= interface_exists(\UnitEnum::class, false);  // Compatibility with XP < 10.8.0
+  }
 
   /** @param string $type */
   public function __construct($type) {
@@ -28,7 +31,7 @@ class Reflection extends Type {
   public function rewriteEnumCase($member) {
     if ($this->reflect->isSubclassOf(Enum::class)) {
       return $this->reflect->getStaticPropertyValue($member, null) instanceof Enum;
-    } else if (!self::$ENUMS && $this->reflect->isSubclassOf(\UnitEnum::class)) {
+    } else if (!self::$ENUMS && self::$UNITENUM && $this->reflect->isSubclassOf(\UnitEnum::class)) {
       $value= $this->reflect->getConstant($member) ?: $this->reflect->getStaticPropertyValue($member, null);
       return $value instanceof \UnitEnum;
     }
