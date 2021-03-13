@@ -102,13 +102,9 @@ class EnumTest extends EmittingTest {
     $t= $this->type('enum <T>: int {
       case NO  = 0;
       case YES = 1;
-
-      public static function run($arg) {
-        return self::from($arg)->name;
-      }
     }');
 
-    Assert::equals($expected, $t->getMethod('run')->invoke(null, [$arg]));
+    Assert::equals($expected, $t->getMethod('from')->invoke(null, [$arg])->name);
   }
 
   #[Test, Values([['asc', 'ASC'], ['desc', 'DESC']])]
@@ -116,13 +112,9 @@ class EnumTest extends EmittingTest {
     $t= $this->type('enum <T>: string {
       case ASC  = "asc";
       case DESC = "desc";
-
-      public static function run($arg) {
-        return self::from($arg)->name;
-      }
     }');
 
-    Assert::equals($expected, $t->getMethod('run')->invoke(null, [$arg]));
+    Assert::equals($expected, $t->getMethod('from')->invoke(null, [$arg])->name);
   }
 
   #[Test]
