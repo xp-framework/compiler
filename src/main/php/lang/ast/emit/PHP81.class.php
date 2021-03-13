@@ -41,6 +41,9 @@ class PHP81 extends PHP {
   }
 
   protected function emitEnumCase($result, $case) {
+
+    // TODO: Once enum PR is merged, remove this conditional and refactor the
+    // code into a `RewriteEnums` trait to be included for all other versions
     if (Type::$ENUMS) {
       $result->out->write('case '.$case->name);
       if ($case->expression) {
@@ -54,6 +57,9 @@ class PHP81 extends PHP {
   }
 
   protected function emitEnum($result, $enum) {
+
+    // TODO: Once enum PR is merged, remove this conditional and refactor the
+    // code into a `RewriteEnums` trait to be included for all other versions
     if (Type::$ENUMS) {
       array_unshift($result->type, $enum);
       array_unshift($result->meta, []);
