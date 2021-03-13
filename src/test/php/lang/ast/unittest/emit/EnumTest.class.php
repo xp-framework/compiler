@@ -89,7 +89,7 @@ class EnumTest extends EmittingTest {
         try {
           self::from("illegal");
           throw new IllegalStateException("No exception raised");
-        } catch (\ValueError $expected) {
+        } catch (\Exception $expected) {
           return $expected->getMessage();
         }
       }
