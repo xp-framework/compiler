@@ -81,21 +81,24 @@ class EnumTest extends EmittingTest {
 
   #[Test]
   public function backed_enum_from_nonexistant() {
-    $t= $this->type('enum <T>: string {
+    $t= $this->type('use lang\IllegalStateException; enum <T>: string {
       case ASC  = "asc";
       case DESC = "desc";
 
       public static function run() {
         try {
           self::from("illegal");
-          throw new \lang\IllegalStateException("No exception raised");
+          throw new IllegalStateException("No exception raised");
         } catch (\ValueError $expected) {
           return $expected->getMessage();
         }
       }
     }');
 
-    Assert::equals('Not an enum value: "illegal"', $t->getMethod('run')->invoke(null));
+    Assert::equals(
+      '"illegal" is not a valid backing value for enum "'.$t->literal().'"',
+      $t->getMethod('run')->invoke(null)
+    );
   }
 
   #[Test, Values([['asc', 'ASC'], ['desc', 'DESC'], ['illegal', null]])]

@@ -387,7 +387,7 @@ abstract class PHP extends Emitter {
       }');
       $result->out->write('public static function from($value) {
         if ($r= self::$values[$value] ?? null) return $r;
-        throw new \ValueError("Not an enum value: ".\util\Objects::stringOf($value));
+        throw new \ValueError(\util\Objects::stringOf($value)." is not a valid backing value for enum \"".self::class."\"");
       }');
     } else {
       $result->out->write('public $name;');
