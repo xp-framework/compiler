@@ -4,7 +4,9 @@ abstract class Type {
   public static $ENUMS;
 
   static function __static() {
-    self::$ENUMS= class_exists(\ReflectionEnum::class, false); // TODO remove once enum PR is merged
+
+    // TODO: Check PHP version ID once enum PR is merged
+    self::$ENUMS= class_exists(\ReflectionEnum::class, false);
   }
 
   /** @return string */
