@@ -65,8 +65,22 @@ class EnumTest extends EmittingTest {
     Assert::equals('desc', $t->getMethod('run')->invoke(null));
   }
 
+  #[Test, Values([[0, 'NO'], [1, 'YES']])]
+  public function backed_enum_from_int($arg, $expected) {
+    $t= $this->type('enum <T>: int {
+      case NO  = 0;
+      case YES = 1;
+
+      public static function run($arg) {
+        return self::from($arg)->name;
+      }
+    }');
+
+    Assert::equals($expected, $t->getMethod('run')->invoke(null, [$arg]));
+  }
+
   #[Test, Values([['asc', 'ASC'], ['desc', 'DESC']])]
-  public function backed_enum_from($arg, $expected) {
+  public function backed_enum_from_string($arg, $expected) {
     $t= $this->type('enum <T>: string {
       case ASC  = "asc";
       case DESC = "desc";
@@ -89,7 +103,7 @@ class EnumTest extends EmittingTest {
         try {
           self::from("illegal");
           throw new IllegalStateException("No exception raised");
-        } catch (\Exception $expected) {
+        } catch (\Throwable $expected) {
           return $expected->getMessage();
         }
       }
