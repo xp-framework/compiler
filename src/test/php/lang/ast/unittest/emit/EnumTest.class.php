@@ -182,6 +182,18 @@ class EnumTest extends EmittingTest {
   }
 
   #[Test]
+  public function enum_implementing_interface() {
+    $t= $this->type('use lang\Closeable; enum <T> implements Closeable {
+      case File;
+      case Stream;
+
+      public function close() { }
+    }');
+
+    Assert::true($t->isSubclassOf('lang.Closeable'));
+  }
+
+  #[Test]
   public function enum_values() {
     $t= $this->type('enum <T> {
       case Hearts;
