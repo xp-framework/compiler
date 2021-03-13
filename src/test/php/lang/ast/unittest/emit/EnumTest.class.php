@@ -194,6 +194,18 @@ class EnumTest extends EmittingTest {
   }
 
   #[Test]
+  public function enum_annotations() {
+    $t= $this->type('#[Test] enum <T> { }');
+    Assert::equals(['test' => null], $t->getAnnotations());
+  }
+
+  #[Test, Ignore('XP core reflection does not support constant annotations')]
+  public function enum_member_annotations() {
+    $t= $this->type('enum <T> { #[Test] case ONE; }');
+    Assert::equals(['test' => null], $t->getConstant('ONE')->getAnnotations());
+  }
+
+  #[Test]
   public function enum_values() {
     $t= $this->type('enum <T> {
       case Hearts;
