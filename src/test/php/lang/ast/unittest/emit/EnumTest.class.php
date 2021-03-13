@@ -38,6 +38,23 @@ class EnumTest extends EmittingTest {
   }
 
   #[Test]
+  public function cases_method_does_not_yield_constants() {
+    $t= $this->type('enum <T> {
+      case Hearts;
+      case Diamonds;
+      case Clubs;
+      case Spades;
+
+      const COLORS = ["red", "black"];
+    }');
+
+    Assert::equals(
+      ['Hearts', 'Diamonds', 'Clubs', 'Spades'],
+      array_map(function($suit) { return $suit->name; }, $t->getMethod('cases')->invoke(null))
+    );
+  }
+
+  #[Test]
   public function used_as_parameter_default() {
     $t= $this->type('enum <T> {
       case ASC;

@@ -2,8 +2,10 @@
 
 use lang\{Enum, ClassNotFoundException};
 
-class Reflection implements Type {
+class Reflection extends Type {
   private $reflect;
+
+  static function __static() { }
 
   /** @param string $type */
   public function __construct($type) {
@@ -21,13 +23,12 @@ class Reflection implements Type {
    * Returns whether a given member is an enum case
    *
    * @param  string $member
-   * @param  bool $native Whether enums are natively supported
    * @return bool
    */
-  public function rewriteEnumCase($member, $native= false) {
+  public function rewriteEnumCase($member) {
     if ($this->reflect->isSubclassOf(Enum::class)) {
       return $this->reflect->getStaticPropertyValue($member, null) instanceof Enum;
-    } else if (!$native && $this->reflect->isSubclassOf(\UnitEnum::class)) {
+    } else if (!self::$ENUMS && $this->reflect->isSubclassOf(\UnitEnum::class)) {
       $value= $this->reflect->getConstant($member) ?: $this->reflect->getStaticPropertyValue($member, null);
       return $value instanceof \UnitEnum;
     }

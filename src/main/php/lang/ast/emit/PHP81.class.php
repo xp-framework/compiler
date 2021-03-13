@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{Literal, Variable};
+use lang\ast\types\Type;
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
 
 /**
@@ -11,12 +11,6 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, Is
  */
 class PHP81 extends PHP {
   use RewriteBlockLambdaExpressions;
-
-  private static $ENUMS;
-
-  static function __static() {
-    self::$ENUMS= class_exists(\ReflectionEnum::class, false); // TODO remove once enum PR is merged
-  }
 
   /** Sets up type => literal mappings */
   public function __construct() {
@@ -38,39 +32,6 @@ class PHP81 extends PHP {
     ];
   }
 
-  /**
-   * Returns whether a given node is a constant expression:
-   *
-   * - Any literal
-   * - Arrays where all members are literals
-   * - Scope expressions with literal members (self::class, T::const)
-   * - Binary expression where left- and right hand side are literals
-   *
-   * @see    https://wiki.php.net/rfc/const_scalar_exprs
-   * @param  lang.ast.Result $result
-   * @param  lang.ast.Node $node
-   * @return bool
-   */
-  protected function isConstant($result, $node) {
-    if ($node instanceof Literal) {
-      return true;
-    } else if ($node instanceof ArrayLiteral) {
-      foreach ($node->values as $node) {
-        if (!$this->isConstant($result, $node)) return false;
-      }
-      return true;
-    } else if ($node instanceof ScopeExpression) {
-      return (
-        $node->member instanceof Literal &&
-        is_string($node->type) &&
-        !$result->lookup($node->type)->rewriteEnumCase($node->member->expression, self::$ENUMS)
-      );
-    } else if ($node instanceof BinaryExpression) {
-      return $this->isConstant($result, $node->left) && $this->isConstant($result, $node->right);
-    }
-    return false;
-  }
-
   protected function emitArguments($result, $arguments) {
     $i= 0;
     foreach ($arguments as $name => $argument) {
@@ -80,28 +41,8 @@ class PHP81 extends PHP {
     }
   }
 
-  protected function emitScope($result, $scope) {
-    if ($scope->type instanceof Variable) {
-      $this->emitOne($result, $scope->type);
-      $result->out->write('::');
-      $this->emitOne($result, $scope->member);
-    } else if ($scope->type instanceof Node) {
-      $t= $result->temp();
-      $result->out->write('('.$t.'=');
-      $this->emitOne($result, $scope->type);
-      $result->out->write(')?'.$t.'::');
-      $this->emitOne($result, $scope->member);
-      $result->out->write(':null');
-    } else if ($scope->member instanceof Literal && $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression, self::$ENUMS)) {
-      $result->out->write($scope->type.'::$'.$scope->member->expression);
-    } else {
-      $result->out->write($scope->type.'::');
-      $this->emitOne($result, $scope->member);
-    }
-  }
-
   protected function emitEnumCase($result, $case) {
-    if (self::$ENUMS) {
+    if (Type::$ENUMS) {
       $result->out->write('case '.$case->name);
       if ($case->expression) {
         $result->out->write('=');
@@ -114,7 +55,7 @@ class PHP81 extends PHP {
   }
 
   protected function emitEnum($result, $enum) {
-    if (self::$ENUMS) {
+    if (Type::$ENUMS) {
       array_unshift($result->type, $enum);
       array_unshift($result->meta, []);
       $result->locals= [[], []];
