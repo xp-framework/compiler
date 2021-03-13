@@ -21,12 +21,13 @@ class Reflection implements Type {
    * Returns whether a given member is an enum case
    *
    * @param  string $member
+   * @param  bool $native Whether enums are natively supported
    * @return bool
    */
-  public function isEnumCase($member) {
+  public function rewriteEnumCase($member, $native= false) {
     if ($this->reflect->isSubclassOf(Enum::class)) {
       return $this->reflect->getStaticPropertyValue($member, null) instanceof Enum;
-    } else if ($this->reflect->isSubclassOf(\UnitEnum::class)) {
+    } else if (!$native && $this->reflect->isSubclassOf(\UnitEnum::class)) {
       $value= $this->reflect->getConstant($member) ?: $this->reflect->getStaticPropertyValue($member, null);
       return $value instanceof \UnitEnum;
     }

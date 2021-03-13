@@ -21,10 +21,11 @@ class Declaration implements Type {
    * Returns whether a given member is an enum case
    *
    * @param  string $member
+   * @param  bool $native Whether native enum support exists
    * @return bool
    */
-  public function isEnumCase($member) {
-    if ('enum' === $this->type->kind) {
+  public function rewriteEnumCase($member, $native= false) {
+    if (!$native && 'enum' === $this->type->kind) {
       return ($this->type->body[$member] ?? null) instanceof EnumCase;
     } else if ('class' === $this->type->kind && '\\lang\\Enum' === $this->type->parent) {
       return ($this->type->body['$'.$member] ?? null) instanceof Property;

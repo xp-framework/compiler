@@ -9,7 +9,8 @@ interface Type {
    * Returns whether a given member is an enum case
    *
    * @param  string $member
+   * @param  bool $native Whether native enum support exists
    * @return bool
    */
-  public function isEnumCase($member);
+  public function rewriteEnumCase($member, $native= false);
 }
