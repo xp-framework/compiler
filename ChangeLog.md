@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.3.0 / 2021-03-13
+
+* Merged PR #106: Compile PHP enums to PHP 7/8 lookalikes, PHP 8.1 native.
+  (@thekid)
+
 ## 6.2.0 / 2021-03-06
 
 * Merged PR #104: Support arbitrary expressions in property initializations
