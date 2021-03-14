@@ -957,10 +957,17 @@ abstract class PHP extends Emitter {
     $this->emitArguments($result, $new->arguments);
     $result->out->write(')');
 
-    $new->definition->parent && $result->out->write(' extends '.$new->definition->parent);
+    // Allow "extends self" to reference enclosing class (except if this
+    // class is an anonymous class!)
+    if ('self' === $new->definition->parent && $result->type[0]->name) {
+      $result->out->write(' extends '.$result->type[0]->name);
+    } else if ($new->definition->parent) {
+      $result->out->write(' extends '.$new->definition->parent);
+    }
     $new->definition->implements && $result->out->write(' implements '.implode(', ', $new->definition->implements));
-    $result->out->write('{');
 
+    array_unshift($result->type, $new->definition);
+    $result->out->write('{');
     foreach ($new->definition->body as $member) {
       $this->emitOne($result, $member);
       $result->out->write("\n");
@@ -968,6 +975,8 @@ abstract class PHP extends Emitter {
     $result->out->write('function __new() {');
     $this->emitMeta($result, null, [], null);
     $result->out->write('return $this; }})->__new()');
+
+    array_shift($result->type);
   }
 
   protected function emitInvoke($result, $invoke) {

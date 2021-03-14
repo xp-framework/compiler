@@ -66,4 +66,14 @@ class AnonymousClassTest extends EmittingTest {
 
     Assert::equals(['inside' => null], typeof($r)->getMethod('fixture')->getAnnotations());
   }
+
+  #[Test]
+  public function extending_enclosing_class() {
+    $t= $this->type('class <T> {
+      public static function run() {
+        return new class() extends self { };
+      }
+    }');
+    Assert::instance($t, $t->getMethod('run')->invoke(null));
+  }
 }

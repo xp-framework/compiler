@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.3.2 / 2021-03-14
+
+* Allowed `new class() extends self` inside class declarations - @thekid
+
 ## 6.3.1 / 2021-03-14
 
 * Fix being able to clone enum lookalikes - @thekid
