@@ -221,6 +221,27 @@ class EnumTest extends EmittingTest {
   }
 
   #[Test]
+  public function cannot_be_cloned() {
+    $t= $this->type('use lang\IllegalStateException; enum <T> {
+      case ONE;
+
+      public static function run() {
+        try {
+          return clone self::ONE;
+          throw new IllegalStateException("No exception raised");
+        } catch (\Error $expected) {
+          return $expected->getMessage();
+        }
+      }
+    }');
+
+    Assert::equals(
+      'Trying to clone an uncloneable object of class '.$t->literal(),
+      $t->getMethod('run')->invoke(null)
+    );
+  }
+
+  #[Test]
   public function enum_values() {
     $t= $this->type('enum <T> {
       case Hearts;

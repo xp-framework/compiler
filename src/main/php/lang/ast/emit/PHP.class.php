@@ -396,6 +396,11 @@ abstract class PHP extends Emitter {
       }');
     }
 
+    // Prevent cloning enums
+    $result->out->write('public function __clone() {
+      throw new \Error("Trying to clone an uncloneable object of class ".self::class);
+    }');
+
     // Enum cases
     $result->out->write('public static function cases() { return [');
     foreach ($cases as $case) {
@@ -676,7 +681,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitPrefix($result, $unary) {
-    $result->out->write($unary->operator);
+    $result->out->write($unary->operator.' ');
     $this->emitOne($result, $unary->expression);
   }
 

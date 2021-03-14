@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.3.1 / 2021-03-14
+
+* Fix being able to clone enum lookalikes - @thekid
+* Fix `clone` operator - @thekid
+
 ## 6.3.0 / 2021-03-13
 
 * Merged PR #106: Compile PHP enums to PHP 7/8 lookalikes, PHP 8.1 native.
