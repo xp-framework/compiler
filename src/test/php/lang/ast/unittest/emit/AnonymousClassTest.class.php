@@ -76,4 +76,18 @@ class AnonymousClassTest extends EmittingTest {
     }');
     Assert::instance($t, $t->getMethod('run')->invoke(null));
   }
+
+  #[Test]
+  public function referencing_enclosing_class() {
+    $t= $this->type('class <T> {
+      const ID = 6100;
+
+      public static function run() {
+        return new class() extends self {
+          public static $id = <T>::ID;
+        };
+      }
+    }');
+    Assert::instance($t, $t->getMethod('run')->invoke(null));
+  }
 }

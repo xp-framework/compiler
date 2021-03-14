@@ -39,12 +39,16 @@ class Result {
    * @return lang.ast.emit.Type
    */
   public function lookup($type) {
-    if ('self' === $type || 'static' === $type || $type === $this->type[0]->name) {
+    if ('self' === $type || 'static' === $type) {
       return new Declaration($this->type[0], $this);
     } else if ('parent' === $type) {
       return $this->lookup($this->type[0]->parent);
-    } else {
-      return new Reflection($type);
     }
+
+    foreach ($this->type as $enclosing) {
+      if ($type === $enclosing->name) return new Declaration($enclosing, $this);
+    }
+
+    return new Reflection($type);
   }
 }
