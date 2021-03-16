@@ -13,7 +13,7 @@ Compiles future PHP to today's PHP.
 
 Usage
 -----
-After adding the compiler to your project via `composer require xp-framework/compiler` classes will be passed through the compiler during autoloading. Code inside files with a *.class.php* ending is considered already compiled; files need to renamed `T.class.php` => `T.php` in order to be picked up.
+After adding the compiler to your project via `composer require xp-framework/compiler`, it will hook into the class loading chain and compile `.php`-files on-demand. This keeps the efficient code-save-reload/rerun development process typical for PHP.
 
 Example
 -------
@@ -41,7 +41,7 @@ class HelloWorld {
 
 Compilation
 -----------
-By default, XP Compiler will hook into the class loading chain and compile files on-demand. This keeps the code-save-reload/rerun development process typical for PHP. However, compilation can also be performed manually by invoking the compiler:
+Compilation can also be performed explicitely by invoking the compiler:
 
 ```bash
 # Compile code and write result to a class file
