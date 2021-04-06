@@ -179,6 +179,20 @@ class LambdasTest extends EmittingTest {
     Assert::equals(2, $r());
   }
 
+  #[Test]
+  public function capturing_with_block() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $a= 1;
+        return fn() => {
+          return $a + 1;
+        };
+      }
+    }');
+
+    Assert::equals(2, $r());
+  }
+
   #[Test, Expect(Errors::class)]
   public function no_longer_supports_hacklang_variant() {
     $this->run('class <T> {
