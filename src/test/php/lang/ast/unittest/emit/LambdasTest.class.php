@@ -7,6 +7,7 @@ use unittest\{Action, Assert, Test};
  * Lambdas (a.k.a. arrow functions) support
  *
  * @see  https://wiki.php.net/rfc/arrow_functions_v2
+ * @see  https://wiki.php.net/rfc/auto-capture-closure
  */
 class LambdasTest extends EmittingTest {
 
