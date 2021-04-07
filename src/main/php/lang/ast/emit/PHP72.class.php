@@ -22,7 +22,7 @@ class PHP72 extends PHP {
       IsUnion::class    => function($t) { return null; },
       IsLiteral::class  => function($t) {
         $l= $t->literal();
-        return 'mixed' === $l ? null : $l;
+        return 'mixed' === $l ? null : ('never' === $l ? 'void' : $l);
       },
     ];
   }
