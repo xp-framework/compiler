@@ -76,4 +76,23 @@ class YieldTest extends EmittingTest {
     }');
     Assert::equals([1, 2, 3, 4], iterator_to_array($r, false));
   }
+
+  #[Test]
+  public function yield_send() {
+    $r= $this->run('class <T> {
+      public function run() {
+        while ($line= yield) {
+          echo $line, "\n";
+        }
+      }
+    }');
+
+    ob_start();
+
+    $r->send('Hello');
+    $r->send('World');
+    $r->send(null);
+
+    Assert::equals("Hello\nWorld\n", ob_get_clean());
+  }
 }
