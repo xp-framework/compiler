@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest;
 
-use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80};
+use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81};
 use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion};
 use unittest\{Assert, Test};
 
@@ -24,6 +24,7 @@ class TypeLiteralsTest {
     yield from $this->base();
     yield [new IsLiteral('object'), null];
     yield [new IsLiteral('void'), null];
+    yield [new IsLiteral('never'), null];
     yield [new IsLiteral('iterable'), null];
     yield [new IsLiteral('mixed'), null];
     yield [new IsNullable(new IsLiteral('string')), null];
@@ -39,6 +40,7 @@ class TypeLiteralsTest {
     yield from $this->base();
     yield [new IsLiteral('object'), null];
     yield [new IsLiteral('void'), 'void'];
+    yield [new IsLiteral('never'), 'void'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), null];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
@@ -55,6 +57,7 @@ class TypeLiteralsTest {
     yield from $this->base();
     yield [new IsLiteral('object'), 'object'];
     yield [new IsLiteral('void'), 'void'];
+    yield [new IsLiteral('never'), 'void'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), null];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
@@ -80,6 +83,24 @@ class TypeLiteralsTest {
     yield from $this->base();
     yield [new IsLiteral('object'), 'object'];
     yield [new IsLiteral('void'), 'void'];
+    yield [new IsLiteral('never'), 'void'];
+    yield [new IsLiteral('iterable'), 'iterable'];
+    yield [new IsLiteral('mixed'), 'mixed'];
+    yield [new IsNullable(new IsLiteral('string')), '?string'];
+    yield [new IsNullable(new IsLiteral('object')), '?object'];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
+  }
+
+  /**
+   * PHP 8.1 added `never`
+   *
+   * @return iterable
+   */
+  private function php81() {
+    yield from $this->base();
+    yield [new IsLiteral('object'), 'object'];
+    yield [new IsLiteral('void'), 'void'];
+    yield [new IsLiteral('never'), 'never'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), 'mixed'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
@@ -110,5 +131,10 @@ class TypeLiteralsTest {
   #[Test, Values('php80')]
   public function php80_literals($type, $literal) {
     Assert::equals($literal, (new PHP80())->literal($type));
+  }
+
+  #[Test, Values('php81')]
+  public function php81_literals($type, $literal) {
+    Assert::equals($literal, (new PHP81())->literal($type));
   }
 }
