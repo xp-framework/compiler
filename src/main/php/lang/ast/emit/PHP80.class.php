@@ -27,7 +27,10 @@ class PHP80 extends PHP {
         }
         return substr($u, 1);
       },
-      IsLiteral::class  => function($t) { return $t->literal(); }
+      IsLiteral::class  => function($t) {
+        $l= $t->literal();
+        return 'never' === $l ? 'void' : $l;
+      }
     ];
   }
 

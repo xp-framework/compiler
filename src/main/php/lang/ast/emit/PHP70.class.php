@@ -22,7 +22,7 @@ class PHP70 extends PHP {
       IsUnion::class    => function($t) { return null; },
       IsLiteral::class  => function($t) {
         $l= $t->literal();
-        return ('object' === $l || 'void' === $l || 'iterable' === $l || 'mixed' === $l) ? null : $l;
+        return ('object' === $l || 'void' === $l || 'iterable' === $l || 'mixed' === $l || 'never' === $l) ? null : $l;
       },
     ];
   }
