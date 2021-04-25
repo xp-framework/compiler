@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.4.0 / 2021-04-25
+
+* Merged PR #110: Rewrite `never` return type to void in PHP < 8.1, adding
+  support for this PHP 8.1 feature. XP Framework reflection supports this
+  as of its 10.10.0 release.
+  (@thekid)
+
 ## 6.3.2 / 2021-03-14
 
 * Allowed `new class() extends self` inside class declarations - @thekid
