@@ -51,7 +51,7 @@ jobs:
 
     - name: Install dependencies
       run: >
-        curl -sSL =https://baltocdn.com/xp-framework/xp-runners/distribution/downloads/e/entrypoint/xp-run-8.5.1.sh > xp-run &&
+        curl -sSL https://baltocdn.com/xp-framework/xp-runners/distribution/downloads/e/entrypoint/xp-run-8.5.1.sh > xp-run &&
         composer install --prefer-dist &&
         echo "vendor/autoload.php" > composer.pth
 
