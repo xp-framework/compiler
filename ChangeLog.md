@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.5.0 / 2021-05-22
+
+* Merged PR #111: Add support for directives using declare - @thekid
+
 ## 6.4.0 / 2021-04-25
 
 * Merged PR #110: Rewrite `never` return type to void in PHP < 8.1, adding
