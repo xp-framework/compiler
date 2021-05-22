@@ -157,6 +157,15 @@ abstract class PHP extends Emitter {
     }
   }
 
+  protected function emitDirectives($result, $directives) {
+    $result->out->write('declare(');
+    foreach ($directives->declare as $directive => $value) {
+      $result->out->write($directive.'=');
+      $this->emitOne($result, $value);
+    }
+    $result->out->write(')');
+  }
+
   protected function emitNamespace($result, $declaration) {
     $result->out->write('namespace '.$declaration->name);
   }
