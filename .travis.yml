@@ -15,7 +15,7 @@ matrix:
     - php: master
 
 before_script:
-  - curl -sSL https://dl.bintray.com/xp-runners/generic/xp-run-8.1.7.sh > xp-run
+  - curl -sSL https://baltocdn.com/xp-framework/xp-runners/distribution/downloads/e/entrypoint/xp-run-8.5.1.sh > xp-run
   - composer install --prefer-dist
   - echo "vendor/autoload.php" > composer.pth
 
