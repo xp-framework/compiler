@@ -21,7 +21,7 @@ class DeclareTest extends EmittingTest {
     }'));
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/must be of type int, float given/')]
+  #[Test, Expect(class: Error::class, withMessage: '/must be of (the )?type int(eger)?, float given/')]
   public function strict_types_on() {
     $this->run('declare(strict_types = 1); class <T> {
       public static function number(int $n) { return $n; }
