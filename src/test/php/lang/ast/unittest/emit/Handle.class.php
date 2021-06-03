@@ -1,9 +1,9 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\IllegalArgumentException;
+use lang\{IllegalArgumentException, Value};
 
 /** Used by `UsingTest` */
-class Handle implements \IDisposable {
+class Handle implements Value, \IDisposable {
   public static $DEFAULT;
   public static $called= [];
   private $id;
@@ -27,6 +27,12 @@ class Handle implements \IDisposable {
     }
     return 'test';
   }
+
+  public function toString() { return nameof($this).'<'.$this->id.'>'; }
+
+  public function hashCode() { return '#'.$this->id; }
+
+  public function compareTo($value) { return $value instanceof self ? $value->id <=> $this->id : 1; }
 
   public function __dispose() {
     self::$called[]= '__dispose@'.$this->id;
