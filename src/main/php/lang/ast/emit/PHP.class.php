@@ -1012,7 +1012,7 @@ abstract class PHP extends Emitter {
         $result->out->write($i.'=>');
         $this->emitOne($result, $argument);
         $result->out->write(',');
-        $argument= new OffsetExpression($p, new Literal((string)$i));
+        $argument= new OffsetExpression($p, new Literal((string)$i), $partial->line);
         continue;
       }
 
