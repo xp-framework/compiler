@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, Variable, Literal, ArrayLiteral, Block};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -993,6 +993,25 @@ abstract class PHP extends Emitter {
     $result->out->write('(');
     $this->emitArguments($result, $invoke->arguments);
     $result->out->write(')');
+  }
+
+  protected function emitPartial($result, $partial) {
+    $signature= [];
+    foreach ($partial->placeholders as $i => $variable) {
+      $t= $result->temp();
+      $v= new Variable(substr($t, 1), $partial->line);
+      if ($variable) {
+        $signature[]= '...'.$t;
+        $partial->invocation->arguments[$i]= new UnpackExpression($v, $partial->line);
+      } else {
+        $signature[]= $t;
+        $partial->invocation->arguments[$i]= $v;
+      }
+    }
+
+    $result->out->write('function('.implode(',', $signature).') { return ');
+    $this->emitOne($result, $partial->invocation);
+    $result->out->write('; }');
   }
 
   protected function emitScope($result, $scope) {
