@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, OffsetExpression, Variable, Literal, ArrayLiteral, Block};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -996,22 +996,41 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitPartial($result, $partial) {
+    $pass= $result->temp();
+    $p= new Variable(substr($pass, 1), $partial->line);
     $signature= [];
-    foreach ($partial->placeholders as $i => $variable) {
+
+    $result->out->write('['.$pass.'= [');
+    foreach ($partial->invocation->arguments as $i => &$argument) {
+      $variable= $partial->placeholders[$i] ?? null;
+
+      // Evaluate arguments once when creating the closure, then use them from within.
+      // Optimize by not passing constant expressions, resulting in less generated code.
+      if (null === $variable) {
+        if ($argument instanceof Literal) continue;
+
+        $result->out->write($i.'=>');
+        $this->emitOne($result, $argument);
+        $result->out->write(',');
+        $argument= new OffsetExpression($p, new Literal((string)$i));
+        continue;
+      }
+
+      // Create signature for one-arg / var arg placeholders
       $t= $result->temp();
       $v= new Variable(substr($t, 1), $partial->line);
       if ($variable) {
         $signature[]= '...'.$t;
-        $partial->invocation->arguments[$i]= new UnpackExpression($v, $partial->line);
+        $argument= new UnpackExpression($v, $partial->line);
       } else {
         $signature[]= $t;
-        $partial->invocation->arguments[$i]= $v;
+        $argument= $v;
       }
     }
 
-    $result->out->write('function('.implode(',', $signature).') { return ');
+    $result->out->write('], function('.implode(',', $signature).') use(&'.$pass.') { return ');
     $this->emitOne($result, $partial->invocation);
-    $result->out->write('; }');
+    $result->out->write('; }][1]');
   }
 
   protected function emitScope($result, $scope) {
