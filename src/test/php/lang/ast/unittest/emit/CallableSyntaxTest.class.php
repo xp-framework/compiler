@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test, Values};
+use unittest\{Assert, Test};
 
 class CallableSyntaxTest extends EmittingTest {
 
