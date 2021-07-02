@@ -988,6 +988,13 @@ abstract class PHP extends Emitter {
     array_shift($result->type);
   }
 
+  protected function emitCallable($result, $callable) {
+    $t= $result->temp();
+    $result->out->write('fn(...'.$t.') => ');
+    $this->emitOne($result, $callable->expression);
+    $result->out->write('(... '.$t.')');
+  }
+
   protected function emitInvoke($result, $invoke) {
     $this->emitOne($result, $invoke->expression);
     $result->out->write('(');
