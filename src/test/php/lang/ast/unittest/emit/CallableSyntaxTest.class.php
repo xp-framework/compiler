@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Assert, Test};
+use unittest\{Assert, Test, Values};
 
 class CallableSyntaxTest extends EmittingTest {
 
@@ -67,26 +67,26 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(4, $f('Test'));
   }
 
-  #[Test]
-  public function variable_instance_method() {
+  #[Test, Values(['$this->$func(...)', '$this->{$func}(...)'])]
+  public function variable_instance_method($expr) {
     $f= $this->run('class <T> {
       private function length($arg) { return strlen($arg); }
       public function run() {
         $func= "length";
-        return $this->$func(...);
+        return '.$expr.';
       }
     }');
 
     Assert::equals(4, $f('Test'));
   }
 
-  #[Test]
-  public function variable_class_method() {
+  #[Test, Values(['self::$func(...)', 'self::{$func}(...)'])]
+  public function variable_class_method($expr) {
     $f= $this->run('class <T> {
       private static function length($arg) { return strlen($arg); }
       public function run() {
         $func= "length";
-        return self::$func(...);
+        return '.$expr.';
       }
     }');
 
