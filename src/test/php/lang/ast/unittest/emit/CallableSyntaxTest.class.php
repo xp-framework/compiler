@@ -52,7 +52,7 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
-  public function variable_function() {
+  public function string_reference() {
     $this->verify('class <T> {
       public function run() {
         $func= "strlen";
@@ -62,7 +62,17 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
-  public function instance_method_reference() {
+  public function fn_reference() {
+    $this->verify('class <T> {
+      public function run() {
+        $func= fn($arg) => strlen($arg);
+        return $func(...);
+      }
+    }');
+  }
+
+  #[Test]
+  public function instance_property_reference() {
     $this->verify('class <T> {
       private $func= "strlen";
       public function run() {
