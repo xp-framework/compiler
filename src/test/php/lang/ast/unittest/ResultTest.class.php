@@ -1,11 +1,11 @@
 <?php namespace lang\ast\unittest;
 
 use io\streams\{StringWriter, MemoryOutputStream};
-use lang\Value;
 use lang\ast\Result;
 use lang\ast\emit\{Declaration, Reflection};
 use lang\ast\nodes\ClassDeclaration;
-use unittest\{Assert, Test};
+use lang\{Value, ClassNotFoundException};
+use unittest\{Assert, Expect, Test};
 
 class ResultTest {
 
@@ -71,5 +71,11 @@ class ResultTest {
     $r= new Result(new StringWriter(new MemoryOutputStream()));
 
     Assert::equals(new Reflection(Value::class), $r->lookup('\\lang\\Value'));
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function lookup_non_existant() {
+    $r= new Result(new StringWriter(new MemoryOutputStream()));
+    $r->lookup('\\NotFound');
   }
 }
