@@ -1,8 +1,9 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\Reflection;
-use lang\{Value, ClassNotFoundException, ClassLoader};
-use unittest\{Assert, Test, Expect};
+use lang\{Value, Enum, ClassNotFoundException, ClassLoader};
+use unittest\actions\RuntimeVersion;
+use unittest\{Action, Assert, Test, Expect};
 
 class ReflectionTest {
 
@@ -22,8 +23,9 @@ class ReflectionTest {
   }
 
   #[Test]
-  public function rewrites_unit_enums() {
-    $t= ClassLoader::defineClass('ReflectionTestEnum', null, [\UnitEnum::class], '{
+  public function rewrites_xp_enums() {
+    $spec= ['kind' => 'class', 'extends' => [Enum::class], 'implements' => [], 'use' => []];
+    $t= ClassLoader::defineType('ReflectionTestXPEnum', $spec, '{
       public static $ONE;
 
       public static $EMPTY= null;
@@ -35,6 +37,38 @@ class ReflectionTest {
 
     $reflect= new Reflection($t->literal());
     Assert::true($reflect->rewriteEnumCase('ONE'));
+    Assert::false($reflect->rewriteEnumCase('EMPTY'));
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion("<8.1")')]
+  public function rewrites_simulated_unit_enums() {
+    $spec= ['kind' => 'class', 'extends' => null, 'implements' => [\UnitEnum::class], 'use' => []];
+    $t= ClassLoader::defineType('ReflectionTestSimulatedEnum', $spec, '{
+      public static $ONE;
+
+      public static $EMPTY= null;
+
+      static function __static() {
+        self::$ONE= new self();
+      }
+    }');
+
+    $reflect= new Reflection($t->literal());
+    Assert::true($reflect->rewriteEnumCase('ONE'));
+    Assert::false($reflect->rewriteEnumCase('EMPTY'));
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function does_not_rewrite_native_enums() {
+    $spec= ['kind' => 'enum', 'extends' => null, 'implements' => [], 'use' => []];
+    $t= ClassLoader::defineType('ReflectionTestNativeEnum', $spec, '{
+      case ONE;
+
+      const EMPTY= null;
+    }');
+
+    $reflect= new Reflection($t->literal());
+    Assert::false($reflect->rewriteEnumCase('ONE'));
     Assert::false($reflect->rewriteEnumCase('EMPTY'));
   }
 }
