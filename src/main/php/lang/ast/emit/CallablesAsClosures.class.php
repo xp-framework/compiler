@@ -27,9 +27,9 @@ trait CallablesAsClosures {
     // Create closure
     $t= $result->temp();
     $result->out->write('function(...'.$t.')');
-    $use && $result->out->write('use($'.implode(', $', array_keys($use)).')');
+    $use && $result->out->write('use($'.implode(',$', array_keys($use)).')');
     $result->out->write('{ return ');
     $this->emitOne($result, $callable->expression);
-    $result->out->write('(... '.$t.'); }');
+    $result->out->write('(...'.$t.'); }');
   }
 }

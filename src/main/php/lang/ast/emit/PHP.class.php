@@ -990,9 +990,9 @@ abstract class PHP extends Emitter {
 
   protected function emitCallable($result, $callable) {
     $t= $result->temp();
-    $result->out->write('fn(...'.$t.') => ');
+    $result->out->write('fn(...'.$t.')=>');
     $this->emitOne($result, $callable->expression);
-    $result->out->write('(... '.$t.')');
+    $result->out->write('(...'.$t.')');
   }
 
   protected function emitInvoke($result, $invoke) {
