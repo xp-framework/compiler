@@ -124,7 +124,7 @@ class CompilingClassLoaderTest {
     });
   }
 
-  #[Test, Expect(class: ClassFormatException::class, withMessage: '/Compiler error: Class ".+" not found/')]
+  #[Test, Expect(class: ClassFormatException::class, withMessage: '/Compiler error: Class .+ not found/')]
   public function load_class_with_non_existant_parent() {
     $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
     $this->compile(['Orphan' => $code], function($loader, $types) {
