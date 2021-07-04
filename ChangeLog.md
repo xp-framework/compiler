@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #114: Implements first-class callable syntax: `strlen(...)`
+  now returns a closure which if invoked with a string argument, returns
+  its length. Includes support for static and instance methods as well as
+  indirect references like `$closure(...)` and `self::{$expression}(...)`,
+  see https://wiki.php.net/rfc/first_class_callable_syntax
+  (@thekid)
+
 ## 6.5.0 / 2021-05-22
 
 * Merged PR #111: Add support for directives using declare - @thekid
