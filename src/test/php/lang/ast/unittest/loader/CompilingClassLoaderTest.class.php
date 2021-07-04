@@ -3,7 +3,8 @@
 use io\{File, FileUtil, Folder};
 use lang\ast\CompilingClassLoader;
 use lang\{ClassFormatException, ClassNotFoundException, ElementNotFoundException, ClassLoader, Environment};
-use unittest\{Assert, Expect, Test, TestCase};
+use unittest\actions\RuntimeVersion;
+use unittest\{Action, Assert, Expect, Test, TestCase};
 
 class CompilingClassLoaderTest {
   private static $runtime;
@@ -124,7 +125,7 @@ class CompilingClassLoaderTest {
     });
   }
 
-  #[Test, Expect(class: ClassFormatException::class, withMessage: '/Compiler error: Class .+ not found/')]
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.3")'), Expect(class: ClassFormatException::class, withMessage: '/Compiler error: Class .+ not found/')]
   public function load_class_with_non_existant_parent() {
     $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
     $this->compile(['Orphan' => $code], function($loader, $types) {
