@@ -77,6 +77,14 @@ class CompilingClassLoaderTest {
   }
 
   #[Test]
+  public function package_contents() {
+    $contents= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
+      return $loader->packageContents(strstr($types['Tests'], '.', true));
+    });
+    Assert::equals(['Tests'.\xp::CLASS_FILE_EXT], $contents);
+  }
+
+  #[Test]
   public function load_dependencies() {
     $source= [
       'Child'   => '<?php namespace %s; class Child extends Base implements Impl { use Feature; }',
