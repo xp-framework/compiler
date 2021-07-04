@@ -2,7 +2,7 @@
 
 use io\{File, FileUtil, Folder};
 use lang\ast\CompilingClassLoader;
-use lang\{ClassFormatException, ElementNotFoundException, ClassLoader, Environment};
+use lang\{ClassFormatException, ClassNotFoundException, ElementNotFoundException, ClassLoader, Environment};
 use unittest\{Assert, Expect, Test, TestCase};
 
 class CompilingClassLoaderTest {
@@ -69,6 +69,14 @@ class CompilingClassLoaderTest {
   }
 
   #[Test]
+  public function compare() {
+    $cl= CompilingClassLoader::instanceFor(self::$runtime);
+
+    Assert::equals(0, $cl->compareTo($cl), 'equals itself');
+    Assert::equals(1, $cl->compareTo(null), 'does not equal null');
+  }
+
+  #[Test]
   public function load_dependencies() {
     $source= [
       'Child'   => '<?php namespace %s; class Child extends Base implements Impl { use Feature; }',
@@ -103,7 +111,17 @@ class CompilingClassLoaderTest {
 
   #[Test, Expect(class: ClassFormatException::class, withMessage: 'Compiler error: Expected "{", have "(end)"')]
   public function load_class_with_syntax_errors() {
-    $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) { return $loader->loadClass($types['Errors']); });
+    $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) {
+      return $loader->loadClass($types['Errors']);
+    });
+  }
+
+  #[Test, Expect(class: ClassFormatException::class, withMessage: '/Compiler error: Class ".+" not found/')]
+  public function load_class_with_non_existant_parent() {
+    $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
+    $this->compile(['Orphan' => $code], function($loader, $types) {
+      return $loader->loadClass($types['Orphan']);
+    });
   }
 
   #[Test]
@@ -136,6 +154,21 @@ class CompilingClassLoaderTest {
   #[Test]
   public function does_not_provide_non_existant_package() {
     Assert::false(CompilingClassLoader::instanceFor(self::$runtime)->providesPackage('notfound'));
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function loading_non_existant_uri() {
+    CompilingClassLoader::instanceFor(self::$runtime)->loadUri('NotFound.php');
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function loading_non_existant_class() {
+    CompilingClassLoader::instanceFor(self::$runtime)->loadClass('NotFound');
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function loading_non_existant_class_bytes() {
+    CompilingClassLoader::instanceFor(self::$runtime)->loadClassBytes('NotFound');
   }
 
   #[Test, Expect(ElementNotFoundException::class)]
