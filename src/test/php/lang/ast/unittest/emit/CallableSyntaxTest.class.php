@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Assert, Test, Values};
+use lang\Error;
+use unittest\{Assert, Expect, Test, Values};
 
 /**
  * Tests for first-class callable syntax
@@ -135,6 +136,17 @@ class CallableSyntaxTest extends EmittingTest {
     $this->verify('class <T> {
       public static function length($arg) { return strlen($arg); }
       public function run() { return [self::class, "length"](...); }
+    }');
+  }
+
+  #[Test, Expect(Error::class), Values(['nonexistant', '$this->nonexistant', 'self::nonexistant', '$nonexistant', '$null'])]
+  public function non_existant($expr) {
+    $this->run('class <T> {
+      public function run() {
+        $null= null;
+        $nonexistant= "nonexistant";
+        return '.$expr.'(...);
+      }
     }');
   }
 }

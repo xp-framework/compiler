@@ -1,35 +1,54 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Node;
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
+
 /**
- * Rewrites callable expressions to regular closures
+ * Rewrites callable expressions to `Callable::fromClosure()`
  *
  * @see  https://wiki.php.net/rfc/first_class_callable_syntax
  */
 trait CallablesAsClosures {
 
   protected function emitCallable($result, $callable) {
+    $result->out->write('\Closure::fromCallable(');
+    if ($callable->expression instanceof Literal) {
 
-    // Use variables in the following cases:
-    //
-    // $closure(...);                => use ($closure)
-    // $obj->method(...);            => use ($obj)
-    // $obj->$method(...);           => use ($obj, $method)
-    // ($obj->property)(...);        => use ($obj)
-    // $class::$method(...);         => use ($class, $method)
-    // [$obj, 'method'](...);        => use ($obj)
-    // [Foo::class, $method](...);   => use ($method)
-    $use= [];
-    foreach ($result->codegen->search($callable, 'variable') as $var) {
-      $use[$var->name]= true;
+      // Rewrite f() => "f"
+      $result->out->write('"'.trim($callable->expression->expression, '"\'').'"');
+    } else if ($callable->expression instanceof InstanceExpression) {
+
+      // Rewrite $this->f => [$this, "f"]
+      $result->out->write('[');
+      $this->emitOne($result, $callable->expression->expression);
+      if ($callable->expression->member instanceof Literal) {
+        $result->out->write(',"'.trim($callable->expression->member, '"\'').'"');
+      } else {
+        $result->out->write(',');
+        $this->emitOne($result, $callable->expression->member);
+      }
+      $result->out->write(']');
+    } else if ($callable->expression instanceof ScopeExpression) {
+
+      // Rewrite self::f => ["self", "f"]
+      $result->out->write('[');
+      if ($callable->expression->type instanceof Node) {
+        $this->emitOne($result, $callable->expression->type);
+      } else {
+        $result->out->write('"'.$callable->expression->type.'"');
+      }
+      if ($callable->expression->member instanceof Literal) {
+        $result->out->write(',"'.trim($callable->expression->member, '"\'').'"');
+      } else {
+        $result->out->write(',');
+        $this->emitOne($result, $callable->expression->member);
+      }
+      $result->out->write(']');
+    } else {
+
+      // Emit other expressions as-is
+      $this->emitOne($result, $callable->expression);
     }
-    unset($use['this']);
-
-    // Create closure
-    $t= $result->temp();
-    $result->out->write('function(...'.$t.')');
-    $use && $result->out->write('use($'.implode(',$', array_keys($use)).')');
-    $result->out->write('{ return ');
-    $this->emitOne($result, $callable->expression);
-    $result->out->write('(...'.$t.'); }');
+    $result->out->write(')');
   }
 }
