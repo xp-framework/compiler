@@ -20,8 +20,9 @@ trait CallablesAsClosures {
     // [Foo::class, $method](...);   => use ($method)
     $use= [];
     foreach ($result->codegen->search($callable, 'variable') as $var) {
-      'this' === $var->name || $use[$var->name]= true;
+      $use[$var->name]= true;
     }
+    unset($use['this']);
 
     // Create closure
     $t= $result->temp();
