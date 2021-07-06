@@ -1,6 +1,5 @@
 <?php namespace lang\ast\unittest\cli;
 
-use io\streams\FileInputStream;
 use io\{File, Folder};
 use lang\Environment;
 use unittest\{Assert, After, Before, Test, Values};
@@ -15,11 +14,17 @@ class FromFilesInTest {
 
     $a= new File($this->folder, 'A.php');
     $a->touch();
-    yield [[$a->getFileName() => $a->in()]];
+    yield [['A.php' => $a->in()]];
 
     $b= new File($this->folder, 'B.php');
     $b->touch();
-    yield [[$a->getFileName() => $a->in(), $b->getFileName() => $b->in()]];
+    yield [['A.php' => $a->in(), 'B.php' => $b->in()]];
+
+    $child= new Folder($this->folder, 'c');
+    $child->create();
+    $c= new File($child, 'C.php');
+    $c->touch();
+    yield [['A.php' => $a->in(), 'B.php' => $b->in(), 'c/C.php' => $c->in()]];
   }
 
   #[Before]
@@ -48,7 +53,7 @@ class FromFilesInTest {
   public function iteration($expected) {
     $results= [];
     foreach (new FromFilesIn($this->folder) as $path => $stream) {
-      $results[(string)$path]= $stream;
+      $results[$path->toString('/')]= $stream;
     }
 
     Assert::equals($expected, $results);
