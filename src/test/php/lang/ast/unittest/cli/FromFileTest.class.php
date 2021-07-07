@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\cli;
 
+use io\streams\FileInputStream;
 use io\{File, Folder};
 use lang\Environment;
 use unittest\{Assert, After, Before, Test};
@@ -37,9 +38,9 @@ class FromFileTest {
   public function iteration() {
     $results= [];
     foreach (new FromFile($this->file) as $path => $stream) {
-      $results[(string)$path]= $stream;
+      $results[(string)$path]= get_class($stream);
     }
 
-    Assert::equals([$this->file->getFileName() => $this->file->in()], $results);
+    Assert::equals([$this->file->getFileName() => FileInputStream::class], $results);
   }
 }
