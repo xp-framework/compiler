@@ -11,7 +11,7 @@ class InputTest {
 
   #[Before]
   public function folder() {
-    $this->folder= new Folder(Environment::tempDir(), '.xp-'.crc32(self::class));
+    $this->folder= new Folder(realpath(Environment::tempDir()), '.xp-'.crc32(self::class));
     $this->folder->exists() && $this->folder->unlink();
     $this->folder->create();
 
