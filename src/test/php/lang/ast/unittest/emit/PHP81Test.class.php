@@ -1,11 +1,24 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Assert, Test};
+use lang\ast\emit\Type;
+use unittest\{Assert, After, Before, Test};
 
 class PHP81Test extends EmittingTest {
+  private $restore;
 
   /** @return string */
   protected function runtime() { return 'PHP.8.1.0'; }
+
+  #[Before]
+  public function enums() {
+    $this->restore= Type::$ENUMS;
+    Type::$ENUMS= true;
+  }
+
+  #[After]
+  public function restore() {
+    Type::$ENUMS= $this->restore;
+  }
 
   #[Test]
   public function named_argument() {
@@ -15,6 +28,22 @@ class PHP81Test extends EmittingTest {
   #[Test]
   public function named_arguments() {
     Assert::equals('f(color:"green",price:12.50);', $this->emit('f(color: "green", price: 12.50);'));
+  }
+
+  #[Test]
+  public function unit_enum() {
+    Assert::equals(
+      'enum OS{case WINDOWS;case UNIX;};',
+      preg_replace('/static function __init.+__init\(\);/', '}', $this->emit('enum OS { case WINDOWS; case UNIX; }'))
+    );
+  }
+
+  #[Test]
+  public function backed_enum() {
+    Assert::equals(
+      'enum Suit:string{case Hearts="♥";};',
+      preg_replace('/static function __init.+__init\(\);/', '}', $this->emit('enum Suit : string { case Hearts= "♥"; }'))
+    );
   }
 
   #[Test]
