@@ -52,6 +52,6 @@ class InputTest {
 
   #[Test, Expect(IllegalArgumentException::class)]
   public function from_illegal_argument() {
-    Input::newInstance(null);
+    Input::newInstance('');
   }
 }
