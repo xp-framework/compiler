@@ -26,14 +26,11 @@ abstract class EmittingTest {
     }
   }
 
-  #[After]
-  public function tearDown() {
-    foreach ($this->transformations as $transformation) {
-      $this->emitter->remove($transformation);
-    }
-  }
-
-  /** @return string */ 
+  /**
+   * Returns runtime to use. Uses `PHP_VERSION` constant.
+   *
+   * @return string
+   */
   protected function runtime() { return 'PHP.'.PHP_VERSION; }
 
   /**
@@ -47,6 +44,12 @@ abstract class EmittingTest {
     $this->transformations[]= $this->emitter->transform($type, $function);
   }
 
+  /**
+   * Parse and emit given code
+   *
+   * @param  string $code
+   * @return string
+   */
   protected function emit($code) {
     $name= 'E'.(self::$id++);
     $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
@@ -94,5 +97,12 @@ abstract class EmittingTest {
    */
   protected function run($code, ... $args) {
     return $this->type($code)->newInstance()->run(...$args);
+  }
+
+  #[After]
+  public function tearDown() {
+    foreach ($this->transformations as $transformation) {
+      $this->emitter->remove($transformation);
+    }
   }
 }
