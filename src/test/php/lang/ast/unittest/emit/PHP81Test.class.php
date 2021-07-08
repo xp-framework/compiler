@@ -1,24 +1,12 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\Type;
-use unittest\{Assert, After, Before, Test};
+use unittest\{Assert, Test};
 
 class PHP81Test extends EmittingTest {
-  private $restore;
 
   /** @return string */
   protected function runtime() { return 'PHP.8.1.0'; }
-
-  #[Before]
-  public function enums() {
-    $this->restore= Type::$ENUMS;
-    Type::$ENUMS= true;
-  }
-
-  #[After]
-  public function restore() {
-    Type::$ENUMS= $this->restore;
-  }
 
   #[Test]
   public function named_argument() {
