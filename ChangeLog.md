@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Removed conditional checks for PHP 8.1 with native enum support, all
+  releases and builds available on CI systems now contain it.
+  (@thekid)
+* Increased test coverage significantly, especially of the compiler CLI
+  (@thekid)
+
 ## 6.5.0 / 2021-05-22
 
 * Merged PR #111: Add support for directives using declare - @thekid
