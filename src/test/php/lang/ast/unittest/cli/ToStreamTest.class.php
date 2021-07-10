@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\cli;
 
 use io\streams\MemoryOutputStream;
-use unittest\{After, Assert, Before, Test};
+use unittest\{Assert, Test};
 use xp\compiler\ToStream;
 
 class ToStreamTest {
