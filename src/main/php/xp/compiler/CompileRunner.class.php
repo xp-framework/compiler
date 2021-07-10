@@ -38,6 +38,7 @@ use util\profiling\Timer;
  * The *-o* and *-n* options accept multiple input sources following them.
  * The *-q* option suppresses all diagnostic output except for errors.
  * 
+ * @codeCoverageIgnore 
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
 class CompileRunner {

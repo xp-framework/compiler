@@ -4,6 +4,7 @@ use lang\ast\{Language, Emitter};
 use lang\reflect\Package;
 use util\cmd\Console;
 
+/** @codeCoverageIgnore */
 class Usage {
   const RUNTIME = 'PHP';
 
