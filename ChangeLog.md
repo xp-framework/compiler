@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.6.0 / 2021-07-10
+
+* Emit null-coalesce operator as `$a ?? $a= expression` instead of as
+  `$a= $a ?? expression`, saving one assignment operation for non-null
+  case. Applies to PHP 7.0, 7.1 and 7.2.
+  (@thekid)
 * Removed conditional checks for PHP 8.1 with native enum support, all
   releases and builds available on CI systems now contain it.
   (@thekid)
