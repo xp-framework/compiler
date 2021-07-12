@@ -166,8 +166,8 @@ class CompilingClassLoader implements IClassLoader {
     try {
       include($this->version.'://'.$uri);
     } catch (ClassLoadingException $e) {
-      unset(\xp::$cl[$class]);
-      throw $e;
+      unset(\xp::$cl[$class]); // @codeCoverageIgnore
+      throw $e;                // @codeCoverageIgnore
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
       throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);

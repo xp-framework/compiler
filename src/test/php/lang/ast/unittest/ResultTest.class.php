@@ -2,7 +2,10 @@
 
 use io\streams\{StringWriter, MemoryOutputStream};
 use lang\ast\Result;
-use unittest\{Assert, Test};
+use lang\ast\emit\{Declaration, Reflection};
+use lang\ast\nodes\ClassDeclaration;
+use lang\{Value, ClassNotFoundException};
+use unittest\{Assert, Expect, Test};
 
 class ResultTest {
 
@@ -37,5 +40,42 @@ class ResultTest {
     $r= new Result(new StringWriter($out));
     $r->out->write('echo "Hello";');
     Assert::equals('<?php echo "Hello";', $out->bytes());
+  }
+
+  #[Test]
+  public function lookup_self() {
+    $r= new Result(new StringWriter(new MemoryOutputStream()));
+    $r->type[0]= new ClassDeclaration([], '\\T', null, [], [], [], null, 1);
+
+    Assert::equals(new Declaration($r->type[0], $r), $r->lookup('self'));
+  }
+
+  #[Test]
+  public function lookup_parent() {
+    $r= new Result(new StringWriter(new MemoryOutputStream()));
+    $r->type[0]= new ClassDeclaration([], '\\T', '\\lang\\Value', [], [], [], null, 1);
+
+    Assert::equals(new Reflection(Value::class), $r->lookup('parent'));
+  }
+
+  #[Test]
+  public function lookup_named() {
+    $r= new Result(new StringWriter(new MemoryOutputStream()));
+    $r->type[0]= new ClassDeclaration([], '\\T', null, [], [], [], null, 1);
+
+    Assert::equals(new Declaration($r->type[0], $r), $r->lookup('\\T'));
+  }
+
+  #[Test]
+  public function lookup_value_interface() {
+    $r= new Result(new StringWriter(new MemoryOutputStream()));
+
+    Assert::equals(new Reflection(Value::class), $r->lookup('\\lang\\Value'));
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function lookup_non_existant() {
+    $r= new Result(new StringWriter(new MemoryOutputStream()));
+    $r->lookup('\\NotFound');
   }
 }

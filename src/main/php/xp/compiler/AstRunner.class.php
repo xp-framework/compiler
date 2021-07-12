@@ -3,6 +3,7 @@
 use lang\ast\{Emitter, Errors, Language, Node, Result, Tokens};
 use util\Objects;
 use util\cmd\Console;
+
 /**
  * Display AST
  *
@@ -14,6 +15,8 @@ use util\cmd\Console;
  *   ```sh
  *   $ echo "<?php echo 1;" | xp ast -
  *   ```
+ *
+ * @codeCoverageIgnore 
  */
 class AstRunner {
 

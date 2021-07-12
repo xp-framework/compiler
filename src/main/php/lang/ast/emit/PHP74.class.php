@@ -8,7 +8,7 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, Is
  * @see  https://wiki.php.net/rfc#php_74
  */
 class PHP74 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteClassOnObjects, RewriteExplicitOctals, CallablesAsClosures;
+  use RewriteBlockLambdaExpressions, RewriteClassOnObjects, RewriteExplicitOctals, RewriteEnums, CallablesAsClosures;
 
   /** Sets up type => literal mappings */
   public function __construct() {

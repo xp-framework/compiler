@@ -16,10 +16,7 @@ trait RewriteBlockLambdaExpressions {
         $this->emitAll($result, $body->statements);
       });
     } else {
-      $result->out->write('fn');
-      $this->emitSignature($result, $lambda->signature);
-      $result->out->write('=>');
-      $this->emitOne($result, $lambda->body);
+      parent::emitLambda($result, $lambda);
     }
   }
 }

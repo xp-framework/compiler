@@ -20,18 +20,18 @@ abstract class EmittingTest {
     $this->output= $output ? array_flip(explode(',', $output)) : [];
     $this->cl= DynamicClassLoader::instanceFor(self::class);
     $this->language= Language::named('PHP');
-    $this->emitter= Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
+    $this->emitter= Emitter::forRuntime($this->runtime())->newInstance();
     foreach ($this->language->extensions() as $extension) {
       $extension->setup($this->language, $this->emitter);
     }
   }
 
-  #[After]
-  public function tearDown() {
-    foreach ($this->transformations as $transformation) {
-      $this->emitter->remove($transformation);
-    }
-  }
+  /**
+   * Returns runtime to use. Uses `PHP_VERSION` constant.
+   *
+   * @return string
+   */
+  protected function runtime() { return 'PHP.'.PHP_VERSION; }
 
   /**
    * Register a transformation. Will take care of removing it on test shutdown.
@@ -42,6 +42,21 @@ abstract class EmittingTest {
    */
   protected function transform($type, $function) {
     $this->transformations[]= $this->emitter->transform($type, $function);
+  }
+
+  /**
+   * Parse and emit given code
+   *
+   * @param  string $code
+   * @return string
+   */
+  protected function emit($code) {
+    $name= 'E'.(self::$id++);
+    $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
+
+    $out= new MemoryOutputStream();
+    $this->emitter->emitAll(new Result(new StringWriter($out), ''), $tree->children());
+    return $out->bytes();
   }
 
   /**
@@ -82,5 +97,12 @@ abstract class EmittingTest {
    */
   protected function run($code, ... $args) {
     return $this->type($code)->newInstance()->run(...$args);
+  }
+
+  #[After]
+  public function tearDown() {
+    foreach ($this->transformations as $transformation) {
+      $this->emitter->remove($transformation);
+    }
   }
 }

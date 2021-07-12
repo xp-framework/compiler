@@ -40,51 +40,6 @@ class PHP81 extends PHP {
     }
   }
 
-  protected function emitEnumCase($result, $case) {
-
-    // TODO: Once enum PR is merged, remove this conditional and refactor the
-    // code into a `RewriteEnums` trait to be included for all other versions
-    if (Type::$ENUMS) {
-      $result->out->write('case '.$case->name);
-      if ($case->expression) {
-        $result->out->write('=');
-        $this->emitOne($result, $case->expression);
-      }
-      $result->out->write(';');
-    } else {
-      parent::emitEnumCase($result, $case);
-    }
-  }
-
-  protected function emitEnum($result, $enum) {
-
-    // TODO: Once enum PR is merged, remove this conditional and refactor the
-    // code into a `RewriteEnums` trait to be included for all other versions
-    if (Type::$ENUMS) {
-      array_unshift($result->type, $enum);
-      array_unshift($result->meta, []);
-      $result->locals= [[], []];
-
-      $result->out->write('enum '.$this->declaration($enum->name));
-      $enum->base && $result->out->write(':'.$enum->base);
-      $enum->implements && $result->out->write(' implements '.implode(', ', $enum->implements));
-      $result->out->write('{');
-
-      foreach ($enum->body as $member) {
-        $this->emitOne($result, $member);
-      }
-
-      // Initializations
-      $result->out->write('static function __init() {');
-      $this->emitInitializations($result, $result->locals[0]);
-      $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-      $result->out->write('}} '.$enum->name.'::__init();');
-      array_shift($result->type);
-    } else {
-      parent::emitEnum($result, $enum);
-    }
-  }
-
   protected function emitNew($result, $new) {
     if ($new->type instanceof Node) {
       $result->out->write('new (');

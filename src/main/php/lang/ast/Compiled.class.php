@@ -55,12 +55,12 @@ class Compiled implements OutputStream {
     $this->compiled.= $bytes;
   }
 
-  /** @return void */
+  /** @codeCoverageIgnore */
   public function flush() {
     // NOOP
   }
 
-  /** @return void */
+  /** @codeCoverageIgnore */
   public function close() {
     // NOOP
   }
@@ -75,12 +75,6 @@ class Compiled implements OutputStream {
     $chunk= substr($this->compiled, $this->offset, $count);
     $this->offset+= $count;
     return $chunk;
-  }
-
-  /** @return [:var] */
-  public function url_stat($path) {
-    $opened= substr($path, strpos($path, '://') + 3);
-    return ['size' => self::$source[$opened]->getResourceAsStream($opened)->size()];
   }
 
   /** @return [:var] */

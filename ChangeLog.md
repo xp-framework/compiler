@@ -8,6 +8,18 @@ XP Compiler ChangeLog
   its length. Includes support for static and instance methods as well as
   indirect references like `$closure(...)` and `self::{$expression}(...)`,
   see https://wiki.php.net/rfc/first_class_callable_syntax
+
+## 6.6.0 / 2021-07-10
+
+* Emit null-coalesce operator as `$a ?? $a= expression` instead of as
+  `$a= $a ?? expression`, saving one assignment operation for non-null
+  case. Applies to PHP 7.0, 7.1 and 7.2.
+  (@thekid)
+* Removed conditional checks for PHP 8.1 with native enum support, all
+  releases and builds available on CI systems now contain it.
+  (@thekid)
+* Increased test coverage significantly (to more than 90%), especially
+  for classes used by the compiler command line.
   (@thekid)
 
 ## 6.5.0 / 2021-05-22
