@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.7.0 / 2021-07-12
+
 * Changed emitter to omit extra newlines between members, making line
   numbers more consistent with the original code.
   (@thekid)
