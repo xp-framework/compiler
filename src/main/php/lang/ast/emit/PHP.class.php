@@ -527,10 +527,9 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $member);
       $result->out->write("\n");
     }
+    $result->out->write('}');
 
-    $result->out->write('static function __init() {');
     $this->emitMeta($result, $trait->name, $trait->annotations, $trait->comment);
-    $result->out->write('}} '.$trait->name.'::__init();');
   }
 
   protected function emitUse($result, $use) {
