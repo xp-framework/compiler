@@ -3,11 +3,15 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed emitter to omit extra newlines between members, making line
+  numbers more consistent with the original code.
+  (@thekid)
 * Merged PR #114: Implements first-class callable syntax: `strlen(...)`
   now returns a closure which if invoked with a string argument, returns
   its length. Includes support for static and instance methods as well as
   indirect references like `$closure(...)` and `self::{$expression}(...)`,
   see https://wiki.php.net/rfc/first_class_callable_syntax
+  (@thekid)
 
 ## 6.6.0 / 2021-07-10
 

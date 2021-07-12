@@ -511,7 +511,6 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     foreach ($interface->body as $member) {
       $this->emitOne($result, $member);
-      $result->out->write("\n");
     }
     $result->out->write('}');
 
@@ -525,7 +524,6 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     foreach ($trait->body as $member) {
       $this->emitOne($result, $member);
-      $result->out->write("\n");
     }
     $result->out->write('}');
 
@@ -936,7 +934,6 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     foreach ($new->definition->body as $member) {
       $this->emitOne($result, $member);
-      $result->out->write("\n");
     }
     $result->out->write('function __new() {');
     $this->emitMeta($result, null, [], null);
