@@ -527,10 +527,9 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $member);
       $result->out->write("\n");
     }
+    $result->out->write('}');
 
-    $result->out->write('static function __init() {');
     $this->emitMeta($result, $trait->name, $trait->annotations, $trait->comment);
-    $result->out->write('}} '.$trait->name.'::__init();');
   }
 
   protected function emitUse($result, $use) {
@@ -944,6 +943,11 @@ abstract class PHP extends Emitter {
     $result->out->write('return $this; }})->__new()');
 
     array_shift($result->type);
+  }
+
+  protected function emitCallable($result, $callable) {
+    $this->emitOne($result, $callable->expression);
+    $result->out->write('(...)');
   }
 
   protected function emitInvoke($result, $invoke) {

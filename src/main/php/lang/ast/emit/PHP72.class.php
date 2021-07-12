@@ -8,7 +8,7 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, Is
  * @see  https://wiki.php.net/rfc#php_72
  */
 class PHP72 extends PHP {
-  use OmitPropertyTypes;
+  use OmitPropertyTypes, CallablesAsClosures;
   use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteClassOnObjects, RewriteExplicitOctals, RewriteEnums;
 
   /** Sets up type => literal mappings */
