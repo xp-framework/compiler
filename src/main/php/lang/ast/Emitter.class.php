@@ -69,7 +69,7 @@ abstract class Emitter {
   }
 
   /**
-   * Catch-all, should `$node->kind` be empty in `{'emit'.$node->kind}`.
+   * Catch-all, should `$node->kind` be empty in `"emit{$node->kind}"`.
    *
    * @return void
    */
@@ -110,11 +110,11 @@ abstract class Emitter {
         $r= $transformation($result->codegen, $node);
         if ($r instanceof Node) {
           if ($r->kind === $node->kind) continue;
-          $this->{'emit'.$r->kind}($result, $r);
+          $this->{"emit{$r->kind}"}($result, $r);
           return;
         } else if ($r) {
           foreach ($r as $n) {
-            $this->{'emit'.$n->kind}($result, $n);
+            $this->{"emit{$n->kind}"}($result, $n);
             $result->out->write(';');
           }
           return;
