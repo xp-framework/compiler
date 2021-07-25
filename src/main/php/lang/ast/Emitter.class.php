@@ -1,8 +1,8 @@
 <?php namespace lang\ast;
 
-use lang\{IllegalArgumentException, IllegalStateException};
 use lang\ast\Node;
 use lang\reflect\Package;
+use lang\{IllegalArgumentException, IllegalStateException};
 
 abstract class Emitter {
   private $transformations= [];
@@ -11,7 +11,7 @@ abstract class Emitter {
    * Selects the correct emitter for a given runtime
    *
    * @param  string $runtime E.g. "PHP.".PHP_VERSION
-   * @return self
+   * @return lang.XPClass
    * @throws lang.IllegalArgumentException
    */
   public static function forRuntime($runtime) {
