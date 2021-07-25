@@ -16,7 +16,11 @@ class TransformationsTest extends EmittingTest {
           ['public'],
           'toString',
           new Signature([], new IsLiteral('string')),
-          [new Code('return "T@".\util\Objects::stringOf(get_object_vars($this))')]
+          [new Code('return "T@".\util\Objects::stringOf(array_filter(
+            get_object_vars($this),
+            function($e, $n) { return 0 !== strncmp($n, "__", 2); },
+            ARRAY_FILTER_USE_BOTH
+          ))')]
         ));
       }
       return $class;
@@ -51,7 +55,7 @@ class TransformationsTest extends EmittingTest {
   #[Test]
   public function generates_string_representation() {
     $t= $this->type('#[Repr] class <T> {
-      private int $id;
+      private $id;
 
       public function __construct(int $id) {
         $this->id= $id;
@@ -79,7 +83,7 @@ class TransformationsTest extends EmittingTest {
   #[Test]
   public function generates_both() {
     $t= $this->type('#[Repr, Getters] class <T> {
-      private int $id;
+      private $id;
 
       public function __construct(int $id) {
         $this->id= $id;

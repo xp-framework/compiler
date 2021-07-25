@@ -138,6 +138,74 @@ abstract class PHP extends Emitter {
   }
 
   /**
+   * Emits virtual instance properties.
+   *
+   * @see    https://github.com/xp-framework/rfc/issues/340
+   * @param  lang.ast.Result $result
+   * @param  [:lang.ast.Node] $properties
+   * @return void
+   */
+  protected function emitVirtual($result, $properties) {
+
+    // Generate virtual members
+    $result->out->write('const __VIRTUAL=[[');
+    foreach ($properties as $property) {
+      $modifiers= 0;
+      foreach ($property->modifiers as $name) {
+        $modifiers |= constant('MODIFIER_'.strtoupper($name));
+      }
+      $result->out->write("'{$property->name}'=>[{$modifiers},");
+      if ($property->type) {
+        $result->out->write("'{$property->type->name()}'],");
+      } else {
+        $result->out->write("null],");
+      }
+    }
+    $result->out->write(']];');
+
+    // Generate backing, using the hidden __id member
+    $result->out->write('private $__id=[');
+    foreach ($properties as $property) {
+      if (!isset($property->expression)) {
+        $result->out->write("'{$property->name}'=>null,");
+      } else if ($this->isConstant($result, $property->expression)) {
+        $result->out->write("'{$property->name}'=>");
+        $this->emitOne($result, $property->expression);
+        $result->out->write(',');
+      } else {
+        $result->locals[1]['$this->'.$property->name]= $property->expression;
+      }
+    }
+    $result->out->write('];');
+
+    // Generate __get
+    $result->out->write('public function __get($name) {
+      if (isset(self::__VIRTUAL[0][$name])) return $this->__id[$name];
+      trigger_error("Undefined property: ".static::class."::\$".$name, E_USER_WARNING);
+    }');
+
+    // Generate __set with typechecking, allowing scalar to string|bool, numeric to int|float coercion
+    $result->out->write('public function __set($name, $value) {
+      if ($p= self::__VIRTUAL[0][$name] ?? null) {
+        if ("string" === $p[1] && is_scalar($value)) {
+          $this->__id[$name]= (string)$value;
+        } else if ("int" === $p[1] && is_numeric($value)) {
+          $this->__id[$name]= (int)$value;
+        } else if ("float" === $p[1] && is_numeric($value)) {
+          $this->__id[$name]= (float)$value;
+        } else if ("bool" === $p[1] && is_scalar($value)) {
+          $this->__id[$name]= (bool)$value;
+        } else if (is($p[1], $value)) {
+          $this->__id[$name]= $value;
+        } else {
+          throw new \TypeError("Cannot assign ".typeof($value)." to property ".get_class($this)."::\$".$name." of type ".$p[1]);
+        }
+      }
+    }');
+  }
+
+
+  /**
    * Convert blocks to IIFEs to allow a list of statements where PHP syntactically
    * doesn't, e.g. `fn`-style lambdas or match expressions.
    *
@@ -397,7 +465,7 @@ abstract class PHP extends Emitter {
   protected function emitClass($result, $class) {
     array_unshift($result->type, $class);
     array_unshift($result->meta, []);
-    $result->locals= [[], []];
+    $result->locals= [[], [], []];
 
     $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
     $class->parent && $result->out->write(' extends '.$class->parent);
@@ -405,6 +473,11 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     foreach ($class->body as $member) {
       $this->emitOne($result, $member);
+    }
+
+    // Create __get and __set property access interceptors
+    if ($result->locals[2]) {
+      $this->emitVirtual($result, $result->locals[2]);
     }
 
     // Create constructor for property initializations to non-static scalars
