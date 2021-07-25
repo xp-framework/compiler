@@ -1,5 +1,6 @@
 <?php namespace xp\compiler;
 
+use Traversable;
 use io\Path;
 
 /** Streamed input */
@@ -18,7 +19,7 @@ class FromStream extends Input {
   }
 
   /** @return iterable */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     yield new Path($this->name) => $this->stream;
   }
 }
