@@ -1,5 +1,6 @@
 <?php namespace xp\compiler;
 
+use Traversable;
 use io\{File, Path};
 
 /** A single source file */
@@ -16,7 +17,7 @@ class FromFile extends Input {
   }
 
   /** @return iterable */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     yield new Path($this->file->getFileName()) => $this->file->in();
   }
 }

@@ -1,5 +1,7 @@
 <?php namespace xp\compiler;
 
+use Traversable;
+
 /** Various inputs */
 class FromInputs extends Input {
   private $inputs;
@@ -14,7 +16,7 @@ class FromInputs extends Input {
   }
 
   /** @return iterable */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     foreach ($this->in as $in) {
       foreach (parent::newInstance($in) as $path => $stream) {
         yield $path => $stream;

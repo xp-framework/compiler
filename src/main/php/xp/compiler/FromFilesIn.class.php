@@ -1,5 +1,6 @@
 <?php namespace xp\compiler;
 
+use Traversable;
 use io\Folder;
 
 /** Source files inside a given folder */
@@ -34,7 +35,7 @@ class FromFilesIn extends Input {
   }
 
   /** @return iterable */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     foreach ($this->filesIn($this->folder) as $path => $stream) {
       yield $path => $stream;
     }
