@@ -136,7 +136,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals('10+ items', $r);
   }
 
-  #[Test, Expect(class: Throwable::class, withMessage: '/Unhandled match value of type .+/')]
+  #[Test, Expect(class: Throwable::class, withMessage: '/Unhandled match (value of type .+|case .+)/')]
   public function unhandled_match() {
     $this->run('class <T> {
       public function run($arg) {
