@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.8.0 / 2021-08-04
+
+* Merged PR #120: Support for PHP 8.1 intersection types, accessible via
+  reflection in all PHP versions, and runtime type-checked with 8.1.0+
+  (@thekid)
+
 ## 6.7.0 / 2021-07-12
 
 * Changed emitter to omit extra newlines between members, making line
