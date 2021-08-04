@@ -60,7 +60,7 @@ class IntersectionTypesTest extends EmittingTest {
   }
 
   #[Test, Action(eval: 'new RuntimeVersion(">=8.1.0-dev")')]
-  public function parameter_function_type_restriction_with_php81() {
+  public function parameter_type_restriction_with_php81() {
     $t= $this->type('class <T> {
       public function test(): Traversable&Countable { }
     }');
