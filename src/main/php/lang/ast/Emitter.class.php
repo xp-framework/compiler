@@ -2,7 +2,7 @@
 
 use lang\ast\Node;
 use lang\reflect\Package;
-use lang\{IllegalArgumentException, IllegalStateException};
+use lang\{ClassLoader, IllegalArgumentException, IllegalStateException};
 
 abstract class Emitter {
   private $transformations= [];
@@ -11,16 +11,39 @@ abstract class Emitter {
    * Selects the correct emitter for a given runtime
    *
    * @param  string $runtime E.g. "PHP.".PHP_VERSION
+   * @param  lang.XPClass[] $add Traits to add
+   * @param  lang.XPClass[] $remove Traits to remove
    * @return lang.XPClass
    * @throws lang.IllegalArgumentException
    */
-  public static function forRuntime($runtime) {
+  public static function forRuntime($runtime, $add= [], $remove= []) {
     sscanf($runtime, '%[^.].%d.%d', $engine, $major, $minor);
     $p= Package::forName('lang.ast.emit');
 
     do {
       $impl= $engine.$major.$minor;
-      if ($p->providesClass($impl)) return $p->loadClass($impl);
+      if ($p->providesClass($impl)) {
+        $class= $p->loadClass($impl);
+        if (empty($add) && empty($remove)) return $class;
+
+        // Modify emitter class
+        $use= [];
+        foreach ($class->getTraits() as $trait) {
+          $use[$trait->getName()]= $trait;
+        }
+        foreach ($remove as $trait) {
+          unset($use[$trait->getName()]);
+        }
+        foreach ($add as $trait) {
+          $use[$trait->getName()]= $trait;
+        }
+
+        return ClassLoader::defineType(
+          sprintf('Emit%u', crc32(implode('&', array_keys($use)))),
+          ['kind' => 'class', 'extends' => [$class->getParentClass()], 'implements' => [], 'use' => $use],
+          []
+        );
+      }
     } while ($minor-- > 0);
 
     throw new IllegalArgumentException('XP Compiler does not support '.$runtime.' yet');

@@ -1,8 +1,9 @@
 <?php namespace xp\compiler;
 
 use io\Path;
-use lang\Runtime;
 use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Result, Tokens};
+use lang\reflect\Package;
+use lang\{ClassLoader, Runtime};
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -47,14 +48,21 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
+    $traits= Package::forName('lang.ast.emit');
     $target= 'PHP.'.PHP_VERSION;
     $in= $out= '-';
     $quiet= false;
+    $add= [];
+    $remove= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
       } else if ('-q' === $args[$i]) {
         $quiet= true;
+      } else if ('-' === ($args[$i][0] ?? null)) {
+        $remove[]= $traits->loadClass(substr($args[$i], 1));
+      } else if ('+' === ($args[$i][0] ?? null)) {
+        $add[]= $traits->loadClass(substr($args[$i], 1));
       } else if ('-o' === $args[$i]) {
         $out= $args[++$i];
         $in= array_slice($args, $i + 1);
@@ -70,8 +78,8 @@ class CompileRunner {
       }
     }
 
+    $emit= Emitter::forRuntime($target, $add, $remove)->newInstance();
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime($target)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }

@@ -2,7 +2,6 @@
 
 use lang\ast\Node;
 use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
-use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
 
 /**
  * PHP 7.0 syntax
@@ -10,25 +9,9 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_70
  */
 class PHP70 extends PHP {
+  use PHP70Literals;
   use OmitPropertyTypes, OmitConstModifiers;
   use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteMultiCatch, RewriteClassOnObjects, RewriteExplicitOctals, RewriteEnums;
-
-  /** Sets up type => literal mappings */
-  public function __construct() {
-    $this->literals= [
-      IsFunction::class     => function($t) { return 'callable'; },
-      IsArray::class        => function($t) { return 'array'; },
-      IsMap::class          => function($t) { return 'array'; },
-      IsValue::class        => function($t) { $l= $t->literal(); return 'static' === $l ? 'self' : $l; },
-      IsNullable::class     => function($t) { return null; },
-      IsUnion::class        => function($t) { return null; },
-      IsIntersection::class => function($t) { return null; },
-      IsLiteral::class      => function($t) {
-        $l= $t->literal();
-        return ('object' === $l || 'void' === $l || 'iterable' === $l || 'mixed' === $l || 'never' === $l) ? null : $l;
-      },
-    ];
-  }
 
   protected function emitCallable($result, $callable) {
     $t= $result->temp();

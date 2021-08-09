@@ -3,7 +3,7 @@
 use io\streams\MemoryOutputStream;
 use lang\ast\nodes\Variable;
 use lang\ast\{Emitter, Node, Code, Result};
-use lang\{IllegalStateException, IllegalArgumentException};
+use lang\{IllegalStateException, IllegalArgumentException, XPClass};
 use unittest\{Assert, Expect, Test, TestCase};
 
 class EmitterTest {
@@ -103,5 +103,25 @@ class EmitterTest {
     $fixture->emitOne(new Result($out), new Variable('a'));
 
     Assert::equals('<?php $a', $out->bytes());
+  }
+
+  #[Test]
+  public function add_enum_rewriting() {
+    $emitter= Emitter::forRuntime('PHP.8.1.0', [XPClass::forName('lang.ast.emit.RewriteEnums')], []);
+    $used= [];
+    foreach ($emitter->getTraits() as $trait) {
+      $used[$trait->getName()]= true;
+    }
+    Assert::true(isset($used['lang.ast.emit.RewriteEnums']));
+  }
+
+  #[Test]
+  public function remove_enum_rewriting() {
+    $emitter= Emitter::forRuntime('PHP.8.0.0', [], [XPClass::forName('lang.ast.emit.RewriteEnums')]);
+    $used= [];
+    foreach ($emitter->getTraits() as $trait) {
+      $used[$trait->getName()]= true;
+    }
+    Assert::false(isset($used['lang.ast.emit.RewriteEnums']));
   }
 }
