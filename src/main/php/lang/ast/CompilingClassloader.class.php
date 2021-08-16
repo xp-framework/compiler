@@ -1,5 +1,6 @@
 <?php namespace lang\ast;
 
+use lang\ast\emit\Reflection;
 use lang\reflect\Package;
 use lang\{
   ClassFormatException,
@@ -16,6 +17,12 @@ class CompilingClassLoader implements IClassLoader {
 
   private static $instance= [];
   private $version;
+
+  static function __static() {
+
+    // See https://github.com/xp-framework/compiler/issues/122
+    Reflection::__static();
+  }
 
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {

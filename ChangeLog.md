@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.8.1 / 2021-08-16
+
+* Fixed issue #122: Undefined constant `Sources::FromEmpty` (when using
+  PHP 8.1 native enumerations in PHP 8.0 and lower *and* the JIT compiler)
+  (@thekid)
+
 ## 6.8.0 / 2021-08-04
 
 * Merged PR #120: Support for PHP 8.1 intersection types, accessible via
