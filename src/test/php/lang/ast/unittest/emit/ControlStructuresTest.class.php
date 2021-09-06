@@ -53,6 +53,24 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
+  #[Test, Values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
+  public function switch_case_constant_ambiguity($whence, $expected) {
+    $r= $this->run('class <T> {
+      const SET = SEEK_SET;
+      const CURRENT = SEEK_CUR;
+      public function run($arg) {
+        $position= 1;
+        switch ($arg) {
+          case self::SET: $position= 10; break;
+          case self::CURRENT: $position+= 10; break;
+        }
+        return $position;
+      }
+    }', $whence);
+
+    Assert::equals($expected, $r);
+  }
+
   #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items']])]
   public function match($input, $expected) {
     $r= $this->run('class <T> {
