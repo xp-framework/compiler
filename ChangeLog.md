@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.8.2 / 2021-09-09
+
+* Fixed *Call to undefined method ...::emitoperator())* which do not
+  provide any context as to where an extraneous operator was encountered.
+  (@thekid)
+
 ## 6.8.1 / 2021-08-16
 
 * Fixed issue #122: Undefined constant `Sources::FromEmpty` (when using
