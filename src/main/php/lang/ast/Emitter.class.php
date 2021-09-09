@@ -1,6 +1,6 @@
 <?php namespace lang\ast;
 
-use lang\ast\Node;
+use lang\ast\{Node, Error, Errors};
 use lang\reflect\Package;
 use lang\{IllegalArgumentException, IllegalStateException};
 
@@ -75,6 +75,17 @@ abstract class Emitter {
    */
   protected function emit() {
     throw new IllegalStateException('Called without node kind');
+  }
+
+  /**
+   * Standalone operators
+   *
+   * @param  lang.ast.Result $result
+   * @param  lang.ast.Token $operator
+   * @return void
+   */
+  protected function emitOperator($result, $operator) {
+    throw new IllegalStateException('Unexpected operator '.$operator->value.' at line '.$operator->line);
   }
 
   /**
