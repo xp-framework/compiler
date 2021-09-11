@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.9.0 / 2021-09-12
+
+* Merged PR #124: Add support for readonly properties. Implements feature
+  request #115, using native code for PHP 8.1 and simulated via virtual
+  properties for PHP 7.X and PHP 8.0
+  (@thekid)
+
 ## 6.8.3 / 2021-09-11
 
 * Fixed types not being emitted for promoted properties - @thekid
