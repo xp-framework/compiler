@@ -1,5 +1,7 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Code;
+
 /**
  * Creates __get() and __set() overloads for readonly properties
  *
@@ -19,7 +21,25 @@ trait ReadonlyProperties {
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => [MODIFIER_READONLY]
     ];
-    $result->locals[2][$property->name]= null;
+
+    // Create virtual property
+    $result->locals[2][$property->name]= [
+      new Code('return $this->__virtual[$name][0] ?? null;'),
+      new Code('
+        if (isset($this->__virtual[$name])) {
+          throw new \\Error("Cannot modify readonly property ".__CLASS__."::{$name}");
+        }
+        $caller= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+        $scope= $caller["class"] ?? null;
+        if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope) {
+          throw new \\Error("Cannot initialize readonly property ".__CLASS__."::{$name} from ".($scope
+            ? "scope {$scope}"
+            : "global scope"
+          ));
+        }
+        $this->__virtual[$name]= [$value];
+      '),
+    ];
 
     if (isset($property->expression)) {
       if ($this->isConstant($result, $property->expression)) {

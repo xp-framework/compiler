@@ -407,36 +407,29 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $member);
     }
 
-    // Virtual properties support
+    // Virtual properties support: __virtual member + __get() and __set()
     if ($result->locals[2]) {
       $result->out->write('private $__virtual= [');
-      foreach ($result->locals[2] as $name => $_) {
+      foreach ($result->locals[2] as $name => $access) {
         $result->out->write("'{$name}' => null,");
       }
       $result->out->write('];');
-      $result->out->write('public function __get($name) {
-        if (!array_key_exists($name, $this->__virtual)) {
-          trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING);
-        }
 
-        return $this->__virtual[$name][0] ?? null;
-      }');
-      $result->out->write('public function __set($name, $value) {
-        if (isset($this->__virtual[$name])) {
-          throw new \\Error("Cannot modify readonly property ".__CLASS__."::".$name);
-        }
+      $result->out->write('public function __get($name) { switch ($name) {');
+      foreach ($result->locals[2] as $name => $access) {
+        $result->out->write('case "'.$name.'":');
+        $this->emitOne($result, $access[0]);
+        $result->out->write('break;');
+      }
+      $result->out->write('default: trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING); }}');
 
-        $caller= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-        $scope= $caller["class"] ?? null;
-        if (__CLASS__ !== $scope && \lang\VirtualProperty::class !== $scope) {
-          throw new \Error("Cannot initialize readonly property ".__CLASS__."::".$name." from ".($scope
-            ? "scope ".$scope
-            : "global scope"
-          ));
-        }
-
-        $this->__virtual[$name]= [$value];
-      }');
+      $result->out->write('public function __set($name, $value) { switch ($name) {');
+      foreach ($result->locals[2] as $name => $access) {
+        $result->out->write('case "'.$name.'":');
+        $this->emitOne($result, $access[1]);
+        $result->out->write('break;');
+      }
+      $result->out->write('}}');
     }
 
     // Create constructor for property initializations to non-static scalars
