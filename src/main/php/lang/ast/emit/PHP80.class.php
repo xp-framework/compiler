@@ -9,7 +9,7 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_80
  */
 class PHP80 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteExplicitOctals, RewriteEnums, CallablesAsClosures;
+  use RewriteBlockLambdaExpressions, RewriteExplicitOctals, RewriteEnums, ReadonlyProperties, CallablesAsClosures;
 
   /** Sets up type => literal mappings */
   public function __construct() {

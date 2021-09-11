@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, Variable, Literal, ArrayLiteral, Block};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, Variable, Literal, ArrayLiteral, Block, Property};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -397,7 +397,7 @@ abstract class PHP extends Emitter {
   protected function emitClass($result, $class) {
     array_unshift($result->type, $class);
     array_unshift($result->meta, []);
-    $result->locals= [[], []];
+    $result->locals= [[], [], []];
 
     $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
     $class->parent && $result->out->write(' extends '.$class->parent);
@@ -405,6 +405,38 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     foreach ($class->body as $member) {
       $this->emitOne($result, $member);
+    }
+
+    // Virtual properties support
+    if ($result->locals[2]) {
+      $result->out->write('private $__virtual= [');
+      foreach ($result->locals[2] as $name => $_) {
+        $result->out->write("'{$name}' => null,");
+      }
+      $result->out->write('];');
+      $result->out->write('public function __get($name) {
+        if (!array_key_exists($name, $this->__virtual)) {
+          trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING);
+        }
+
+        return $this->__virtual[$name][0] ?? null;
+      }');
+      $result->out->write('public function __set($name, $value) {
+        if (isset($this->__virtual[$name])) {
+          throw new \\Error("Cannot modify readonly property ".__CLASS__."::".$name);
+        }
+
+        $caller= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+        $scope= $caller["class"] ?? null;
+        if (__CLASS__ !== $scope && \lang\VirtualProperty::class !== $scope) {
+          throw new \Error("Cannot initialize readonly property ".__CLASS__."::".$name." from ".($scope
+            ? "scope ".$scope
+            : "global scope"
+          ));
+        }
+
+        $this->__virtual[$name]= [$value];
+      }');
     }
 
     // Create constructor for property initializations to non-static scalars
@@ -496,7 +528,10 @@ abstract class PHP extends Emitter {
         $this->attributes($result, $meta[DETAIL_ANNOTATIONS], $meta[DETAIL_TARGET_ANNO]);
         $result->out->write(', DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
         $result->out->write(', DETAIL_COMMENT => '.$this->comment($meta[DETAIL_COMMENT]));
-        $result->out->write(', DETAIL_ARGUMENTS => [\''.implode('\', \'', $meta[DETAIL_ARGUMENTS]).'\']],');
+        $result->out->write(', DETAIL_ARGUMENTS => ['.($meta[DETAIL_ARGUMENTS]
+          ? "'".implode("', '", $meta[DETAIL_ARGUMENTS])."']],"
+          : ']],'
+        ));
       }
       $result->out->write('],');
     }
@@ -577,10 +612,10 @@ abstract class PHP extends Emitter {
     // Include non-static initializations for members in constructor, removing
     // them to signal emitClass() no constructor needs to be generated.
     if ('__construct' === $method->name && isset($result->locals[1])) {
-      $locals= ['this' => true, 1 => $result->locals[1]];
+      $locals= [[], $result->locals[1], [], 'this' => true];
       $result->locals[1]= [];
     } else {
-      $locals= ['this' => true, 1 => []];
+      $locals= [[], [], [], 'this' => true];
     }
     $result->stack[]= $result->locals;
     $result->locals= $locals;
@@ -596,21 +631,16 @@ abstract class PHP extends Emitter {
     $result->out->write(implode(' ', $method->modifiers).' function '.$method->name);
     $this->emitSignature($result, $method->signature);
 
-    $promoted= '';
+    $promoted= [];
     foreach ($method->signature->parameters as $param) {
       $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
       $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
 
+      // Create properties from promoted parameters. Do not include default value, this is handled
+      // in emitParameter() already; otherwise we would be emitting it twice.
       if (isset($param->promote)) {
-        $promoted.= $param->promote.' $'.$param->name.';';
+        $promoted[]= new Property(explode(' ', $param->promote), $param->name, $param->type, null, [], null, $param->line);
         $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
-        $result->meta[0][self::PROPERTY][$param->name]= [
-          DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
-          DETAIL_ANNOTATIONS => [],
-          DETAIL_COMMENT     => null,
-          DETAIL_TARGET_ANNO => [],
-          DETAIL_ARGUMENTS   => []
-        ];
       }
 
       if (isset($param->default) && !$this->isConstant($result, $param->default)) {
@@ -627,9 +657,13 @@ abstract class PHP extends Emitter {
       $result->out->write('}');
     }
 
-    $result->out->write($promoted);
+    foreach ($promoted as $property) {
+      $this->emitOne($result, $property);
+    }
+
+    // Copy any virtual properties inside locals[2] to class scope
+    $result->locals= [2 => $result->locals[2]] + array_pop($result->stack);
     $result->meta[0][self::METHOD][$method->name]= $meta;
-    $result->locals= array_pop($result->stack);
   }
 
   protected function emitBraced($result, $braced) {

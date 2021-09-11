@@ -10,7 +10,7 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_70
  */
 class PHP70 extends PHP {
-  use OmitPropertyTypes, OmitConstModifiers;
+  use OmitPropertyTypes, OmitConstModifiers, ReadonlyProperties;
   use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteMultiCatch, RewriteClassOnObjects, RewriteExplicitOctals, RewriteEnums;
 
   /** Sets up type => literal mappings */
