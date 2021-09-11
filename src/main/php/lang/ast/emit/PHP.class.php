@@ -602,7 +602,7 @@ abstract class PHP extends Emitter {
       $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
 
       if (isset($param->promote)) {
-        $promoted.= $param->promote.' $'.$param->name.';';
+        $promoted.= $param->promote.' '.$this->propertyType($param->type).' $'.$param->name.';';
         $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
         $result->meta[0][self::PROPERTY][$param->name]= [
           DETAIL_RETURNS     => $param->type ? $param->type->name() : 'var',
