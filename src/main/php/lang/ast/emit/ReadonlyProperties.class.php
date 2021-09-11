@@ -22,11 +22,11 @@ trait ReadonlyProperties {
       DETAIL_ARGUMENTS   => [MODIFIER_READONLY]
     ];
 
-    // Create virtual property
+    // Create virtual property implementing the readonly semantics
     $result->locals[2][$property->name]= [
-      new Code('return $this->__virtual[$name][0] ?? null;'),
+      new Code('return $this->__virtual["'.$property->name.'"][0] ?? null;'),
       new Code('
-        if (isset($this->__virtual[$name])) {
+        if (isset($this->__virtual["'.$property->name.'"])) {
           throw new \\Error("Cannot modify readonly property ".__CLASS__."::{$name}");
         }
         $caller= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
@@ -37,7 +37,7 @@ trait ReadonlyProperties {
             : "global scope"
           ));
         }
-        $this->__virtual[$name]= [$value];
+        $this->__virtual["'.$property->name.'"]= [$value];
       '),
     ];
 
