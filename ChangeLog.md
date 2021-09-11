@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.8.3 / 2021-09-11
+
+* Fixed types not being emitted for promoted properties - @thekid
+
 ## 6.8.2 / 2021-09-09
 
 * Fixed *Call to undefined method ...::emitoperator())* which do not
