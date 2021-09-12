@@ -2,15 +2,12 @@
 
 use lang\ClassLoader;
 
-/**
- * XP Compiler
- */
+/** XP Compiler */
 module xp-framework/compiler {
 
   /** @return void */
   public function initialize() {
-    $runtime= 'PHP.'.PHP_VERSION;
-    ClassLoader::registerLoader(CompilingClassloader::instanceFor($runtime));
+    ClassLoader::registerLoader(CompilingClassloader::instanceFor('php:'.PHP_VERSION));
 
     if (!interface_exists(\IDisposable::class, false)) {
       eval('interface IDisposable { public function __dispose(); }');

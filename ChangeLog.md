@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.10.0 / 2021-09-12
+
+* Implemented feature request #123: Use `php:X.Y` instead of *PHP.X.Y*
+  for target runtimes. The older syntax is still supported!
+  (@thekid)
+
 ## 6.9.0 / 2021-09-12
 
 * Merged PR #124: Add support for readonly properties. Implements feature

@@ -10,7 +10,7 @@ class CompilingClassLoaderTest {
   private static $runtime;
 
   static function __static() {
-    self::$runtime= 'PHP.'.PHP_VERSION;
+    self::$runtime= 'php:'.PHP_VERSION;
   }
 
   /**
@@ -49,17 +49,17 @@ class CompilingClassLoaderTest {
 
   #[Test, Values(['7.0.0', '7.0.1', '7.1.0', '7.2.0', '7.3.0', '7.4.0', '7.4.12', '8.0.0'])]
   public function supports_php($version) {
-    CompilingClassLoader::instanceFor('PHP.'.$version);
+    CompilingClassLoader::instanceFor('php:'.$version);
   }
 
   #[Test]
   public function string_representation() {
-    Assert::equals('CompilingCL<PHP70>', CompilingClassLoader::instanceFor('PHP.7.0.0')->toString());
+    Assert::equals('CompilingCL<PHP70>', CompilingClassLoader::instanceFor('php:7.0.0')->toString());
   }
 
   #[Test]
   public function hashcode() {
-    Assert::equals('CPHP70', CompilingClassLoader::instanceFor('PHP.7.0.0')->hashCode());
+    Assert::equals('CPHP70', CompilingClassLoader::instanceFor('php:7.0.0')->hashCode());
   }
 
   #[Test]

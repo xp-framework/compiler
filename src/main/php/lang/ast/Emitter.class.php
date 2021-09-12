@@ -10,14 +10,15 @@ abstract class Emitter {
   /**
    * Selects the correct emitter for a given runtime
    *
-   * @param  string $runtime E.g. "PHP.".PHP_VERSION
+   * @param  string $runtime E.g. "php:".PHP_VERSION
    * @return lang.XPClass
    * @throws lang.IllegalArgumentException
    */
   public static function forRuntime($runtime) {
-    sscanf($runtime, '%[^.].%d.%d', $engine, $major, $minor);
+    sscanf($runtime, '%[^.:]%*[.:]%d.%d', $engine, $major, $minor);
     $p= Package::forName('lang.ast.emit');
 
+    $engine= strtoupper($engine);
     do {
       $impl= $engine.$major.$minor;
       if ($p->providesClass($impl)) return $p->loadClass($impl);

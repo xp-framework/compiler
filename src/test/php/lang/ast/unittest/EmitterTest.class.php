@@ -9,7 +9,7 @@ use unittest\{Assert, Expect, Test, TestCase};
 class EmitterTest {
 
   private function newEmitter() {
-    return Emitter::forRuntime('PHP.'.PHP_VERSION)->newInstance();
+    return Emitter::forRuntime('php:'.PHP_VERSION)->newInstance();
   }
 
   #[Test]
@@ -17,9 +17,14 @@ class EmitterTest {
     $this->newEmitter();
   }
 
+  #[Test]
+  public function dotted_argument_bc() {
+    Assert::equals(Emitter::forRuntime('php:'.PHP_VERSION), Emitter::forRuntime('PHP.'.PHP_VERSION));
+  }
+
   #[Test, Expect(IllegalArgumentException::class)]
   public function cannot_create_for_unsupported_php_version() {
-    Emitter::forRuntime('PHP.4.3.0');
+    Emitter::forRuntime('php:4.3.0');
   }
 
   #[Test]

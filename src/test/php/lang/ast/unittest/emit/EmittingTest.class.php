@@ -31,7 +31,7 @@ abstract class EmittingTest {
    *
    * @return string
    */
-  protected function runtime() { return 'PHP.'.PHP_VERSION; }
+  protected function runtime() { return 'php:'.PHP_VERSION; }
 
   /**
    * Register a transformation. Will take care of removing it on test shutdown.

@@ -32,7 +32,7 @@ use util\profiling\Timer;
  *   ```
  * - Target PHP 7.4 (default target is current PHP version)
  *   ```sh
- *   $ xp compile -t PHP.7.4 HelloWorld.php HelloWorld.class.php
+ *   $ xp compile -t php:7.4 HelloWorld.php HelloWorld.class.php
  *   ```
  *
  * The *-o* and *-n* options accept multiple input sources following them.
@@ -47,7 +47,7 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $target= 'PHP.'.PHP_VERSION;
+    $target= 'php:'.PHP_VERSION;
     $in= $out= '-';
     $quiet= false;
     for ($i= 0; $i < sizeof($args); $i++) {
