@@ -204,4 +204,18 @@ class InitializeWithExpressionsTest extends EmittingTest {
     }');
     Assert::equals(new Handle(0), $r);
   }
+
+  #[Test]
+  public function with_argument_promotion() {
+    $t= $this->type('use lang\ast\unittest\emit\Handle; class <T> {
+      private $h= new Handle(0);
+
+      public function __construct(private Handle $p) { }
+
+      public function run() {
+        return $this->h->compareTo($this->p);
+      }
+    }');
+    Assert::equals(1, $t->newInstance(new Handle(1))->run());
+  }
 }
