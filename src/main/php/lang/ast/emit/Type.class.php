@@ -4,9 +4,7 @@ abstract class Type {
   public static $ENUMS;
 
   static function __static() {
-
-    // TODO: Check PHP version ID once enum PR is merged
-    self::$ENUMS= class_exists(\ReflectionEnum::class, false);
+    self::$ENUMS= PHP_VERSION_ID >= 80100;
   }
 
   /** @return string */
