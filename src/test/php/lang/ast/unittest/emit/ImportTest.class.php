@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use Traversable, Iterator;
 use lang\XPClass;
 use unittest\{Assert, Test};
 use util\Date;
@@ -50,6 +51,28 @@ class ImportTest extends EmittingTest {
 
       class <T> {
         public function run() { return fixture(); }
+      }'
+    ));
+  }
+
+  #[Test]
+  public function import_global_into_namespace() {
+    Assert::equals(Traversable::class, $this->run('namespace test;
+      use Traversable;
+
+      class <T> {
+        public function run() { return Traversable::class; }
+      }'
+    ));
+  }
+
+  #[Test]
+  public function import_globals_into_namespace() {
+    Assert::equals([Traversable::class, Iterator::class], $this->run('namespace test;
+      use Traversable, Iterator;
+
+      class <T> {
+        public function run() { return [Traversable::class, Iterator::class]; }
       }'
     ));
   }
