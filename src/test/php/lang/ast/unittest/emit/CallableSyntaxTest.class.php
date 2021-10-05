@@ -149,4 +149,14 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
   }
+
+  #[Test]
+  public function instantiation() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run() {
+        return new Handle(...);
+      }
+    }');
+    Assert::equals(new Handle(1), $f(1));
+  }
 }
