@@ -11,14 +11,6 @@ use lang\ast\nodes\{InstanceExpression, ScopeExpression, NewExpression, NewClass
 trait CallablesAsClosures {
 
   protected function emitCallable($result, $callable) {
-    if ($callable->expression instanceof NewExpression || $callable->expression instanceof NewClassExpression) {
-      $unpack= cast($callable->expression->arguments[0], UnpackExpression::class);
-      $result->out->write('function(...$'.$unpack->expression->name.') { return ');
-      $this->emitOne($result, $callable->expression);
-      $result->out->write(';}');
-      return;
-    }
-
     $result->out->write('\Closure::fromCallable(');
     if ($callable->expression instanceof Literal) {
 

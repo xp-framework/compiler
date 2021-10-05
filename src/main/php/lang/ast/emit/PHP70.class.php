@@ -31,14 +31,6 @@ class PHP70 extends PHP {
   }
 
   protected function emitCallable($result, $callable) {
-    if ($callable->expression instanceof NewExpression || $callable->expression instanceof NewClassExpression) {
-      $unpack= cast($callable->expression->arguments[0], UnpackExpression::class);
-      $result->out->write('function(...$'.$unpack->expression->name.') { return ');
-      $this->emitOne($result, $callable->expression);
-      $result->out->write(';}');
-      return;
-    }
-
     $t= $result->temp();
     $result->out->write('(is_callable('.$t.'=');
     if ($callable->expression instanceof Literal) {
