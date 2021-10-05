@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, NewExpression, NewClassExpression, Literal};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, NewExpression, NewClassExpression, UnpackExpression, Literal};
 
 /**
  * Rewrites callable expressions to `Callable::fromClosure()`
@@ -12,7 +12,8 @@ trait CallablesAsClosures {
 
   protected function emitCallable($result, $callable) {
     if ($callable->expression instanceof NewExpression || $callable->expression instanceof NewClassExpression) {
-      $result->out->write('fn(...$_args) => ');
+      $unpack= cast($callable->expression->arguments[0], UnpackExpression::class);
+      $result->out->write('fn(...$'.$unpack->expression->name.') => ');
       $this->emitOne($result, $callable->expression);
       return;
     }
