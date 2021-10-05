@@ -165,11 +165,11 @@ class CallableSyntaxTest extends EmittingTest {
     $f= $this->run('class <T> {
       public function run() {
         return new class(...) {
-          public function __construct(private $value) { }
-          public function value() { return $this->value; }
+          public $value;
+          public function __construct($value) { $this->value= $value; }
         };
       }
     }');
-    Assert::equals($this, $f($this)->value());
+    Assert::equals($this, $f($this)->value);
   }
 }
