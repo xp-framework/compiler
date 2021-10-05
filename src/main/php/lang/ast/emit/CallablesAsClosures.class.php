@@ -6,6 +6,7 @@ use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
 /**
  * Rewrites callable expressions to `Callable::fromClosure()`
  *
+ * @see  https://www.php.net/manual/de/closure.fromcallable.php
  * @see  https://wiki.php.net/rfc/first_class_callable_syntax
  */
 trait CallablesAsClosures {
