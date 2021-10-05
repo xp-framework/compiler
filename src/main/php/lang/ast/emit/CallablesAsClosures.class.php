@@ -13,8 +13,9 @@ trait CallablesAsClosures {
   protected function emitCallable($result, $callable) {
     if ($callable->expression instanceof NewExpression || $callable->expression instanceof NewClassExpression) {
       $unpack= cast($callable->expression->arguments[0], UnpackExpression::class);
-      $result->out->write('fn(...$'.$unpack->expression->name.') => ');
+      $result->out->write('function(...$'.$unpack->expression->name.') { return ');
       $this->emitOne($result, $callable->expression);
+      $result->out->write(';}');
       return;
     }
 
