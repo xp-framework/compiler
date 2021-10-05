@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, NewExpression, NewClassExpression, UnpackExpression, Literal};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
 
 /**
