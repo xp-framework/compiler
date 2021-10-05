@@ -159,4 +159,17 @@ class CallableSyntaxTest extends EmittingTest {
     }');
     Assert::equals(new Handle(1), $f(1));
   }
+
+  #[Test]
+  public function anonymous_instantiation() {
+    $f= $this->run('class <T> {
+      public function run() {
+        return new class(...) {
+          public function __construct(private $value) { }
+          public function value() { return $this->value; }
+        };
+      }
+    }');
+    Assert::equals($this, $f($this)->value());
+  }
 }
