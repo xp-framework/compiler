@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.11.0 / 2021-10-06
+
+* Merged PR #125: Support `new T(...)` callable syntax - @thekid
+
 ## 6.10.0 / 2021-09-12
 
 * Implemented feature request #123: Use `php:X.Y` instead of *PHP.X.Y*
