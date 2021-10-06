@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, Variable, Literal, ArrayLiteral, Block, Property};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block, Property};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -972,6 +972,17 @@ abstract class PHP extends Emitter {
   protected function emitCallable($result, $callable) {
     $this->emitOne($result, $callable->expression);
     $result->out->write('(...)');
+  }
+
+  protected function emitCallableNew($result, $callable) {
+    $t= $result->temp();
+    $result->out->write("function(...{$t}) { return ");
+
+    $callable->type->arguments= [new UnpackExpression(new Variable(substr($t, 1)), $callable->line)];
+    $this->emitOne($result, $callable->type);
+    $callable->type->arguments= null;
+
+    $result->out->write("; }");
   }
 
   protected function emitInvoke($result, $invoke) {
