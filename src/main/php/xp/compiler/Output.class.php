@@ -14,7 +14,7 @@ abstract class Output {
     if (null === $arg) {
       return new CompileOnly();
     } else if ('-' === $arg) {
-      return new ToStream(Console::$out->getStream());
+      return new ToStream(Console::$out->stream());
     } else if (strstr($arg, '.php')) {
       return new ToFile($arg);
     } else if (strstr($arg, '.xar')) {

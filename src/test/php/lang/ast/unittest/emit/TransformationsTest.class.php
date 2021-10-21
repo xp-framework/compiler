@@ -52,13 +52,18 @@ class TransformationsTest extends EmittingTest {
   public function generates_string_representation() {
     $t= $this->type('#[Repr] class <T> {
       private int $id;
+      private string $name;
 
-      public function __construct(int $id) {
+      public function __construct(int $id, string $name) {
         $this->id= $id;
+        $this->name= $name;
       }
     }');
     Assert::true($t->hasMethod('toString'));
-    Assert::equals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
+    Assert::equals(
+      "T@[\n  id => 1\n  name => \"Test\"\n]",
+      $t->getMethod('toString')->invoke($t->newInstance(1, 'Test'))
+    );
   }
 
   #[Test, Values([['id', 1], ['name', 'Test']])]
@@ -80,12 +85,20 @@ class TransformationsTest extends EmittingTest {
   public function generates_both() {
     $t= $this->type('#[Repr, Getters] class <T> {
       private int $id;
+      private string $name;
 
-      public function __construct(int $id) {
+      public function __construct(int $id, string $name) {
         $this->id= $id;
+        $this->name= $name;
       }
     }');
-    Assert::equals(1, $t->getMethod('id')->invoke($t->newInstance(1)));
-    Assert::equals("T@[\n  id => 1\n]", $t->getMethod('toString')->invoke($t->newInstance(1)));
+
+    $instance= $t->newInstance(1, 'Test');
+    Assert::equals(1, $t->getMethod('id')->invoke($instance));
+    Assert::equals('Test', $t->getMethod('name')->invoke($instance));
+    Assert::equals(
+      "T@[\n  id => 1\n  name => \"Test\"\n]",
+      $t->getMethod('toString')->invoke($instance)
+    );
   }
 }

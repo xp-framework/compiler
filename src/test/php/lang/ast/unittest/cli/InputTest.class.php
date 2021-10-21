@@ -26,7 +26,7 @@ class InputTest {
 
   #[Test]
   public function from_stdin() {
-    Assert::equals(new FromStream(Console::$in->getStream(), '-'), Input::newInstance('-'));
+    Assert::equals(new FromStream(Console::$in->stream(), '-'), Input::newInstance('-'));
   }
 
   #[Test]

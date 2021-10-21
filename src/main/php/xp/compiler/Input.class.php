@@ -14,7 +14,7 @@ abstract class Input implements \IteratorAggregate {
    */
   public static function newInstance($arg) {
     if ('-' === $arg) {
-      return new FromStream(Console::$in->getStream(), '-');
+      return new FromStream(Console::$in->stream(), '-');
     } else if (is_array($arg)) {
       return new FromInputs($arg);
     } else if (is_file($arg)) {

@@ -34,7 +34,7 @@ class OutputTest {
 
   #[Test]
   public function to_stdin() {
-    Assert::equals(new ToStream(Console::$out->getStream()), Output::newInstance('-'));
+    Assert::equals(new ToStream(Console::$out->stream()), Output::newInstance('-'));
   }
 
   #[Test]

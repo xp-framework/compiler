@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 7.0.0 / 2021-10-21
+
+* Made compatible with XP 11 - @thekid
+* Implemented xp-framework/rfc#341, dropping compatibility with XP 9
+  (@thekid)
+
 ## 6.11.0 / 2021-10-06
 
 * Merged PR #125: Support `new T(...)` callable syntax - @thekid
