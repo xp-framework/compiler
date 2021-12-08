@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\loader;
 
-use io\{File, FileUtil, Folder};
+use io\{File, Files, Folder};
 use lang\ast\CompilingClassLoader;
 use lang\{ClassFormatException, ClassNotFoundException, ElementNotFoundException, ClassLoader, Environment};
 use unittest\actions\RuntimeVersion;
@@ -28,7 +28,7 @@ class CompilingClassLoaderTest {
 
     $names= [];
     foreach ($source as $type => $code) {
-      FileUtil::setContents(new File($folder, $type.'.php'), sprintf($code, $namespace));
+      Files::write(new File($folder, $type.'.php'), sprintf($code, $namespace));
       $names[$type]= $namespace.'.'.$type;
     }
     $cl= ClassLoader::registerPath($folder->path);
