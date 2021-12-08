@@ -11,45 +11,41 @@ use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
  */
 trait CallablesAsClosures {
 
-  protected function emitCallable($result, $callable) {
-    $result->out->write('\Closure::fromCallable(');
-    if ($callable->expression instanceof Literal) {
+  private function emitQuoted($result, $node) {
+    if ($node instanceof Literal) {
 
       // Rewrite f() => "f"
-      $result->out->write('"'.trim($callable->expression->expression, '"\'').'"');
-    } else if ($callable->expression instanceof InstanceExpression) {
+      $result->out->write('"'.trim($node, '"\'').'"');
+    } else if ($node instanceof InstanceExpression) {
 
       // Rewrite $this->f => [$this, "f"]
       $result->out->write('[');
-      $this->emitOne($result, $callable->expression->expression);
-      if ($callable->expression->member instanceof Literal) {
-        $result->out->write(',"'.trim($callable->expression->member, '"\'').'"');
-      } else {
-        $result->out->write(',');
-        $this->emitOne($result, $callable->expression->member);
-      }
+      $this->emitOne($result, $node->expression);
+      $result->out->write(',');
+      $this->emitQuoted($result, $node->member);
       $result->out->write(']');
-    } else if ($callable->expression instanceof ScopeExpression) {
+    } else if ($node instanceof ScopeExpression) {
 
-      // Rewrite self::f => ["self", "f"]
+      // Rewrite T::f => [T::class, "f"]
       $result->out->write('[');
-      if ($callable->expression->type instanceof Node) {
-        $this->emitOne($result, $callable->expression->type);
+      if ($node->type instanceof Node) {
+        $this->emitOne($result, $node->type);
       } else {
-        $result->out->write('"'.$callable->expression->type.'"');
+        $result->out->write($node->type.'::class');
       }
-      if ($callable->expression->member instanceof Literal) {
-        $result->out->write(',"'.trim($callable->expression->member, '"\'').'"');
-      } else {
-        $result->out->write(',');
-        $this->emitOne($result, $callable->expression->member);
-      }
+      $result->out->write(',');
+      $this->emitQuoted($result, $node->member);
       $result->out->write(']');
     } else {
 
       // Emit other expressions as-is
-      $this->emitOne($result, $callable->expression);
+      $this->emitOne($result, $node);
     }
+  }
+
+  protected function emitCallable($result, $callable) {
+    $result->out->write('\Closure::fromCallable(');
+    $this->emitQuoted($result, $callable->expression);
     $result->out->write(')');
   }
 }
