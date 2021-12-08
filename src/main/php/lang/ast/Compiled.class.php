@@ -6,6 +6,7 @@ class Compiled implements OutputStream {
   public static $source= [], $emit= [], $lang= [];
 
   private $compiled= '', $offset= 0;
+  public $context;
 
   public static function bytes($version, $source, $file) {
     $stream= $source[1]->getResourceAsStream($file);

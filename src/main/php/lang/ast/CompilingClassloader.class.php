@@ -17,6 +17,7 @@ class CompilingClassLoader implements IClassLoader {
 
   private static $instance= [];
   private $version;
+  private $source= [];
 
   static function __static() {
 

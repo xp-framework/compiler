@@ -4,7 +4,7 @@ use Traversable;
 
 /** Various inputs */
 class FromInputs extends Input {
-  private $inputs;
+  private $in;
 
   /**
    * Creates a new instance
