@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 7.1.0 / 2021-12-08
+
+* Added preliminary PHP 8.2 support by fixing various issues throughout
+  the code base and adding a PHP 8.2 emitter.
+  (@thekid)
+
 ## 7.0.0 / 2021-10-21
 
 * Made compatible with XP 11 - @thekid
