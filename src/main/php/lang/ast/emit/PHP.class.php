@@ -759,43 +759,40 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitMatch($result, $match) {
-    $t= $result->temp();
     if (null === $match->expression) {
-      $result->out->write('('.$t.'=true)');
+      $result->out->write('match (true) {');
     } else {
-      $result->out->write('('.$t.'=');
+      $result->out->write('match (');
       $this->emitOne($result, $match->expression);
-      $result->out->write(')');
+      $result->out->write(') {');
     }
 
-    $b= 0;
     foreach ($match->cases as $case) {
+      $b= 0;
       foreach ($case->expressions as $expression) {
-        $b && $result->out->write($t);
-        $result->out->write('===(');
+        $b && $result->out->write(',');
         $this->emitOne($result, $expression);
-        $result->out->write(')?');
-        $this->emitAsExpression($result, $case->body);
-        $result->out->write(':(');
         $b++;
       }
+      $result->out->write('=>');
+      $this->emitAsExpression($result, $case->body);
+      $result->out->write(',');
     }
 
-    // Emit IIFE for raising an error until we have throw expressions
-    if (null === $match->default) {
-      $result->out->write('function() use('.$t.') { throw new \\Error("Unhandled match value of type ".gettype('.$t.')); })(');
-    } else {
+    if ($match->default) {
+      $result->out->write('default=>');
       $this->emitAsExpression($result, $match->default);
     }
-    $result->out->write(str_repeat(')', $b));
+
+    $result->out->write('}');
   }
 
   protected function emitCatch($result, $catch) {
-    $capture= $catch->variable ? '$'.$catch->variable : $result->temp();
+    $capture= $catch->variable ? ' $'.$catch->variable : '';
     if (empty($catch->types)) {
-      $result->out->write('catch(\\Throwable '.$capture.') {');
+      $result->out->write('catch(\\Throwable'.$capture.') {');
     } else {
-      $result->out->write('catch('.implode('|', $catch->types).' '.$capture.') {');
+      $result->out->write('catch('.implode('|', $catch->types).$capture.') {');
     }
     $this->emitAll($result, $catch->body);
     $result->out->write('}');
@@ -824,13 +821,8 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitThrowExpression($result, $throw) {
-    $result->out->write('(');
-    $this->enclose($result, $throw->expression, null, function($result, $expression) {
-      $result->out->write('throw ');
-      $this->emitOne($result, $expression);
-      $result->out->write(';');
-    });
-    $result->out->write(')()');
+    $result->out->write('throw ');
+    $this->emitOne($result, $throw->expression);
   }
 
   protected function emitForeach($result, $foreach) {
@@ -920,25 +912,24 @@ abstract class PHP extends Emitter {
 
   protected function emitArguments($result, $arguments) {
     $i= 0;
-    foreach ($arguments as $argument) {
+    foreach ($arguments as $name => $argument) {
       if ($i++) $result->out->write(',');
+      if (is_string($name)) $result->out->write($name.':');
       $this->emitOne($result, $argument);
     }
   }
 
   protected function emitNew($result, $new) {
     if ($new->type instanceof Node) {
-      $t= $result->temp();
-      $result->out->write('('.$t.'= ');
+      $result->out->write('new (');
       $this->emitOne($result, $new->type);
-      $result->out->write(') ? new '.$t.'(');
-      $this->emitArguments($result, $new->arguments);
-      $result->out->write(') : null');
+      $result->out->write(')(');
     } else {
       $result->out->write('new '.$new->type.'(');
-      $this->emitArguments($result, $new->arguments);
-      $result->out->write(')');
     }
+
+    $this->emitArguments($result, $new->arguments);
+    $result->out->write(')');
   }
 
   protected function emitNewClass($result, $new) {
@@ -1032,10 +1023,8 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNullsafeInstance($result, $instance) {
-    $t= $result->temp();
-    $result->out->write('null===('.$t.'=');
     $this->emitOne($result, $instance->expression);
-    $result->out->write(')?null:'.$t.'->');
+    $result->out->write('?->');
 
     if ('literal' === $instance->member->kind) {
       $result->out->write($instance->member->expression);
