@@ -22,7 +22,7 @@ class PHP81Test extends EmittingTest {
   public function unit_enum() {
     Assert::equals(
       'enum OS{case WINDOWS;case UNIX;};',
-      preg_replace('/static function __init.+__init\(\);/', '}', $this->emit('enum OS { case WINDOWS; case UNIX; }'))
+      preg_replace('/static function __static.+}}/', '}', $this->emit('enum OS { case WINDOWS; case UNIX; }'))
     );
   }
 
@@ -30,7 +30,7 @@ class PHP81Test extends EmittingTest {
   public function backed_enum() {
     Assert::equals(
       'enum Suit:string{case Hearts="♥";};',
-      preg_replace('/static function __init.+__init\(\);/', '}', $this->emit('enum Suit : string { case Hearts= "♥"; }'))
+      preg_replace('/static function __static.+}}/', '}', $this->emit('enum Suit : string { case Hearts= "♥"; }'))
     );
   }
 

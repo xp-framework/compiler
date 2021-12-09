@@ -382,15 +382,18 @@ abstract class PHP extends Emitter {
     $enum->implements && $result->out->write(' implements '.implode(', ', $enum->implements));
     $result->out->write('{');
 
-    foreach ($enum->body as $member) {
-      $this->emitOne($result, $member);
+    foreach ($enum->body as $name => $member) {
+      if ('__static()' !== $name) {
+        $this->emitOne($result, $member);
+      }
     }
 
     // Initializations
-    $result->out->write('static function __init() {');
+    $result->out->write('static function __static() {');
+    isset($enum->body['__static()']) && $this->emitAll($result, $enum->body['__static()']->body);
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-    $result->out->write('}} '.$enum->name.'::__init();');
+    $result->out->write('}}');
     array_shift($result->type);
   }
 
@@ -403,8 +406,10 @@ abstract class PHP extends Emitter {
     $class->parent && $result->out->write(' extends '.$class->parent);
     $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
     $result->out->write('{');
-    foreach ($class->body as $member) {
-      $this->emitOne($result, $member);
+    foreach ($class->body as $name => $member) {
+      if ('__static()' !== $name) {
+        $this->emitOne($result, $member);
+      }
     }
 
     // Virtual properties support: __virtual member + __get() and __set()
@@ -440,10 +445,16 @@ abstract class PHP extends Emitter {
       $result->out->write('}');
     }
 
-    $result->out->write('static function __init() {');
+    // Merge static initializer. For XP enums, include parent initializer
+    $result->out->write('static function __static() {');
+    if (isset($class->body['__static()'])) {
+      $this->emitAll($result, $class->body['__static()']->body);
+    } else if ('\\lang\\Enum' === $class->parent) {
+      $result->out->write('parent::__static();');
+    }
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
-    $result->out->write('}} '.$class->name.'::__init();');
+    $result->out->write('}}');
     array_shift($result->type);
   }
 

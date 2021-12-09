@@ -21,9 +21,11 @@ trait RewriteEnums {
     $result->out->write('{');
 
     $cases= [];
-    foreach ($enum->body as $member) {
+    foreach ($enum->body as $name => $member) {
       if ($member->is('enumcase')) $cases[]= $member;
-      $this->emitOne($result, $member);
+      if ('__static()' !== $name) {
+        $this->emitOne($result, $member);
+      }
     }
 
     // Constructors
@@ -62,7 +64,7 @@ trait RewriteEnums {
     $result->out->write(']; }');
 
     // Initializations
-    $result->out->write('static function __init() {');
+    $result->out->write('static function __static() {');
     if ($enum->base) {
       foreach ($cases as $case) {
         $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'", ');
@@ -74,9 +76,10 @@ trait RewriteEnums {
         $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
       }
     }
+    isset($enum->body['__static()']) && $this->emitAll($result, $enum->body['__static()']->body);
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-    $result->out->write('}} '.$enum->name.'::__init();');
+    $result->out->write('}}');
     array_shift($result->type);
   }
 }
