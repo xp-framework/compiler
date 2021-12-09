@@ -8,7 +8,8 @@ use util\cmd\Console;
 use util\profiling\Timer;
 
 /**
- * Compiles future PHP to today's PHP.
+ * Compiles future PHP to today's PHP
+ * ==================================
  *
  * - Compile code and write result to a class file
  *   ```sh
