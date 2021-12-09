@@ -239,10 +239,10 @@ class MembersTest extends EmittingTest {
   #[Test]
   public function static_return_type() {
     $t= $this->type('
-      class <T>Base { public function run(): static { return $this; } }
-      class <T> extends <T>Base { }
+      class <T> { public function run(): static { return $this; } }
     ');
-    Assert::equals($t, $t->getMethod('run')->getReturnType());
+    $child= typeof(newinstance($t->literal(), [], []));
+    Assert::equals($child, $child->getMethod('run')->getReturnType());
   }
 
   #[Test]
