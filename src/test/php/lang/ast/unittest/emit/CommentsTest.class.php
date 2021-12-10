@@ -23,6 +23,12 @@ class CommentsTest extends EmittingTest {
   }
 
   #[Test]
+  public function on_enum() {
+    $t= $this->type('/** Test */ enum <T> { }');
+    Assert::equals('Test', $t->getComment());
+  }
+
+  #[Test]
   public function on_method() {
     $t= $this->type('class <T> {
 
