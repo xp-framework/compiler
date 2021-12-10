@@ -6,7 +6,7 @@ use unittest\{Assert, Test};
 class PHP81Test extends EmittingTest {
 
   /** @return string */
-  protected function runtime() { return 'PHP.8.1.0'; }
+  protected function runtime() { return 'php:8.1.0'; }
 
   #[Test]
   public function named_argument() {

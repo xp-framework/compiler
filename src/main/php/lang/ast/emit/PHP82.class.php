@@ -6,6 +6,7 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
 /**
  * PHP 8.2 syntax
  *
+ * @test lang.ast.unittest.emit.PHP82Test
  * @see  https://wiki.php.net/rfc#php_82
  */
 class PHP82 extends PHP {
