@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 7.2.0 / 2021-12-20
+
+* Optimized generated code for arrays including unpack expressions for
+  PHP 8.1+, which natively supports unpacking with keys. See
+  https://wiki.php.net/rfc/array_unpacking_string_keys
+  (@thekid)
+
 ## 7.1.0 / 2021-12-08
 
 * Added preliminary PHP 8.2 support by fixing various issues throughout

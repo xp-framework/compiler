@@ -10,8 +10,23 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_70
  */
 class PHP70 extends PHP {
-  use OmitPropertyTypes, OmitConstModifiers, OmitArgumentNames, ReadonlyProperties, MatchAsTernaries, NullsafeAsTernaries, ArbitrayNewExpressions;
-  use RewriteNullCoalesceAssignment, RewriteLambdaExpressions, RewriteMultiCatch, RewriteClassOnObjects, RewriteExplicitOctals, RewriteEnums, RewriteThrowableExpressions;
+  use 
+    ArbitrayNewExpressions,
+    ArrayUnpackUsingMerge,
+    MatchAsTernaries,
+    NullsafeAsTernaries,
+    OmitArgumentNames,
+    OmitConstModifiers,
+    OmitPropertyTypes,
+    ReadonlyProperties,
+    RewriteClassOnObjects,
+    RewriteEnums,
+    RewriteExplicitOctals,
+    RewriteLambdaExpressions,
+    RewriteMultiCatch,
+    RewriteNullCoalesceAssignment,
+    RewriteThrowableExpressions
+  ;
 
   /** Sets up type => literal mappings */
   public function __construct() {

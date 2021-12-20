@@ -8,8 +8,21 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_74
  */
 class PHP74 extends PHP {
-  use CallablesAsClosures, OmitArgumentNames, ReadonlyProperties, MatchAsTernaries, NullsafeAsTernaries, NonCapturingCatchVariables, ArbitrayNewExpressions;
-  use RewriteBlockLambdaExpressions, RewriteClassOnObjects, RewriteExplicitOctals, RewriteEnums, RewriteThrowableExpressions;
+  use
+    ArbitrayNewExpressions,
+    ArrayUnpackUsingMerge,
+    CallablesAsClosures,
+    MatchAsTernaries,
+    NonCapturingCatchVariables,
+    NullsafeAsTernaries,
+    OmitArgumentNames,
+    ReadonlyProperties,
+    RewriteBlockLambdaExpressions,
+    RewriteClassOnObjects,
+    RewriteEnums,
+    RewriteExplicitOctals,
+    RewriteThrowableExpressions
+  ;
 
   /** Sets up type => literal mappings */
   public function __construct() {
