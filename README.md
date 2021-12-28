@@ -69,7 +69,7 @@ The -q option suppresses all diagnostic output except for errors.
 Features supported
 ------------------
 
-XP Compiler supports features such as annotations, arrow functions, enums property type-hints, the null-safe instance operator as well as all PHP 7 and PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
+XP Compiler supports features such as annotations, arrow functions, enums, property type-hints, the null-safe instance operator as well as all PHP 7 and PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
 
 Additional syntax can be added by installing compiler plugins from [here](https://github.com/xp-lang):
 
