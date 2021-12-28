@@ -48,8 +48,8 @@ abstract class PHP extends Emitter {
     if ($node instanceof Literal) {
       return true;
     } else if ($node instanceof ArrayLiteral) {
-      foreach ($node->values as $node) {
-        if (!$this->isConstant($result, $node)) return false;
+      foreach ($node->values as $element) {
+        if (!$this->isConstant($result, $element[1])) return false;
       }
       return true;
     } else if ($node instanceof ScopeExpression) {
