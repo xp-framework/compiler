@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 7.2.1 / 2021-12-28
+
+* Fixed PHP 8.1 not emitting native callable syntax - @thekid
+* Fixed `isConstant()` for constant arrays - @thekid
+
 ## 7.2.0 / 2021-12-20
 
 * Optimized generated code for arrays including unpack expressions for
