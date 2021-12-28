@@ -24,7 +24,7 @@ class RewriteClassOnObjectsTest extends EmitterTraitTest {
   public function does_not_rewrite_type_literal() {
     Assert::equals('self::class', $this->emit(
       new ScopeExpression('self', new Literal('class')),
-      [new ClassDeclaration([], '\\T', null, [], [], [], null, 1)]
+      [new ClassDeclaration([], '\\T', null, [], [], null, null, 1)]
     ));
   }
 }

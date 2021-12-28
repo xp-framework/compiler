@@ -51,6 +51,7 @@ class CompileRunner {
     $target= 'php:'.PHP_VERSION;
     $in= $out= '-';
     $quiet= false;
+    $emitters= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
@@ -64,6 +65,9 @@ class CompileRunner {
         $out= null;
         $in= array_slice($args, $i + 1);
         break;
+      } else if ('-e' === $args[$i]) {
+        $emitter= $args[++$i];
+        $emitters[]= $emitter;
       } else {
         $in= $args[$i];
         $out= $args[$i + 1] ?? '-';
@@ -72,7 +76,7 @@ class CompileRunner {
     }
 
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime($target)->newInstance();
+    $emit= Emitter::forRuntime($target, $emitters)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }

@@ -2,6 +2,7 @@
 
 use io\streams\{MemoryOutputStream, StringWriter};
 use lang\DynamicClassLoader;
+use lang\ast\emit\XPMeta;
 use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
 use unittest\{After, Assert, TestCase};
 use util\cmd\Console;
@@ -20,7 +21,7 @@ abstract class EmittingTest {
     $this->output= $output ? array_flip(explode(',', $output)) : [];
     $this->cl= DynamicClassLoader::instanceFor(self::class);
     $this->language= Language::named('PHP');
-    $this->emitter= Emitter::forRuntime($this->runtime())->newInstance();
+    $this->emitter= Emitter::forRuntime($this->runtime(), [XPMeta::class])->newInstance();
     foreach ($this->language->extensions() as $extension) {
       $extension->setup($this->language, $this->emitter);
     }

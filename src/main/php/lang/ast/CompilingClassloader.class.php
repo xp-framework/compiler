@@ -1,6 +1,6 @@
 <?php namespace lang\ast;
 
-use lang\ast\emit\Reflection;
+use lang\ast\emit\{Reflection, XPMeta};
 use lang\reflect\Package;
 use lang\{
   ClassFormatException,
@@ -27,7 +27,8 @@ class CompilingClassLoader implements IClassLoader {
 
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
-    $this->version= $emit->getSimpleName();
+    $this->version= str_replace('⋈', '+', $emit->getSimpleName());
+
     Compiled::$emit[$this->version]= $emit->newInstance();
     stream_wrapper_register($this->version, Compiled::class);
   }
@@ -246,7 +247,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return  lang.IClassLoader
    */
   public static function instanceFor($version) {
-    $emit= Emitter::forRuntime($version);
+    $emit= Emitter::forRuntime($version, [XPMeta::class]);
 
     $id= $emit->getName();
     if (!isset(self::$instance[$id])) {
@@ -261,7 +262,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return string
    */
   public function toString() {
-    return 'CompilingCL<'.$this->version.'>';
+    return 'CompilingCL<'.nameof(Compiled::$emit[$this->version]).'>';
   }
 
   /**

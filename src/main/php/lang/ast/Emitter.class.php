@@ -2,7 +2,7 @@
 
 use lang\ast\{Node, Error, Errors};
 use lang\reflect\Package;
-use lang\{IllegalArgumentException, IllegalStateException};
+use lang\{IllegalArgumentException, IllegalStateException, ClassLoader, XPClass};
 
 abstract class Emitter {
   private $transformations= [];
@@ -11,17 +11,34 @@ abstract class Emitter {
    * Selects the correct emitter for a given runtime
    *
    * @param  string $runtime E.g. "php:".PHP_VERSION
+   * @param  string[]|lang.XPClass[] $emitters Optional
    * @return lang.XPClass
    * @throws lang.IllegalArgumentException
    */
-  public static function forRuntime($runtime) {
+  public static function forRuntime($runtime, $emitters= []) {
     sscanf($runtime, '%[^.:]%*[.:]%d.%d', $engine, $major, $minor);
     $p= Package::forName('lang.ast.emit');
 
     $engine= strtoupper($engine);
     do {
       $impl= $engine.$major.$minor;
-      if ($p->providesClass($impl)) return $p->loadClass($impl);
+      if ($p->providesClass($impl)) {
+        if (empty($emitters)) return $p->loadClass($impl);
+
+        // Extend loaded class, including all given emitters
+        $extended= ['kind' => 'class', 'extends' => [$p->loadClass($impl)], 'implements' => [], 'use' => []];
+        foreach ($emitters as $class) {
+          if ($class instanceof XPClass) {
+            $impl.= '⋈'.$class->getSimpleName();
+            $extended['use'][]= $class;
+          } else {
+            $d= strrpos(strtr($class, '\\', '.'), '.');
+            $impl.= '⋈'.(false === $d ? $class : substr($class, $d + 1));
+            $extended['use'][]= XPClass::forName($class);
+          }
+        }
+        return ClassLoader::defineType($p->getName().'.'.$impl, $extended, '{}');
+      }
     } while ($minor-- > 0);
 
     throw new IllegalArgumentException('XP Compiler does not support '.$runtime.' yet');
@@ -111,6 +128,8 @@ abstract class Emitter {
    * @return void
    */
   public function emitOne($result, $node) {
+
+    // Inlined Result::at()
     if ($node->line > $result->line) {
       $result->out->write(str_repeat("\n", $node->line - $result->line));
       $result->line= $node->line;
