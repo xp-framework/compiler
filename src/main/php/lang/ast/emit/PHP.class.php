@@ -424,29 +424,28 @@ abstract class PHP extends Emitter {
 
   protected function emitAnnotation($result, $annotation) {
     $result->out->write('\\'.$annotation->name);
-    if ($annotation->arguments) {
+    if (empty($annotation->arguments)) return;
 
-      // Check whether arguments are constant
+    // Check whether arguments are constant
+    foreach ($annotation->arguments as $argument) {
+      if ($this->isConstant($result, $argument)) continue;
+
+      // Found first non-constant argument, enclose in `eval`
+      // FIXME Emit more than one argument
+      $result->out->write('(eval: \'');
+      $out= $result->out->stream();
+      $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
       foreach ($annotation->arguments as $argument) {
-        if ($this->isConstant($result, $argument)) continue;
-
-        // Found first non-constant argument, enclose in `eval`
-        // FIXME Emit more than one argument
-        $result->out->write('(eval: \'');
-        $out= $result->out->stream();
-        $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
-        foreach ($annotation->arguments as $argument) {
-          $this->emitOne($result, $argument);
-        }
-        $result->out->redirect($out);
-        $result->out->write('\')');
-        return;
+        $this->emitOne($result, $argument);
       }
-
-      $result->out->write('(');
-      $this->emitArguments($result, $annotation->arguments);
-      $result->out->write(')');
+      $result->out->redirect($out);
+      $result->out->write('\')');
+      return;
     }
+
+    $result->out->write('(');
+    $this->emitArguments($result, $annotation->arguments);
+    $result->out->write(')');
   }
 
   protected function emitAnnotations($result, $annotations) {
