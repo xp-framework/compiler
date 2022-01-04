@@ -1,8 +1,8 @@
 <?php namespace xp\compiler;
 
 use io\Path;
-use lang\Runtime;
 use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Result, Tokens};
+use lang\{Runtime, XPClass};
 use text\StreamTokenizer;
 use util\cmd\Console;
 use util\profiling\Timer;
@@ -35,6 +35,10 @@ use util\profiling\Timer;
  *   ```sh
  *   $ xp compile -t php:7.4 HelloWorld.php HelloWorld.class.php
  *   ```
+ * - Emit XP meta information (includes `lang.ast.emit.php.XpMeta`):
+ *   ```sh
+ *   $ xp compile -t php:7.4 -e php:xp-meta -o dist src/main/php
+ *   ```
  *
  * The *-o* and *-n* options accept multiple input sources following them.
  * The *-q* option suppresses all diagnostic output except for errors.
@@ -43,6 +47,19 @@ use util\profiling\Timer;
  * @see  https://github.com/xp-framework/rfc/issues/299
  */
 class CompileRunner {
+
+  /** Returns an emitter by a given name */
+  private static function emitter(string $name): XPClass {
+    $p= strpos($name, ':');
+    if (false === $p) return XPClass::forName($name);
+
+    // Translate php:xp-meta to lang.ast.emit.php.XpMeta
+    return XPClass::forName(sprintf(
+      'lang.ast.emit.%s.%s',
+      substr($name, 0, $p),
+      implode('', array_map('ucfirst', explode('-', substr($name, $p + 1))))
+    ));
+  }
 
   /** @return int */
   public static function main(array $args) {
@@ -66,8 +83,7 @@ class CompileRunner {
         $in= array_slice($args, $i + 1);
         break;
       } else if ('-e' === $args[$i]) {
-        $emitter= $args[++$i];
-        $emitters[]= $emitter;
+        $emitters[]= self::emitter($args[++$i]);
       } else {
         $in= $args[$i];
         $out= $args[$i + 1] ?? '-';

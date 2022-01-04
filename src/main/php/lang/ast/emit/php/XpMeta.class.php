@@ -1,4 +1,4 @@
-<?php namespace lang\ast\emit;
+<?php namespace lang\ast\emit\php;
 
 /**
  * Emit meta information so that the XP reflection API won't have to parse
@@ -8,7 +8,7 @@
  *
  * @see  https://github.com/xp-framework/rfc/issues/336
  */
-trait XPMeta {
+trait XpMeta {
 
   /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
   protected function annotations($result, $annotations) {

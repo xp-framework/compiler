@@ -1,6 +1,7 @@
 <?php namespace lang\ast;
 
-use lang\ast\emit\{Reflection, XPMeta};
+use lang\ast\emit\Reflection;
+use lang\ast\emit\php\XpMeta;
 use lang\reflect\Package;
 use lang\{
   ClassFormatException,
@@ -247,7 +248,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return  lang.IClassLoader
    */
   public static function instanceFor($version) {
-    $emit= Emitter::forRuntime($version, [XPMeta::class]);
+    $emit= Emitter::forRuntime($version, [XpMeta::class]);
 
     $id= $emit->getName();
     if (!isset(self::$instance[$id])) {
