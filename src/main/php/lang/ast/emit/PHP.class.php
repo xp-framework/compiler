@@ -431,13 +431,23 @@ abstract class PHP extends Emitter {
       if ($this->isConstant($result, $argument)) continue;
 
       // Found first non-constant argument, enclose in `eval`
-      // FIXME Emit more than one argument
       $result->out->write('(eval: \'');
       $out= $result->out->stream();
       $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
-      foreach ($annotation->arguments as $argument) {
-        $this->emitOne($result, $argument);
+
+      // If exactly one unnamed argument exists, emit its value directly
+      if (1 === sizeof($annotation->arguments) && 0 === key($annotation->arguments)) {
+        $this->emitOne($result, current($annotation->arguments));
+      } else {
+        $result->out->write('[');
+        foreach ($annotation->arguments as $key => $argument) {
+          $result->out->write("'{$key}'=>");
+          $this->emitOne($result, $argument);
+          $result->out->write(',');
+        }
+        $result->out->write(']');
       }
+
       $result->out->redirect($out);
       $result->out->write('\')');
       return;

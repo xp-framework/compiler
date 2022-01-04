@@ -75,6 +75,13 @@ abstract class AnnotationSupport extends EmittingTest {
   }
 
   #[Test]
+  public function named_arrow_function_value() {
+    $t= $this->type('#[Verify(func: fn($arg) => $arg)] class <T> { }');
+    $f= $t->getAnnotation('verify');
+    Assert::equals('test', $f['func']('test'));
+  }
+
+  #[Test]
   public function single_quoted_string_inside_non_constant_expression() {
     $t= $this->type('#[Verify(fn($arg) => \'php\\\\\'.$arg)] class <T> { }');
     $f= $t->getAnnotation('verify');
