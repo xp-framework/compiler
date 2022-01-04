@@ -13,6 +13,7 @@ class PHP70 extends PHP {
   use 
     ArbitrayNewExpressions,
     ArrayUnpackUsingMerge,
+    AttributesAsComments,
     MatchAsTernaries,
     NullsafeAsTernaries,
     OmitArgumentNames,

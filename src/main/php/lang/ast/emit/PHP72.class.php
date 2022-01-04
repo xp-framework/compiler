@@ -11,6 +11,7 @@ class PHP72 extends PHP {
   use 
     ArbitrayNewExpressions,
     ArrayUnpackUsingMerge,
+    AttributesAsComments,
     CallablesAsClosures,
     MatchAsTernaries,
     NonCapturingCatchVariables,

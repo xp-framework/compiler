@@ -21,11 +21,18 @@ abstract class EmittingTest {
     $this->output= $output ? array_flip(explode(',', $output)) : [];
     $this->cl= DynamicClassLoader::instanceFor(self::class);
     $this->language= Language::named('PHP');
-    $this->emitter= Emitter::forRuntime($this->runtime(), [XpMeta::class])->newInstance();
+    $this->emitter= Emitter::forRuntime($this->runtime(), $this->emitters())->newInstance();
     foreach ($this->language->extensions() as $extension) {
       $extension->setup($this->language, $this->emitter);
     }
   }
+
+  /**
+   * Returns emitters to use. Defaults to XpMeta
+   *
+   * @return string[]
+   */
+  protected function emitters() { return [XpMeta::class]; }
 
   /**
    * Returns runtime to use. Uses `PHP_VERSION` constant.
