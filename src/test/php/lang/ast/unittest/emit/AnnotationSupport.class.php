@@ -126,4 +126,16 @@ abstract class AnnotationSupport extends EmittingTest {
     $t= $this->type('class <T> { #[Test, Values([1, 2, 3])] public function fixture() { } }');
     Assert::equals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
   }
+
+  #[Test]
+  public function multiline_annotations() {
+    $t= $this->type('
+      #[Authors([
+        "Timm",
+        "Mr. Midori",
+      ])]
+      class <T> { }'
+    );
+    Assert::equals(['authors' => ['Timm', 'Mr. Midori']], $t->getAnnotations());
+  }
 }

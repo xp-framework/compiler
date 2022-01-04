@@ -2,9 +2,11 @@
 
 /**
  * Rewrites PHP 8 attributes as comments for PHP 7, ensuring they are
- * always on a line by themselves. This might break line numbers and
- * make it harder to debug but guarantees the emitted code is syntactically
- * correct!
+ * always on a line by themselves *and* never span more than one line.
+ *
+ * This will break line numbers if annotations are on the same line as
+ * the element they belong to and make it harder to debug but guarantees
+ * the emitted code is syntactically correct!
  *
  * @see  https://wiki.php.net/rfc/shorter_attribute_syntax_change
  */
@@ -28,12 +30,18 @@ trait AttributesAsComments {
   }
 
   protected function emitAnnotations($result, $annotations) {
+    $line= $annotations->line;
     $result->out->write('#[');
+
+    $out= $result->out->stream();
+    $result->out->redirect(new Escaping($out, ["\n" => " "]));
     foreach ($annotations->named as $annotation) {
       $this->emitOne($result, $annotation);
       $result->out->write(',');
     }
+    $result->out->redirect($out);
+
     $result->out->write("]\n");
-    $result->line++;
+    $result->line= $line + 1;
   }
 }
