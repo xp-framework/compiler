@@ -1,6 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
+use lang\ast\emit\Escaping;
 use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block, Property};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
@@ -432,9 +433,12 @@ abstract class PHP extends Emitter {
         // Found first non-constant argument, enclose in `eval`
         // FIXME Emit more than one argument
         $result->out->write('(eval: \'');
-        foreach ($annotation->arguments as $name => $argument) {
+        $out= $result->out->stream();
+        $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
+        foreach ($annotation->arguments as $argument) {
           $this->emitOne($result, $argument);
         }
+        $result->out->redirect($out);
         $result->out->write('\')');
         return;
       }

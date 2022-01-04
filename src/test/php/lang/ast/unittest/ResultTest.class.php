@@ -2,7 +2,7 @@
 
 use io\streams\{StringWriter, MemoryOutputStream};
 use lang\ast\Result;
-use lang\ast\emit\{Declaration, Reflection};
+use lang\ast\emit\{Declaration, Escaping, Reflection};
 use lang\ast\nodes\ClassDeclaration;
 use lang\{Value, ClassNotFoundException};
 use unittest\{Assert, Expect, Test};
@@ -40,6 +40,20 @@ class ResultTest {
     $r= new Result(new StringWriter($out));
     $r->out->write('echo "Hello";');
     Assert::equals('<?php echo "Hello";', $out->bytes());
+  }
+
+  #[Test]
+  public function write_escaped() {
+    $out= new MemoryOutputStream();
+    $r= new Result(new StringWriter($out));
+
+    $r->out->write("'");
+    $r->out->redirect(new Escaping($out, ["'" => "\\'"]));
+    $r->out->write("echo 'Hello'");
+    $r->out->redirect($out);
+    $r->out->write("'");
+
+    Assert::equals("<?php 'echo \'Hello\''", $out->bytes());
   }
 
   #[Test]
