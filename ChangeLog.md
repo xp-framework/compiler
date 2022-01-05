@@ -23,6 +23,8 @@ XP Compiler ChangeLog
 
 ## 7.0.0 / 2021-10-21
 
+This major release drops compatiblity with older XP versions.
+
 * Made compatible with XP 11 - @thekid
 * Implemented xp-framework/rfc#341, dropping compatibility with XP 9
   (@thekid)
@@ -134,6 +136,10 @@ XP Compiler ChangeLog
 
 ## 6.0.0 / 2020-11-28
 
+This major release removes legacy XP and Hack language annotations as
+well as curly braces for string and array offsets. It also includes the
+first PHP 8.1 features.
+
 * Added `-q` command line option which suppresses all diagnostic output
   from the compiler except for errors
   (@thekid)
@@ -232,6 +238,9 @@ XP Compiler ChangeLog
 
 ## 5.0.0 / 2019-11-30
 
+This major release drops PHP 5 support. The minimum required PHP version
+is now 7.0.0.
+
 * Merged PR #70: Extract compact methods; to use these, require the
   library https://github.com/xp-lang/php-compact-methods
   (@thekid)
@@ -280,6 +289,10 @@ XP Compiler ChangeLog
 
 ## 4.0.0 / 2019-09-09
 
+This major release adds an extension mechanisms. Classes inside the package
+`lang.ast.syntax.php` (regardless of their class path) will be loaded auto-
+matically on startup.
+
 * Merged PR #69: Remove support for Hack arrow functions - @thekid
 * Fixed operator precedence for unary prefix operators - @thekid
 * Merged PR #66: Syntax plugins. With this facility in place, the compiler
@@ -290,6 +303,10 @@ XP Compiler ChangeLog
   (@thekid)
 
 ## 3.0.0 / 2019-08-10
+
+This release aligns XP Compiler compatible with PHP 7.4 and changes it
+to try to continue parsing after an error has occured, possibly yielding
+multiple errors.
 
 * Made compatible with PHP 7.4 - refrain using `{}` for string offsets
   (@thekid)
@@ -445,6 +462,10 @@ XP Compiler ChangeLog
 
 ## 2.0.0 / 2017-11-06
 
+This major release extracts the AST API to its own library, and cleans it
+up while doing so. The idea is to be able to use this library in other
+places in the future.
+
 * Implemented `use function` and `use const` - @thekid
 * Fixed issue #21: Comments are not escaped - @thekid
 * Project [AST API](https://github.com/xp-framework/compiler/projects/1):
@@ -496,6 +517,11 @@ XP Compiler ChangeLog
   (@thekid)
 
 ## 1.0.0 / 2017-10-25
+
+This first release brings consistency to annotations, casting and how
+and where keywords can be used. XP Compiler is already being used in
+production in an internal project at the time of writing, so you might
+do so too:)
 
 * Indexed type members by name; implementing feature suggested in #10 
   (@thekid)
