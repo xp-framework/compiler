@@ -1,8 +1,7 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Code;
 use lang\ast\emit\Escaping;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block, Property};
+use lang\ast\nodes\{Annotation, InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block, Property};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -568,37 +567,43 @@ abstract class PHP extends Emitter {
     $method->comment && $this->emitOne($result, $method->comment);
     $method->annotations && $this->emitOne($result, $method->annotations);
     $result->at($method->declared)->out->write(implode(' ', $method->modifiers).' function '.$method->name);
-    $this->emitSignature($result, $method->signature);
 
     $promoted= [];
     foreach ($method->signature->parameters as $param) {
-      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
-      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
+
+      // Create a parameter annotation named `default` for non-constant parameter defaults
+      if (isset($param->default) && !$this->isConstant($result, $param->default)) {
+        $param->annotate(new Annotation('default', [$param->default]));
+      }
 
       // Create properties from promoted parameters. Do not include default value, this is handled
       // in emitParameter() already; otherwise we would be emitting it twice.
       if (isset($param->promote)) {
-        $promoted[]= new Property(explode(' ', $param->promote), $param->name, $param->type, null, null, null, $param->line);
-        $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
+        $promoted[]= [
+          $param->reference,
+          new Property(explode(' ', $param->promote), $param->name, $param->type, null, null, null, $param->line)
+        ];
       }
 
-      // Create a parameter annotation named `default` for non-constant parameter defaults
-      if (isset($param->default) && !$this->isConstant($result, $param->default)) {
-        $meta[DETAIL_TARGET_ANNO][$param->name]['default']= [$param->default];
-      }
+      $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
+      $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
     }
+    $this->emitSignature($result, $method->signature);
 
     if (null === $method->body) {
       $result->out->write(';');
     } else {
       $result->out->write(' {');
       $this->emitInitializations($result, $result->locals[1]);
+      foreach ($promoted as $promote) {
+        $result->out->write('$this->'.$promote[1]->name.($promote[0] ? '=&$' : '=$').$promote[1]->name.';');
+      }
       $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
 
-    foreach ($promoted as $property) {
-      $this->emitOne($result, $property);
+    foreach ($promoted as $promote) {
+      $this->emitOne($result, $promote[1]);
     }
 
     // Copy any virtual properties inside locals[2] to class scope
