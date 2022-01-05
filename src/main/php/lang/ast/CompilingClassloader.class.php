@@ -263,7 +263,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return string
    */
   public function toString() {
-    return 'CompilingCL<'.nameof(Compiled::$emit[$this->version]).'>';
+    return 'CompilingCL<'.$this->version.'>';
   }
 
   /**
