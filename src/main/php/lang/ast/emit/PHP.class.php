@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\emit\Escaping;
-use lang\ast\nodes\{Annotation, InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block, Property};
+use lang\ast\nodes\{Annotation, InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -570,19 +570,11 @@ abstract class PHP extends Emitter {
 
     $promoted= [];
     foreach ($method->signature->parameters as $param) {
+      if (isset($param->promote)) $promoted[]= $param;
 
       // Create a parameter annotation named `default` for non-constant parameter defaults
       if (isset($param->default) && !$this->isConstant($result, $param->default)) {
         $param->annotate(new Annotation('default', [$param->default]));
-      }
-
-      // Create properties from promoted parameters. Do not include default value, this is handled
-      // in emitParameter() already; otherwise we would be emitting it twice.
-      if (isset($param->promote)) {
-        $promoted[]= [
-          $param->reference,
-          new Property(explode(' ', $param->promote), $param->name, $param->type, null, null, null, $param->line)
-        ];
       }
 
       $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
@@ -595,15 +587,15 @@ abstract class PHP extends Emitter {
     } else {
       $result->out->write(' {');
       $this->emitInitializations($result, $result->locals[1]);
-      foreach ($promoted as $promote) {
-        $result->out->write('$this->'.$promote[1]->name.($promote[0] ? '=&$' : '=$').$promote[1]->name.';');
+      foreach ($promoted as $param) {
+        $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
       }
       $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
 
-    foreach ($promoted as $promote) {
-      $this->emitOne($result, $promote[1]);
+    foreach ($promoted as $param) {
+      $result->out->write($param->promote.' '.$this->propertyType($param->type).' $'.$param->name.';');
     }
 
     // Copy any virtual properties inside locals[2] to class scope
