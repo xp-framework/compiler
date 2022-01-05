@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 7.3.0 / ????-??-??
+
+* Made compatible with `xp-framework/ast` versiom 8.0.0 - @thekid
+
 ## 7.2.1 / 2021-12-28
 
 * Fixed PHP 8.1 not emitting native callable syntax - @thekid

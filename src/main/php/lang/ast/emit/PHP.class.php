@@ -1,7 +1,18 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block, Property};
+use lang\ast\nodes\{
+  ArrayLiteral,
+  BinaryExpression,
+  Block,
+  Comment,
+  InstanceExpression,
+  Literal,
+  Property,
+  ScopeExpression,
+  UnpackExpression,
+  Variable
+};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -410,6 +421,8 @@ abstract class PHP extends Emitter {
 
   /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
   protected function annotations($result, $annotations) {
+    if (null === $annotations) return [];
+
     $lookup= [];
     foreach ($annotations as $name => $arguments) {
       $p= strrpos($name, '\\');
@@ -457,6 +470,8 @@ abstract class PHP extends Emitter {
   private function comment($comment) {
     if (null === $comment || '' === $comment) {
       return 'null';
+    } else if ($comment instanceof Comment) {
+      return var_export($comment->content(), true);
     } else if ('/' === $comment[0]) {
       return "'".str_replace("'", "\\'", trim(preg_replace('/\n\s+\* ?/', "\n", substr($comment, 3, -2))))."'";
     } else {
