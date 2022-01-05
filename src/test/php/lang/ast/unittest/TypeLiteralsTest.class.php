@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest;
 
-use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81};
-use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion};
+use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81, PHP82};
+use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion, IsIntersection};
 use unittest\{Assert, Test};
 
 class TypeLiteralsTest {
@@ -92,7 +92,7 @@ class TypeLiteralsTest {
   }
 
   /**
-   * PHP 8.1 added `never`
+   * PHP 8.1 added `never` and intersections
    *
    * @return iterable
    */
@@ -106,6 +106,16 @@ class TypeLiteralsTest {
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
+  }
+
+  /**
+   * PHP 8.2 is the same as PHP 8.1
+   *
+   * @return iterable
+   */
+  private function php82() {
+    yield from $this->php81();
   }
 
   #[Test, Values('php70')]
@@ -136,5 +146,10 @@ class TypeLiteralsTest {
   #[Test, Values('php81')]
   public function php81_literals($type, $literal) {
     Assert::equals($literal, (new PHP81())->literal($type));
+  }
+
+  #[Test, Values('php82')]
+  public function php82_literals($type, $literal) {
+    Assert::equals($literal, (new PHP82())->literal($type));
   }
 }
