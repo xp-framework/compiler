@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest;
 
 use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81};
-use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion};
+use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion, IsIntersection};
 use unittest\{Assert, Test};
 
 class TypeLiteralsTest {
@@ -92,7 +92,7 @@ class TypeLiteralsTest {
   }
 
   /**
-   * PHP 8.1 added `never`
+   * PHP 8.1 added `never` and intersections
    *
    * @return iterable
    */
@@ -106,6 +106,7 @@ class TypeLiteralsTest {
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
   }
 
   #[Test, Values('php70')]
