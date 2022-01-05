@@ -1,7 +1,18 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\emit\Escaping;
-use lang\ast\nodes\{Annotation, InstanceExpression, ScopeExpression, BinaryExpression, UnpackExpression, Variable, Literal, ArrayLiteral, Block};
+use lang\ast\nodes\{
+  Annotation,
+  ArrayLiteral,
+  BinaryExpression,
+  Block,
+  InstanceExpression,
+  Literal,
+  Property,
+  ScopeExpression,
+  UnpackExpression,
+  Variable
+};
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
 use lang\ast\{Emitter, Node, Type};
 
@@ -595,7 +606,7 @@ abstract class PHP extends Emitter {
     }
 
     foreach ($promoted as $param) {
-      $result->out->write($param->promote.' '.$this->propertyType($param->type).' $'.$param->name.';');
+      $this->emitProperty($result, new Property(explode(' ', $param->promote), $param->name, $param->type));
     }
 
     // Copy any virtual properties inside locals[2] to class scope
