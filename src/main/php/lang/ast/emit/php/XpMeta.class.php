@@ -4,7 +4,8 @@
  * Emit meta information so that the XP reflection API won't have to parse
  * it. Also omits apidoc comments and annotations from the generated code.
  *
- * Code compiled with this optimization in place require using the XP Core!
+ * Code compiled with this optimization in place requires using the XP Core
+ * as a dependency!
  *
  * @see  https://github.com/xp-framework/rfc/issues/336
  */
