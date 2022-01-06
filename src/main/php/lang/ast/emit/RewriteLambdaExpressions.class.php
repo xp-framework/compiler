@@ -10,7 +10,7 @@ use lang\ast\nodes\Block;
 trait RewriteLambdaExpressions {
 
   protected function emitLambda($result, $lambda) {
-    $this->enclose($result, $lambda, $lambda->signature, function($result, $lambda) {
+    $this->enclose($result, $lambda, $lambda->signature, isset($lambda->static) && $lambda->static, function($result, $lambda) {
       if ($lambda->body instanceof Block) {
         $this->emitAll($result, $lambda->body->statements);
       } else {

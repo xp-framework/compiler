@@ -1,6 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\Errors;
+use lang\ast\nodes\{ClosureExpression, LambdaExpression};
+use unittest\actions\VerifyThat;
 use unittest\{Action, Assert, Test};
 
 /**
@@ -44,6 +46,28 @@ class LambdasTest extends EmittingTest {
     }');
 
     Assert::equals(3, $r(1));
+  }
+
+  #[Test, Action(eval: 'new VerifyThat(fn() => property_exists(LambdaExpression::class, "static"))')]
+  public function static_fn_does_not_capture_this() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return static fn() => isset($this);
+      }
+    }');
+
+    Assert::false($r());
+  }
+
+  #[Test, Action(eval: 'new VerifyThat(fn() => property_exists(ClosureExpression::class, "static"))')]
+  public function static_function_does_not_capture_this() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return static function() { return isset($this); };
+      }
+    }');
+
+    Assert::false($r());
   }
 
   #[Test]

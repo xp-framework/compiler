@@ -97,9 +97,10 @@ abstract class PHP extends Emitter {
    * @param  lang.ast.Result $result
    * @param  lang.ast.Node $node
    * @param  ?lang.ast.nodes.Signature $signature
+   * @param  bool $static
    * @param  function(lang.ast.Result, lang.ast.Node): void $emit
    */
-  protected function enclose($result, $node, $signature, $emit) {
+  protected function enclose($result, $node, $signature, $static, $emit) {
     $capture= [];
     foreach ($result->codegen->search($node, 'variable') as $var) {
       if (isset($result->locals[$var->name])) {
@@ -111,7 +112,7 @@ abstract class PHP extends Emitter {
     $result->stack[]= $result->locals;
     $result->locals= [];
     if ($signature) {
-      $result->out->write('function');
+      $static ? $result->out->write('static function') : $result->out->write('function');
       $this->emitSignature($result, $signature);
       foreach ($signature->parameters as $param) {
         unset($capture[$param->name]);
@@ -159,7 +160,7 @@ abstract class PHP extends Emitter {
   protected function emitAsExpression($result, $expression) {
     if ($expression instanceof Block) {
       $result->out->write('(');
-      $this->enclose($result, $expression, null, function($result, $expression) {
+      $this->enclose($result, $expression, null, false, function($result, $expression) {
         $this->emitAll($result, $expression->statements);
       });
       $result->out->write(')()');
@@ -312,7 +313,7 @@ abstract class PHP extends Emitter {
     $result->stack[]= $result->locals;
     $result->locals= [];
 
-    $result->out->write('function'); 
+    isset($closure->static) && $closure->static ? $result->out->write('static function') : $result->out->write('function');
     $this->emitSignature($result, $closure->signature);
 
     if ($closure->use) {
@@ -329,7 +330,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitLambda($result, $lambda) {
-    $result->out->write('fn');
+    isset($lambda->static) && $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
     $this->emitOne($result, $lambda->body);
