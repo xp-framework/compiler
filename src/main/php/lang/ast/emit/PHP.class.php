@@ -6,6 +6,7 @@ use lang\ast\nodes\{
   ArrayLiteral,
   BinaryExpression,
   Block,
+  Comment,
   InstanceExpression,
   Literal,
   Property,
@@ -462,10 +463,6 @@ abstract class PHP extends Emitter {
       $result->out->write('\')');
       return;
     }
-
-    $result->out->write('(');
-    $this->emitArguments($result, $annotation->arguments);
-    $result->out->write(')');
   }
 
   protected function emitAnnotations($result, $annotations) {

@@ -39,6 +39,8 @@ class HelloWorld {
 }
 ```
 
+To run this code, use `xp HelloWorld` in a terminal window.
+
 Compilation
 -----------
 Compilation can also be performed explicitely by invoking the compiler:
