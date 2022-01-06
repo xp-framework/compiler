@@ -9,7 +9,7 @@ trait RewriteThrowableExpressions {
 
   protected function emitThrowExpression($result, $throw) {
     $result->out->write('(');
-    $this->enclose($result, $throw->expression, null, function($result, $expression) {
+    $this->enclose($result, $throw->expression, null, false, function($result, $expression) {
       $result->out->write('throw ');
       $this->emitOne($result, $expression);
       $result->out->write(';');

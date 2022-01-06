@@ -12,7 +12,7 @@ trait RewriteBlockLambdaExpressions {
 
   protected function emitLambda($result, $lambda) {
     if ($lambda->body instanceof Block) {
-      $this->enclose($result, $lambda->body, $lambda->signature, function($result, $body) {
+      $this->enclose($result, $lambda->body, $lambda->signature, isset($lambda->static) && $lambda->static, function($result, $body) {
         $this->emitAll($result, $body->statements);
       });
     } else {
