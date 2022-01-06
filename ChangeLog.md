@@ -5,7 +5,8 @@ XP Compiler ChangeLog
 
 ## 7.3.0 / ????-??-??
 
-* Made compatible with `xp-framework/ast` versiom 8.0.0 - @thekid
+* Merged PR #128: Add support for static closures - @thekid
+* Made compatible with `xp-framework/ast` version 8.0.0 - @thekid
 
 ## 7.2.1 / 2021-12-28
 
