@@ -313,7 +313,7 @@ abstract class PHP extends Emitter {
     $result->stack[]= $result->locals;
     $result->locals= [];
 
-    isset($closure->static) && $closure->static ? $result->out->write('static function') : $result->out->write('function');
+    $closure->static ? $result->out->write('static function') : $result->out->write('function');
     $this->emitSignature($result, $closure->signature);
 
     if ($closure->use) {
@@ -330,7 +330,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitLambda($result, $lambda) {
-    isset($lambda->static) && $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
+    $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
     $this->emitOne($result, $lambda->body);
