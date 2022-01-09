@@ -63,6 +63,9 @@ $ xp compile -n src/main/php/
 
 # Target PHP 7.4 (default target is current PHP version)
 $ xp compile -t php:7.4 HelloWorld.php HelloWorld.class.php
+
+# Emit XP meta information (includes lang.ast.emit.php.XpMeta):
+$ xp compile -t php:7.4 -e php:xp-meta -o dist src/main/php
 ```
 
 The -o and -n options accept multiple input sources following them.

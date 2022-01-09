@@ -1,7 +1,8 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Code;
+use lang\ast\emit\Escaping;
 use lang\ast\nodes\{
+  Annotation,
   ArrayLiteral,
   BinaryExpression,
   Block,
@@ -262,6 +263,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
+    $parameter->annotations && $this->emitOne($result, $parameter->annotations);
     if ($parameter->type && $t= $this->literal($parameter->type)) {
       $result->out->write($t.' ');
     }
@@ -350,7 +352,9 @@ abstract class PHP extends Emitter {
     array_unshift($result->meta, []);
     $result->locals= [[], []];
 
-    $result->out->write('enum '.$this->declaration($enum->name));
+    $enum->comment && $this->emitOne($result, $enum->comment);
+    $enum->annotations && $this->emitOne($result, $enum->annotations);
+    $result->at($enum->declared)->out->write('enum '.$this->declaration($enum->name));
     $enum->base && $result->out->write(':'.$enum->base);
     $enum->implements && $result->out->write(' implements '.implode(', ', $enum->implements));
     $result->out->write('{');
@@ -372,7 +376,9 @@ abstract class PHP extends Emitter {
     array_unshift($result->meta, []);
     $result->locals= [[], [], []];
 
-    $result->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
+    $class->comment && $this->emitOne($result, $class->comment);
+    $class->annotations && $this->emitOne($result, $class->annotations);
+    $result->at($class->declared)->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
     $class->parent && $result->out->write(' extends '.$class->parent);
     $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
     $result->out->write('{');
@@ -420,98 +426,65 @@ abstract class PHP extends Emitter {
     array_shift($result->type);
   }
 
-  /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
-  protected function annotations($result, $annotations) {
-    if (null === $annotations) return [];
+  protected function emitMeta($result, $name, $annotations, $comment) {
+    // NOOP
+  }
 
-    $lookup= [];
-    foreach ($annotations as $name => $arguments) {
-      $p= strrpos($name, '\\');
-      $key= lcfirst(false === $p ? $name : substr($name, $p + 1));
-      $result->out->write("'".$key."' => ");
-      $name === $key || $lookup[$key]= $name;
+  protected function emitComment($result, $comment) {
+    $result->out->write($comment->declaration);
+  }
 
-      if (empty($arguments)) {
-        $result->out->write('null,');
-      } else if (1 === sizeof($arguments) && isset($arguments[0])) {
-        $this->emitOne($result, $arguments[0]);
-        $result->out->write(',');
+  protected function emitAnnotation($result, $annotation) {
+    $result->out->write('\\'.$annotation->name);
+    if (empty($annotation->arguments)) return;
+
+    // Check whether arguments are constant
+    foreach ($annotation->arguments as $argument) {
+      if ($this->isConstant($result, $argument)) continue;
+
+      // Found first non-constant argument, enclose in `eval`
+      $result->out->write('(eval: \'');
+      $out= $result->out->stream();
+      $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
+
+      // If exactly one unnamed argument exists, emit its value directly
+      if (1 === sizeof($annotation->arguments) && 0 === key($annotation->arguments)) {
+        $this->emitOne($result, current($annotation->arguments));
       } else {
         $result->out->write('[');
-        foreach ($arguments as $name => $argument) {
-          is_string($name) && $result->out->write("'".$name."' => ");
+        foreach ($annotation->arguments as $key => $argument) {
+          $result->out->write("'{$key}'=>");
           $this->emitOne($result, $argument);
           $result->out->write(',');
         }
-        $result->out->write('],');
+        $result->out->write(']');
       }
+
+      $result->out->redirect($out);
+      $result->out->write('\')');
+      return;
     }
-    return $lookup;
+
+    $result->out->write('(');
+    $this->emitArguments($result, $annotation->arguments);
+    $result->out->write(')');
   }
 
-  /** Emits annotations in XP format - and mappings for their names */
-  protected function attributes($result, $annotations, $target) {
-    $result->out->write('DETAIL_ANNOTATIONS => [');
-    $lookup= $this->annotations($result, $annotations);
-    $result->out->write('], DETAIL_TARGET_ANNO => [');
-    foreach ($target as $name => $annotations) {
-      $result->out->write("'$".$name."' => [");
-      foreach ($this->annotations($result, $annotations) as $key => $value) {
-        $lookup[$key]= $value;
-      }
-      $result->out->write('],');
-    }
-    foreach ($lookup as $key => $value) {
-      $result->out->write("'".$key."' => '".$value."',");
+  protected function emitAnnotations($result, $annotations) {
+    $result->out->write('#[');
+    foreach ($annotations->named as $annotation) {
+      $this->emitOne($result, $annotation);
+      $result->out->write(',');
     }
     $result->out->write(']');
-  }
-
-  /** Removes leading, intermediate and trailing stars from apidoc comments */
-  private function comment($comment) {
-    if (null === $comment || '' === $comment) {
-      return 'null';
-    } else if ($comment instanceof Comment) {
-      return var_export($comment->content(), true);
-    } else if ('/' === $comment[0]) {
-      return "'".str_replace("'", "\\'", trim(preg_replace('/\n\s+\* ?/', "\n", substr($comment, 3, -2))))."'";
-    } else {
-      return "'".str_replace("'", "\\'", $comment)."'";
-    }
-  }
-
-  /** Emit meta information so that the reflection API won't have to parse it */
-  protected function emitMeta($result, $name, $annotations, $comment) {
-    if (null === $name) {
-      $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
-    } else {
-      $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
-    }
-    $result->out->write('"class" => [');
-    $this->attributes($result, $annotations, []);
-    $result->out->write(', DETAIL_COMMENT => '.$this->comment($comment).'],');
-
-    foreach (array_shift($result->meta) as $type => $lookup) {
-      $result->out->write($type.' => [');
-      foreach ($lookup as $key => $meta) {
-        $result->out->write("'".$key."' => [");
-        $this->attributes($result, $meta[DETAIL_ANNOTATIONS], $meta[DETAIL_TARGET_ANNO]);
-        $result->out->write(', DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
-        $result->out->write(', DETAIL_COMMENT => '.$this->comment($meta[DETAIL_COMMENT]));
-        $result->out->write(', DETAIL_ARGUMENTS => ['.($meta[DETAIL_ARGUMENTS]
-          ? "'".implode("', '", $meta[DETAIL_ARGUMENTS])."']],"
-          : ']],'
-        ));
-      }
-      $result->out->write('],');
-    }
-    $result->out->write('];');
   }
 
   protected function emitInterface($result, $interface) {
     array_unshift($result->meta, []);
 
-    $result->out->write('interface '.$this->declaration($interface->name));
+    $interface->comment && $this->emitOne($result, $interface->comment);
+    $interface->annotations && $this->emitOne($result, $interface->annotations);
+    $result->at($interface->declared)->out->write('interface '.$this->declaration($interface->name));
     $interface->parents && $result->out->write(' extends '.implode(', ', $interface->parents));
     $result->out->write('{');
     foreach ($interface->body as $member) {
@@ -525,7 +498,9 @@ abstract class PHP extends Emitter {
   protected function emitTrait($result, $trait) {
     array_unshift($result->meta, []);
 
-    $result->out->write('trait '.$this->declaration($trait->name));
+    $trait->comment && $this->emitOne($result, $trait->comment);
+    $trait->annotations && $this->emitOne($result, $trait->annotations);
+    $result->at($trait->declared)->out->write('trait '.$this->declaration($trait->name));
     $result->out->write('{');
     foreach ($trait->body as $member) {
       $this->emitOne($result, $member);
@@ -549,7 +524,9 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitConst($result, $const) {
-    $result->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
+    $const->comment && $this->emitOne($result, $const->comment);
+    $const->annotations && $this->emitOne($result, $const->annotations);
+    $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
     $this->emitOne($result, $const->expression);
     $result->out->write(';');
   }
@@ -563,7 +540,9 @@ abstract class PHP extends Emitter {
       DETAIL_ARGUMENTS   => []
     ];
 
-    $result->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
+    $property->comment && $this->emitOne($result, $property->comment);
+    $property->annotations && $this->emitOne($result, $property->annotations);
+    $result->at($property->declared)->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
     if (isset($property->expression)) {
       if ($this->isConstant($result, $property->expression)) {
         $result->out->write('=');
@@ -598,37 +577,38 @@ abstract class PHP extends Emitter {
       DETAIL_ARGUMENTS   => []
     ];
 
-    $result->out->write(implode(' ', $method->modifiers).' function '.$method->name);
-    $this->emitSignature($result, $method->signature);
+    $method->comment && $this->emitOne($result, $method->comment);
+    $method->annotations && $this->emitOne($result, $method->annotations);
+    $result->at($method->declared)->out->write(implode(' ', $method->modifiers).' function '.$method->name);
 
     $promoted= [];
     foreach ($method->signature->parameters as $param) {
+      if (isset($param->promote)) $promoted[]= $param;
+
+      // Create a parameter annotation named `default` for non-constant parameter defaults
+      if (isset($param->default) && !$this->isConstant($result, $param->default)) {
+        $param->annotate(new Annotation('default', [$param->default]));
+      }
+
       $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
       $meta[DETAIL_ARGUMENTS][]= $param->type ? $param->type->name() : 'var';
-
-      // Create properties from promoted parameters. Do not include default value, this is handled
-      // in emitParameter() already; otherwise we would be emitting it twice.
-      if (isset($param->promote)) {
-        $promoted[]= new Property(explode(' ', $param->promote), $param->name, $param->type, null, [], null, $param->line);
-        $result->locals[1]['$this->'.$param->name]= new Code(($param->reference ? '&$' : '$').$param->name);
-      }
-
-      if (isset($param->default) && !$this->isConstant($result, $param->default)) {
-        $meta[DETAIL_TARGET_ANNO][$param->name]['default']= [$param->default];
-      }
     }
+    $this->emitSignature($result, $method->signature);
 
     if (null === $method->body) {
       $result->out->write(';');
     } else {
       $result->out->write(' {');
       $this->emitInitializations($result, $result->locals[1]);
+      foreach ($promoted as $param) {
+        $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
+      }
       $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
 
-    foreach ($promoted as $property) {
-      $this->emitOne($result, $property);
+    foreach ($promoted as $param) {
+      $this->emitProperty($result, new Property(explode(' ', $param->promote), $param->name, $param->type));
     }
 
     // Copy any virtual properties inside locals[2] to class scope

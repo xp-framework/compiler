@@ -3,6 +3,7 @@
 abstract class Type {
   public static $ENUMS;
 
+  /** @codeCoverageIgnore */
   static function __static() {
     self::$ENUMS= PHP_VERSION_ID >= 80100;
   }

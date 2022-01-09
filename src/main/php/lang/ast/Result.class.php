@@ -33,6 +33,20 @@ class Result {
   }
 
   /**
+   * Forwards output line to given line number
+   *
+   * @param  int $line
+   * @return self
+   */
+  public function at($line) {
+    if ($line > $this->line) {
+      $this->out->write(str_repeat("\n", $line - $this->line));
+      $this->line= $line;
+    }
+    return $this;
+  }
+
+  /**
    * Looks up a given type 
    *
    * @param  string $type

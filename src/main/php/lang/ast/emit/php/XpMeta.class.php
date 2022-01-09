@@ -1,0 +1,105 @@
+<?php namespace lang\ast\emit\php;
+
+/**
+ * Emit meta information so that the XP reflection API won't have to parse
+ * it. Also omits apidoc comments and annotations from the generated code.
+ *
+ * Code compiled with this optimization in place requires using the XP Core
+ * as a dependency!
+ *
+ * @see  https://github.com/xp-framework/rfc/issues/336
+ */
+trait XpMeta {
+
+  /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
+  protected function annotations($result, $annotations) {
+    if (null === $annotations) return [];
+
+    $lookup= [];
+    foreach ($annotations as $name => $arguments) {
+      $p= strrpos($name, '\\');
+      $key= lcfirst(false === $p ? $name : substr($name, $p + 1));
+      $result->out->write("'".$key."' => ");
+      $name === $key || $lookup[$key]= $name;
+
+      if (empty($arguments)) {
+        $result->out->write('null,');
+      } else if (1 === sizeof($arguments) && isset($arguments[0])) {
+        $this->emitOne($result, $arguments[0]);
+        $result->out->write(',');
+      } else {
+        $result->out->write('[');
+        foreach ($arguments as $name => $argument) {
+          is_string($name) && $result->out->write("'".$name."' => ");
+          $this->emitOne($result, $argument);
+          $result->out->write(',');
+        }
+        $result->out->write('],');
+      }
+    }
+    return $lookup;
+  }
+
+  /** Emits annotations in XP format - and mappings for their names */
+  private function attributes($result, $annotations, $target) {
+    $result->out->write('DETAIL_ANNOTATIONS => [');
+    $lookup= $this->annotations($result, $annotations);
+    $result->out->write('], DETAIL_TARGET_ANNO => [');
+    foreach ($target as $name => $annotations) {
+      $result->out->write("'$".$name."' => [");
+      foreach ($this->annotations($result, $annotations) as $key => $value) {
+        $lookup[$key]= $value;
+      }
+      $result->out->write('],');
+    }
+    foreach ($lookup as $key => $value) {
+      $result->out->write("'".$key."' => '".$value."',");
+    }
+    $result->out->write(']');
+  }
+
+  /** Emit comment inside meta information */
+  private function comment($comment) {
+    return null === $comment ? 'null' : var_export($comment->content(), true);
+  }
+
+  /** Emit xp::$meta */
+  protected function emitMeta($result, $name, $annotations, $comment) {
+    if (null === $name) {
+      $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
+    } else {
+      $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+    }
+    $result->out->write('"class" => [');
+    $this->attributes($result, $annotations, []);
+    $result->out->write(', DETAIL_COMMENT => '.$this->comment($comment).'],');
+
+    foreach (array_shift($result->meta) as $type => $lookup) {
+      $result->out->write($type.' => [');
+      foreach ($lookup as $key => $meta) {
+        $result->out->write("'".$key."' => [");
+        $this->attributes($result, $meta[DETAIL_ANNOTATIONS], $meta[DETAIL_TARGET_ANNO]);
+        $result->out->write(', DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
+        $result->out->write(', DETAIL_COMMENT => '.$this->comment($meta[DETAIL_COMMENT]));
+        $result->out->write(', DETAIL_ARGUMENTS => ['.($meta[DETAIL_ARGUMENTS]
+          ? "'".implode("', '", $meta[DETAIL_ARGUMENTS])."']],"
+          : ']],'
+        ));
+      }
+      $result->out->write('],');
+    }
+    $result->out->write('];');
+  }
+
+  protected function emitComment($result, $comment) {
+    // Omit from generated code
+  }
+
+  protected function emitAnnotation($result, $annotation) {
+    // Omit from generated code
+  }
+
+  protected function emitAnnotations($result, $annotations) {
+    // Omit from generated code
+  }
+}

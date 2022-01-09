@@ -6,6 +6,7 @@ class Reflection extends Type {
   private $reflect;
   private static $UNITENUM;
 
+  /** @codeCoverageIgnore */
   static function __static() {
     self::$UNITENUM= interface_exists(\UnitEnum::class, false);  // Compatibility with XP < 10.8.0
   }
