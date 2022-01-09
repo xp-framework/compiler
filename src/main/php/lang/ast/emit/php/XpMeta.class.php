@@ -3,9 +3,11 @@
 /**
  * Emit meta information so that the XP reflection API won't have to parse
  * it. Also omits apidoc comments and annotations from the generated code.
+ * This is the only way we can add full annotation support to PHP 7 without
+ * impacting the line numbers!
  *
- * Code compiled with this optimization in place requires using the XP Core
- * as a dependency!
+ * Code compiled with this optimization in place requires using XP Core as
+ * a dependency!
  *
  * @see  https://github.com/xp-framework/rfc/issues/336
  */
