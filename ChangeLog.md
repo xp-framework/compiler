@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.0.0 / ????-??-??
+
+* Merged PR #127: Do not emit XP meta information by default. This is
+  the first step towards generating code that runs without a dependency
+  on XP core.
+  (@thekid)
+
 ## 7.3.0 / 2022-01-07
 
 * Merged PR #128: Add support for static closures - @thekid
