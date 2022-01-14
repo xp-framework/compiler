@@ -612,7 +612,11 @@ abstract class PHP extends Emitter {
     }
 
     // Copy any virtual properties inside locals[2] to class scope
-    $result->locals= [2 => $result->locals[2]] + array_pop($result->stack);
+    $virtual= $result->locals[2];
+    $result->locals= array_pop($result->stack);
+    foreach ($virtual as $name => $access) {
+      $result->locals[2][$name]= $access;
+    }
     $result->meta[0][self::METHOD][$method->name]= $meta;
   }
 
