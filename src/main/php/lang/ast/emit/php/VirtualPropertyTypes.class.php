@@ -4,7 +4,11 @@ use lang\ast\Code;
 
 /**
  * Creates __get() and __set() overloads which will create type-checked
- * instance properties for PHP < 7.4
+ * instance properties for PHP < 7.4. Performs type coercion for scalar
+ * types just as PHP would w/o strict type checks.
+ *
+ * Important: Because PHP doesn't have __getStatic() and __setStatic(),
+ * we cannot simulate property type checks for static members!
  *
  * @see  https://wiki.php.net/rfc/typed_properties_v2
  */
@@ -21,8 +25,7 @@ trait VirtualPropertyTypes {
       'readonly'  => 0x0080, // XP 10.13: MODIFIER_READONLY
     ];
 
-    // Because PHP doesn't have __getStatic() and __setStatic(), we cannot simulate
-    // property type checks for static members.
+    // Exclude properties w/o type and static properties
     if (null === $property->type || in_array('static', $property->modifiers)) {
       return parent::emitProperty($result, $property);
     }
@@ -51,13 +54,13 @@ trait VirtualPropertyTypes {
       $check= (
         '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
         'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
-        '  throw new \\Error("Cannot access private property ".__CLASS__."::\\$%1$s");'
+        'throw new \\Error("Cannot access private property ".__CLASS__."::\\$%1$s");'
       );
     } else if (in_array('protected', $property->modifiers)) {
       $check= (
         '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
         'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
-        '  throw new \\Error("Cannot access protected property ".__CLASS__."::\\$%1$s");'
+        'throw new \\Error("Cannot access protected property ".__CLASS__."::\\$%1$s");'
       );
     } else {
       $check= '';
@@ -66,7 +69,8 @@ trait VirtualPropertyTypes {
     $result->locals[2][$property->name]= [
       new Code(sprintf($check.'return $this->__virtual["%1$s"];', $property->name)),
       new Code(sprintf(
-        $check.$assign.'else throw new \\TypeError("Cannot assign ".typeof($value)." to property ".__CLASS__."::\\$%1$s of type %2$s");',
+        $check.$assign.
+        'else throw new \\TypeError("Cannot assign ".typeof($value)." to property ".__CLASS__."::\\$%1$s of type %2$s");',
         $property->name,
         $property->type->name()
       ))
