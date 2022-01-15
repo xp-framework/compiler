@@ -46,10 +46,27 @@ trait VirtualPropertyTypes {
         break;
     }
 
+    // Add visibility check for private and protected properties
+    if (in_array('private', $property->modifiers)) {
+      $check= (
+        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
+        'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
+        '  throw new \\Error("Cannot access private property ".__CLASS__."::\\$%1$s");'
+      );
+    } else if (in_array('protected', $property->modifiers)) {
+      $check= (
+        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
+        'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
+        '  throw new \\Error("Cannot access protected property ".__CLASS__."::\\$%1$s");'
+      );
+    } else {
+      $check= '';
+    }
+
     $result->locals[2][$property->name]= [
-      new Code('return $this->__virtual["'.$property->name.'"];'),
+      new Code(sprintf($check.'return $this->__virtual["%1$s"];', $property->name)),
       new Code(sprintf(
-        $assign.'else throw new \\TypeError("Cannot assign ".typeof($value)." to property ".self::class."::\\$%1$s of type %2$s");',
+        $check.$assign.'else throw new \\TypeError("Cannot assign ".typeof($value)." to property ".__CLASS__."::\\$%1$s of type %2$s");',
         $property->name,
         $property->type->name()
       ))

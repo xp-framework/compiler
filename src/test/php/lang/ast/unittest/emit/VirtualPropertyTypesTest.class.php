@@ -27,6 +27,57 @@ class VirtualPropertyTypesTest extends EmittingTest {
     Assert::equals(MODIFIER_PRIVATE, $t->getField('value')->getModifiers());
   }
 
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot access private property .+::\\$value/')]
+  public function cannot_read_private_field() {
+    $t= $this->type('class <T> {
+      private int $value;
+    }');
+
+    $t->newInstance()->value;
+  }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot access private property .+::\\$value/')]
+  public function cannot_write_private_field() {
+    $t= $this->type('class <T> {
+      private int $value;
+    }');
+
+    $t->newInstance()->value= 6100;
+  }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot access protected property .+::\\$value/')]
+  public function cannot_read_protected_field() {
+    $t= $this->type('class <T> {
+      protected int $value;
+    }');
+
+    $t->newInstance()->value;
+  }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot access protected property .+::\\$value/')]
+  public function cannot_write_protected_field() {
+    $t= $this->type('class <T> {
+      protected int $value;
+    }');
+
+    $t->newInstance()->value= 6100;
+  }
+
+  #[Test]
+  public function can_access_protected_field_from_subclass() {
+    $t= $this->type('class <T> {
+      protected int $value;
+    }');
+    $i= newinstance($t->getName(), [], [
+      'run' => function() {
+        $this->value= 6100;
+        return $this->value;
+      }
+    ]);
+
+    Assert::equals(6100, $i->run());
+  }
+
   #[Test]
   public function initial_value_available_via_reflection() {
     $t= $this->type('class <T> {
