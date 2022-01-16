@@ -25,8 +25,8 @@ trait VirtualPropertyTypes {
       'readonly'  => 0x0080, // XP 10.13: MODIFIER_READONLY
     ];
 
-    // Exclude properties w/o type and static properties
-    if (null === $property->type || in_array('static', $property->modifiers)) {
+    // Exclude properties w/o type, static and readonly properties
+    if (null === $property->type || in_array('static', $property->modifiers) || in_array('readonly', $property->modifiers)) {
       return parent::emitProperty($result, $property);
     }
 
