@@ -3,9 +3,14 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 8.0.0 / ????-??-??
+## 8.0.0 / 2022-01-16
 
-* Merged PR #129: Add (optional) emitter to create property type checks
+This release is the first in a series of releases to make the XP compiler
+more universally useful: Compiled code now doesn't include generated XP
+meta information by default, and is thus less dependant on XP Core, see
+https://github.com/xp-framework/compiler/projects/4.
+
+* Merged PR #129: Add augmentable emitter to create property type checks
   for PHP < 7.4
   (@thekid)
 * Fixed private and protected readonly properties being accessible from
