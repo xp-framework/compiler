@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 8.0.0 / ????-??-??
 
+* Merged PR #129: Add (optional) emitter to create property type checks
+  for PHP < 7.4
+  (@thekid)
 * Fixed private and protected readonly properties being accessible from
   any scope in PHP < 8.1
   (@thekid)
