@@ -37,7 +37,7 @@ use util\profiling\Timer;
  *   ```
  * - Emit XP meta information (includes `lang.ast.emit.php.XpMeta`):
  *   ```sh
- *   $ xp compile -t php:7.4 -e php:xp-meta -o dist src/main/php
+ *   $ xp compile -t php:7.4 -a php:xp-meta -o dist src/main/php
  *   ```
  *
  * The *-o* and *-n* options accept multiple input sources following them.
@@ -48,7 +48,7 @@ use util\profiling\Timer;
  */
 class CompileRunner {
 
-  /** Returns an emitter by a given name */
+  /** Returns an emitter to be augment by a given name */
   private static function emitter(string $name): XPClass {
     $p= strpos($name, ':');
     if (false === $p) return XPClass::forName($name);
@@ -68,7 +68,7 @@ class CompileRunner {
     $target= 'php:'.PHP_VERSION;
     $in= $out= '-';
     $quiet= false;
-    $emitters= [];
+    $augment= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
@@ -82,8 +82,8 @@ class CompileRunner {
         $out= null;
         $in= array_slice($args, $i + 1);
         break;
-      } else if ('-e' === $args[$i]) {
-        $emitters[]= self::emitter($args[++$i]);
+      } else if ('-a' === $args[$i]) {
+        $augment[]= self::emitter($args[++$i]);
       } else {
         $in= $args[$i];
         $out= $args[$i + 1] ?? '-';
@@ -92,7 +92,7 @@ class CompileRunner {
     }
 
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime($target, $emitters)->newInstance();
+    $emit= Emitter::forRuntime($target, $augment)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }
