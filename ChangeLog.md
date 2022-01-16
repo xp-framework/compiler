@@ -5,6 +5,9 @@ XP Compiler ChangeLog
 
 ## 8.0.0 / ????-??-??
 
+* Fixed private and protected readonly properties being accessible from
+  any scope in PHP < 8.1
+  (@thekid)
 * Merged PR #127: Do not emit XP meta information by default. This is
   the first step towards generating code that runs without a dependency
   on XP core.
