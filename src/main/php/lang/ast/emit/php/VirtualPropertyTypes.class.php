@@ -70,7 +70,7 @@ trait VirtualPropertyTypes {
       new Code(sprintf($check.'return $this->__virtual["%1$s"];', $property->name)),
       new Code(sprintf(
         $check.$assign.
-        'else throw new \\TypeError("Cannot assign ".typeof($value)." to property ".__CLASS__."::\\$%1$s of type %2$s");',
+        'else throw new \\TypeError("Cannot assign ".(is_object($value) ? get_class($value) : gettype($value))." to property ".__CLASS__."::\\$%1$s of type %2$s");',
         $property->name,
         $property->type->name()
       ))
