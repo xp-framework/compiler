@@ -89,6 +89,19 @@ class CastingTest extends EmittingTest {
     ));
   }
 
+  #[Test, Values([null, 'test'])]
+  public function nullable_string_cast_of_expression_returning($value) {
+    Assert::equals($value, $this->run(
+      'class <T> {
+        public function run($value) {
+          $values= [$value];
+          return (?string)array_pop($values);
+        }
+      }',
+      $value
+    ));
+  }
+
   #[Test]
   public function cast_braced() {
     Assert::equals(['test'], $this->run(

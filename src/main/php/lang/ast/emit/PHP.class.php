@@ -14,7 +14,7 @@ use lang\ast\nodes\{
   UnpackExpression,
   Variable
 };
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable};
 use lang\ast\{Emitter, Node, Type};
 
 abstract class PHP extends Emitter {
@@ -234,17 +234,26 @@ abstract class PHP extends Emitter {
   protected function emitCast($result, $cast) {
     static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true];
 
-    $name= $cast->type->name();
-    if ('?' === $name[0]) {
-      $result->out->write('cast(');
+    // Inline nullable checks using ternaries
+    if ($cast->type instanceof IsNullable) {
+      $t= $result->temp();
+      $result->out->write('null===('.$t.'=');
       $this->emitOne($result, $cast->expression);
-      $result->out->write(',\''.$name.'\', false)');
-    } else if (isset($native[$name])) {
-      $result->out->write('('.$cast->type->literal().')');
-      $this->emitOne($result, $cast->expression);
+      $result->out->write(')?null:');
+
+      $name= $cast->type->element->name();
+      $expression= new Variable(substr($t, 1));
+    } else {
+      $name= $cast->type->name();
+      $expression= $cast->expression;
+    }
+
+    if (isset($native[$name])) {
+      $result->out->write('('.$name.')');
+      $this->emitOne($result, $expression);
     } else {
       $result->out->write('cast(');
-      $this->emitOne($result, $cast->expression);
+      $this->emitOne($result, $expression);
       $result->out->write(',\''.$name.'\')');
     }
   }
