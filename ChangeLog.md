@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.1.0 / 2022-01-29
+
+* Merged PR #131: Inline nullable checks when casting - @thekid
+
 ## 8.0.0 / 2022-01-16
 
 This release is the first in a series of releases to make the XP compiler
