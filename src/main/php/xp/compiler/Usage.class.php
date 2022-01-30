@@ -6,7 +6,7 @@ use util\cmd\Console;
 
 /** @codeCoverageIgnore */
 class Usage {
-  const RUNTIME = 'PHP';
+  const RUNTIME = 'php';
 
   /** @return int */
   public static function main(array $args) {
@@ -20,7 +20,7 @@ class Usage {
       }
     };
 
-    $emitter= Emitter::forRuntime(self::RUNTIME.'.'.PHP_VERSION);
+    $emitter= Emitter::forRuntime(self::RUNTIME.':'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION);
     foreach (Package::forName('lang.ast.emit')->getClasses() as $class) {
       if ($class->isSubclassOf(Emitter::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
         $impl->add($class, $class->equals($emitter));

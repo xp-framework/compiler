@@ -7,7 +7,7 @@ module xp-framework/compiler {
 
   /** @return void */
   public function initialize() {
-    ClassLoader::registerLoader(CompilingClassloader::instanceFor('php:'.PHP_VERSION));
+    ClassLoader::registerLoader(CompilingClassloader::instanceFor('php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION));
 
     if (!interface_exists(\IDisposable::class, false)) {
       eval('interface IDisposable { public function __dispose(); }');

@@ -65,7 +65,7 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $target= 'php:'.PHP_VERSION;
+    $target= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
     $in= $out= '-';
     $quiet= false;
     $augment= [];

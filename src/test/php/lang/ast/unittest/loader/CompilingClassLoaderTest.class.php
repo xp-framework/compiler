@@ -10,7 +10,7 @@ class CompilingClassLoaderTest {
   private static $runtime;
 
   static function __static() {
-    self::$runtime= 'php:'.PHP_VERSION;
+    self::$runtime= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
   }
 
   /**
