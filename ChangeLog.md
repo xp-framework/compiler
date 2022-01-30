@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.2.0 / 2022-01-30
+
+* Support passing emitter-augmenting class names to the instanceFor()
+  method of `lang.ast.CompilingClassLoader`.
+  (@thekid)
+
 ## 8.1.0 / 2022-01-29
 
 * Merged PR #131: Inline nullable checks when casting - @thekid

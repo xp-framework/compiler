@@ -28,7 +28,7 @@ class CompilingClassLoader implements IClassLoader {
 
   /** Creates a new instances with a given PHP runtime */
   private function __construct($emit) {
-    $this->version= str_replace('⋈', '+', $emit->getSimpleName());
+    $this->version= strtr($emit->getSimpleName(), ['⋈' => '+', '·' => '.']);
 
     Compiled::$emit[$this->version]= $emit->newInstance();
     stream_wrapper_register($this->version, Compiled::class);
@@ -242,13 +242,14 @@ class CompilingClassLoader implements IClassLoader {
   }
 
   /**
-   * Fetch instance of classloader by path
+   * Fetch instance of classloader by version
    *
-   * @param   string path the identifier
-   * @return  lang.IClassLoader
+   * @param  string $version
+   * @return lang.IClassLoader
    */
   public static function instanceFor($version) {
-    $emit= Emitter::forRuntime($version, [XpMeta::class]);
+    sscanf($version, "%[^+]+%[^\r]", $emitter, $augmented);
+    $emit= Emitter::forRuntime($emitter, $augmented ? explode('+', $augmented) : [XpMeta::class]);
 
     $id= $emit->getName();
     if (!isset(self::$instance[$id])) {

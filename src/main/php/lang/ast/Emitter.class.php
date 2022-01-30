@@ -29,11 +29,10 @@ abstract class Emitter {
         $extended= ['kind' => 'class', 'extends' => [$p->loadClass($impl)], 'implements' => [], 'use' => []];
         foreach ($emitters as $class) {
           if ($class instanceof XPClass) {
-            $impl.= '⋈'.$class->getSimpleName();
+            $impl.= '⋈'.strtr($class->getName(), ['.' => '·']);
             $extended['use'][]= $class;
           } else {
-            $d= strrpos(strtr($class, '\\', '.'), '.');
-            $impl.= '⋈'.(false === $d ? $class : substr($class, $d + 1));
+            $impl.= '⋈'.strtr($class, ['.' => '·', '\\' => '·']);
             $extended['use'][]= XPClass::forName($class);
           }
         }

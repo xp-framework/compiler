@@ -54,12 +54,12 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function string_representation() {
-    Assert::equals('CompilingCL<PHP70+XpMeta>', CompilingClassLoader::instanceFor('php:7.0.0')->toString());
+    Assert::equals('CompilingCL<PHP70+lang.ast.emit.php.XpMeta>', CompilingClassLoader::instanceFor('php:7.0.0')->toString());
   }
 
   #[Test]
   public function hashcode() {
-    Assert::equals('CPHP70+XpMeta', CompilingClassLoader::instanceFor('php:7.0.0')->hashCode());
+    Assert::equals('CPHP70+lang.ast.emit.php.XpMeta', CompilingClassLoader::instanceFor('php:7.0.0')->hashCode());
   }
 
   #[Test]
@@ -75,6 +75,14 @@ class CompilingClassLoaderTest {
 
     Assert::equals(0, $cl->compareTo($cl), 'equals itself');
     Assert::equals(1, $cl->compareTo(null), 'does not equal null');
+  }
+
+  #[Test]
+  public function instanced_for_augmented() {
+    Assert::equals(
+      'PHP80+lang.ast.emit.php.XpMeta',
+      CompilingClassLoader::instanceFor('php:8.0.0+lang.ast.emit.php.XpMeta')->instanceId()
+    );
   }
 
   #[Test]
