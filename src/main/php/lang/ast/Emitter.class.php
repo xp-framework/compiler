@@ -172,7 +172,7 @@ abstract class Emitter {
    * @return io.streams.OutputStream
    * @throws lang.ast.Errors
    */
-  public function write(iterable $nodes, OutputStream $target) {
+  public function write($nodes, OutputStream $target) {
     $result= $this->result($target);
     try {
       $this->emitAll($result, $nodes);

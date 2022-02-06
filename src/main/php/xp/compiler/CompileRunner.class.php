@@ -65,13 +65,13 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $emitter= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
+    $target= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
     $in= $out= '-';
     $quiet= false;
     $augment= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
-        $emitter= $args[++$i];
+        $target= $args[++$i];
       } else if ('-q' === $args[$i]) {
         $quiet= true;
       } else if ('-o' === $args[$i]) {
@@ -92,7 +92,7 @@ class CompileRunner {
     }
 
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime($emitter, $augment)->newInstance();
+    $emit= Emitter::forRuntime($target, $augment)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }
