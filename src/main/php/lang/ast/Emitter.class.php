@@ -1,5 +1,6 @@
 <?php namespace lang\ast;
 
+use io\streams\OutputStream;
 use lang\ast\{Node, Error, Errors};
 use lang\reflect\Package;
 use lang\{IllegalArgumentException, IllegalStateException, ClassLoader, XPClass};
@@ -153,5 +154,31 @@ abstract class Emitter {
       // Fall through, use default
     }
     $this->{'emit'.$node->kind}($result, $node);
+  }
+
+  /**
+   * Creates result
+   *
+   * @param  io.streams.OutputStream $target
+   * @return lang.ast.Result
+   */
+  protected abstract function result($target);
+
+  /**
+   * Emitter entry point, takes nodes and emits them to the given target.
+   * 
+   * @param  iterable $nodes
+   * @param  io.streams.OutputStream $target
+   * @return io.streams.OutputStream
+   * @throws lang.ast.Errors
+   */
+  public function write(iterable $nodes, OutputStream $target) {
+    $result= $this->result($target);
+    try {
+      $this->emitAll($result, $nodes);
+      return $target;
+    } finally {
+      $result->close();
+    }
   }
 }

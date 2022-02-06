@@ -21,23 +21,33 @@ class ResultTest {
   }
 
   #[Test]
-  public function writes_php_open_tag_as_default_preamble() {
+  public function prolog_and_epilog_default_to_emtpy_strings() {
     $out= new MemoryOutputStream();
     $r= new Result(new StringWriter($out));
-    Assert::equals('<?php ', $out->bytes());
+    Assert::equals('', $out->bytes());
   }
 
   #[Test, Values(['', '<?php '])]
-  public function writes_preamble($preamble) {
+  public function writes_prolog($prolog) {
     $out= new MemoryOutputStream();
-    $r= new Result(new StringWriter($out), $preamble);
-    Assert::equals($preamble, $out->bytes());
+    $r= new Result(new StringWriter($out), $prolog);
+    $r->close();
+    Assert::equals($prolog, $out->bytes());
+  }
+
+  #[Test]
+  public function writes_epilog_on_closing() {
+    $out= new MemoryOutputStream();
+    $r= new Result(new StringWriter($out), '<?php ', '?>');
+    $r->close();
+
+    Assert::equals('<?php ?>', $out->bytes());
   }
 
   #[Test]
   public function write() {
     $out= new MemoryOutputStream();
-    $r= new Result(new StringWriter($out));
+    $r= new Result(new StringWriter($out), '<?php ');
     $r->out->write('echo "Hello";');
     Assert::equals('<?php echo "Hello";', $out->bytes());
   }
@@ -45,7 +55,7 @@ class ResultTest {
   #[Test]
   public function write_escaped() {
     $out= new MemoryOutputStream();
-    $r= new Result(new StringWriter($out));
+    $r= new Result(new StringWriter($out), '<?php ');
 
     $r->out->write("'");
     $r->out->redirect(new Escaping($out, ["'" => "\\'"]));
@@ -102,7 +112,7 @@ class ResultTest {
   #[Test, Values([[1, '<?php test'], [2, "<?php \ntest"], [3, "<?php \n\ntest"]])]
   public function write_at_line($line, $expected) {
     $out= new MemoryOutputStream();
-    $r= new Result(new StringWriter($out));
+    $r= new Result(new StringWriter($out), '<?php ');
     $r->at($line)->out->write('test');
 
     Assert::equals($expected, $out->bytes());
@@ -112,7 +122,7 @@ class ResultTest {
   #[Test]
   public function at_cannot_go_backwards() {
     $out= new MemoryOutputStream();
-    $r= new Result(new StringWriter($out));
+    $r= new Result(new StringWriter($out), '<?php ');
     $r->at(0)->out->write('test');
 
     Assert::equals('<?php test', $out->bytes());

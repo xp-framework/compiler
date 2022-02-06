@@ -65,13 +65,13 @@ class CompileRunner {
   public static function main(array $args) {
     if (empty($args)) return Usage::main($args);
 
-    $target= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
+    $emitter= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
     $in= $out= '-';
     $quiet= false;
     $augment= [];
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
-        $target= $args[++$i];
+        $emitter= $args[++$i];
       } else if ('-q' === $args[$i]) {
         $quiet= true;
       } else if ('-o' === $args[$i]) {
@@ -92,7 +92,7 @@ class CompileRunner {
     }
 
     $lang= Language::named('PHP');
-    $emit= Emitter::forRuntime($target, $augment)->newInstance();
+    $emit= Emitter::forRuntime($emitter, $augment)->newInstance();
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }
@@ -107,9 +107,7 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $parse= $lang->parse(new Tokens($source, $file));
-        $target= $output->target((string)$path);
-        $emit->emitAll(new Result($target), $parse->stream());
+        $emit->write($lang->parse(new Tokens($source, $file))->stream(), $output->target((string)$path));
 
         $t->stop();
         $quiet || Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
@@ -121,7 +119,6 @@ class CompileRunner {
         $total++;
         $time+= $t->elapsedTime();
         $source->close();
-        $target->close();
       }
     }
 

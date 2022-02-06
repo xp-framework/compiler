@@ -15,13 +15,23 @@ use lang\ast\nodes\{
   Variable
 };
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable};
-use lang\ast\{Emitter, Node, Type};
+use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
 
   protected $literals= [];
+
+  /**
+   * Creates result
+   *
+   * @param  io.streams.OutputStream $target
+   * @return lang.ast.Result
+   */
+  protected function result($target) {
+    return new Result($target, '<?php ');
+  }
 
   /**
    * Emit type literal or NULL if no type should be emitted

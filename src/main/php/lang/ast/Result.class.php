@@ -1,8 +1,9 @@
 <?php namespace lang\ast;
 
+use lang\Closeable;
 use lang\ast\emit\{Declaration, Reflection};
 
-class Result {
+class Result implements Closeable {
   public $out;
   public $codegen;
   public $line= 1;
@@ -10,16 +11,19 @@ class Result {
   public $locals= [];
   public $stack= [];
   public $type= [];
+  private $epilog;
 
   /**
-   * Starts a result stream, including a preamble
+   * Starts a result stream, including an optional prolog and epilog
    *
    * @param io.streams.Writer $out
-   * @param string $preamble
+   * @param string $prolog
+   * @param string $epilog
    */
-  public function __construct($out, $preamble= '<?php ') {
+  public function __construct($out, $prolog= '', $epilog= '') {
     $this->out= $out;
-    $this->out->write($preamble);
+    $this->out->write($prolog);
+    $this->epilog= $epilog;
     $this->codegen= new CodeGen();
   }
 
@@ -64,5 +68,15 @@ class Result {
     }
 
     return new Reflection($type);
+  }
+
+  /** @return void */
+  public function close() {
+    if (null === $this->out) return;
+
+    // Write epilog, then close and ensure this doesn't happen twice
+    '' === $this->epilog || $this->out->write($this->epilog);
+    $this->out->close();
+    unset($this->out);
   }
 }
