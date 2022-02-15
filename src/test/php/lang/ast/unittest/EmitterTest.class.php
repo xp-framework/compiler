@@ -65,9 +65,10 @@ class EmitterTest {
 
   #[Test, Expect(IllegalStateException::class)]
   public function emit_node_without_kind() {
-    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), new class() extends Node {
+    $node= new class() extends Node {
       public $kind= null;
-    });
+    };
+    $this->newEmitter()->write([$node], new MemoryOutputStream());
   }
 
   #[Test]

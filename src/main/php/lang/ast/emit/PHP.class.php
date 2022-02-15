@@ -30,7 +30,7 @@ abstract class PHP extends Emitter {
    * @return lang.ast.Result
    */
   protected function result($target) {
-    return new Result($target, '<?php ');
+    return new GeneratedCode($target, '<?php ');
   }
 
   /**
@@ -463,8 +463,8 @@ abstract class PHP extends Emitter {
 
       // Found first non-constant argument, enclose in `eval`
       $result->out->write('(eval: \'');
-      $out= $result->out->stream();
-      $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
+      $out= $result->out;
+      $result->out= new Escaping($out, ["'" => "\\'", '\\' => '\\\\']);
 
       // If exactly one unnamed argument exists, emit its value directly
       if (1 === sizeof($annotation->arguments) && 0 === key($annotation->arguments)) {
@@ -479,7 +479,7 @@ abstract class PHP extends Emitter {
         $result->out->write(']');
       }
 
-      $result->out->redirect($out);
+      $result->out= $out;
       $result->out->write('\')');
       return;
     }
