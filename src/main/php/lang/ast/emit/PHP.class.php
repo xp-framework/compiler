@@ -463,8 +463,7 @@ abstract class PHP extends Emitter {
 
       // Found first non-constant argument, enclose in `eval`
       $result->out->write('(eval: \'');
-      $out= $result->out;
-      $result->out= new Escaping($out, ["'" => "\\'", '\\' => '\\\\']);
+      $result->out= new Escaping($result->out, ["'" => "\\'", '\\' => '\\\\']);
 
       // If exactly one unnamed argument exists, emit its value directly
       if (1 === sizeof($annotation->arguments) && 0 === key($annotation->arguments)) {
@@ -479,7 +478,7 @@ abstract class PHP extends Emitter {
         $result->out->write(']');
       }
 
-      $result->out= $out;
+      $result->out= $result->out->original();
       $result->out->write('\')');
       return;
     }
