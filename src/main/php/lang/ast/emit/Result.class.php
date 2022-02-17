@@ -1,7 +1,8 @@
-<?php namespace lang\ast;
+<?php namespace lang\ast\emit;
 
 use io\streams\OutputStream;
 use lang\Closeable;
+use lang\ast\CodeGen;
 
 class Result implements Closeable {
   public $out;

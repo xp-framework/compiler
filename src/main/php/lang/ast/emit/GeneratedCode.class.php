@@ -1,7 +1,5 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Result;
-
 class GeneratedCode extends Result {
   private $epilog;
   public $line= 1;
