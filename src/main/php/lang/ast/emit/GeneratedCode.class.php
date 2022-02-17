@@ -4,6 +4,8 @@ use lang\ast\Result;
 
 class GeneratedCode extends Result {
   private $epilog;
+  public $line= 1;
+  public $type= [];
 
   /**
    * Starts a result stream, including an optional prolog and epilog
@@ -17,6 +19,20 @@ class GeneratedCode extends Result {
 
     $out->write($prolog);
     $this->epilog= $epilog;
+  }
+
+  /**
+   * Forwards output line to given line number
+   *
+   * @param  int $line
+   * @return self
+   */
+  public function at($line) {
+    if ($line > $this->line) {
+      $this->out->write(str_repeat("\n", $line - $this->line));
+      $this->line= $line;
+    }
+    return $this;
   }
 
   /**
@@ -48,13 +64,12 @@ class GeneratedCode extends Result {
     return new Reflection($type);
   }
 
-  /** @return void */
-  public function close() {
-    if (null === $this->out) return;
-
-    // Write epilog, then close and ensure this doesn't happen twice
+  /**
+   * Write epilog
+   *
+   * @return void
+   */
+  protected function finalize() {
     '' === $this->epilog || $this->out->write($this->epilog);
-    $this->out->close();
-    unset($this->out);
   }
 }

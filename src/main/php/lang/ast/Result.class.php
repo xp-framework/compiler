@@ -6,11 +6,9 @@ use lang\Closeable;
 class Result implements Closeable {
   public $out;
   public $codegen;
-  public $line= 1;
   public $meta= [];
   public $locals= [];
   public $stack= [];
-  public $type= [];
 
   /**
    * Starts a result stream, including an optional prolog and epilog
@@ -23,23 +21,20 @@ class Result implements Closeable {
   }
 
   /**
-   * Forwards output line to given line number
+   * Finalize result. Guaranteed to be called *once* from within `close()`.
+   * Without implementation here - overwrite in subclasses.
    *
-   * @param  int $line
-   * @return self
+   * @return void
    */
-  public function at($line) {
-    if ($line > $this->line) {
-      $this->out->write(str_repeat("\n", $line - $this->line));
-      $this->line= $line;
-    }
-    return $this;
+  protected function finalize() {
+    // NOOP
   }
 
   /** @return void */
   public function close() {
     if (null === $this->out) return;
 
+    $this->finalize();
     $this->out->close();
     unset($this->out);
   }
