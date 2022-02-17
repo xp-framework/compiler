@@ -1034,4 +1034,15 @@ abstract class PHP extends Emitter {
     $result->out->write('yield from ');
     $this->emitOne($result, $from->iterable);
   }
+
+  /**
+   * Emit single nodes
+   *
+   * @param  lang.ast.Result $result
+   * @param  lang.ast.Node $node
+   * @return void
+   */
+  public function emitOne($result, $node) {
+    parent::emitOne($result->at($node->line), $node);
+  }
 }

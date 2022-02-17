@@ -129,23 +129,17 @@ abstract class Emitter {
    */
   public function emitOne($result, $node) {
 
-    // Inlined Result::at()
-    if ($node->line > $result->line) {
-      $result->out->write(str_repeat("\n", $node->line - $result->line));
-      $result->line= $node->line;
-    }
-
     // Check for transformations
     if (isset($this->transformations[$node->kind])) {
       foreach ($this->transformations[$node->kind] as $transformation) {
         $r= $transformation($result->codegen, $node);
         if ($r instanceof Node) {
           if ($r->kind === $node->kind) continue;
-          $this->{"emit{$r->kind}"}($result, $r);
+          $this->{'emit'.$r->kind}($result, $r);
           return;
         } else if ($r) {
           foreach ($r as $n) {
-            $this->{"emit{$n->kind}"}($result, $n);
+            $this->{'emit'.$n->kind}($result, $n);
             $result->out->write(';');
           }
           return;
@@ -153,6 +147,7 @@ abstract class Emitter {
       }
       // Fall through, use default
     }
+
     $this->{'emit'.$node->kind}($result, $node);
   }
 
