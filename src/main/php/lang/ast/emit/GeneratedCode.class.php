@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 class GeneratedCode extends Result {
-  private $epilog;
+  private $prolog, $epilog;
   public $line= 1;
   public $type= [];
 
@@ -13,10 +13,28 @@ class GeneratedCode extends Result {
    * @param string $epilog
    */
   public function __construct($out, $prolog= '', $epilog= '') {
-    parent::__construct($out);
-
-    $out->write($prolog);
+    $this->prolog= $prolog;
     $this->epilog= $epilog;
+    parent::__construct($out);
+  }
+
+  /**
+   * Initialize result. Guaranteed to be called *once* from constructor.
+   * Without implementation here - overwrite in subclasses.
+   *
+   * @return void
+   */
+  protected function initialize() {
+    '' === $this->prolog || $this->out->write($this->prolog);
+  }
+
+  /**
+   * Write epilog
+   *
+   * @return void
+   */
+  protected function finalize() {
+    '' === $this->epilog || $this->out->write($this->epilog);
   }
 
   /**
@@ -60,14 +78,5 @@ class GeneratedCode extends Result {
     }
 
     return new Reflection($type);
-  }
-
-  /**
-   * Write epilog
-   *
-   * @return void
-   */
-  protected function finalize() {
-    '' === $this->epilog || $this->out->write($this->epilog);
   }
 }

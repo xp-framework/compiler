@@ -12,13 +12,24 @@ class Result implements Closeable {
   public $stack= [];
 
   /**
-   * Starts a result stream, including an optional prolog and epilog
+   * Starts a result stream.
    *
    * @param io.streams.OutputStream $out
    */
   public function __construct(OutputStream $out) {
     $this->out= $out;
     $this->codegen= new CodeGen();
+    $this->initialize();
+  }
+
+  /**
+   * Initialize result. Guaranteed to be called *once* from constructor.
+   * Without implementation here - overwrite in subclasses.
+   *
+   * @return void
+   */
+  protected function initialize() {
+    // NOOP
   }
 
   /**
