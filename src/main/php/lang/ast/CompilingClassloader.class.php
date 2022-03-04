@@ -62,8 +62,8 @@ class CompilingClassLoader implements IClassLoader {
   public function providesUri($uri) {
     if (isset($this->source[$uri])) return true;
 
-    $e= -strlen(self::EXTENSION);
-    if (0 !== substr_compare($uri, self::EXTENSION, $e)) return false;
+    $e= strlen(self::EXTENSION);
+    if (0 !== substr_compare($uri, self::EXTENSION, -$e)) return false;
     if (0 === substr_compare($uri, \xp::CLASS_FILE_EXT, -strlen(\xp::CLASS_FILE_EXT))) return false;
 
     foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
@@ -71,7 +71,7 @@ class CompilingClassLoader implements IClassLoader {
 
       $l= strlen($loader->path);
       if (0 === substr_compare($loader->path, $uri, 0, $l)) {
-        $this->source[$uri]= strtr(substr($uri, $l, $e), [DIRECTORY_SEPARATOR => '.']);
+        $this->source[$uri]= strtr(substr($uri, $l, -$e), [DIRECTORY_SEPARATOR => '.']);
         return true;
       }
     }
