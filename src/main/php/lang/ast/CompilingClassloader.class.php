@@ -16,6 +16,7 @@ use lang\{
 class CompilingClassLoader implements IClassLoader {
   const EXTENSION = '.php';
 
+  private static $ignore= ['autoload.php' => true, '__xp.php' => true];
   private static $instance= [];
   private $version;
   private $source= [];
@@ -60,7 +61,9 @@ class CompilingClassLoader implements IClassLoader {
    */
   public function providesUri($uri) {
     if (isset($this->source[$uri])) return true;
-    if (0 !== substr_compare($uri, self::EXTENSION, -4)) return false;
+
+    $e= -strlen(self::EXTENSION);
+    if (0 !== substr_compare($uri, self::EXTENSION, $e)) return false;
     if (0 === substr_compare($uri, \xp::CLASS_FILE_EXT, -strlen(\xp::CLASS_FILE_EXT))) return false;
 
     foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
@@ -68,7 +71,7 @@ class CompilingClassLoader implements IClassLoader {
 
       $l= strlen($loader->path);
       if (0 === substr_compare($loader->path, $uri, 0, $l)) {
-        $this->source[$uri]= strtr(substr($uri, $l, -4), [DIRECTORY_SEPARATOR => '.']);
+        $this->source[$uri]= strtr(substr($uri, $l, $e), [DIRECTORY_SEPARATOR => '.']);
         return true;
       }
     }
@@ -117,6 +120,7 @@ class CompilingClassLoader implements IClassLoader {
     foreach (ClassLoader::getDefault()->getLoaders() as $loader) {
       if ($loader instanceof self) continue;
       foreach ($loader->packageContents($package) as $content) {
+        if (isset(self::$ignore[$content])) continue;
         if (self::EXTENSION === substr($content, $p= strpos($content, '.'))) {
           $r[]= substr($content, 0, $p).\xp::CLASS_FILE_EXT;
         }
