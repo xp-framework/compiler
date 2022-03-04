@@ -13,6 +13,20 @@ class CompilingClassLoaderTest {
     self::$runtime= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
   }
 
+  private function tempFolder($structure) {
+    $namespace= 'ns'.uniqid();
+    $folder= new Folder(Environment::tempDir(), $namespace);
+    $folder->exists() || $folder->create();
+
+    $names= [];
+    foreach ($structure as $type => $code) {
+      Files::write(new File($folder, $type.'.php'), sprintf($code, $namespace));
+      $names[$type]= $namespace.'.'.$type;
+    }
+
+    return [$folder, $names];
+  }
+
   /**
    * Sets us compiling class loader with a given type and source code, then
    * executes callback.
@@ -22,20 +36,11 @@ class CompilingClassLoaderTest {
    * @return var
    */
   private function compile($source, $callback) {
-    $namespace= 'ns'.uniqid();
-    $folder= new Folder(Environment::tempDir(), $namespace);
-    $folder->exists() || $folder->create();
+    list($folder, $names)= $this->tempFolder($source);
 
-    $names= [];
-    foreach ($source as $type => $code) {
-      Files::write(new File($folder, $type.'.php'), sprintf($code, $namespace));
-      $names[$type]= $namespace.'.'.$type;
-    }
     $cl= ClassLoader::registerPath($folder->path);
-
-    $loader= CompilingClassLoader::instanceFor(self::$runtime);
     try {
-      return $callback($loader, $names, $cl);
+      return $callback(CompilingClassLoader::instanceFor(self::$runtime), $names, $cl);
     } finally {
       ClassLoader::removeLoader($cl);
       $folder->unlink();
@@ -196,5 +201,25 @@ class CompilingClassLoaderTest {
   #[Test, Expect(ElementNotFoundException::class)]
   public function loading_non_existant_resource_as_stream() {
     CompilingClassLoader::instanceFor(self::$runtime)->getResourceAsStream('notfound.md');
+  }
+
+  #[Test]
+  public function ignores_autoload_and_xp_entry() {
+    list($folder, $names)= $this->tempFolder([
+      '__xp'     => '<?php ...',
+      'autoload' => '<?php ...',
+      'Fixture'  => '<?php class Fixture { }',
+    ]);
+
+    $cl= ClassLoader::registerPath($folder->path);
+    try {
+      Assert::equals(
+        ['Fixture.class.php'],
+        CompilingClassLoader::instanceFor(self::$runtime)->packageContents($folder->dirname)
+      );
+    } finally {
+      ClassLoader::removeLoader($cl);
+      $folder->unlink();
+    }
   }
 }
