@@ -441,6 +441,7 @@ abstract class PHP extends Emitter {
 
   protected function emitComment($result, $comment) {
     $result->out->write($comment->declaration);
+    $result->line+= substr_count($comment->declaration, "\n");
   }
 
   protected function emitAnnotation($result, $annotation) {

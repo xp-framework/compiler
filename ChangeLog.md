@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed #136: Line number inconsistent after multi-line doc comments
+  (@thekid)
+
 ## 8.2.0 / 2022-01-30
 
 * Support passing emitter-augmenting class names to the instanceFor()

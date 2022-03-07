@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\nodes\Variable;
+use lang\ast\nodes\{Variable, Comment};
 use lang\ast\{Emitter, Node, Code, Result};
 use lang\{IllegalStateException, IllegalArgumentException};
 use unittest\{Assert, Expect, Test, TestCase};
@@ -108,5 +108,25 @@ class EmitterTest {
     $fixture->emitOne(new Result($out), new Variable('a'));
 
     Assert::equals('<?php $a', $out->bytes());
+  }
+
+  #[Test]
+  public function emit_multiline_comment() {
+    $fixture= $this->newEmitter();
+    $out= new MemoryOutputStream();
+    $fixture->emitAll(new Result($out), [
+      new Comment(
+        "/**\n".
+        " * Doc comment\n".
+        " *\n".
+        " * @see http://example.com/\n".
+        " */",
+        3
+      ),
+      new Variable('a', 8)
+    ]);
+
+    $code= $out->bytes();
+    Assert::equals('$a;', explode("\n", $code)[7], $code);
   }
 }
