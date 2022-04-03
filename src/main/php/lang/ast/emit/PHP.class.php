@@ -959,6 +959,7 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $scope->type);
       $result->out->write('::');
       $this->emitOne($result, $scope->member);
+      return;
     } else if ($scope->type instanceof Node) {
       $t= $result->temp();
       $result->out->write('('.$t.'=');
@@ -966,12 +967,19 @@ abstract class PHP extends Emitter {
       $result->out->write(')?'.$t.'::');
       $this->emitOne($result, $scope->member);
       $result->out->write(':null');
-    } else if ($scope->member instanceof Literal && $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)) {
-      $result->out->write($scope->type.'::$'.$scope->member->expression);
-    } else {
-      $result->out->write($scope->type.'::');
-      $this->emitOne($result, $scope->member);
+      return;
+    } else if ($scope->member instanceof Literal) {
+      if ('namespace' === $scope->member->expression) {
+        $result->out->write("'".ltrim($scope->type, '\\')."'");
+        return;
+      } else if ($result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)) {
+        $result->out->write($scope->type.'::$'.$scope->member->expression);
+        return;
+      }
     }
+
+    $result->out->write($scope->type.'::');
+    $this->emitOne($result, $scope->member);
   }
 
   protected function emitInstance($result, $instance) {

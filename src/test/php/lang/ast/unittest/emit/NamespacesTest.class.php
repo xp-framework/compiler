@@ -84,4 +84,34 @@ class NamespacesTest extends EmittingTest {
     }');
     Assert::equals(new Date('1977-12-14'), $r);
   }
+
+  #[Test]
+  public function unqualified_namespace_constant() {
+    $r= $this->run('namespace test\api; class <T> {
+      public function run() {
+        return v1::namespace;
+      }
+    }');
+    Assert::equals('test\\api\\v1', $r);
+  }
+
+  #[Test]
+  public function relative_namespace_constant() {
+    $r= $this->run('namespace test; class <T> {
+      public function run() {
+        return api\v1::namespace;
+      }
+    }');
+    Assert::equals('test\\api\\v1', $r);
+  }
+
+  #[Test]
+  public function absolute_namespace_constant() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return \test\api\v1::namespace;
+      }
+    }');
+    Assert::equals('test\\api\\v1', $r);
+  }
 }
