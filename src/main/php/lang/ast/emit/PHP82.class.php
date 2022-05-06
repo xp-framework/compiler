@@ -10,7 +10,7 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_82
  */
 class PHP82 extends PHP {
-  use RewriteBlockLambdaExpressions;
+  use RewriteBlockLambdaExpressions, ReadonlyClasses;
 
   /** Sets up type => literal mappings */
   public function __construct() {

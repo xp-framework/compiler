@@ -4,11 +4,12 @@ use lang\Error;
 use unittest\{Assert, Expect, Test};
 
 /**
- * Readonly properties
+ * Readonly classes and properties
  *
  * @see  https://wiki.php.net/rfc/readonly_properties_v2
+ * @see  https://wiki.php.net/rfc/readonly_classes
  */
-class ReadonlyPropertiesTest extends EmittingTest {
+class ReadonlyTest extends EmittingTest {
 
   /** @return iterable */
   private function modifiers() {
@@ -20,7 +21,19 @@ class ReadonlyPropertiesTest extends EmittingTest {
   }
 
   #[Test]
-  public function declaration() {
+  public function class_declaration() {
+    $t= $this->type('readonly class <T> {
+      public int $fixture;
+    }');
+
+    Assert::equals(
+      sprintf('public readonly int %s::$fixture', $t->getName()),
+      $t->getField('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function property_declaration() {
     $t= $this->type('class <T> {
       public readonly int $fixture;
     }');

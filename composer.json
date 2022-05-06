@@ -7,7 +7,7 @@
   "keywords": ["module", "xp"],
   "require" : {
     "xp-framework/core": "^11.0 | ^10.0",
-    "xp-framework/ast": "^8.0",
+    "xp-framework/ast": "dev-feature/readonly_classes as 8.1.0",
     "php" : ">=7.0.0"
   },
   "require-dev" : {

@@ -19,6 +19,7 @@ class PHP70 extends PHP {
     OmitArgumentNames,
     OmitConstModifiers,
     OmitPropertyTypes,
+    ReadonlyClasses,
     ReadonlyProperties,
     RewriteClassOnObjects,
     RewriteEnums,
