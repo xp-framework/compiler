@@ -45,11 +45,28 @@ class ReadonlyTest extends EmittingTest {
   }
 
   #[Test]
-  public function with_constructor_argument_promotion() {
+  public function class_with_constructor_argument_promotion() {
+    $t= $this->type('readonly class <T> {
+      public function __construct(public string $fixture) { }
+    }');
+
+    Assert::equals(
+      sprintf('public readonly string %s::$fixture', $t->getName()),
+      $t->getField('fixture')->toString()
+    );
+    Assert::equals('Test', $t->newInstance('Test')->fixture);
+  }
+
+  #[Test]
+  public function property_defined_with_constructor_argument_promotion() {
     $t= $this->type('class <T> {
       public function __construct(public readonly string $fixture) { }
     }');
 
+    Assert::equals(
+      sprintf('public readonly string %s::$fixture', $t->getName()),
+      $t->getField('fixture')->toString()
+    );
     Assert::equals('Test', $t->newInstance('Test')->fixture);
   }
 
