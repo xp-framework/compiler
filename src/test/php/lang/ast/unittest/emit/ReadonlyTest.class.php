@@ -173,4 +173,16 @@ class ReadonlyTest extends EmittingTest {
       public readonly string $fixture= "Test";
     }');
   }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot create dynamic property .+fixture/')]
+  public function cannot_read_dynamic_members_from_readonly_classes() {
+    $t= $this->type('readonly class <T> { }');
+    $t->newInstance()->fixture;
+  }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot create dynamic property .+fixture/')]
+  public function cannot_write_dynamic_members_from_readonly_classes() {
+    $t= $this->type('readonly class <T> { }');
+    $t->newInstance()->fixture= true;
+  }
 }

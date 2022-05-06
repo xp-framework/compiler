@@ -383,7 +383,7 @@ abstract class PHP extends Emitter {
   protected function emitClass($result, $class) {
     array_unshift($result->type, $class);
     array_unshift($result->meta, []);
-    $result->locals= [[], [], []];
+    $result->locals ?: $result->locals= [[], [], []];
 
     $class->comment && $this->emitOne($result, $class->comment);
     $class->annotations && $this->emitOne($result, $class->annotations);
@@ -399,21 +399,24 @@ abstract class PHP extends Emitter {
     if ($result->locals[2]) {
       $result->out->write('private $__virtual= [');
       foreach ($result->locals[2] as $name => $access) {
-        $result->out->write("'{$name}' => null,");
+        $name && $result->out->write("'{$name}' => null,");
       }
       $result->out->write('];');
 
       $result->out->write('public function __get($name) { switch ($name) {');
       foreach ($result->locals[2] as $name => $access) {
-        $result->out->write('case "'.$name.'":');
+        $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[0]);
         $result->out->write('break;');
       }
-      $result->out->write('default: trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING); }}');
+      isset($result->locals[2][null]) || $result->out->write(
+        'default: trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING);'
+      );
+      $result->out->write('}}');
 
       $result->out->write('public function __set($name, $value) { switch ($name) {');
       foreach ($result->locals[2] as $name => $access) {
-        $result->out->write('case "'.$name.'":');
+        $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[1]);
         $result->out->write('break;');
       }
@@ -433,6 +436,7 @@ abstract class PHP extends Emitter {
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name.'::__init();');
     array_shift($result->type);
+    $result->locals= [];
   }
 
   protected function emitMeta($result, $name, $annotations, $comment) {
