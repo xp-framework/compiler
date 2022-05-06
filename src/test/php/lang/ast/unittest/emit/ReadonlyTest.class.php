@@ -185,4 +185,11 @@ class ReadonlyTest extends EmittingTest {
     $t= $this->type('readonly class <T> { }');
     $t->newInstance()->fixture= true;
   }
+
+  #[Test, Ignore('Until proper error handling facilities exist')]
+  public function readonly_classes_cannot_have_static_members() {
+    $this->type('readonly class <T> {
+      public static $test;
+    }');
+  }
 }
