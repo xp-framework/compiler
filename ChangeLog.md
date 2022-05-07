@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.3.0 / 2022-03-07
+
+* Made JIT class loader ignore *autoload.php* files - @thekid
+* Fixed #136: Line number inconsistent after multi-line doc comments
+  (@thekid)
+
 ## 8.2.0 / 2022-01-30
 
 * Support passing emitter-augmenting class names to the instanceFor()
