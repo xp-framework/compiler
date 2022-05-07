@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #135: Move responsibility for creating result to emitter
+  (@thekid)
+
 ## 8.3.0 / 2022-03-07
 
 * Made JIT class loader ignore *autoload.php* files - @thekid
