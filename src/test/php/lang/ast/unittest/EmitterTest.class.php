@@ -109,19 +109,20 @@ class EmitterTest {
 
   #[Test]
   public function emit_multiline_comment() {
-    $fixture= $this->newEmitter();
-    $out= new MemoryOutputStream();
-    $fixture->emitAll(new Result($out), [
-      new Comment(
-        "/**\n".
-        " * Doc comment\n".
-        " *\n".
-        " * @see http://example.com/\n".
-        " */",
-        3
-      ),
-      new Variable('a', 8)
-    ]);
+    $out= $this->newEmitter()->write(
+      [
+        new Comment(
+          "/**\n".
+          " * Doc comment\n".
+          " *\n".
+          " * @see http://example.com/\n".
+          " */",
+          3
+        ),
+        new Variable('a', 8)
+      ],
+      new MemoryOutputStream()
+    );
 
     $code= $out->bytes();
     Assert::equals('$a;', explode("\n", $code)[7], $code);
