@@ -33,13 +33,12 @@ trait AttributesAsComments {
     $line= $annotations->line;
     $result->out->write('#[');
 
-    $out= $result->out->stream();
-    $result->out->redirect(new Escaping($out, ["\n" => " "]));
+    $result->out= new Escaping($result->out, ["\n" => " "]);
     foreach ($annotations->named as $annotation) {
       $this->emitOne($result, $annotation);
       $result->out->write(',');
     }
-    $result->out->redirect($out);
+    $result->out= $result->out->original();
 
     $result->out->write("]\n");
     $result->line= $line + 1;

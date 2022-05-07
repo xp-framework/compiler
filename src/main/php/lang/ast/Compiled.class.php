@@ -22,14 +22,9 @@ class Compiled implements OutputStream {
   }
 
   private static function parse($lang, $in, $version, $out, $file) {
-    $language= isset(self::$lang[$lang])
-      ? self::$lang[$lang]
-      : self::$lang[$lang]= self::language($lang, self::$emit[$version])
-    ;
-
+    $language= self::$lang[$lang] ?? self::$lang[$lang]= self::language($lang, self::$emit[$version]);
     try {
-      self::$emit[$version]->emitAll(new Result($out), $language->parse(new Tokens($in, $file))->stream());
-      return $out;
+      return self::$emit[$version]->write($language->parse(new Tokens($in, $file))->stream(), $out);
     } finally {
       $in->close();
     }

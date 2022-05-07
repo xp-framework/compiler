@@ -1,7 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\{Node, Result};
+use lang\ast\Node;
+use lang\ast\emit\GeneratedCode;
 use unittest\Before;
 
 abstract class EmitterTraitTest {
@@ -9,7 +10,7 @@ abstract class EmitterTraitTest {
 
   /** Emits a node and returns the emitted code */
   protected function emit(Node $node, array $type= []): string {
-    $result= new Result(new MemoryOutputStream(), '');
+    $result= new GeneratedCode(new MemoryOutputStream(), '');
     $result->type= $type;
 
     $this->emitter->emitOne($result, $node);

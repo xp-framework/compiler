@@ -1,5 +1,6 @@
 <?php namespace lang\ast;
 
+use io\streams\OutputStream;
 use lang\ast\{Node, Error, Errors};
 use lang\reflect\Package;
 use lang\{IllegalArgumentException, IllegalStateException, ClassLoader, XPClass};
@@ -128,23 +129,17 @@ abstract class Emitter {
    */
   public function emitOne($result, $node) {
 
-    // Inlined Result::at()
-    if ($node->line > $result->line) {
-      $result->out->write(str_repeat("\n", $node->line - $result->line));
-      $result->line= $node->line;
-    }
-
     // Check for transformations
     if (isset($this->transformations[$node->kind])) {
       foreach ($this->transformations[$node->kind] as $transformation) {
         $r= $transformation($result->codegen, $node);
         if ($r instanceof Node) {
           if ($r->kind === $node->kind) continue;
-          $this->{"emit{$r->kind}"}($result, $r);
+          $this->{'emit'.$r->kind}($result, $r);
           return;
         } else if ($r) {
           foreach ($r as $n) {
-            $this->{"emit{$n->kind}"}($result, $n);
+            $this->{'emit'.$n->kind}($result, $n);
             $result->out->write(';');
           }
           return;
@@ -152,6 +147,33 @@ abstract class Emitter {
       }
       // Fall through, use default
     }
+
     $this->{'emit'.$node->kind}($result, $node);
+  }
+
+  /**
+   * Creates result
+   *
+   * @param  io.streams.OutputStream $target
+   * @return lang.ast.Result
+   */
+  protected abstract function result($target);
+
+  /**
+   * Emitter entry point, takes nodes and emits them to the given target.
+   * 
+   * @param  iterable $nodes
+   * @param  io.streams.OutputStream $target
+   * @return io.streams.OutputStream
+   * @throws lang.ast.Errors
+   */
+  public function write($nodes, OutputStream $target) {
+    $result= $this->result($target);
+    try {
+      $this->emitAll($result, $nodes);
+      return $target;
+    } finally {
+      $result->close();
+    }
   }
 }

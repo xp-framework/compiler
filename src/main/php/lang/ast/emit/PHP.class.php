@@ -15,13 +15,23 @@ use lang\ast\nodes\{
   Variable
 };
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable};
-use lang\ast\{Emitter, Node, Type};
+use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
 
   protected $literals= [];
+
+  /**
+   * Creates result
+   *
+   * @param  io.streams.OutputStream $target
+   * @return lang.ast.Result
+   */
+  protected function result($target) {
+    return new GeneratedCode($target, '<?php ');
+  }
 
   /**
    * Emit type literal or NULL if no type should be emitted
@@ -454,8 +464,7 @@ abstract class PHP extends Emitter {
 
       // Found first non-constant argument, enclose in `eval`
       $result->out->write('(eval: \'');
-      $out= $result->out->stream();
-      $result->out->redirect(new Escaping($out, ["'" => "\\'", '\\' => '\\\\']));
+      $result->out= new Escaping($result->out, ["'" => "\\'", '\\' => '\\\\']);
 
       // If exactly one unnamed argument exists, emit its value directly
       if (1 === sizeof($annotation->arguments) && 0 === key($annotation->arguments)) {
@@ -470,7 +479,7 @@ abstract class PHP extends Emitter {
         $result->out->write(']');
       }
 
-      $result->out->redirect($out);
+      $result->out= $result->out->original();
       $result->out->write('\')');
       return;
     }
@@ -1025,5 +1034,16 @@ abstract class PHP extends Emitter {
   protected function emitFrom($result, $from) {
     $result->out->write('yield from ');
     $this->emitOne($result, $from->iterable);
+  }
+
+  /**
+   * Emit single nodes
+   *
+   * @param  lang.ast.Result $result
+   * @param  lang.ast.Node $node
+   * @return void
+   */
+  public function emitOne($result, $node) {
+    parent::emitOne($result->at($node->line), $node);
   }
 }

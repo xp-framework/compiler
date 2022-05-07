@@ -21,4 +21,8 @@ class Escaping implements OutputStream {
   public function close() {
     $this->target->close();
   }
+
+  public function original() {
+    return $this->target;
+  }
 }

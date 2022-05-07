@@ -65,66 +65,64 @@ class EmitterTest {
 
   #[Test, Expect(IllegalStateException::class)]
   public function emit_node_without_kind() {
-    $this->newEmitter()->emitOne(new Result(new MemoryOutputStream()), new class() extends Node {
+    $node= new class() extends Node {
       public $kind= null;
-    });
+    };
+    $this->newEmitter()->write([$node], new MemoryOutputStream());
   }
 
   #[Test]
   public function transform_modifying_node() {
     $fixture= $this->newEmitter();
     $fixture->transform('variable', function($codegen, $var) { $var->name= '_'.$var->name; return $var; });
-    $out= new MemoryOutputStream();
-    $fixture->emitOne(new Result($out), new Variable('a'));
+    $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
-    Assert::equals('<?php $_a', $out->bytes());
+    Assert::equals('<?php $_a;', $out->bytes());
   }
 
   #[Test]
   public function transform_to_node() {
     $fixture= $this->newEmitter();
     $fixture->transform('variable', function($codegen, $var) { return new Code('$variables["'.$var->name.'"]'); });
-    $out= new MemoryOutputStream();
-    $fixture->emitOne(new Result($out), new Variable('a'));
+    $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
-    Assert::equals('<?php $variables["a"]', $out->bytes());
+    Assert::equals('<?php $variables["a"];', $out->bytes());
   }
 
   #[Test]
   public function transform_to_array() {
     $fixture= $this->newEmitter();
     $fixture->transform('variable', function($codegen, $var) { return [new Code('$variables["'.$var->name.'"]')]; });
-    $out= new MemoryOutputStream();
-    $fixture->emitOne(new Result($out), new Variable('a'));
+    $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
-    Assert::equals('<?php $variables["a"];', $out->bytes());
+    Assert::equals('<?php $variables["a"];;', $out->bytes());
   }
 
   #[Test]
   public function transform_to_null() {
     $fixture= $this->newEmitter();
     $fixture->transform('variable', function($codegen, $var) { return null; });
-    $out= new MemoryOutputStream();
-    $fixture->emitOne(new Result($out), new Variable('a'));
+    $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
-    Assert::equals('<?php $a', $out->bytes());
+    Assert::equals('<?php $a;', $out->bytes());
   }
 
   #[Test]
   public function emit_multiline_comment() {
-    $fixture= $this->newEmitter();
-    $out= new MemoryOutputStream();
-    $fixture->emitAll(new Result($out), [
-      new Comment(
-        "/**\n".
-        " * Doc comment\n".
-        " *\n".
-        " * @see http://example.com/\n".
-        " */",
-        3
-      ),
-      new Variable('a', 8)
-    ]);
+    $out= $this->newEmitter()->write(
+      [
+        new Comment(
+          "/**\n".
+          " * Doc comment\n".
+          " *\n".
+          " * @see http://example.com/\n".
+          " */",
+          3
+        ),
+        new Variable('a', 8)
+      ],
+      new MemoryOutputStream()
+    );
 
     $code= $out->bytes();
     Assert::equals('$a;', explode("\n", $code)[7], $code);

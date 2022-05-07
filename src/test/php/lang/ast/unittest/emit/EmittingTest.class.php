@@ -1,7 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
-use io\streams\{MemoryOutputStream, StringWriter};
+use io\streams\MemoryOutputStream;
 use lang\DynamicClassLoader;
+use lang\ast\emit\GeneratedCode;
 use lang\ast\emit\php\XpMeta;
 use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
 use unittest\{After, Assert, TestCase};
@@ -63,7 +64,7 @@ abstract class EmittingTest {
     $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
 
     $out= new MemoryOutputStream();
-    $this->emitter->emitAll(new Result(new StringWriter($out), ''), $tree->children());
+    $this->emitter->emitAll(new GeneratedCode($out, ''), $tree->children());
     return $out->bytes();
   }
 
@@ -75,8 +76,6 @@ abstract class EmittingTest {
    */
   protected function type($code) {
     $name= 'T'.(self::$id++);
-    $out= new MemoryOutputStream();
-
     $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
     if (isset($this->output['ast'])) {
       Console::writeLine();
@@ -84,7 +83,8 @@ abstract class EmittingTest {
       Console::writeLine($tree);
     }
 
-    $this->emitter->emitAll(new Result(new StringWriter($out), ''), $tree->children());
+    $out= new MemoryOutputStream();
+    $this->emitter->emitAll(new GeneratedCode($out, ''), $tree->children());
     if (isset($this->output['code'])) {
       Console::writeLine();
       Console::writeLine('=== ', static::class, ' ===');
