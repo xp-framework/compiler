@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.4.0 / 2022-05-14
+
+* Merged PR #138: Implement readonly modifier for classes - a PHP 8.2
+  feature, see https://wiki.php.net/rfc/readonly_classes
+  (@thekid)
 * Merged PR #135: Move responsibility for creating result to emitter
   (@thekid)
 
