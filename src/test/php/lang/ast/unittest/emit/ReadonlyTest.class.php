@@ -4,11 +4,12 @@ use lang\Error;
 use unittest\{Assert, Expect, Test};
 
 /**
- * Readonly properties
+ * Readonly classes and properties
  *
  * @see  https://wiki.php.net/rfc/readonly_properties_v2
+ * @see  https://wiki.php.net/rfc/readonly_classes
  */
-class ReadonlyPropertiesTest extends EmittingTest {
+class ReadonlyTest extends EmittingTest {
 
   /** @return iterable */
   private function modifiers() {
@@ -20,7 +21,19 @@ class ReadonlyPropertiesTest extends EmittingTest {
   }
 
   #[Test]
-  public function declaration() {
+  public function class_declaration() {
+    $t= $this->type('readonly class <T> {
+      public int $fixture;
+    }');
+
+    Assert::equals(
+      sprintf('public readonly int %s::$fixture', $t->getName()),
+      $t->getField('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function property_declaration() {
     $t= $this->type('class <T> {
       public readonly int $fixture;
     }');
@@ -32,11 +45,28 @@ class ReadonlyPropertiesTest extends EmittingTest {
   }
 
   #[Test]
-  public function with_constructor_argument_promotion() {
+  public function class_with_constructor_argument_promotion() {
+    $t= $this->type('readonly class <T> {
+      public function __construct(public string $fixture) { }
+    }');
+
+    Assert::equals(
+      sprintf('public readonly string %s::$fixture', $t->getName()),
+      $t->getField('fixture')->toString()
+    );
+    Assert::equals('Test', $t->newInstance('Test')->fixture);
+  }
+
+  #[Test]
+  public function property_defined_with_constructor_argument_promotion() {
     $t= $this->type('class <T> {
       public function __construct(public readonly string $fixture) { }
     }');
 
+    Assert::equals(
+      sprintf('public readonly string %s::$fixture', $t->getName()),
+      $t->getField('fixture')->toString()
+    );
     Assert::equals('Test', $t->newInstance('Test')->fixture);
   }
 
@@ -141,6 +171,25 @@ class ReadonlyPropertiesTest extends EmittingTest {
   public function cannot_have_an_initial_value() {
     $this->type('class <T> {
       public readonly string $fixture= "Test";
+    }');
+  }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot create dynamic property .+fixture/')]
+  public function cannot_read_dynamic_members_from_readonly_classes() {
+    $t= $this->type('readonly class <T> { }');
+    $t->newInstance()->fixture;
+  }
+
+  #[Test, Expect(class: Error::class, withMessage: '/Cannot create dynamic property .+fixture/')]
+  public function cannot_write_dynamic_members_from_readonly_classes() {
+    $t= $this->type('readonly class <T> { }');
+    $t->newInstance()->fixture= true;
+  }
+
+  #[Test, Ignore('Until proper error handling facilities exist')]
+  public function readonly_classes_cannot_have_static_members() {
+    $this->type('readonly class <T> {
+      public static $test;
     }');
   }
 }
