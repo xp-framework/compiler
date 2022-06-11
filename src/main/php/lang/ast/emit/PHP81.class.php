@@ -36,7 +36,12 @@ class PHP81 extends PHP {
         }
         return substr($u, 1);
       },
-      IsLiteral::class      => function($t) { return $t->literal(); }
+      IsLiteral::class      => function($t) {
+        static $omit= ['true' => 1, 'false' => 1, 'null' => 1];
+
+        $l= $t->literal();
+        return isset($omit[$l]) ? null : $l;
+      }
     ];
   }
 }

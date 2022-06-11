@@ -39,8 +39,10 @@ class PHP71 extends PHP {
       IsUnion::class        => function($t) { return null; },
       IsIntersection::class => function($t) { return null; },
       IsLiteral::class      => function($t) {
+        static $omit= ['object' => 1, 'mixed' => 1, 'true' => 1, 'false' => 1, 'null' => 1];
+
         $l= $t->literal();
-        return ('object' === $l || 'mixed' === $l) ? null : ('never' === $l ? 'void' : $l);
+        return isset($omit[$l]) ? null : ('never' === $l ? 'void' : $l);
       },
     ];
   }

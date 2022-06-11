@@ -39,8 +39,10 @@ class PHP72 extends PHP {
       IsUnion::class        => function($t) { return null; },
       IsIntersection::class => function($t) { return null; },
       IsLiteral::class      => function($t) {
+        static $omit= ['mixed' => 1, 'true' => 1, 'false' => 1, 'null' => 1];
+
         $l= $t->literal();
-        return 'mixed' === $l ? null : ('never' === $l ? 'void' : $l);
+        return isset($omit[$l]) ? null : ('never' === $l ? 'void' : $l);
       },
     ];
   }
