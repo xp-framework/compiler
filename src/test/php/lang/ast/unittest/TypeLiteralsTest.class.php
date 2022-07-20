@@ -28,8 +28,8 @@ class TypeLiteralsTest {
     yield [new IsLiteral('iterable'), null];
     yield [new IsLiteral('mixed'), null];
     yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), null];
-    yield [new IsLiteral('true'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), null];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
@@ -49,8 +49,8 @@ class TypeLiteralsTest {
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), null];
     yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), null];
-    yield [new IsLiteral('true'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), null];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
@@ -71,8 +71,8 @@ class TypeLiteralsTest {
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), null];
     yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), null];
-    yield [new IsLiteral('true'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
@@ -102,12 +102,12 @@ class TypeLiteralsTest {
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), 'mixed'];
     yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), null];
-    yield [new IsLiteral('true'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|bool'];
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
   }
 
@@ -124,12 +124,12 @@ class TypeLiteralsTest {
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), 'mixed'];
     yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), null];
-    yield [new IsLiteral('true'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|bool'];
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
   }
 

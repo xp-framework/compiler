@@ -37,10 +37,14 @@ class PHP81 extends PHP {
         return substr($u, 1);
       },
       IsLiteral::class      => function($t) {
-        static $omit= ['true' => 1, 'false' => 1, 'null' => 1];
+        static $rewrite= [
+          'null'     => 1,
+          'true'     => 'bool',
+          'false'    => 'bool',
+        ];
 
         $l= $t->literal();
-        return isset($omit[$l]) ? null : $l;
+        return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
       }
     ];
   }
