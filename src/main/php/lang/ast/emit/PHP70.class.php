@@ -41,8 +41,19 @@ class PHP70 extends PHP {
       IsUnion::class        => function($t) { return null; },
       IsIntersection::class => function($t) { return null; },
       IsLiteral::class      => function($t) {
+        static $rewrite= [
+          'object'   => 1,
+          'void'     => 1,
+          'iterable' => 1,
+          'mixed'    => 1,
+          'null'     => 1,
+          'never'    => 1,
+          'true'     => 'bool',
+          'false'    => 'bool',
+        ];
+
         $l= $t->literal();
-        return ('object' === $l || 'void' === $l || 'iterable' === $l || 'mixed' === $l || 'never' === $l) ? null : $l;
+        return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
       },
     ];
   }

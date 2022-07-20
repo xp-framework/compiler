@@ -30,8 +30,15 @@ class PHP80 extends PHP {
         return substr($u, 1);
       },
       IsLiteral::class      => function($t) {
+        static $rewrite= [
+          'null'     => 1,
+          'never'    => 'void',
+          'true'     => 'bool',
+          'false'    => 'bool',
+        ];
+
         $l= $t->literal();
-        return 'never' === $l ? 'void' : $l;
+        return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
       }
     ];
   }

@@ -36,7 +36,16 @@ class PHP81 extends PHP {
         }
         return substr($u, 1);
       },
-      IsLiteral::class      => function($t) { return $t->literal(); }
+      IsLiteral::class      => function($t) {
+        static $rewrite= [
+          'null'     => 1,
+          'true'     => 'bool',
+          'false'    => 'bool',
+        ];
+
+        $l= $t->literal();
+        return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
+      }
     ];
   }
 }

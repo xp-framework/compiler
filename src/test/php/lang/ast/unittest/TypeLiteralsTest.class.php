@@ -27,8 +27,13 @@ class TypeLiteralsTest {
     yield [new IsLiteral('never'), null];
     yield [new IsLiteral('iterable'), null];
     yield [new IsLiteral('mixed'), null];
+    yield [new IsLiteral('null'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), null];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
   }
 
   /**
@@ -43,9 +48,14 @@ class TypeLiteralsTest {
     yield [new IsLiteral('never'), 'void'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), null];
+    yield [new IsLiteral('null'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), null];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
   }
 
   /**
@@ -60,9 +70,14 @@ class TypeLiteralsTest {
     yield [new IsLiteral('never'), 'void'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), null];
+    yield [new IsLiteral('null'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
   }
 
   /**
@@ -86,9 +101,14 @@ class TypeLiteralsTest {
     yield [new IsLiteral('never'), 'void'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), 'mixed'];
+    yield [new IsLiteral('null'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|bool'];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
   }
 
   /**
@@ -103,19 +123,36 @@ class TypeLiteralsTest {
     yield [new IsLiteral('never'), 'never'];
     yield [new IsLiteral('iterable'), 'iterable'];
     yield [new IsLiteral('mixed'), 'mixed'];
+    yield [new IsLiteral('null'), null];
+    yield [new IsLiteral('false'), 'bool'];
+    yield [new IsLiteral('true'), 'bool'];
     yield [new IsNullable(new IsLiteral('string')), '?string'];
     yield [new IsNullable(new IsLiteral('object')), '?object'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|bool'];
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
   }
 
   /**
-   * PHP 8.2 is the same as PHP 8.1
+   * PHP 8.2 added `null`, `false` and `true`
    *
    * @return iterable
    */
   private function php82() {
-    yield from $this->php81();
+    yield from $this->base();
+    yield [new IsLiteral('object'), 'object'];
+    yield [new IsLiteral('void'), 'void'];
+    yield [new IsLiteral('never'), 'never'];
+    yield [new IsLiteral('iterable'), 'iterable'];
+    yield [new IsLiteral('mixed'), 'mixed'];
+    yield [new IsLiteral('null'), 'null'];
+    yield [new IsLiteral('false'), 'false'];
+    yield [new IsLiteral('true'), 'true'];
+    yield [new IsNullable(new IsLiteral('string')), '?string'];
+    yield [new IsNullable(new IsLiteral('object')), '?object'];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
+    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|false'];
+    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
   }
 
   #[Test, Values('php70')]
