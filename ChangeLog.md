@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.5.0 / 2022-07-20
+
+* Merged PR #140: Add support for null, true and false types - @thekid
+
 ## 8.4.0 / 2022-05-14
 
 * Merged PR #138: Implement readonly modifier for classes - a PHP 8.2
