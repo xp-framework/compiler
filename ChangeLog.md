@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.5.1 / 2022-09-03
+
+* Fixed issue #142: Nullable type unions don't work as expected - @thekid
+
 ## 8.5.0 / 2022-07-20
 
 * Merged PR #140: Add support for null, true and false types - @thekid
