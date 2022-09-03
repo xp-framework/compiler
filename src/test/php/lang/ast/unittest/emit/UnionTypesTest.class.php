@@ -55,7 +55,7 @@ class UnionTypesTest extends EmittingTest {
 
     Assert::equals(
       new Nullable(new TypeUnion([Primitive::$INT, Primitive::$STRING])),
-      $t->getMethod('test')->getTypeRestriction()
+      $t->getMethod('test')->getReturnTypeRestriction()
     );
   }
 
