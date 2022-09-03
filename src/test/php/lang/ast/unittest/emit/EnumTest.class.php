@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\Enum;
+use lang\reflect\TargetInvocationException;
+use lang\{Enum, Error};
 use unittest\actions\VerifyThat;
 use unittest\{Assert, Action, Test};
 
@@ -137,26 +138,17 @@ class EnumTest extends EmittingTest {
     Assert::equals($expected, $t->getMethod('from')->invoke(null, [$arg])->name);
   }
 
-  #[Test]
+  #[Test, Expect(class: Error::class, withMessage: '/"illegal" is not a valid backing value for enum .+/')]
   public function backed_enum_from_nonexistant() {
-    $t= $this->type('use lang\IllegalStateException; enum <T>: string {
+    $t= $this->type('enum <T>: string {
       case ASC  = "asc";
       case DESC = "desc";
-
-      public static function run() {
-        try {
-          self::from("illegal");
-          throw new IllegalStateException("No exception raised");
-        } catch (\Error $expected) {
-          return $expected->getMessage();
-        }
-      }
     }');
-
-    Assert::equals(
-      '"illegal" is not a valid backing value for enum "'.$t->literal().'"',
-      $t->getMethod('run')->invoke(null)
-    );
+    try {
+      $t->getMethod('from')->invoke(null, ['illegal']);
+    } catch (TargetInvocationException $e) {
+      throw $e->getCause();
+    }
   }
 
   #[Test, Values([['asc', 'ASC'], ['desc', 'DESC'], ['illegal', null]])]

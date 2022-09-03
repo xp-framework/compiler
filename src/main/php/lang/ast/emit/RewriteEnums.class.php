@@ -40,7 +40,7 @@ trait RewriteEnums {
       }');
       $result->out->write('public static function from($value) {
         if ($r= self::$values[$value] ?? null) return $r;
-        throw new \Error(\util\Objects::stringOf($value)." is not a valid backing value for enum \"".self::class."\"");
+        throw new \Error(\util\Objects::stringOf($value)." is not a valid backing value for enum ".self::class);
       }');
     } else {
       $result->out->write('public $name;');
