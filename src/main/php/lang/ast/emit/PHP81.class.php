@@ -19,7 +19,10 @@ class PHP81 extends PHP {
       IsMap::class          => function($t) { return 'array'; },
       IsFunction::class     => function($t) { return 'callable'; },
       IsValue::class        => function($t) { return $t->literal(); },
-      IsNullable::class     => function($t) { $l= $this->literal($t->element); return null === $l ? null : '?'.$l; },
+      IsNullable::class     => function($t) {
+        if (null === ($l= $this->literal($t->element))) return null;
+        return $t->element instanceof IsUnion ? $l.'|null' : '?'.$l;
+      },
       IsIntersection::class => function($t) {
         $i= '';
         foreach ($t->components as $component) {

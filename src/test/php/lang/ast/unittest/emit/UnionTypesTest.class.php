@@ -59,6 +59,18 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
+  #[Test]
+  public function nullable_union_type_alternative_syntax() {
+    $t= $this->type('class <T> {
+      public function test(): ?(int|string) { }
+    }');
+
+    Assert::equals(
+      new Nullable(new TypeUnion([Primitive::$INT, Primitive::$STRING])),
+      $t->getMethod('test')->getReturnType()
+    );
+  }
+
   #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
   public function nullable_union_type_restriction() {
     $t= $this->type('class <T> {
