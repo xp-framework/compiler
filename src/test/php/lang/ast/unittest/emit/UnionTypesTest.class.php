@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\{Primitive, Type, TypeUnion};
+use lang\{Primitive, Nullable, Type, TypeUnion};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Test, Action};
 
@@ -44,6 +44,18 @@ class UnionTypesTest extends EmittingTest {
     Assert::equals(
       new TypeUnion([Primitive::$INT, Primitive::$STRING]),
       $t->getMethod('test')->getReturnType()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
+  public function nullable_union_type_restriction() {
+    $t= $this->type('class <T> {
+      public function test(): int|string|null { }
+    }');
+
+    Assert::equals(
+      new Nullable(new TypeUnion([Primitive::$INT, Primitive::$STRING])),
+      $t->getMethod('test')->getTypeRestriction()
     );
   }
 

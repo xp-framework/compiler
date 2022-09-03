@@ -24,8 +24,13 @@ class PHP80 extends PHP {
       IsUnion::class        => function($t) {
         $u= '';
         foreach ($t->components as $component) {
-          if (null === ($l= $this->literal($component))) return null;
-          $u.= '|'.$l;
+          if ('null' === $component->literal) {
+            $u.= '|null';
+          } else if (null !== ($l= $this->literal($component))) {
+            $u.= '|'.$l;
+          } else {
+            return null;  // One of the components didn't resolve
+          }
         }
         return substr($u, 1);
       },
