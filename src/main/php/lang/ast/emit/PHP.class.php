@@ -14,7 +14,7 @@ use lang\ast\nodes\{
   UnpackExpression,
   Variable
 };
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpression};
 use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
@@ -373,9 +373,17 @@ abstract class PHP extends Emitter {
 
     $enum->comment && $this->emitOne($result, $enum->comment);
     $enum->annotations && $this->emitOne($result, $enum->annotations);
-    $result->at($enum->declared)->out->write('enum '.$this->declaration($enum->name));
+    $result->at($enum->declared)->out->write('enum '.$enum->declaration());
     $enum->base && $result->out->write(':'.$enum->base);
-    $enum->implements && $result->out->write(' implements '.implode(', ', $enum->implements));
+
+    if ($enum->implements) {
+      $list= '';
+      foreach ($enum->implements as $type) {
+        $list.= ', '.$type->literal();
+      }
+      $result->out->write(' implements '.substr($list, 2));
+    }
+
     $result->out->write('{');
 
     foreach ($enum->body as $member) {
@@ -386,7 +394,7 @@ abstract class PHP extends Emitter {
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-    $result->out->write('}} '.$enum->name.'::__init();');
+    $result->out->write('}} '.$enum->name->literal().'::__init();');
     array_shift($result->type);
   }
 
@@ -397,9 +405,17 @@ abstract class PHP extends Emitter {
 
     $class->comment && $this->emitOne($result, $class->comment);
     $class->annotations && $this->emitOne($result, $class->annotations);
-    $result->at($class->declared)->out->write(implode(' ', $class->modifiers).' class '.$this->declaration($class->name));
-    $class->parent && $result->out->write(' extends '.$class->parent);
-    $class->implements && $result->out->write(' implements '.implode(', ', $class->implements));
+    $result->at($class->declared)->out->write(implode(' ', $class->modifiers).' class '.$class->declaration());
+    $class->parent && $result->out->write(' extends '.$class->parent->literal());
+
+    if ($class->implements) {
+      $list= '';
+      foreach ($class->implements as $type) {
+        $list.= ', '.$type->literal();
+      }
+      $result->out->write(' implements '.substr($list, 2));
+    }
+
     $result->out->write('{');
     foreach ($class->body as $member) {
       $this->emitOne($result, $member);
@@ -444,7 +460,7 @@ abstract class PHP extends Emitter {
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
-    $result->out->write('}} '.$class->name.'::__init();');
+    $result->out->write('}} '.$class->name->literal().'::__init();');
     array_shift($result->type);
     $result->locals= [];
   }
@@ -507,7 +523,7 @@ abstract class PHP extends Emitter {
 
     $interface->comment && $this->emitOne($result, $interface->comment);
     $interface->annotations && $this->emitOne($result, $interface->annotations);
-    $result->at($interface->declared)->out->write('interface '.$this->declaration($interface->name));
+    $result->at($interface->declared)->out->write('interface '.$interface->declaration());
     $interface->parents && $result->out->write(' extends '.implode(', ', $interface->parents));
     $result->out->write('{');
     foreach ($interface->body as $member) {
@@ -523,7 +539,7 @@ abstract class PHP extends Emitter {
 
     $trait->comment && $this->emitOne($result, $trait->comment);
     $trait->annotations && $this->emitOne($result, $trait->annotations);
-    $result->at($trait->declared)->out->write('trait '.$this->declaration($trait->name));
+    $result->at($trait->declared)->out->write('trait '.$trait->declaration());
     $result->out->write('{');
     foreach ($trait->body as $member) {
       $this->emitOne($result, $member);
@@ -904,12 +920,12 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNew($result, $new) {
-    if ($new->type instanceof Node) {
+    if ($new->type instanceof IsExpression) {
       $result->out->write('new (');
-      $this->emitOne($result, $new->type);
+      $this->emitOne($result, $new->type->expression);
       $result->out->write(')(');
     } else {
-      $result->out->write('new '.$new->type.'(');
+      $result->out->write('new '.$new->type->literal().'(');
     }
 
     $this->emitArguments($result, $new->arguments);
@@ -925,12 +941,19 @@ abstract class PHP extends Emitter {
 
     // Allow "extends self" to reference enclosing class (except if this
     // class is an anonymous class!)
-    if ('self' === $new->definition->parent && $result->type && $result->type[0]->name) {
-      $result->out->write(' extends '.$result->type[0]->name);
+    if ($result->type && $result->type[0]->name && $new->definition->parent && 'self' === $new->definition->parent->name()) {
+      $result->out->write(' extends '.$result->type[0]->name->literal());
     } else if ($new->definition->parent) {
-      $result->out->write(' extends '.$new->definition->parent);
+      $result->out->write(' extends '.$new->definition->parent->literal());
     }
-    $new->definition->implements && $result->out->write(' implements '.implode(', ', $new->definition->implements));
+
+    if ($new->definition->implements) {
+      $list= '';
+      foreach ($new->definition->implements as $type) {
+        $list.= ', '.$type->literal();
+      }
+      $result->out->write(' implements '.substr($list, 2));
+    }
 
     array_unshift($result->type, $new->definition);
     $result->out->write('{');

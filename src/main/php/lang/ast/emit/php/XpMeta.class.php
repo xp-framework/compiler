@@ -66,11 +66,11 @@ trait XpMeta {
   }
 
   /** Emit xp::$meta */
-  protected function emitMeta($result, $name, $annotations, $comment) {
-    if (null === $name) {
+  protected function emitMeta($result, $type, $annotations, $comment) {
+    if (null === $type) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
     } else {
-      $result->out->write('\xp::$meta[\''.strtr(ltrim($name, '\\'), '\\', '.').'\']= [');
+      $result->out->write('\xp::$meta[\''.strtr($type->name(), '\\', '.').'\']= [');
     }
     $result->out->write('"class" => [');
     $this->attributes($result, $annotations, []);

@@ -2,6 +2,7 @@
 
 use lang\ast\emit\{PHP, RewriteClassOnObjects};
 use lang\ast\nodes\{ScopeExpression, Variable, Literal, ClassDeclaration};
+use lang\ast\types\IsValue;
 use unittest\{Assert, Test};
 
 class RewriteClassOnObjectsTest extends EmitterTraitTest {
@@ -24,7 +25,7 @@ class RewriteClassOnObjectsTest extends EmitterTraitTest {
   public function does_not_rewrite_type_literal() {
     Assert::equals('self::class', $this->emit(
       new ScopeExpression('self', new Literal('class')),
-      [new ClassDeclaration([], '\\T', null, [], [], null, null, 1)]
+      [new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)]
     ));
   }
 }
