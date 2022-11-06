@@ -16,8 +16,16 @@ trait RewriteEnums {
     array_unshift($result->meta, []);
     $result->locals= [[], []];
 
-    $result->out->write('final class '.$this->declaration($enum->name).' implements \\'.($enum->base ? 'BackedEnum' : 'UnitEnum'));
-    $enum->implements && $result->out->write(', '.implode(', ', $enum->implements));
+    $result->out->write('final class '.$enum->declaration().' implements \\'.($enum->base ? 'BackedEnum' : 'UnitEnum'));
+
+    if ($enum->implements) {
+      $list= '';
+      foreach ($enum->implements as $type) {
+        $list.= ', '.$type->literal();
+      }
+      $result->out->write($list);
+    }
+
     $result->out->write('{');
 
     $cases= [];
