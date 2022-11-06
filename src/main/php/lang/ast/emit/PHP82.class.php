@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
+use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
  * PHP 8.2 syntax
@@ -39,7 +39,8 @@ class PHP82 extends PHP {
         }
         return substr($u, 1);
       },
-      IsLiteral::class      => function($t) { return $t->literal(); }
+      IsLiteral::class      => function($t) { return $t->literal(); },
+      IsGeneric::class      => function($t) { return null; }
     ];
   }
 }

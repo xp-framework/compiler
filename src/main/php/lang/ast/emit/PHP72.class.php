@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
+use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
  * PHP 7.2 syntax
@@ -50,6 +50,7 @@ class PHP72 extends PHP {
         $l= $t->literal();
         return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
       },
+      IsGeneric::class      => function($t) { return null; }
     ];
   }
 }

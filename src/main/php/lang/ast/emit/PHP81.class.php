@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral};
+use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
  * PHP 8.1 syntax
@@ -53,7 +53,8 @@ class PHP81 extends PHP {
 
         $l= $t->literal();
         return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
-      }
+      },
+      IsGeneric::class      => function($t) { return null; }
     ];
   }
 }

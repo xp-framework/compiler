@@ -1,13 +1,14 @@
 <?php namespace lang\ast\unittest;
 
 use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81, PHP82};
-use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion, IsIntersection};
+use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion, IsIntersection, IsGeneric};
 use unittest\{Assert, Test};
 
 class TypeLiteralsTest {
 
   /** @return iterable */
   private function base() {
+    yield [new IsGeneric('Set', [new IsLiteral('string')]), null];
     yield [new IsLiteral('int'), 'int'];
     yield [new IsValue('Test'), 'Test'];
     yield [new IsFunction([], new IsLiteral('int')), 'callable'];
