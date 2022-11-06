@@ -7,7 +7,7 @@
   "keywords": ["module", "xp"],
   "require" : {
     "xp-framework/core": "^11.0 | ^10.0",
-    "xp-framework/ast": "dev-refactor/types as 9.0.0",
+    "xp-framework/ast": "^9.0",
     "php" : ">=7.0.0"
   },
   "require-dev" : {
