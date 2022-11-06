@@ -1,6 +1,7 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Node;
+use lang\ast\nodes\Variable;
+use lang\ast\types\IsExpression;
 
 /**
  * Rewrites `new` with arbitrary expressions
@@ -10,17 +11,20 @@ use lang\ast\Node;
 trait ArbitrayNewExpressions {
  
   protected function emitNew($result, $new) {
-    if ($new->type instanceof Node) {
+    if (!($new->type instanceof IsExpression)) return parent::emitNew($result, $new);
+
+    // Emit supported `new $var`, rewrite unsupported `new ($expr)`
+    if ($new->type->expression instanceof Variable) {
+      $result->out->write('new $'.$new->type->expression->name.'(');
+      $this->emitArguments($result, $new->arguments);
+      $result->out->write(')');
+    } else {
       $t= $result->temp();
       $result->out->write('('.$t.'= ');
-      $this->emitOne($result, $new->type);
+      $this->emitOne($result, $new->type->expression);
       $result->out->write(') ? new '.$t.'(');
       $this->emitArguments($result, $new->arguments);
       $result->out->write(') : null');
-    } else {
-      $result->out->write('new '.$new->type.'(');
-      $this->emitArguments($result, $new->arguments);
-      $result->out->write(')');
     }
   }
 }
