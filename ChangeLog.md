@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.6.0 / 2022-11-06
+
+* Bumped dependency on `xp-framework/ast` to version 9.1.0 - @thekid
+* Merged PR #143: Adapt to AST type refactoring (xp-framework/ast#39)
+  (@thekid)
+
 ## 8.5.1 / 2022-09-03
 
 * Fixed issue #142: Nullable type unions don't work as expected - @thekid
