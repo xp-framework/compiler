@@ -44,16 +44,6 @@ abstract class PHP extends Emitter {
   }
 
   /**
-   * Returns the simple name for use in a declaration
-   *
-   * @param  string $name E.g. `\lang\ast\Parse`
-   * @return string In the above example, `Parse`.
-   */
-  protected function declaration($name) {
-    return substr($name, strrpos($name, '\\') + 1);
-  }
-
-  /**
    * Returns whether a given node is a constant expression:
    *
    * - Any literal
