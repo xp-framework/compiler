@@ -2,6 +2,7 @@
 
 use lang\ast\emit\Declaration;
 use lang\ast\nodes\{ClassDeclaration, Property};
+use lang\ast\types\IsValue;
 use unittest\{Assert, Test, Expect};
 
 class DeclarationTest {
@@ -9,7 +10,7 @@ class DeclarationTest {
 
   #[Before]
   public function type() {
-    $this->type= new ClassDeclaration([], '\\T', '\\lang\\Enum', [], [
+    $this->type= new ClassDeclaration([], '\\T', new IsValue('\\lang\\Enum'), [], [
       '$ONE' => new Property(['public', 'static'], 'ONE', null, null, [], null, 1)
     ]);
   }

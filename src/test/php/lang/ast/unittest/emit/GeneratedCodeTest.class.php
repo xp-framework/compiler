@@ -3,6 +3,7 @@
 use io\streams\MemoryOutputStream;
 use lang\ast\emit\{GeneratedCode, Declaration, Escaping, Reflection};
 use lang\ast\nodes\ClassDeclaration;
+use lang\ast\types\IsValue;
 use lang\{Value, ClassNotFoundException};
 use unittest\{Assert, Expect, Test};
 
@@ -46,7 +47,7 @@ class GeneratedCodeTest {
   #[Test]
   public function lookup_self() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], '\\T', null, [], [], null, null, 1);
+    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
 
     Assert::equals(new Declaration($r->type[0], $r), $r->lookup('self'));
   }
@@ -54,7 +55,7 @@ class GeneratedCodeTest {
   #[Test]
   public function lookup_parent() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], '\\T', '\\lang\\Value', [], [], null, null, 1);
+    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), new IsValue('\\lang\\Value'), [], [], null, null, 1);
 
     Assert::equals(new Reflection(Value::class), $r->lookup('parent'));
   }
@@ -62,7 +63,7 @@ class GeneratedCodeTest {
   #[Test]
   public function lookup_named() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], '\\T', null, [], [], null, null, 1);
+    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
 
     Assert::equals(new Declaration($r->type[0], $r), $r->lookup('\\T'));
   }
