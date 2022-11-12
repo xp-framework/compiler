@@ -190,6 +190,18 @@ class ArraysTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
+  #[Test, Values([[['a' => 1, 'b' => 2], [1, 2]], [['a' => 1], [1, null]]])]
+  public function destructuring_coalesce_with_keys($input, $expected) {
+    $r= $this->run('class <T> {
+      public function run($input) {
+        ["a" => $a, "b" => $b ?? null]= $input;
+        return [$a, $b];
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
   #[Test]
   public function init_with_variable() {
     $r= $this->run('class <T> {
