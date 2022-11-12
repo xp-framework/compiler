@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #146: Add support for omitting expressions in destructuring
+  assignments, e.g. `list($a, , $b)= $expr` or `[, $a]= $expr`.
+  (@thekid)
 * Merged PR #145: Add support for specifying keys in list(), which has
   been in PHP since 7.1.0, see https://wiki.php.net/rfc/list_keys
   (@thekid)
