@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal, Variable};
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
@@ -104,5 +104,30 @@ class PHP70 extends PHP {
     $a= $result->temp();
     $result->out->write(')?function(...'.$a.') use('.$t.') { return '.$t.'(...'.$a.'); }:');
     $result->out->write('(function() { throw new \Error("Given argument is not callable"); })())');
+  }
+
+  protected function emitAssignment($result, $assignment) {
+    if ('??=' === $assignment->operator) {
+
+      // Rewrite null-coalesce operator
+      $this->emitAssign($result, $assignment->variable);
+      $result->out->write('??');
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write('=');
+      $this->emitOne($result, $assignment->expression);
+      return;
+    } else if ('array' === $assignment->variable->kind) {
+
+      // Rewrite destructuring unless assignment consists only of variables
+      $r= false;
+      foreach ($assignment->variable->values as $pair) {
+        if (!$pair[0] && $pair[1] instanceof Variable) continue;
+        $r= true;
+        break;
+      }
+      if ($r) return $this->rewriteDestructuring($result, $assignment);
+    }
+
+    return parent::emitAssignment($result, $assignment);
   }
 }
