@@ -106,6 +106,18 @@ class ArraysTest extends EmittingTest {
     Assert::equals([1, 2], $r);
   }
 
+  #[Test, Values([null, true, false, 0, 0.5, '', 'Test'])]
+  public function destructuring_with_non_array($value) {
+    $r= $this->run('class <T> {
+      public function run($arg) {
+        $r= [$a, $b]= $arg;
+        return [$a, $b, $r];
+      }
+    }', $value);
+
+    Assert::equals([null, null, $value], $r);
+  }
+
   #[Test]
   public function init_with_variable() {
     $r= $this->run('class <T> {
