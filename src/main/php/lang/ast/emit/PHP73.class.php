@@ -3,11 +3,13 @@
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
- * PHP 7.2 syntax
+ * PHP 7.3 syntax. Same as PHP 7.2 but supports list reference assignments
+ * so only rewrites null-coalesce assignments.
  *
- * @see  https://wiki.php.net/rfc#php_72
+ * @see  https://wiki.php.net/rfc/list_reference_assignment
+ * @see  https://wiki.php.net/rfc#php_73
  */
-class PHP72 extends PHP {
+class PHP73 extends PHP {
   use 
     ArbitrayNewExpressions,
     ArrayUnpackUsingMerge,
@@ -20,7 +22,6 @@ class PHP72 extends PHP {
     OmitPropertyTypes,
     ReadonlyProperties,
     ReadonlyClasses,
-    RewriteAssignments,
     RewriteClassOnObjects,
     RewriteEnums,
     RewriteExplicitOctals,
@@ -52,5 +53,17 @@ class PHP72 extends PHP {
       },
       IsGeneric::class      => function($t) { return null; }
     ];
+  }
+
+  protected function emitAssignment($result, $assignment) {
+    if ('??=' === $assignment->operator) {
+      $this->emitAssign($result, $assignment->variable);
+      $result->out->write('??');
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write('=');
+      $this->emitOne($result, $assignment->expression);
+    } else {
+      parent::emitAssignment($result, $assignment);
+    }
   }
 }
