@@ -16,7 +16,7 @@ class NullCoalesceAssignmentTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[Test, Values([[[], [true]], [[null], [true]]])]
+  #[Test, Values([[[], true], [[null], true], [[false], false], [['Test'], 'Test']])]
   public function fills_array_if_non_existant_or_null($value, $expected) {
     $r= $this->run('class <T> {
       public function run($arg) {
@@ -25,6 +25,6 @@ class NullCoalesceAssignmentTest extends EmittingTest {
       }
     }', $value);
 
-    Assert::equals($expected, $r);
+    Assert::equals($expected, $r[0]);
   }
 }
