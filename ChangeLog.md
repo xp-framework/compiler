@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.7.0 / 2022-11-12
+
 * Fixed issue #31: Support `list()` reference assignment for PHP < 7.3
   (@thekid)
 * Fixed `foreach` statement using destructuring assignments in PHP 7.0
