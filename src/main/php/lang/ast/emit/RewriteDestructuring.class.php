@@ -1,6 +1,15 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{UnaryExpression, BinaryExpression, Variable, Literal, InstanceExpression, ScopeExpression};
+use lang\ast\nodes\{
+  Assignment,
+  BinaryExpression,
+  InstanceExpression,
+  Literal,
+  OffsetExpression,
+  ScopeExpression,
+  UnaryExpression,
+  Variable
+};
 
 trait RewriteDestructuring {
 
@@ -18,6 +27,7 @@ trait RewriteDestructuring {
       $result->out->write('&');
     }
 
+    $temp= new Variable(substr($t, 1));
     $this->emitOne($result, $assignment->expression);
     $result->out->write(')?[');
     foreach ($assignment->variable->values as $i => $pair) {
@@ -27,25 +37,16 @@ trait RewriteDestructuring {
       }
 
       // Assign by reference
+      $value= new OffsetExpression($temp, $pair[0] ?? new Literal((string)$i));
       if ($pair[1] instanceof UnaryExpression) {
-        $this->emitAssign($result, $pair[1]->expression);
-        $result->out->write('='.$pair[1]->operator.$t.'[');
+        $this->emitAssignment($result, new Assignment($pair[1]->expression, '=&', $value));
         $default= null;
       } else if ($pair[1] instanceof BinaryExpression) {
-        $this->emitAssign($result, $pair[1]->left);
-        $result->out->write('='.$t.'[');
+        $this->emitAssignment($result, new Assignment($pair[1]->left, '=&', $value));
         $default= $pair[1];
       } else {
-        $this->emitAssign($result, $pair[1]);
-        $result->out->write('='.$t.'[');
+        $this->emitAssignment($result, new Assignment($pair[1], '=', $value));
         $default= null;
-      }
-
-      if ($pair[0]) {
-        $this->emitOne($result, $pair[0]);
-        $result->out->write(']');
-      } else {
-        $result->out->write($i.']');
       }
 
       // Null-coalesce
@@ -55,18 +56,20 @@ trait RewriteDestructuring {
       }
       $result->out->write(',');
     }
+
+    $null= new Literal('null');
     $result->out->write(']:([');
     foreach ($assignment->variable->values as $pair) {
       if (null === $pair[1]) {
         continue;
       } else if ($pair[1] instanceof UnaryExpression) {
-        $this->emitAssign($result, $pair[1]->expression);
+        $this->emitAssignment($result, new Assignment($pair[1]->expression, '=', $null));
       } else if ($pair[1] instanceof BinaryExpression) {
-        $this->emitAssign($result, $pair[1]->left);
+        $this->emitAssignment($result, new Assignment($pair[1]->left, '=', $null));
       } else if ($pair[1]) {
-        $this->emitAssign($result, $pair[1]);
+        $this->emitAssignment($result, new Assignment($pair[1], '=', $null));
       }
-      $result->out->write('=null,');
+      $result->out->write(',');
     }
     $result->out->write(']?'.$t.':null)');
   }

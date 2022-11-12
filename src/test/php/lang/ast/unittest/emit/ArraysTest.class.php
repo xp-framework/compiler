@@ -62,6 +62,18 @@ class ArraysTest extends EmittingTest {
   }
 
   #[Test]
+  public function nested_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [[$a, $b], $c]= [[1, 2], 3];
+        return [$a, $b, $c];
+      }
+    }');
+
+    Assert::equals([1, 2, 3], $r);
+  }
+
+  #[Test]
   public function destructuring_with_empty_between() {
     $r= $this->run('class <T> {
       public function run() {
@@ -109,6 +121,18 @@ class ArraysTest extends EmittingTest {
     }');
 
     Assert::equals([2, 1], $r);
+  }
+
+  #[Test]
+  public function nested_destructuring_with_map() {
+    $r= $this->run('class <T> {
+      public function run() {
+        ["nested" => ["one" => $a], "three" => $b]= ["nested" => ["one" => 1], "three" => 3];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([1, 3], $r);
   }
 
   #[Test, Values(['$list', '$this->instance', 'self::$static'])]

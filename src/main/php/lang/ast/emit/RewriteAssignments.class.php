@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{UnaryExpression, BinaryExpression, Variable, Literal, InstanceExpression, ScopeExpression};
+use lang\ast\nodes\{UnaryExpression, BinaryExpression};
 
 /**
  * Rewrites list reference assignments and null-coalesce for PHP <= 7.3
