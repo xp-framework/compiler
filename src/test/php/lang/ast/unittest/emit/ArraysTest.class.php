@@ -63,6 +63,20 @@ class ArraysTest extends EmittingTest {
     Assert::equals([2, 1], $r);
   }
 
+  #[Test]
+  public function destructuring_map_with_expression() {
+    $r= $this->run('class <T> {
+      private $one= "one";
+      public function run() {
+        $two= "two";
+        [$two => $a, $this->one => $b]= ["one" => 1, "two" => 2];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([2, 1], $r);
+  }
+
   #[Test, Values(['$list', '$this->instance', 'self::$static'])]
   public function reference_destructuring($reference) {
     $r= $this->run('class <T> {
