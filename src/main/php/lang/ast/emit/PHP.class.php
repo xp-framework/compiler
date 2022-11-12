@@ -697,6 +697,10 @@ abstract class PHP extends Emitter {
     } else if ('array' === $target->kind) {
       $result->out->write('list(');
       foreach ($target->values as $pair) {
+        if ($pair[0]) {
+          $this->emitOne($result, $pair[0]);
+          $result->out->write('=>');
+        }
         $this->emitAssign($result, $pair[1]);
         $result->out->write(',');
       }

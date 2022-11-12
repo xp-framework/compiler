@@ -10,53 +10,65 @@ use lang\ast\nodes\{UnaryExpression, Variable, Literal, InstanceExpression, Scop
  */
 trait RewriteAssignments {
 
+  protected function rewriteDestructuring($result, $assignment) {
+    $t= $result->temp();
+    $result->out->write('null===('.$t.'=');
+
+    // Create reference to right-hand if possible
+    $r= $assignment->expression;
+    if (
+      ($r instanceof Variable) ||
+      ($r instanceof InstanceExpression && $r->member instanceof Literal) ||
+      ($r instanceof ScopeExpression && $r->member instanceof Variable)
+    ) {
+      $result->out->write('&');
+    }
+
+    $this->emitOne($result, $assignment->expression);
+    $result->out->write(')?null:[');
+    foreach ($assignment->variable->values as $i => $pair) {
+
+      // Assign by reference
+      if ($pair[1] instanceof UnaryExpression) {
+        $this->emitAssign($result, $pair[1]->expression);
+        $result->out->write('='.$pair[1]->operator.$t.'[');
+      } else {
+        $this->emitAssign($result, $pair[1]);
+        $result->out->write('='.$t.'[');
+      }
+
+      if ($pair[0]) {
+        $this->emitOne($result, $pair[0]);
+        $result->out->write('],');
+      } else {
+        $result->out->write($i.'],');
+      }
+    }
+    $result->out->write(']');
+  }
+
   protected function emitAssignment($result, $assignment) {
     if ('??=' === $assignment->operator) {
+
+      // Rewrite null-coalesce operator
       $this->emitAssign($result, $assignment->variable);
       $result->out->write('??');
       $this->emitOne($result, $assignment->variable);
       $result->out->write('=');
       $this->emitOne($result, $assignment->expression);
+      return;
     } else if ('array' === $assignment->variable->kind) {
 
-      // Check whether the list assignment consists only of variables
-      $supported= true;
+      // Rewrite destructuring unless assignment consists only of variables
+      $r= false;
       foreach ($assignment->variable->values as $pair) {
         if ($pair[1] instanceof Variable) continue;
-        $supported= false;
+        $r= true;
         break;
       }
-      if ($supported) return parent::emitAssignment($result, $assignment);
-
-      $t= $result->temp();
-      $result->out->write('null===('.$t.'=');
-
-      // Create reference to right-hand if possible
-      $r= $assignment->expression;
-      if (
-        ($r instanceof Variable) ||
-        ($r instanceof InstanceExpression && $r->member instanceof Literal) ||
-        ($r instanceof ScopeExpression && $r->member instanceof Variable)
-      ) {
-        $result->out->write('&');
-      }
-
-      $this->emitOne($result, $assignment->expression);
-      $result->out->write(')?null:[');
-      foreach ($assignment->variable->values as $i => $pair) {
-
-        // Assign by reference
-        if ($pair[1] instanceof UnaryExpression) {
-          $this->emitAssign($result, $pair[1]->expression);
-          $result->out->write('='.$pair[1]->operator.$t.'['.$i.'],');  
-        } else {
-          $this->emitAssign($result, $pair[1]);
-          $result->out->write('='.$t.'['.$i.'],');  
-        }
-      }
-      $result->out->write(']');
-    } else {
-      return parent::emitAssignment($result, $assignment);
+      if ($r) return $this->rewriteDestructuring($result, $assignment);
     }
+
+    return parent::emitAssignment($result, $assignment);
   }
 }
