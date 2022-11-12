@@ -3,11 +3,11 @@
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
- * PHP 7.2 syntax
+ * PHP 7.3 syntax
  *
- * @see  https://wiki.php.net/rfc#php_72
+ * @see  https://wiki.php.net/rfc#php_73
  */
-class PHP72 extends PHP {
+class PHP73 extends PHP {
   use 
     ArbitrayNewExpressions,
     ArrayUnpackUsingMerge,
@@ -21,10 +21,10 @@ class PHP72 extends PHP {
     ReadonlyProperties,
     ReadonlyClasses,
     RewriteClassOnObjects,
-    RewriteDestructuring,
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
+    RewriteNullCoalesceAssignment,
     RewriteThrowableExpressions
   ;
 

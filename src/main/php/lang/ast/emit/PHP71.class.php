@@ -21,10 +21,10 @@ class PHP71 extends PHP {
     ReadonlyProperties,
     ReadonlyClasses,
     RewriteClassOnObjects,
+    RewriteDestructuring,
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
-    RewriteNullCoalesceAssignment,
     RewriteThrowableExpressions
   ;
 
