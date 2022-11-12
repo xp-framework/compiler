@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #145: Add support for specifying keys in list(), which has
+  been in PHP since 7.1.0, see https://wiki.php.net/rfc/list_keys
+  (@thekid)
 * Merged PR #144: Rewrite `list(&$a)= $expr` for PHP 7.0, 7.1 and 7.2
   (@thekid)
 
