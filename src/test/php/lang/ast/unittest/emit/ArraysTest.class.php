@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test};
+use unittest\{Action, Assert, Test, Values};
 
 class ArraysTest extends EmittingTest {
 
@@ -74,6 +74,31 @@ class ArraysTest extends EmittingTest {
       public function run() {
         list($a, $b)= [1, 2];
         return [$a, $b];
+      }
+    }');
+
+    Assert::equals([1, 2], $r);
+  }
+
+  #[Test]
+  public function swap_using_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $a= 1;
+        $b= 2;
+        [$b, $a]= [$a, $b];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([2, 1], $r);
+  }
+
+  #[Test]
+  public function result_of_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        return [$a, $b]= [1, 2];
       }
     }');
 
