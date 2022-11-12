@@ -48,6 +48,32 @@ class LoopsTest extends EmittingTest {
   }
 
   #[Test]
+  public function foreach_with_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $result= "";
+        foreach ([[1, 2], [3, 4]] as [$a, $b]) $result.= ",".$a." & ".$b;
+        return substr($result, 1);
+      }
+    }');
+
+    Assert::equals('1 & 2,3 & 4', $r);
+  }
+
+  #[Test]
+  public function foreach_with_destructuring_and_missing_expressions() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $result= "";
+        foreach ([[1, 2, 3], [4, 5, 6]] as [$a, , $b]) $result.= ",".$a." & ".$b;
+        return substr($result, 1);
+      }
+    }');
+
+    Assert::equals('1 & 3,4 & 6', $r);
+  }
+
+  #[Test]
   public function for_loop() {
     $r= $this->run('class <T> {
       public function run() {

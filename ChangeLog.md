@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed `foreach` statement using destructuring assignments in PHP 7.0
+  (@thekid)
 * Merged PR #146: Add support for omitting expressions in destructuring
   assignments, e.g. `list($a, , $b)= $expr` or `[, $a]= $expr`.
   (@thekid)

@@ -130,4 +130,30 @@ class PHP70 extends PHP {
 
     return parent::emitAssignment($result, $assignment);
   }
+
+  protected function emitForeach($result, $foreach) {
+    $result->out->write('foreach (');
+    $this->emitOne($result, $foreach->expression);
+    $result->out->write(' as ');
+    if ($foreach->key) {
+      $this->emitOne($result, $foreach->key);
+      $result->out->write(' => ');
+    }
+
+    // Short list syntax didn't arrive until PHP 7.1
+    if ('array' === $foreach->value->kind) {
+      $result->out->write('list(');
+      foreach ($foreach->value->values as $pair) {
+        $pair[1] && $this->emitOne($result, $pair[1]);
+        $result->out->write(',');
+      }
+      $result->out->write(')');
+    } else {
+      $this->emitOne($result, $foreach->value);
+    }
+
+    $result->out->write(') {');
+    $this->emitAll($result, $foreach->body);
+    $result->out->write('}');
+  }
 }
