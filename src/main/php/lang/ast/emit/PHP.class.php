@@ -829,7 +829,21 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $foreach->key);
       $result->out->write(' => ');
     }
-    $this->emitOne($result, $foreach->value);
+
+    if ('array' === $foreach->value->kind) {
+      $result->out->write('[');
+      foreach ($foreach->value->values as $pair) {
+        if ($pair[0]) {
+          $this->emitOne($result, $pair[0]);
+          $result->out->write('=>');
+        }
+        $pair[1] && $this->emitOne($result, $pair[1]);
+        $result->out->write(',');
+      }
+      $result->out->write(']');
+    } else {
+      $this->emitOne($result, $foreach->value);
+    }
     $result->out->write(') {');
     $this->emitAll($result, $foreach->body);
     $result->out->write('}');

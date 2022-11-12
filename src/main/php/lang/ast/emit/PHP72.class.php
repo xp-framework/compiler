@@ -13,6 +13,7 @@ class PHP72 extends PHP {
     ArrayUnpackUsingMerge,
     AttributesAsComments,
     CallablesAsClosures,
+    ForeachDestructuringAsStatement,
     MatchAsTernaries,
     NonCapturingCatchVariables,
     NullsafeAsTernaries,

@@ -48,6 +48,62 @@ class LoopsTest extends EmittingTest {
   }
 
   #[Test]
+  public function foreach_with_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $result= "";
+        foreach ([[1, 2], [3, 4]] as [$a, $b]) $result.= ",".$a." & ".$b;
+        return substr($result, 1);
+      }
+    }');
+
+    Assert::equals('1 & 2,3 & 4', $r);
+  }
+
+  #[Test]
+  public function foreach_with_destructuring_and_missing_expressions() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $result= "";
+        foreach ([[1, 2, 3], [4, 5, 6]] as [$a, , $b]) $result.= ",".$a." & ".$b;
+        return substr($result, 1);
+      }
+    }');
+
+    Assert::equals('1 & 3,4 & 6', $r);
+  }
+
+  #[Test]
+  public function foreach_with_destructuring_keys() {
+    $r= $this->run('class <T> {
+      public function run() {
+        $result= "";
+        foreach ([["a" => 1, "b" => 2], ["a" => 3, "b" => 4]] as ["a" => $a, "b" => $b]) $result.= ",".$a." & ".$b;
+        return substr($result, 1);
+      }
+    }');
+
+    Assert::equals('1 & 2,3 & 4', $r);
+  }
+
+  #[Test]
+  public function foreach_with_destructuring_references() {
+    $r= $this->run('class <T> {
+      private $list= [[1, 2], [3, 4]];
+
+      public function run() {
+        foreach ($this->list as [&$a, &$b]) {
+          $a*= 3;
+          $b*= 2;
+        }
+        return $this->list;
+      }
+    }');
+
+    Assert::equals([[3, 4], [9, 8]], $r);
+  }
+
+  #[Test]
   public function for_loop() {
     $r= $this->run('class <T> {
       public function run() {
