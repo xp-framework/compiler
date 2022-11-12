@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #144: Rewrite `list(&$a)= $expr` for PHP 7.0, 7.1 and 7.2
+  (@thekid)
+
 ## 8.6.0 / 2022-11-06
 
 * Bumped dependency on `xp-framework/ast` to version 9.1.0 - @thekid
