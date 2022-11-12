@@ -12,7 +12,7 @@ trait RewriteAssignments {
 
   protected function rewriteDestructuring($result, $assignment) {
     $t= $result->temp();
-    $result->out->write('null===('.$t.'=');
+    $result->out->write('is_array('.$t.'=');
 
     // Create reference to right-hand if possible
     $r= $assignment->expression;
@@ -25,8 +25,12 @@ trait RewriteAssignments {
     }
 
     $this->emitOne($result, $assignment->expression);
-    $result->out->write(')?null:[');
+    $result->out->write(')?[');
     foreach ($assignment->variable->values as $i => $pair) {
+      if (null === $pair[1]) {
+        $result->out->write('null,');
+        continue;
+      }
 
       // Assign by reference
       if ($pair[1] instanceof UnaryExpression) {
@@ -44,7 +48,17 @@ trait RewriteAssignments {
         $result->out->write($i.'],');
       }
     }
-    $result->out->write(']');
+    $result->out->write(']:([');
+    foreach ($assignment->variable->values as $pair) {
+      if ($pair[1] instanceof UnaryExpression) {
+        $this->emitAssign($result, $pair[1]->expression);
+        $result->out->write('=null,');
+      } else if ($pair[1]) {
+        $this->emitAssign($result, $pair[1]);
+        $result->out->write('=null,');
+      }
+    }
+    $result->out->write(']?'.$t.':null)');
   }
 
   protected function emitAssignment($result, $assignment) {
