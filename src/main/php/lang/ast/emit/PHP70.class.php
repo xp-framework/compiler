@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal, Variable};
+use lang\ast\nodes\{Assignment, InstanceExpression, ScopeExpression, Literal, Variable};
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
@@ -140,20 +140,19 @@ class PHP70 extends PHP {
       $result->out->write(' => ');
     }
 
-    // Short list syntax didn't arrive until PHP 7.1
+    // Rewrite destructuring assignment as first statement in loop
     if ('array' === $foreach->value->kind) {
-      $result->out->write('list(');
-      foreach ($foreach->value->values as $pair) {
-        $pair[1] && $this->emitOne($result, $pair[1]);
-        $result->out->write(',');
-      }
-      $result->out->write(')');
+      $t= $result->temp();
+      $result->out->write($t.') {');
+      $this->rewriteDestructuring($result, new Assignment($foreach->value, '=', new Variable(substr($t, 1))));
+      $result->out->write(';');
+      $this->emitAll($result, $foreach->body);
+      $result->out->write('}');
     } else {
       $this->emitOne($result, $foreach->value);
+      $result->out->write(') {');
+      $this->emitAll($result, $foreach->body);
+      $result->out->write('}');
     }
-
-    $result->out->write(') {');
-    $this->emitAll($result, $foreach->body);
-    $result->out->write('}');
   }
 }
