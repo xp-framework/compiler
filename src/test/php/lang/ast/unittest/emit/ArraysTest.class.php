@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Assert, Test};
+use unittest\actions\RuntimeVersion;
+use unittest\{Action, Assert, Test};
 
 class ArraysTest extends EmittingTest {
 
@@ -44,6 +45,34 @@ class ArraysTest extends EmittingTest {
     $r= $this->run('class <T> {
       public function run() {
         [$a, $b]= [1, 2];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([1, 2], $r);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4.0")')]
+  public function reference_destructuring() {
+    $r= $this->run('class <T> {
+      private $list= [1, 2];
+
+      public function run() {
+        [&$a, &$b]= $this->list;
+        $a++;
+        $b--;
+        return $this->list;
+      }
+    }');
+
+    Assert::equals([2, 1], $r);
+  }
+
+  #[Test]
+  public function list_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        list($a, $b)= [1, 2];
         return [$a, $b];
       }
     }');
