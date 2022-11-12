@@ -52,7 +52,7 @@ class ArraysTest extends EmittingTest {
     Assert::equals([1, 2], $r);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4.0")')]
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.3.0")')]
   public function reference_destructuring() {
     $r= $this->run('class <T> {
       private $list= [1, 2];
