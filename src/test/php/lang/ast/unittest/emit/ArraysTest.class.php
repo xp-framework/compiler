@@ -62,6 +62,18 @@ class ArraysTest extends EmittingTest {
   }
 
   #[Test]
+  public function nested_destructuring() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [[$a, $b], $c]= [[1, 2], 3];
+        return [$a, $b, $c];
+      }
+    }');
+
+    Assert::equals([1, 2, 3], $r);
+  }
+
+  #[Test]
   public function destructuring_with_empty_between() {
     $r= $this->run('class <T> {
       public function run() {
