@@ -36,19 +36,16 @@ trait RewriteDestructuring {
         continue;
       }
 
-      // Assign by reference
+      // Assign by reference, null-coalesce handling
       $value= new OffsetExpression($temp, $pair[0] ?? new Literal((string)$i));
       if ($pair[1] instanceof UnaryExpression) {
         $this->emitAssignment($result, new Assignment($pair[1]->expression, '=&', $value));
-        $default= null;
       } else if ($pair[1] instanceof BinaryExpression) {
         $target= $pair[1]->left;
         $pair[1]->left= $value;
         $this->emitAssignment($result, new Assignment($target, '=', $pair[1]));
-        $default= $pair[1];
       } else {
         $this->emitAssignment($result, new Assignment($pair[1], '=', $value));
-        $default= null;
       }
       $result->out->write(',');
     }
