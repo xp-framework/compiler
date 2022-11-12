@@ -27,7 +27,7 @@ class Usage {
       }
     }
 
-    $language= Language::named(self::RUNTIME);
+    $language= Language::named(strtoupper(self::RUNTIME));
     foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
       if ($class->isSubclassOf(Language::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
         $impl->add($class, $class->isInstance($language));
