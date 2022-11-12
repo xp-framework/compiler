@@ -120,13 +120,10 @@ class PHP70 extends PHP {
     } else if ('array' === $assignment->variable->kind) {
 
       // Rewrite destructuring unless assignment consists only of variables
-      $r= false;
       foreach ($assignment->variable->values as $pair) {
         if (null === $pair[0] && (null === $pair[1] || $pair[1] instanceof Variable)) continue;
-        $r= true;
-        break;
+        return $this->rewriteDestructuring($result, $assignment);
       }
-      if ($r) return $this->rewriteDestructuring($result, $assignment);
     }
 
     return parent::emitAssignment($result, $assignment);
