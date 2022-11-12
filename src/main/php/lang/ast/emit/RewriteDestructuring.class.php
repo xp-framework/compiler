@@ -5,15 +5,13 @@ use lang\ast\nodes\{UnaryExpression, Variable, Literal, InstanceExpression, Scop
 /**
  * Rewrites list reference assignments and null-coalesce for PHP <= 7.3
  *
- * @see  lang.ast.emit.RewriteNullCoalesceAssignment
+ * @see  https://wiki.php.net/rfc/null_coalesce_equal_operator
  * @see  https://wiki.php.net/rfc/list_reference_assignment
  */
 trait RewriteDestructuring {
 
   protected function emitAssignment($result, $assignment) {
     if ('??=' === $assignment->operator) {
-
-      // Inlined version of RewriteNullCoalesceAssignment
       $this->emitAssign($result, $assignment->variable);
       $result->out->write('??');
       $this->emitOne($result, $assignment->variable);
