@@ -99,6 +99,32 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
+  #[Test]
+  public function list_property() {
+    $r= $this->run('class <T> {
+      private $list= [1, 2, 3];
+
+      public function run() {
+        return $this->list;
+      }
+    }');
+
+    Assert::equals([1, 2, 3], $r);
+  }
+
+  #[Test]
+  public function list_method() {
+    $r= $this->run('class <T> {
+      private function list() { return [1, 2, 3]; }
+
+      public function run() {
+        return $this->list();
+      }
+    }');
+
+    Assert::equals([1, 2, 3], $r);
+  }
+
   #[Test, Values(['variable', 'invocation', 'array'])]
   public function class_on_objects($via) {
     $t= $this->type('class <T> {
