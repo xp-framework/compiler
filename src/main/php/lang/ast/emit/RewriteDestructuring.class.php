@@ -42,17 +42,13 @@ trait RewriteDestructuring {
         $this->emitAssignment($result, new Assignment($pair[1]->expression, '=&', $value));
         $default= null;
       } else if ($pair[1] instanceof BinaryExpression) {
-        $this->emitAssignment($result, new Assignment($pair[1]->left, '=&', $value));
+        $target= $pair[1]->left;
+        $pair[1]->left= $value;
+        $this->emitAssignment($result, new Assignment($target, '=', $pair[1]));
         $default= $pair[1];
       } else {
         $this->emitAssignment($result, new Assignment($pair[1], '=', $value));
         $default= null;
-      }
-
-      // Null-coalesce
-      if ($default) {
-        $result->out->write($default->operator);
-        $this->emitOne($result, $default->right);
       }
       $result->out->write(',');
     }
