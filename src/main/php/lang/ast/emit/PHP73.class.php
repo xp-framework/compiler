@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\nodes\BinaryExpression;
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
@@ -22,6 +23,7 @@ class PHP73 extends PHP {
     OmitPropertyTypes,
     ReadonlyProperties,
     ReadonlyClasses,
+    RewriteAssignments,
     RewriteClassOnObjects,
     RewriteEnums,
     RewriteExplicitOctals,
@@ -62,8 +64,13 @@ class PHP73 extends PHP {
       $this->emitOne($result, $assignment->variable);
       $result->out->write('=');
       $this->emitOne($result, $assignment->expression);
-    } else {
-      parent::emitAssignment($result, $assignment);
+      return;
+    } else if ('array' === $assignment->variable->kind) {
+      foreach ($assignment->variable->values as $pair) {
+        if ($pair[1] instanceof BinaryExpression) return $this->rewriteDestructuring($result, $assignment);
+      }
     }
+
+    parent::emitAssignment($result, $assignment);
   }
 }

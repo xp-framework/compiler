@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal, Variable};
+use lang\ast\nodes\{InstanceExpression, ScopeExpression, UnaryExpression, BinaryExpression, Literal};
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
@@ -119,13 +119,13 @@ class PHP70 extends PHP {
     } else if ('array' === $assignment->variable->kind) {
 
       // Rewrite destructuring unless assignment consists only of variables
-      $r= false;
       foreach ($assignment->variable->values as $pair) {
-        if (null === $pair[0] && (null === $pair[1] || $pair[1] instanceof Variable)) continue;
-        $r= true;
-        break;
+        if (
+          $pair[0] ||
+          $pair[1] instanceof UnaryExpression ||
+          $pair[1] instanceof BinaryExpression
+        ) return $this->rewriteDestructuring($result, $assignment);
       }
-      if ($r) return $this->rewriteDestructuring($result, $assignment);
     }
 
     return parent::emitAssignment($result, $assignment);
