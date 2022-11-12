@@ -87,6 +87,23 @@ class LoopsTest extends EmittingTest {
   }
 
   #[Test]
+  public function foreach_with_destructuring_references() {
+    $r= $this->run('class <T> {
+      private $list= [[1, 2], [3, 4]];
+
+      public function run() {
+        foreach ($this->list as [&$a, &$b]) {
+          $a*= 3;
+          $b*= 2;
+        }
+        return $this->list;
+      }
+    }');
+
+    Assert::equals([[3, 4], [9, 8]], $r);
+  }
+
+  #[Test]
   public function for_loop() {
     $r= $this->run('class <T> {
       public function run() {
