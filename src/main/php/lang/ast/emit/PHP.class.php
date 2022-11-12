@@ -265,7 +265,7 @@ abstract class PHP extends Emitter {
         $this->emitOne($result, $pair[0]);
         $result->out->write('=>');
       }
-      $this->emitOne($result, $pair[1]);
+      $this->emitOne($result, $pair[1] ?? $this->raise('Cannot use empty array elements in arrays'));
       $result->out->write(',');
     }
     $result->out->write(']');
@@ -701,7 +701,9 @@ abstract class PHP extends Emitter {
           $this->emitOne($result, $pair[0]);
           $result->out->write('=>');
         }
-        $this->emitAssign($result, $pair[1]);
+        if ($pair[1]) {
+          $this->emitAssign($result, $pair[1]);
+        }
         $result->out->write(',');
       }
       $result->out->write(')');

@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use lang\IllegalStateException;
 use unittest\{Assert, Test, Values};
 
 class ArraysTest extends EmittingTest {
@@ -39,6 +40,15 @@ class ArraysTest extends EmittingTest {
     Assert::equals([1, 2, 3], $r);
   }
 
+  #[Test, Values(['[1, , 3]', '[1, , ]', '[, 1]']), Expect(class: IllegalStateException::class, withMessage: 'Cannot use empty array elements in arrays')]
+  public function arrays_cannot_have_empty_elements($input) {
+    $r= $this->run('class <T> {
+      public function run() {
+        return '.$input.';
+      }
+    }');
+  }
+
   #[Test]
   public function destructuring() {
     $r= $this->run('class <T> {
@@ -49,6 +59,30 @@ class ArraysTest extends EmittingTest {
     }');
 
     Assert::equals([1, 2], $r);
+  }
+
+  #[Test]
+  public function destructuring_with_empty_between() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [$a, , $b]= [1, 2, 3];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([1, 3], $r);
+  }
+
+  #[Test]
+  public function destructuring_with_empty_start() {
+    $r= $this->run('class <T> {
+      public function run() {
+        [, $a, $b]= [1, 2, 3];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([2, 3], $r);
   }
 
   #[Test]
