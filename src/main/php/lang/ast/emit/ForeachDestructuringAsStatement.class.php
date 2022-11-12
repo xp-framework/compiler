@@ -4,7 +4,7 @@ use lang\ast\nodes\{Assignment, Variable};
 
 /**
  * Rewrite destructuring assignment as first statement in `foreach` loops.
- * 
+ *
  * This ensures compatibility with:
  *
  * - PHP 7.0, which neither supports keys nor references
