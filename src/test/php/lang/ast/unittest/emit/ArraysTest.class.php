@@ -123,6 +123,18 @@ class ArraysTest extends EmittingTest {
     Assert::equals([2, 1], $r);
   }
 
+  #[Test]
+  public function nested_destructuring_with_map() {
+    $r= $this->run('class <T> {
+      public function run() {
+        ["nested" => ["one" => $a], "three" => $b]= ["nested" => ["one" => 1], "three" => 3];
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([1, 3], $r);
+  }
+
   #[Test, Values(['$list', '$this->instance', 'self::$static'])]
   public function reference_destructuring($reference) {
     $r= $this->run('class <T> {

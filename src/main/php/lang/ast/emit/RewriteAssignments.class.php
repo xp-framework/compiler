@@ -1,6 +1,14 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{UnaryExpression, Variable, Literal, InstanceExpression, ScopeExpression};
+use lang\ast\nodes\{
+  Assignment,
+  InstanceExpression,
+  Literal,
+  OffsetExpression,
+  ScopeExpression,
+  UnaryExpression,
+  Variable
+};
 
 /**
  * Rewrites list reference assignments and null-coalesce for PHP <= 7.3
@@ -24,6 +32,7 @@ trait RewriteAssignments {
       $result->out->write('&');
     }
 
+    $temp= new Variable(substr($t, 1));
     $this->emitOne($result, $assignment->expression);
     $result->out->write(')?[');
     foreach ($assignment->variable->values as $i => $pair) {
@@ -33,30 +42,24 @@ trait RewriteAssignments {
       }
 
       // Assign by reference
+      $value= new OffsetExpression($temp, $pair[0] ?? new Literal($i));
       if ($pair[1] instanceof UnaryExpression) {
-        $this->emitAssign($result, $pair[1]->expression);
-        $result->out->write('='.$pair[1]->operator.$t.'[');
+        $this->emitAssignment($result, new Assignment($pair[1]->expression, '=&', $value));
       } else {
-        $this->emitAssign($result, $pair[1]);
-        $result->out->write('='.$t.'[');
+        $this->emitAssignment($result, new Assignment($pair[1], '=', $value));
       }
-
-      if ($pair[0]) {
-        $this->emitOne($result, $pair[0]);
-        $result->out->write('],');
-      } else {
-        $result->out->write($i.'],');
-      }
+      $result->out->write(',');
     }
+
+    $null= new Literal('null');
     $result->out->write(']:([');
     foreach ($assignment->variable->values as $pair) {
       if ($pair[1] instanceof UnaryExpression) {
-        $this->emitAssign($result, $pair[1]->expression);
-        $result->out->write('=null,');
-      } else if ($pair[1]) {
-        $this->emitAssign($result, $pair[1]);
-        $result->out->write('=null,');
+        $this->emitAssignment($result, new Assignment($pair[1]->expression, '=', $null));
+      } else {
+        $this->emitAssignment($result, new Assignment($pair[1], '=', $null));
       }
+      $result->out->write(',');
     }
     $result->out->write(']?'.$t.':null)');
   }
