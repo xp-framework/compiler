@@ -56,7 +56,7 @@ trait RewriteAssignments {
     foreach ($assignment->variable->values as $pair) {
       if ($pair[1] instanceof UnaryExpression) {
         $this->emitAssignment($result, new Assignment($pair[1]->expression, '=', $null));
-      } else {
+      } else if ($pair[1]) {
         $this->emitAssignment($result, new Assignment($pair[1], '=', $null));
       }
       $result->out->write(',');
