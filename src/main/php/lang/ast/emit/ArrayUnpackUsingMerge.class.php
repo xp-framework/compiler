@@ -19,7 +19,8 @@ trait ArrayUnpackUsingMerge {
 
     $unpack= false;
     foreach ($array->values as $pair) {
-      if ('unpack' === $pair[1]->kind) {
+      $element= $pair[1] ?? $this->raise('Cannot use empty array elements in arrays');
+      if ('unpack' === $element->kind) {
         $unpack= true;
         break;
       }
@@ -32,6 +33,7 @@ trait ArrayUnpackUsingMerge {
           $this->emitOne($result, $pair[0]);
           $result->out->write('=>');
         }
+
         if ('unpack' === $pair[1]->kind) {
           if ('array' === $pair[1]->expression->kind) {
             $result->out->write('],');

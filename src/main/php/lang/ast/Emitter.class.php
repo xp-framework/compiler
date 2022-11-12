@@ -45,6 +45,17 @@ abstract class Emitter {
   }
 
   /**
+   * Raises an exception
+   *
+   * @param  string $error
+   * @param  ?Throwable $cause
+   * @return never
+   */
+  public function raise($error, $cause= null) {
+    throw new IllegalStateException($error, $cause);
+  }
+
+  /**
    * Transforms nodes of a certain kind using the given function, which
    * may return either single node, which will be then emitted, or an
    * iterable producing nodes, which will then be emitted as statements.

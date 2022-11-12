@@ -121,7 +121,7 @@ class PHP70 extends PHP {
       // Rewrite destructuring unless assignment consists only of variables
       $r= false;
       foreach ($assignment->variable->values as $pair) {
-        if (!$pair[0] && $pair[1] instanceof Variable) continue;
+        if (null === $pair[0] && (null === $pair[1] || $pair[1] instanceof Variable)) continue;
         $r= true;
         break;
       }
