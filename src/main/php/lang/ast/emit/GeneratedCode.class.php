@@ -70,7 +70,7 @@ class GeneratedCode extends Result {
     if ('self' === $type || 'static' === $type) {
       return new Declaration($this->type[0], $this);
     } else if ('parent' === $type) {
-      return $this->lookup($this->type[0]->parent->literal());
+      return $this->type[0]->parent ? $this->lookup($this->type[0]->parent->literal()) : null;
     }
 
     foreach ($this->type as $enclosing) {

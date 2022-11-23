@@ -61,6 +61,14 @@ class GeneratedCodeTest {
   }
 
   #[Test]
+  public function lookup_parent_without_parent() {
+    $r= new GeneratedCode(new MemoryOutputStream());
+    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
+
+    Assert::null($r->lookup('parent'));
+  }
+
+  #[Test]
   public function lookup_named() {
     $r= new GeneratedCode(new MemoryOutputStream());
     $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
