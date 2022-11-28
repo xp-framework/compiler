@@ -12,9 +12,10 @@ use lang\ast\nodes\{
   Property,
   ScopeExpression,
   UnpackExpression,
+  TraitDeclaration,
   Variable
 };
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpression};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsExpression};
 use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
@@ -359,7 +360,7 @@ abstract class PHP extends Emitter {
   protected function emitEnum($result, $enum) {
     array_unshift($result->type, $enum);
     array_unshift($result->meta, []);
-    $result->locals= [[], []];
+    $result->locals ?: $result->locals= [[], [], [], []];
 
     $enum->comment && $this->emitOne($result, $enum->comment);
     $enum->annotations && $this->emitOne($result, $enum->annotations);
@@ -385,23 +386,27 @@ abstract class PHP extends Emitter {
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
     $result->out->write('}} '.$enum->name->literal().'::__init();');
+
     array_shift($result->type);
+    $result->locals= [];
   }
 
   protected function emitClass($result, $class) {
     array_unshift($result->type, $class);
     array_unshift($result->meta, []);
-    $result->locals ?: $result->locals= [[], [], []];
+    $result->locals ?: $result->locals= [[], [], [], []];
 
     $class->comment && $this->emitOne($result, $class->comment);
     $class->annotations && $this->emitOne($result, $class->annotations);
     $result->at($class->declared)->out->write(implode(' ', $class->modifiers).' class '.$class->declaration());
     $class->parent && $result->out->write(' extends '.$class->parent->literal());
 
+    $defaults= [];
     if ($class->implements) {
       $list= '';
       foreach ($class->implements as $type) {
         $list.= ', '.$type->literal();
+        $result->lookup($type->literal())->defaultImplementations() && $defaults[]= $type;
       }
       $result->out->write(' implements '.substr($list, 2));
     }
@@ -447,10 +452,15 @@ abstract class PHP extends Emitter {
       $result->out->write('}');
     }
 
+    foreach ($defaults as $trait) {
+      $result->out->write('use __'.substr($trait->literal(), 1).'_Defaults;');
+    }
+
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $result->locals[0]);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name->literal().'::__init();');
+
     array_shift($result->type);
     $result->locals= [];
   }
@@ -509,7 +519,9 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitInterface($result, $interface) {
+    array_unshift($result->type, $interface);
     array_unshift($result->meta, []);
+    $result->locals ?: $result->locals= [[], [], [], []];
 
     $interface->comment && $this->emitOne($result, $interface->comment);
     $interface->annotations && $this->emitOne($result, $interface->annotations);
@@ -522,10 +534,24 @@ abstract class PHP extends Emitter {
     $result->out->write('}');
 
     $this->emitMeta($result, $interface->name, $interface->annotations, $interface->comment);
+
+    // Emit default implementations
+    if ($result->locals[3]) {
+      $this->emitOne($result, new TraitDeclaration(
+        [],
+        new IsValue('\\__'.$interface->declaration().'_Defaults'),
+        $result->locals[3]
+      ));
+    }
+
+    array_shift($result->type);
+    $result->locals= [];
   }
 
   protected function emitTrait($result, $trait) {
+    array_unshift($result->type, $trait);
     array_unshift($result->meta, []);
+    $result->locals= [[], [], [], []];
 
     $trait->comment && $this->emitOne($result, $trait->comment);
     $trait->annotations && $this->emitOne($result, $trait->annotations);
@@ -537,6 +563,9 @@ abstract class PHP extends Emitter {
     $result->out->write('}');
 
     $this->emitMeta($result, $trait->name, $trait->annotations, $trait->comment);
+
+    array_shift($result->type);
+    $result->locals= [];
   }
 
   protected function emitUse($result, $use) {
@@ -626,6 +655,10 @@ abstract class PHP extends Emitter {
 
     if (null === $method->body) {
       $result->out->write(';');
+      $default= null;
+    } else if ('interface' === $result->type[0]->kind) {
+      $result->out->write(';');
+      $default= $method;
     } else {
       $result->out->write(' {');
       $this->emitInitializations($result, $result->locals[1]);
@@ -634,6 +667,7 @@ abstract class PHP extends Emitter {
       }
       $this->emitAll($result, $method->body);
       $result->out->write('}');
+      $default= null;
     }
 
     foreach ($promoted as $param) {
@@ -646,6 +680,10 @@ abstract class PHP extends Emitter {
     foreach ($virtual as $name => $access) {
       $result->locals[2][$name]= $access;
     }
+
+    // Copy default implementations to class scope
+    $default && $result->locals[3][]= $default;
+
     $result->meta[0][self::METHOD][$method->name]= $meta;
   }
 

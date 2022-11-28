@@ -24,6 +24,15 @@ class Reflection extends Type {
   public function name() { return $this->reflect->name; }
 
   /**
+   * Returns whether this is an interface with default implementations
+   *
+   * @return bool
+   */
+  public function defaultImplementations() {
+    return $this->reflect->isInterface() && trait_exists('__'.$this->reflect->name.'_Defaults', false);
+  }
+
+  /**
    * Returns whether a given member is an enum case
    *
    * @param  string $member

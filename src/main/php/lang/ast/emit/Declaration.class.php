@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{EnumCase, Property};
+use lang\ast\nodes\{EnumCase, Property, Method};
 
 class Declaration extends Type {
   private $type, $result;
@@ -18,6 +18,20 @@ class Declaration extends Type {
 
   /** @return string */
   public function name() { return ltrim($this->type->name, '\\'); }
+
+  /**
+   * Returns whether this is an interface with default implementations
+   *
+   * @return bool
+   */
+  public function defaultImplementations() {
+    if ('interface' === $this->type->kind) {
+      foreach ($this->type->body as $member) {
+        if ($member instanceof Method && null !== $member->body) return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * Returns whether a given member is an enum case

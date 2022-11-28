@@ -58,6 +58,22 @@ class TypeDeclarationTest extends EmittingTest {
     Assert::true($this->type('interface <T> { public function name(); }')->isInterface());
   }
 
+  #[Test]
+  public function interface_type_with_default_method() {
+    $i= $this->type('interface <T> {
+      public function all();
+      public function filter($filter) {
+        foreach ($this->all() as $element) {
+          $filter($element) || yield $element;
+        }
+      }
+    }');
+    $t= $this->type('class <T> implements '.$i->literal().'{
+      public function all() { return [1, 2, 3]; }
+    }');
+    Assert::equals([2], iterator_to_array($t->newInstance()->filter(function($i) { return $i % 2; })));
+  }
+
   #[Test, Values(['public', 'private', 'protected'])]
   public function constant($modifiers) {
     $c= $this->type('class <T> { '.$modifiers.' const test = 1; }')->getConstant('test');
