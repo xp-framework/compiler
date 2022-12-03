@@ -287,7 +287,7 @@ abstract class PHP extends Emitter {
         $this->emitOne($result, $parameter->default);
       } else {
         $result->out->write('=null');
-        $result->codegen->context[0]->init[InType::INSTANCE]['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
+        $result->codegen->context[0]->init['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
       }
     }
     $result->locals[$parameter->name]= true;
@@ -377,7 +377,7 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $member);
     }
     $result->out->write('static function __init() {');
-    $this->emitInitializations($result, $context->init[InType::STATICS]);
+    $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
     $result->out->write('}} '.$enum->name->literal().'::__init();');
 
@@ -435,14 +435,14 @@ abstract class PHP extends Emitter {
 
     // Create constructor for property initializations to non-static scalars
     // which have not already been emitted inside constructor
-    if ($context->init[InType::INSTANCE]) {
+    if ($context->init) {
       $result->out->write('public function __construct() {');
-      $this->emitInitializations($result, $context->init[InType::INSTANCE]);
+      $this->emitInitializations($result, $context->init);
       $result->out->write('}');
     }
 
     $result->out->write('static function __init() {');
-    $this->emitInitializations($result, $context->init[InType::STATICS]);
+    $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
     $result->out->write('}} '.$class->name->literal().'::__init();');
 
@@ -574,9 +574,9 @@ abstract class PHP extends Emitter {
         $result->out->write('=');
         $this->emitOne($result, $property->expression);
       } else if (in_array('static', $property->modifiers)) {
-        $result->codegen->context[0]->init[InType::STATICS]['self::$'.$property->name]= $property->expression;
+        $result->codegen->context[0]->statics['self::$'.$property->name]= $property->expression;
       } else {
-        $result->codegen->context[0]->init[InType::INSTANCE]['$this->'.$property->name]= $property->expression;
+        $result->codegen->context[0]->init['$this->'.$property->name]= $property->expression;
       }
     }
     $result->out->write(';');
@@ -615,8 +615,8 @@ abstract class PHP extends Emitter {
       $result->out->write(';');
     } else {
       $result->out->write(' {');
-      $this->emitInitializations($result, $result->codegen->context[0]->init[InType::INSTANCE]);
-      $result->codegen->context[0]->init[InType::INSTANCE]= [];
+      $this->emitInitializations($result, $result->codegen->context[0]->init);
+      $result->codegen->context[0]->init= [];
       foreach ($promoted as $param) {
         $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
       }

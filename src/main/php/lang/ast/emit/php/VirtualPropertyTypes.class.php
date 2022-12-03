@@ -80,7 +80,7 @@ trait VirtualPropertyTypes {
 
     // Initialize via constructor
     if (isset($property->expression)) {
-      $context->init[InType::INSTANCE]['$this->'.$property->name]= $property->expression;
+      $context->init['$this->'.$property->name]= $property->expression;
     }
 
     // Emit XP meta information for the reflection API

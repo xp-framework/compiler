@@ -79,7 +79,7 @@ trait RewriteEnums {
         $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
       }
     }
-    $this->emitInitializations($result, $context->init[InType::STATICS]);
+    $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
     $result->out->write('}} '.$enum->name.'::__init();');
     $result->codegen->leave();
