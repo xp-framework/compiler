@@ -76,7 +76,7 @@ trait XpMeta {
     $this->attributes($result, $annotations, []);
     $result->out->write(', DETAIL_COMMENT => '.$this->comment($comment).'],');
 
-    foreach (array_shift($result->meta) as $type => $lookup) {
+    foreach ($result->codegen->context[0]->meta as $type => $lookup) {
       $result->out->write($type.' => [');
       foreach ($lookup as $key => $meta) {
         $result->out->write("'".$key."' => [");
