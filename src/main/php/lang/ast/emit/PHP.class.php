@@ -934,7 +934,7 @@ abstract class PHP extends Emitter {
 
     // Allow "extends self" to reference enclosing class (except if this
     // class is an anonymous class!)
-    if ($enclosing && $enclosing->type->name && $new->definition->parent && 'self' === $new->definition->parent->name()) {
+    if ($enclosing && $new->definition->parent && 'self' === $new->definition->parent->name()) {
       $result->out->write(' extends '.$enclosing->type->name->literal());
     } else if ($new->definition->parent) {
       $result->out->write(' extends '.$new->definition->parent->literal());
