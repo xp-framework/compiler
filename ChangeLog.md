@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.8.0 / 2022-12-04
+
+* Merged PR #152: Make enclosing type(s) accessible via code generator
+  (@thekid)
+
 ## 8.7.0 / 2022-11-12
 
 * Fixed issue #31: Support `list()` reference assignment for PHP < 7.3
