@@ -12,10 +12,7 @@ trait RewriteEnums {
   }
 
   protected function emitEnum($result, $enum) {
-    array_unshift($result->type, $enum);
-    array_unshift($result->meta, []);
-    $result->locals= [[], []];
-
+    $context= $result->codegen->enter(new InType($enum));
     $result->out->write('final class '.$enum->declaration().' implements \\'.($enum->base ? 'BackedEnum' : 'UnitEnum'));
 
     if ($enum->implements) {
@@ -82,9 +79,9 @@ trait RewriteEnums {
         $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
       }
     }
-    $this->emitInitializations($result, $result->locals[0]);
+    $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
     $result->out->write('}} '.$enum->name.'::__init();');
-    array_shift($result->type);
+    $result->codegen->leave();
   }
 }

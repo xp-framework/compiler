@@ -7,7 +7,6 @@ use lang\ast\CodeGen;
 class Result implements Closeable {
   public $out;
   public $codegen;
-  public $meta= [];
   public $locals= [];
   public $stack= [];
 

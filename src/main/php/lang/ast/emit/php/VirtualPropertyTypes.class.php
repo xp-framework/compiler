@@ -1,6 +1,7 @@
 <?php namespace lang\ast\emit\php;
 
 use lang\ast\Code;
+use lang\ast\emit\InType;
 
 /**
  * Creates __get() and __set() overloads which will create type-checked
@@ -66,7 +67,8 @@ trait VirtualPropertyTypes {
       $check= '';
     }
 
-    $result->locals[2][$property->name]= [
+    $context= $result->codegen->context[0];
+    $context->virtual[$property->name]= [
       new Code(sprintf($check.'return $this->__virtual["%1$s"];', $property->name)),
       new Code(sprintf(
         $check.$assign.
@@ -78,7 +80,7 @@ trait VirtualPropertyTypes {
 
     // Initialize via constructor
     if (isset($property->expression)) {
-      $result->locals[1]['$this->'.$property->name]= $property->expression;
+      $context->init['$this->'.$property->name]= $property->expression;
     }
 
     // Emit XP meta information for the reflection API
@@ -86,7 +88,7 @@ trait VirtualPropertyTypes {
     foreach ($property->modifiers as $name) {
       $modifiers|= $lookup[$name];
     }
-    $result->meta[0][self::PROPERTY][$property->name]= [
+    $context->meta[self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
       DETAIL_ANNOTATIONS => $property->annotations,
       DETAIL_COMMENT     => $property->comment,
