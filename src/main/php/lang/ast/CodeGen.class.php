@@ -2,18 +2,18 @@
 
 class CodeGen {
   private $id= 0;
-  public $context= [];
+  public $scope= [];
 
   /** Creates a new, unique symbol */
   public function symbol() { return '_'.($this->id++); }
 
-  public function enter($context) {
-    array_unshift($this->context, $context);
-    return $context;
+  public function enter($scope) {
+    array_unshift($this->scope, $scope);
+    return $scope;
   }
 
   public function leave() {
-    return array_shift($this->context);
+    return array_shift($this->scope);
   }
 
   /**

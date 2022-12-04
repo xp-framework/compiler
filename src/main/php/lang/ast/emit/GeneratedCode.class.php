@@ -66,7 +66,7 @@ class GeneratedCode extends Result {
    * @return lang.ast.emit.Type
    */
   public function lookup($type) {
-    $enclosing= $this->codegen->context[0] ?? null;
+    $enclosing= $this->codegen->scope[0] ?? null;
 
     if ('self' === $type || 'static' === $type) {
       return new Declaration($enclosing->type, $this);
@@ -74,9 +74,9 @@ class GeneratedCode extends Result {
       return $enclosing->type->parent ? $this->lookup($enclosing->type->parent->literal()) : null;
     }
 
-    foreach ($this->codegen->context as $context) {
-      if ($context->type->name && $type === $context->type->name->literal()) {
-        return new Declaration($context->type, $this);
+    foreach ($this->codegen->scope as $scope) {
+      if ($scope->type->name && $type === $scope->type->name->literal()) {
+        return new Declaration($scope->type, $this);
       }
     }
 

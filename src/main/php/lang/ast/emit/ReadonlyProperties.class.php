@@ -23,12 +23,12 @@ trait ReadonlyProperties {
 
     if (!in_array('readonly', $property->modifiers)) return parent::emitProperty($result, $property);
 
-    $context= $result->codegen->context[0];
+    $scope= $result->codegen->scope[0];
     $modifiers= 0;
     foreach ($property->modifiers as $name) {
       $modifiers|= $lookup[$name];
     }
-    $context->meta[self::PROPERTY][$property->name]= [
+    $scope->meta[self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
       DETAIL_ANNOTATIONS => $property->annotations,
       DETAIL_COMMENT     => $property->comment,
@@ -54,7 +54,7 @@ trait ReadonlyProperties {
     }
 
     // Create virtual property implementing the readonly semantics
-    $context->virtual[$property->name]= [
+    $scope->virtual[$property->name]= [
       new Code(sprintf($check.'return $this->__virtual["%1$s"][0] ?? null;', $property->name)),
       new Code(sprintf(
         ($check ?: '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;').

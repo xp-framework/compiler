@@ -287,7 +287,7 @@ abstract class PHP extends Emitter {
         $this->emitOne($result, $parameter->default);
       } else {
         $result->out->write('=null');
-        $result->codegen->context[0]->init['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
+        $result->codegen->scope[0]->init['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
       }
     }
     $result->locals[$parameter->name]= true;
@@ -385,7 +385,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitClass($result, $class) {
-    $context= $result->codegen->context[0] ?? $result->codegen->enter(new InType($class));
+    $context= $result->codegen->scope[0] ?? $result->codegen->enter(new InType($class));
 
     $class->comment && $this->emitOne($result, $class->comment);
     $class->annotations && $this->emitOne($result, $class->annotations);
@@ -558,7 +558,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitProperty($result, $property) {
-    $result->codegen->context[0]->meta[self::PROPERTY][$property->name]= [
+    $result->codegen->scope[0]->meta[self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
       DETAIL_ANNOTATIONS => $property->annotations,
       DETAIL_COMMENT     => $property->comment,
@@ -574,9 +574,9 @@ abstract class PHP extends Emitter {
         $result->out->write('=');
         $this->emitOne($result, $property->expression);
       } else if (in_array('static', $property->modifiers)) {
-        $result->codegen->context[0]->statics['self::$'.$property->name]= $property->expression;
+        $result->codegen->scope[0]->statics['self::$'.$property->name]= $property->expression;
       } else {
-        $result->codegen->context[0]->init['$this->'.$property->name]= $property->expression;
+        $result->codegen->scope[0]->init['$this->'.$property->name]= $property->expression;
       }
     }
     $result->out->write(';');
@@ -615,8 +615,8 @@ abstract class PHP extends Emitter {
       $result->out->write(';');
     } else {
       $result->out->write(' {');
-      $this->emitInitializations($result, $result->codegen->context[0]->init);
-      $result->codegen->context[0]->init= [];
+      $this->emitInitializations($result, $result->codegen->scope[0]->init);
+      $result->codegen->scope[0]->init= [];
       foreach ($promoted as $param) {
         $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
       }
@@ -629,7 +629,7 @@ abstract class PHP extends Emitter {
     }
 
     $result->locals= array_pop($result->stack);
-    $result->codegen->context[0]->meta[self::METHOD][$method->name]= $meta;
+    $result->codegen->scope[0]->meta[self::METHOD][$method->name]= $meta;
   }
 
   protected function emitBraced($result, $braced) {
@@ -926,7 +926,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNewClass($result, $new) {
-    $enclosing= $result->codegen->context[0] ?? null;
+    $enclosing= $result->codegen->scope[0] ?? null;
 
     $result->out->write('(new class(');
     $this->emitArguments($result, $new->arguments);
