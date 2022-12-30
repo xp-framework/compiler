@@ -2,7 +2,7 @@
 
 use io\{File, Folder};
 use lang\{Environment, IllegalArgumentException};
-use unittest\{Assert, After, Before, Test, Values};
+use unittest\{Assert, After, Before, Expect, Test, Values};
 use util\cmd\Console;
 use xp\compiler\{Input, FromStream, FromFile, FromFilesIn, FromInputs};
 

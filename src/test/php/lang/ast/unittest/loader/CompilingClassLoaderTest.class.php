@@ -4,7 +4,7 @@ use io\{File, Files, Folder};
 use lang\ast\CompilingClassLoader;
 use lang\{ClassFormatException, ClassNotFoundException, ElementNotFoundException, ClassLoader, Environment};
 use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Expect, Test, TestCase};
+use unittest\{Action, Assert, Expect, Test, Values};
 
 class CompilingClassLoaderTest {
   private static $runtime;
