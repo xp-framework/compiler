@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalStateException;
-use unittest\{Assert, Test, Values};
+use unittest\{Assert, Expect, Test, Values};
 
 class ArraysTest extends EmittingTest {
 
