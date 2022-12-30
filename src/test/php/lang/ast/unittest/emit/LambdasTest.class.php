@@ -3,7 +3,7 @@
 use lang\ast\Errors;
 use lang\ast\nodes\{ClosureExpression, LambdaExpression};
 use unittest\actions\VerifyThat;
-use unittest\{Action, Assert, Test};
+use unittest\{Action, Assert, Expect, Test};
 
 /**
  * Lambdas (a.k.a. arrow functions) support
