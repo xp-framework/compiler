@@ -5,7 +5,7 @@ use unittest\{Assert, Test, Values};
 
 class TernaryTest extends EmittingTest {
 
-  #[Test, Values(map: [true => 'OK', false => 'Fail'])]
+  #[Test, Values([[true, 'OK'], [false, 'Fail']])]
   public function ternary($value, $result) {
     Assert::equals($result, $this->run(
       'class <T> {
@@ -17,7 +17,7 @@ class TernaryTest extends EmittingTest {
     ));
   }
 
-  #[Test, Values(map: [true => MODIFIER_PUBLIC, false => MODIFIER_PRIVATE])]
+  #[Test, Values([[true, MODIFIER_PUBLIC], [false, MODIFIER_PRIVATE]])]
   public function ternary_constants_goto_label_ambiguity($value, $result) {
     Assert::equals($result, $this->run(
       'class <T> {
@@ -29,7 +29,7 @@ class TernaryTest extends EmittingTest {
     ));
   }
 
-  #[Test, Values(['map' => ['OK' => 'OK', null => 'Fail']])]
+  #[Test, Values([['OK', 'OK'], [null, 'Fail']])]
   public function short_ternary($value, $result) {
     Assert::equals($result, $this->run(
       'class <T> {
