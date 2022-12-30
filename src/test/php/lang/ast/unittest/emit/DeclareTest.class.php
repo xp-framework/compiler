@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
-use unittest\{Assert, AssertionFailedError, Test};
+use unittest\{Assert, Expect, AssertionFailedError, Test};
 
 class DeclareTest extends EmittingTest {
 
