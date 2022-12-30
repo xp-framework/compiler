@@ -21,6 +21,7 @@ class ToArchiveTest {
 
   #[After]
   public function cleanup() {
+    $this->archive->isOpen() && $this->archive->close();
     $this->folder->unlink();
   }
 

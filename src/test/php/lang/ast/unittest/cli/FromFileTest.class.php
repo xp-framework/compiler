@@ -21,6 +21,7 @@ class FromFileTest {
 
   #[After]
   public function cleanup() {
+    $this->file->isOpen() && $this->file->close();
     $this->folder->unlink();
   }
 
