@@ -5,7 +5,7 @@ use lang\ast\emit\{InType, GeneratedCode, Declaration, Escaping, Reflection};
 use lang\ast\nodes\ClassDeclaration;
 use lang\ast\types\IsValue;
 use lang\{Value, ClassNotFoundException};
-use unittest\{Assert, Expect, Test};
+use unittest\{Assert, Expect, Values, Test};
 
 class GeneratedCodeTest {
 
