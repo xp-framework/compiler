@@ -3,7 +3,7 @@
 use lang\reflect\TargetInvocationException;
 use lang\{Enum, Error};
 use unittest\actions\VerifyThat;
-use unittest\{Assert, Action, Test};
+use unittest\{Assert, Action, Ignore, Expect, Values, Test};
 
 #[Action(eval: 'new VerifyThat(fn() => function_exists("enum_exists"))')]
 class EnumTest extends EmittingTest {
