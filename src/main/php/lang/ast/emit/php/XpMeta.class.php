@@ -9,6 +9,7 @@
  * Code compiled with this optimization in place requires using XP Core as
  * a dependency!
  *
+ * @see  https://github.com/xp-framework/reflection/pull/27
  * @see  https://github.com/xp-framework/rfc/issues/336
  */
 trait XpMeta {
@@ -29,6 +30,7 @@ trait XpMeta {
       } else if (1 === sizeof($arguments) && isset($arguments[0])) {
         $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
+        $lookup[$name]= 1; // Resolve ambiguity
       } else {
         $result->out->write('[');
         foreach ($arguments as $name => $argument) {
