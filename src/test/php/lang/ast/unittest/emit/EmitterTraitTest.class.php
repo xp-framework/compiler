@@ -2,8 +2,8 @@
 
 use io\streams\MemoryOutputStream;
 use lang\ast\Node;
-use lang\ast\emit\{InType, GeneratedCode};
-use unittest\Before;
+use lang\ast\emit\{GeneratedCode, InType};
+use test\Before;
 
 abstract class EmitterTraitTest {
   private $emitter;

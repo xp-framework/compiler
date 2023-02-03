@@ -2,9 +2,9 @@
 
 use io\{File, Files, Folder};
 use lang\ast\CompilingClassLoader;
-use lang\{ClassFormatException, ClassNotFoundException, ElementNotFoundException, ClassLoader, Environment};
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Expect, Test, Values};
+use lang\{ClassFormatException, ClassLoader, ClassNotFoundException, ElementNotFoundException, Environment};
+use test\verify\Runtime;
+use test\{Action, Assert, Expect, Test, Values};
 
 class CompilingClassLoaderTest {
   private static $runtime;
@@ -131,14 +131,14 @@ class CompilingClassLoaderTest {
     Assert::equals('Tests', $class->getSimpleName());
   }
 
-  #[Test, Expect(class: ClassFormatException::class, withMessage: 'Compiler error: Expected "type name", have "(end)"')]
+  #[Test, Expect(class: ClassFormatException::class, message: 'Compiler error: Expected "type name", have "(end)"')]
   public function load_class_with_syntax_errors() {
     $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) {
       return $loader->loadClass($types['Errors']);
     });
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.3")'), Expect(class: ClassFormatException::class, withMessage: '/Compiler error: Class .+ not found/')]
+  #[Test, Runtime(php: '>=7.3'), Expect(class: ClassFormatException::class, message: '/Compiler error: Class .+ not found/')]
   public function load_class_with_non_existant_parent() {
     $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
     $this->compile(['Orphan' => $code], function($loader, $types) {

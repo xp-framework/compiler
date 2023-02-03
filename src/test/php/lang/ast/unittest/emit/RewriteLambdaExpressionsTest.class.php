@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\{PHP, RewriteLambdaExpressions};
-use lang\ast\nodes\{LambdaExpression, ReturnStatement, Signature, Literal, Block};
-use unittest\{Assert, Test};
+use lang\ast\nodes\{Block, LambdaExpression, Literal, ReturnStatement, Signature};
+use test\{Assert, Test};
 
 class RewriteLambdaExpressionsTest extends EmitterTraitTest {
 

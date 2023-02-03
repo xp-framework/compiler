@@ -11,7 +11,7 @@
     "php" : ">=7.0.0"
   },
   "require-dev" : {
-    "xp-framework/unittest": "^11.0 | ^10.0"
+    "xp-framework/test": "dev-main"
   },
   "bin": ["bin/xp.xp-framework.compiler.compile", "bin/xp.xp-framework.compiler.ast"],
   "autoload" : {

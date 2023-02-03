@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\IllegalArgumentException;
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 
 /**
  * Initialize parameters and properties with arbitrary expressions
@@ -27,7 +27,7 @@ class InitializeWithExpressionsTest extends EmittingTest {
     yield ['[new Handle(0)]', [new Handle(0)]];
   }
 
-  #[Test, Values('expressions')]
+  #[Test, Values(from: 'expressions')]
   public function property($declaration, $expected) {
     Assert::equals($expected, $this->run(sprintf('use lang\ast\unittest\emit\{FileInput, Handle}; class <T> {
       const INITIAL= "initial";
@@ -39,7 +39,7 @@ class InitializeWithExpressionsTest extends EmittingTest {
     }', $declaration)));
   }
 
-  #[Test, Values('expressions')]
+  #[Test, Values(from: 'expressions')]
   public function reflective_access_to_property($declaration, $expected) {
     Assert::equals($expected, $this->run(sprintf('use lang\ast\unittest\emit\{FileInput, Handle}; class <T> {
       const INITIAL= "initial";

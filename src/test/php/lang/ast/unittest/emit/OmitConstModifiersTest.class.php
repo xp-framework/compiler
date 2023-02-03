@@ -1,9 +1,9 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ast\emit\{PHP, OmitConstModifiers};
+use lang\ast\emit\{OmitConstModifiers, PHP};
 use lang\ast\nodes\{Constant, Literal};
 use lang\ast\types\IsLiteral;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class OmitConstModifiersTest extends EmitterTraitTest {
 

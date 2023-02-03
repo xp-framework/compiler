@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 /** @see http://php.net/manual/en/language.generators.syntax.php */
 class YieldTest extends EmittingTest {

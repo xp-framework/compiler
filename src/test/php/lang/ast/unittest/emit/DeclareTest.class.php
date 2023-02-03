@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
-use unittest\{Assert, Expect, AssertionFailedError, Test};
+use test\{Assert, AssertionFailedError, Expect, Test};
 
 class DeclareTest extends EmittingTest {
 
@@ -21,7 +21,7 @@ class DeclareTest extends EmittingTest {
     }'));
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/must be of (the )?type int(eger)?, string given/')]
+  #[Test, Expect(class: Error::class, message: '/must be of (the )?type int(eger)?, string given/')]
   public function strict_types_on() {
     $this->run('declare(strict_types = 1); class <T> {
       public static function number(int $n) { return $n; }

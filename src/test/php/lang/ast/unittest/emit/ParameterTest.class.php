@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{ArrayType, MapType, Primitive, Type, Value, XPClass};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Test, Values, Action};
+use test\verify\Runtime;
+use test\{Action, Assert, Test, Values};
 
 class ParameterTest extends EmittingTest {
   use NullableSupport;
@@ -38,7 +38,7 @@ class ParameterTest extends EmittingTest {
     Assert::equals(Type::$VAR, $this->param('$param')->getType());
   }
 
-  #[Test, Values('special')]
+  #[Test, Values(from: 'special')]
   public function with_special_type($declaration, $type) {
     Assert::equals($type, $this->param($declaration)->getType());
   }
@@ -73,7 +73,7 @@ class ParameterTest extends EmittingTest {
     Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->getType());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function nullable_string_type_restriction() {
     Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->getTypeRestriction());
   }

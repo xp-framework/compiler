@@ -1,11 +1,11 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\emit\{InType, GeneratedCode, Declaration, Escaping, Reflection};
+use lang\ast\emit\{Declaration, Escaping, GeneratedCode, InType, Reflection};
 use lang\ast\nodes\ClassDeclaration;
 use lang\ast\types\IsValue;
-use lang\{Value, ClassNotFoundException};
-use unittest\{Assert, Expect, Values, Test};
+use lang\{ClassNotFoundException, Value};
+use test\{Assert, Expect, Test, Values};
 
 class GeneratedCodeTest {
 

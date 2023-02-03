@@ -1,9 +1,9 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\{PHP, RewriteClassOnObjects};
-use lang\ast\nodes\{ScopeExpression, Variable, Literal, ClassDeclaration};
+use lang\ast\nodes\{ClassDeclaration, Literal, ScopeExpression, Variable};
 use lang\ast\types\IsValue;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class RewriteClassOnObjectsTest extends EmitterTraitTest {
 

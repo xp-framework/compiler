@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Throwable;
-use unittest\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Test, Values};
 
 class ControlStructuresTest extends EmittingTest {
 
@@ -154,7 +154,7 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals('10+ items', $r);
   }
 
-  #[Test, Expect(class: Throwable::class, withMessage: '/Unhandled match (value of type .+|case .+)/')]
+  #[Test, Expect(class: Throwable::class, message: '/Unhandled match (value of type .+|case .+)/')]
   public function unhandled_match() {
     $this->run('class <T> {
       public function run($arg) {
@@ -167,7 +167,7 @@ class ControlStructuresTest extends EmittingTest {
     }', SEEK_END);
   }
 
-  #[Test, Expect(class: Throwable::class, withMessage: '/Unknown seek mode .+/')]
+  #[Test, Expect(class: Throwable::class, message: '/Unknown seek mode .+/')]
   public function match_with_throw_expression() {
     $this->run('class <T> {
       public function run($arg) {

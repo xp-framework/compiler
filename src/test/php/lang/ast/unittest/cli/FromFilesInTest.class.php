@@ -3,7 +3,7 @@
 use io\streams\FileInputStream;
 use io\{File, Folder};
 use lang\Environment;
-use unittest\{Assert, After, Before, Test, Values};
+use test\{After, Assert, Before, Test, Values};
 use xp\compiler\FromFilesIn;
 
 class FromFilesInTest {
@@ -50,7 +50,7 @@ class FromFilesInTest {
     new FromFilesIn($this->folder->getURI());
   }
 
-  #[Test, Values('files')]
+  #[Test, Values(from: 'files')]
   public function iteration($expected) {
     $results= [];
     foreach (new FromFilesIn($this->folder) as $path => $stream) {

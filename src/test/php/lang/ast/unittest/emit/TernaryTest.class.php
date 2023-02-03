@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\Path;
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 
 class TernaryTest extends EmittingTest {
 

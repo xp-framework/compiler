@@ -1,9 +1,9 @@
 <?php namespace lang\ast\unittest\cli;
 
-use io\{Folder, File};
+use io\{File, Folder};
 use lang\Environment;
 use lang\FileSystemClassLoader;
-use unittest\{After, Assert, Before, Test};
+use test\{After, Assert, Before, Test};
 use xp\compiler\ToFolder;
 
 class ToFolderTest {

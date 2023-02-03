@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Action, Assert, Test};
+use test\{Action, Assert, Test};
 
 class NullCoalesceTest extends EmittingTest {
 

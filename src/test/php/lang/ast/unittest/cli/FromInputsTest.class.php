@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\cli;
 
-use io\streams\{FileInputStream, ConsoleInputStream};
-use unittest\{Assert, Test, Values};
+use io\streams\{ConsoleInputStream, FileInputStream};
+use test\{Assert, Test, Values};
 use xp\compiler\FromInputs;
 
 class FromInputsTest {
@@ -18,7 +18,7 @@ class FromInputsTest {
     new FromInputs([]);
   }
 
-  #[Test, Values('inputs')]
+  #[Test, Values(from: 'inputs')]
   public function iteration($inputs, $expected) {
     $results= [];
     foreach (new FromInputs($inputs) as $path => $stream) {
