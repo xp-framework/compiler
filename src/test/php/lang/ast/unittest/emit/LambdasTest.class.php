@@ -48,7 +48,7 @@ class LambdasTest extends EmittingTest {
     Assert::equals(3, $r(1));
   }
 
-  #[Test, Condition(assert: 'fn() => property_exists(LambdaExpression::class, "static")')]
+  #[Test, Condition(assert: 'property_exists(LambdaExpression::class, "static")')]
   public function static_fn_does_not_capture_this() {
     $r= $this->run('class <T> {
       public function run() {
@@ -59,7 +59,7 @@ class LambdasTest extends EmittingTest {
     Assert::false($r());
   }
 
-  #[Test, Condition(assert: 'fn() => property_exists(ClosureExpression::class, "static")')]
+  #[Test, Condition(assert: 'property_exists(ClosureExpression::class, "static")')]
   public function static_function_does_not_capture_this() {
     $r= $this->run('class <T> {
       public function run() {

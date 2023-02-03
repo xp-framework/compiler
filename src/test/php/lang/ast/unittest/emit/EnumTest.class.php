@@ -5,7 +5,7 @@ use lang\{Enum, Error};
 use test\verify\Condition;
 use test\{Action, Assert, Expect, Ignore, Test, Values};
 
-#[Condition(assert: 'fn() => function_exists("enum_exists")')]
+#[Condition(assert: 'function_exists("enum_exists")')]
 class EnumTest extends EmittingTest {
 
   #[Test]
