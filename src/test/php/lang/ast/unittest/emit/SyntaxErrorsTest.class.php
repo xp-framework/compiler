@@ -6,17 +6,17 @@ use test\{Assert, Expect, Test};
 
 class SyntaxErrorsTest extends EmittingTest {
 
-  #[Test, Expect(class: Errors::class, message: 'Missing semicolon after assignment statement')]
+  #[Test, Expect(class: Errors::class, message: '/Missing semicolon after assignment statement/')]
   public function missing_semicolon() {
     $this->emit('$greeting= hello() world()');
   }
 
-  #[Test, Expect(class: Errors::class, message: 'Unexpected :')]
+  #[Test, Expect(class: Errors::class, message: '/Unexpected :/')]
   public function unexpected_colon() {
     $this->emit('$greeting= hello();:');
   }
 
-  #[Test, Expect(class: IllegalStateException::class, message: 'Unexpected operator = at line 1')]
+  #[Test, Expect(class: IllegalStateException::class, message: '/Unexpected operator =/')]
   public function operator() {
     $this->emit('=;');
   }

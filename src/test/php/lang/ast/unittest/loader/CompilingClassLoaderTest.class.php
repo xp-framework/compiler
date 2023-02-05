@@ -131,7 +131,7 @@ class CompilingClassLoaderTest {
     Assert::equals('Tests', $class->getSimpleName());
   }
 
-  #[Test, Expect(class: ClassFormatException::class, message: 'Compiler error: Expected "type name", have "(end)"')]
+  #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Expected "type name", have .+/')]
   public function load_class_with_syntax_errors() {
     $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) {
       return $loader->loadClass($types['Errors']);

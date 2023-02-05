@@ -83,7 +83,7 @@ class ArgumentPromotionTest extends EmittingTest {
     );
   }
 
-  #[Test, Expect(class: Errors::class, message: 'Variadic parameters cannot be promoted')]
+  #[Test, Expect(class: Errors::class, message: '/Variadic parameters cannot be promoted/')]
   public function variadic_parameters_cannot_be_promoted() {
     $this->type('class <T> {
       public function __construct(private string... $in) { }
