@@ -32,9 +32,6 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         ini-values: date.timezone=Europe/Berlin
 
-    - name: Setup Problem Matchers for PHP
-      run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-
     - name: Validate composer.json and composer.lock
       run: composer validate
 
