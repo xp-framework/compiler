@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #153: Migrate to new testing library - @thekid
+
 ## 8.8.1 / 2023-01-29
 
 * Added flag to meta information to resolve ambiguity when exactly one
