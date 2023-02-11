@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\{PHP, RewriteMultiCatch};
-use lang\ast\nodes\{TryStatement, CatchStatement};
-use unittest\{Assert, Test};
+use lang\ast\nodes\{CatchStatement, TryStatement};
+use test\{Assert, Test};
 
 class RewriteMultiCatchTest extends EmitterTraitTest {
 

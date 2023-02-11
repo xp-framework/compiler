@@ -2,10 +2,10 @@
 
 use lang\reflect\TargetInvocationException;
 use lang\{Enum, Error};
-use unittest\actions\VerifyThat;
-use unittest\{Assert, Action, Ignore, Expect, Values, Test};
+use test\verify\Condition;
+use test\{Action, Assert, Expect, Ignore, Test, Values};
 
-#[Action(eval: 'new VerifyThat(fn() => function_exists("enum_exists"))')]
+#[Condition(assert: 'function_exists("enum_exists")')]
 class EnumTest extends EmittingTest {
 
   #[Test]
@@ -138,7 +138,7 @@ class EnumTest extends EmittingTest {
     Assert::equals($expected, $t->getMethod('from')->invoke(null, [$arg])->name);
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/"illegal" is not a valid backing value for enum .+/')]
+  #[Test, Expect(class: Error::class, message: '/"illegal" is not a valid backing value for enum .+/')]
   public function backed_enum_from_nonexistant() {
     $t= $this->type('enum <T>: string {
       case ASC  = "asc";

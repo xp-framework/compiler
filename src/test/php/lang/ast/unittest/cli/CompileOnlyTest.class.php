@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\cli;
 
-use unittest\Test;
+use test\Test;
 use xp\compiler\CompileOnly;
 
 class CompileOnlyTest {

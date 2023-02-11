@@ -3,7 +3,7 @@
 use io\streams\FileInputStream;
 use io\{File, Folder};
 use lang\Environment;
-use unittest\{Assert, After, Before, Test};
+use test\{After, Assert, Before, Test};
 use xp\compiler\FromFile;
 
 class FromFileTest {

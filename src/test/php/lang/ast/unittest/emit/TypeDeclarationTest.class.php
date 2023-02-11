@@ -2,7 +2,7 @@
 
 use lang\XPClass;
 use lang\reflect\Modifiers;
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 
 class TypeDeclarationTest extends EmittingTest {
 

@@ -2,7 +2,7 @@
 
 use io\streams\MemoryOutputStream;
 use lang\ast\emit\Escaping;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class EscapingTest {
 

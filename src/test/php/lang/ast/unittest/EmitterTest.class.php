@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\nodes\{Variable, Comment};
-use lang\ast\{Emitter, Node, Code, Result};
-use lang\{IllegalStateException, IllegalArgumentException};
-use unittest\{Assert, Expect, Test, TestCase};
+use lang\ast\nodes\{Comment, Variable};
+use lang\ast\{Code, Emitter, Node, Result};
+use lang\{IllegalArgumentException, IllegalStateException};
+use test\{Assert, Expect, Test, TestCase};
 
 class EmitterTest {
 

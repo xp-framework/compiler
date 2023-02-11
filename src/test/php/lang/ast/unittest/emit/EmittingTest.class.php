@@ -5,9 +5,10 @@ use lang\DynamicClassLoader;
 use lang\ast\emit\GeneratedCode;
 use lang\ast\emit\php\XpMeta;
 use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
-use unittest\{After, Assert, TestCase};
+use test\{Args, After, Assert, TestCase};
 use util\cmd\Console;
 
+#[Args(['output' => null])]
 abstract class EmittingTest {
   private static $id= 0;
   private $cl, $language, $emitter, $output;

@@ -1,9 +1,9 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\Reflection;
-use lang\{Value, Enum, ClassNotFoundException, ClassLoader};
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test, Expect};
+use lang\{ClassLoader, ClassNotFoundException, Enum, Value};
+use test\verify\Runtime;
+use test\{Action, Assert, Expect, Test};
 
 class ReflectionTest {
 
@@ -40,7 +40,7 @@ class ReflectionTest {
     Assert::false($reflect->rewriteEnumCase('EMPTY'));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion("<8.1")')]
+  #[Test, Runtime(php: '<8.1')]
   public function rewrites_simulated_unit_enums() {
     $spec= ['kind' => 'class', 'extends' => null, 'implements' => [\UnitEnum::class], 'use' => []];
     $t= ClassLoader::defineType('ReflectionTestSimulatedEnum', $spec, '{
@@ -58,7 +58,7 @@ class ReflectionTest {
     Assert::false($reflect->rewriteEnumCase('EMPTY'));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  #[Test, Runtime(php: '>=8.1')]
   public function does_not_rewrite_native_enums() {
     $spec= ['kind' => 'enum', 'extends' => null, 'implements' => [], 'use' => []];
     $t= ClassLoader::defineType('ReflectionTestNativeEnum', $spec, '{
