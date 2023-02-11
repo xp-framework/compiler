@@ -379,7 +379,7 @@ abstract class PHP extends Emitter {
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-    $result->out->write('}} '.$enum->name->literal().'::__init();');
+    $result->out->write('}} '.$enum->declaration().'::__init();');
 
     $result->codegen->leave();
   }
@@ -444,7 +444,7 @@ abstract class PHP extends Emitter {
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
-    $result->out->write('}} '.$class->name->literal().'::__init();');
+    $result->out->write('}} '.$class->declaration().'::__init();');
 
     $result->codegen->leave();
   }
