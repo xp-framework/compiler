@@ -1,5 +1,7 @@
 <?php namespace lang\ast\emit\php;
 
+use lang\ast\types\IsGeneric;
+
 /**
  * Emit meta information so that the XP reflection API won't have to parse
  * it. Also omits apidoc comments and annotations from the generated code.
@@ -71,8 +73,10 @@ trait XpMeta {
   protected function emitMeta($result, $type, $annotations, $comment) {
     if (null === $type) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
+    } else if ($type instanceof IsGeneric) {
+      $result->out->write('\xp::$meta[\''.$type->base->name().'\']= [');
     } else {
-      $result->out->write('\xp::$meta[\''.strtr($type->name(), '\\', '.').'\']= [');
+      $result->out->write('\xp::$meta[\''.$type->name().'\']= [');
     }
     $result->out->write('"class" => [');
     $this->attributes($result, $annotations, []);
