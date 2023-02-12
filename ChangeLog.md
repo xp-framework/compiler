@@ -5,7 +5,7 @@ XP Compiler ChangeLog
 
 ## 8.8.3 / 2023-02-12
 
-* Merged PR #156: Do not error at compile time for unresolved classes
+* Merged PR #155: Do not error at compile time for unresolved classes
   (@thekid)
 
 ## 8.8.2 / 2023-02-12
