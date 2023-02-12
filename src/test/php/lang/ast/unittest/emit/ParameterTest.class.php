@@ -139,4 +139,12 @@ class ParameterTest extends EmittingTest {
     ;
     Assert::equals(1, sizeof($p), 'number of parameters');
   }
+
+  #[Test]
+  public function soft_string_typed() {
+    $param= $this->param('@string $param');
+
+    Assert::null($param->getTypeRestriction());
+    Assert::equals(Primitive::$STRING, $param->getType());
+  }
 }
