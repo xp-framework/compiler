@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\{Primitive, Nullable, Type, TypeUnion};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Test, Action};
+use lang\{Nullable, Primitive, Type, TypeUnion};
+use test\verify\Runtime;
+use test\{Action, Assert, Test};
 
 /**
  * Union types
@@ -71,7 +71,7 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
+  #[Test, Runtime(php: '>=8.0.0-dev')]
   public function nullable_union_type_restriction() {
     $t= $this->type('class <T> {
       public function test(): int|string|null { }
@@ -83,7 +83,7 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
+  #[Test, Runtime(php: '>=8.0.0-dev')]
   public function parameter_type_restriction_with_php8() {
     $t= $this->type('class <T> {
       public function test(int|string|array<string> $arg) { }
@@ -95,7 +95,7 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
+  #[Test, Runtime(php: '>=8.0.0-dev')]
   public function parameter_function_type_restriction_with_php8() {
     $t= $this->type('class <T> {
       public function test(): string|(function(): string) { }
@@ -107,7 +107,7 @@ class UnionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0.0-dev")')]
+  #[Test, Runtime(php: '>=8.0.0-dev')]
   public function return_type_restriction_with_php8() {
     $t= $this->type('class <T> {
       public function test(): int|string|array<string> { }

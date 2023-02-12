@@ -2,9 +2,9 @@
 
 use io\{File, Folder};
 use lang\{Environment, IllegalArgumentException};
-use unittest\{Assert, After, Before, Test, Values};
+use test\{After, Assert, Before, Expect, Test, Values};
 use util\cmd\Console;
-use xp\compiler\{Input, FromStream, FromFile, FromFilesIn, FromInputs};
+use xp\compiler\{FromFile, FromFilesIn, FromInputs, FromStream, Input};
 
 class InputTest {
   private $folder, $file;

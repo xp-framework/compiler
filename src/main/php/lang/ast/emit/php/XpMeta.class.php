@@ -1,5 +1,7 @@
 <?php namespace lang\ast\emit\php;
 
+use lang\ast\types\IsGeneric;
+
 /**
  * Emit meta information so that the XP reflection API won't have to parse
  * it. Also omits apidoc comments and annotations from the generated code.
@@ -9,6 +11,7 @@
  * Code compiled with this optimization in place requires using XP Core as
  * a dependency!
  *
+ * @see  https://github.com/xp-framework/reflection/pull/27
  * @see  https://github.com/xp-framework/rfc/issues/336
  */
 trait XpMeta {
@@ -29,6 +32,7 @@ trait XpMeta {
       } else if (1 === sizeof($arguments) && isset($arguments[0])) {
         $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
+        $lookup[$name]= 1; // Resolve ambiguity
       } else {
         $result->out->write('[');
         foreach ($arguments as $name => $argument) {
@@ -69,14 +73,16 @@ trait XpMeta {
   protected function emitMeta($result, $type, $annotations, $comment) {
     if (null === $type) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
+    } else if ($type instanceof IsGeneric) {
+      $result->out->write('\xp::$meta[\''.$type->base->name().'\']= [');
     } else {
-      $result->out->write('\xp::$meta[\''.strtr($type->name(), '\\', '.').'\']= [');
+      $result->out->write('\xp::$meta[\''.$type->name().'\']= [');
     }
     $result->out->write('"class" => [');
     $this->attributes($result, $annotations, []);
     $result->out->write(', DETAIL_COMMENT => '.$this->comment($comment).'],');
 
-    foreach (array_shift($result->meta) as $type => $lookup) {
+    foreach ($result->codegen->scope[0]->meta as $type => $lookup) {
       $result->out->write($type.' => [');
       foreach ($lookup as $key => $meta) {
         $result->out->write("'".$key."' => [");

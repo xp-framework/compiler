@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\{Primitive, XPClass, TypeIntersection};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Test, Action};
+use lang\{Primitive, TypeIntersection, XPClass};
+use test\verify\Runtime;
+use test\{Action, Assert, Test};
 
 /**
  * Intersection types
@@ -47,7 +47,7 @@ class IntersectionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1.0-dev")')]
+  #[Test, Runtime(php: '>=8.1.0-dev')]
   public function field_type_restriction_with_php81() {
     $t= $this->type('class <T> {
       private Traversable&Countable $test;
@@ -59,7 +59,7 @@ class IntersectionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1.0-dev")')]
+  #[Test, Runtime(php: '>=8.1.0-dev')]
   public function parameter_type_restriction_with_php81() {
     $t= $this->type('class <T> {
       public function test(Traversable&Countable $arg) { }
@@ -71,7 +71,7 @@ class IntersectionTypesTest extends EmittingTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1.0-dev")')]
+  #[Test, Runtime(php: '>=8.1.0-dev')]
   public function return_type_restriction_with_php81() {
     $t= $this->type('class <T> {
       public function test(): Traversable&Countable { }

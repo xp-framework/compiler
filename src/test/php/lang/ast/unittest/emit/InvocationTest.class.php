@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test, Values};
+use test\verify\Runtime;
+use test\{Action, Assert, Test, Values};
 
 class InvocationTest extends EmittingTest {
 
@@ -139,7 +139,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function named_arguments_in_reverse_order() {
     Assert::equals('html(&lt;) = &amp;lt;', $this->run(
       'class <T> {
@@ -155,7 +155,7 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function named_arguments_omitting_one() {
     Assert::equals('html(&lt;) = &lt;', $this->run(
       'class <T> {

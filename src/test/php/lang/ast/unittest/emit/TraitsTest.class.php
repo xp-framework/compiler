@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\XPClass;
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test};
+use test\verify\Runtime;
+use test\{Action, Assert, Test};
 
 /**
  * Traits
@@ -63,7 +63,7 @@ class TraitsTest extends EmittingTest {
     Assert::equals('Not spinning', $t->getMethod('noLongerSpinning')->invoke($instance));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.2.0-dev")')]
+  #[Test, Runtime(php: '>=8.2.0-dev')]
   public function can_have_constants() {
     $t= $this->type('trait <T> { const FIXTURE = 1; }');
     Assert::equals(1, $t->getConstant('FIXTURE'));

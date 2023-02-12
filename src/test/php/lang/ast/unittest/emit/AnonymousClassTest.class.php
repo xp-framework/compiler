@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Runnable;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 use util\AbstractDeferredInvokationHandler;
 
 /**

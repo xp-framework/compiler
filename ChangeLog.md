@@ -3,6 +3,23 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.8.2 / 2023-02-12
+
+* Fixed emitted meta information for generic declarations - @thekid
+* Merged PR #153: Migrate to new testing library - @thekid
+
+## 8.8.1 / 2023-01-29
+
+* Added flag to meta information to resolve ambiguity when exactly one
+  unnamed annotation argument is present and an array or NULL. See
+  xp-framework/reflection#27
+  (@thekid)
+
+## 8.8.0 / 2022-12-04
+
+* Merged PR #152: Make enclosing type(s) accessible via code generator
+  (@thekid)
+
 ## 8.7.0 / 2022-11-12
 
 * Fixed issue #31: Support `list()` reference assignment for PHP < 7.3

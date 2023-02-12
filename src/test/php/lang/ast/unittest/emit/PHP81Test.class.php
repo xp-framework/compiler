@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\Type;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class PHP81Test extends EmittingTest {
 

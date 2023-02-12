@@ -2,7 +2,7 @@
 
 use Traversable, Iterator;
 use lang\XPClass;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 use util\Date;
 
 class ImportTest extends EmittingTest {

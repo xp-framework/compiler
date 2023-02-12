@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest;
 
 use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81, PHP82};
-use lang\ast\types\{IsLiteral, IsArray, IsFunction, IsMap, IsValue, IsNullable, IsUnion, IsIntersection, IsGeneric};
-use unittest\{Assert, Test};
+use lang\ast\types\{IsArray, IsFunction, IsGeneric, IsIntersection, IsLiteral, IsMap, IsNullable, IsUnion, IsValue};
+use test\{Assert, Test, Values};
 
 class TypeLiteralsTest {
 
@@ -156,37 +156,37 @@ class TypeLiteralsTest {
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
   }
 
-  #[Test, Values('php70')]
+  #[Test, Values(from: 'php70')]
   public function php70_literals($type, $literal) {
     Assert::equals($literal, (new PHP70())->literal($type));
   }
 
-  #[Test, Values('php71')]
+  #[Test, Values(from: 'php71')]
   public function php71_literals($type, $literal) {
     Assert::equals($literal, (new PHP71())->literal($type));
   }
 
-  #[Test, Values('php72')]
+  #[Test, Values(from: 'php72')]
   public function php72_literals($type, $literal) {
     Assert::equals($literal, (new PHP72())->literal($type));
   }
 
-  #[Test, Values('php74')]
+  #[Test, Values(from: 'php74')]
   public function php74_literals($type, $literal) {
     Assert::equals($literal, (new PHP74())->literal($type));
   }
 
-  #[Test, Values('php80')]
+  #[Test, Values(from: 'php80')]
   public function php80_literals($type, $literal) {
     Assert::equals($literal, (new PHP80())->literal($type));
   }
 
-  #[Test, Values('php81')]
+  #[Test, Values(from: 'php81')]
   public function php81_literals($type, $literal) {
     Assert::equals($literal, (new PHP81())->literal($type));
   }
 
-  #[Test, Values('php82')]
+  #[Test, Values(from: 'php82')]
   public function php82_literals($type, $literal) {
     Assert::equals($literal, (new PHP82())->literal($type));
   }

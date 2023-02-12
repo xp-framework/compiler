@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
-use unittest\{Assert, Expect, Test};
+use test\{Assert, Expect, Ignore, Test, Values};
 
 /**
  * Readonly classes and properties
@@ -70,7 +70,7 @@ class ReadonlyTest extends EmittingTest {
     Assert::equals('Test', $t->newInstance('Test')->fixture);
   }
 
-  #[Test, Values('modifiers')]
+  #[Test, Values(from: 'modifiers')]
   public function reading_from_class($modifiers) {
     $t= $this->type('class <T> {
       public function __construct('.$modifiers.' readonly string $fixture) { }
@@ -99,7 +99,7 @@ class ReadonlyTest extends EmittingTest {
     Assert::equals('Test', $i->run());
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access protected property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+fixture/')]
   public function cannot_read_protected() {
     $t= $this->type('class <T> {
       public function __construct(protected readonly string $fixture) { }
@@ -107,7 +107,7 @@ class ReadonlyTest extends EmittingTest {
     $t->newInstance('Test')->fixture;
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access protected property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+fixture/')]
   public function cannot_write_protected() {
     $t= $this->type('class <T> {
       public function __construct(protected readonly string $fixture) { }
@@ -115,7 +115,7 @@ class ReadonlyTest extends EmittingTest {
     $t->newInstance('Test')->fixture= 'Modified';
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access private property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access private property .+fixture/')]
   public function cannot_read_private() {
     $t= $this->type('class <T> {
       public function __construct(private readonly string $fixture) { }
@@ -123,7 +123,7 @@ class ReadonlyTest extends EmittingTest {
     $t->newInstance('Test')->fixture;
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access private property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access private property .+fixture/')]
   public function cannot_write_private() {
     $t= $this->type('class <T> {
       public function __construct(private readonly string $fixture) { }
@@ -151,7 +151,7 @@ class ReadonlyTest extends EmittingTest {
     Assert::equals('Test', $i->fixture);
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot initialize readonly property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot initialize readonly property .+fixture/')]
   public function cannot_initialize_from_outside() {
     $t= $this->type('class <T> {
       public readonly string $fixture;
@@ -159,7 +159,7 @@ class ReadonlyTest extends EmittingTest {
     $t->newInstance()->fixture= 'Test';
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot modify readonly property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot modify readonly property .+fixture/')]
   public function cannot_be_set_after_initialization() {
     $t= $this->type('class <T> {
       public function __construct(public readonly string $fixture) { }
@@ -174,13 +174,13 @@ class ReadonlyTest extends EmittingTest {
     }');
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot create dynamic property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot create dynamic property .+fixture/')]
   public function cannot_read_dynamic_members_from_readonly_classes() {
     $t= $this->type('readonly class <T> { }');
     $t->newInstance()->fixture;
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot create dynamic property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot create dynamic property .+fixture/')]
   public function cannot_write_dynamic_members_from_readonly_classes() {
     $t= $this->type('readonly class <T> { }');
     $t->newInstance()->fixture= true;

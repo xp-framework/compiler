@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ArrayType;
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 
 class MembersTest extends EmittingTest {
 

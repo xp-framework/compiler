@@ -1,11 +1,11 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\emit\{GeneratedCode, Declaration, Escaping, Reflection};
+use lang\ast\emit\{Declaration, Escaping, GeneratedCode, InType, Reflection};
 use lang\ast\nodes\ClassDeclaration;
 use lang\ast\types\IsValue;
-use lang\{Value, ClassNotFoundException};
-use unittest\{Assert, Expect, Test};
+use lang\{ClassNotFoundException, Value};
+use test\{Assert, Expect, Test, Values};
 
 class GeneratedCodeTest {
 
@@ -47,15 +47,15 @@ class GeneratedCodeTest {
   #[Test]
   public function lookup_self() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
+    $context= $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
 
-    Assert::equals(new Declaration($r->type[0], $r), $r->lookup('self'));
+    Assert::equals(new Declaration($context->type, $r), $r->lookup('self'));
   }
 
   #[Test]
   public function lookup_parent() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), new IsValue('\\lang\\Value'), [], [], null, null, 1);
+    $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), new IsValue('\\lang\\Value'), [], [], null, null, 1)));
 
     Assert::equals(new Reflection(Value::class), $r->lookup('parent'));
   }
@@ -63,7 +63,7 @@ class GeneratedCodeTest {
   #[Test]
   public function lookup_parent_without_parent() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
+    $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
 
     Assert::null($r->lookup('parent'));
   }
@@ -71,9 +71,9 @@ class GeneratedCodeTest {
   #[Test]
   public function lookup_named() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->type[0]= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
+    $context= $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
 
-    Assert::equals(new Declaration($r->type[0], $r), $r->lookup('\\T'));
+    Assert::equals(new Declaration($context->type, $r), $r->lookup('\\T'));
   }
 
   #[Test]

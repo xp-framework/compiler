@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\{FunctionType, Primitive};
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 /**
  * Function types

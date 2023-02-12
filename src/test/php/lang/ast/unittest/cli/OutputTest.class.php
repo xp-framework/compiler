@@ -2,9 +2,9 @@
 
 use io\{File, Folder};
 use lang\Environment;
-use unittest\{Assert, After, Before, Test, Values};
+use test\{After, Assert, Before, Test, Values};
 use util\cmd\Console;
-use xp\compiler\{Output, CompileOnly, ToStream, ToFile, ToArchive, ToFolder};
+use xp\compiler\{CompileOnly, Output, ToArchive, ToFile, ToFolder, ToStream};
 
 class OutputTest {
   private $folder, $file, $archive;

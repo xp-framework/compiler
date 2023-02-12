@@ -1,7 +1,7 @@
 <?php namespace xp\compiler;
 
 use io\Path;
-use lang\ast\{CompilingClassloader, Emitter, Errors, Language, Result, Tokens};
+use lang\ast\{CompilingClassLoader, Emitter, Errors, Language, Result, Tokens};
 use lang\{Runtime, XPClass};
 use text\StreamTokenizer;
 use util\cmd\Console;

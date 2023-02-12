@@ -2,7 +2,7 @@
 
 use lang\ast\emit\{OmitPropertyTypes, OmitReturnTypes};
 use lang\ast\types\IsLiteral;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class OmitTypesTest {
   use OmitPropertyTypes, OmitReturnTypes;

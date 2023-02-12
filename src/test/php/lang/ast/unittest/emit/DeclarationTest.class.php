@@ -3,7 +3,7 @@
 use lang\ast\emit\Declaration;
 use lang\ast\nodes\{ClassDeclaration, Property};
 use lang\ast\types\IsValue;
-use unittest\{Assert, Test, Expect};
+use test\{Assert, Before, Expect, Test};
 
 class DeclarationTest {
   private $type;

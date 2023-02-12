@@ -3,7 +3,6 @@
 class GeneratedCode extends Result {
   private $prolog, $epilog;
   public $line= 1;
-  public $type= [];
 
   /**
    * Starts a result stream, including an optional prolog and epilog
@@ -67,14 +66,18 @@ class GeneratedCode extends Result {
    * @return lang.ast.emit.Type
    */
   public function lookup($type) {
+    $enclosing= $this->codegen->scope[0] ?? null;
+
     if ('self' === $type || 'static' === $type) {
-      return new Declaration($this->type[0], $this);
+      return new Declaration($enclosing->type, $this);
     } else if ('parent' === $type) {
-      return $this->type[0]->parent ? $this->lookup($this->type[0]->parent->literal()) : null;
+      return $enclosing->type->parent ? $this->lookup($enclosing->type->parent->literal()) : null;
     }
 
-    foreach ($this->type as $enclosing) {
-      if ($enclosing->name && $type === $enclosing->name->literal()) return new Declaration($enclosing, $this);
+    foreach ($this->codegen->scope as $scope) {
+      if ($scope->type->name && $type === $scope->type->name->literal()) {
+        return new Declaration($scope->type, $this);
+      }
     }
 
     return new Reflection($type);

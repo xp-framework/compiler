@@ -1,8 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ast\emit\php\{XpMeta, VirtualPropertyTypes};
+use lang\ast\emit\php\{VirtualPropertyTypes, XpMeta};
 use lang\{Error, Primitive};
-use unittest\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Test, Values};
 
 class VirtualPropertyTypesTest extends EmittingTest {
 
@@ -27,7 +27,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
     Assert::equals(MODIFIER_PRIVATE, $t->getField('value')->getModifiers());
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access private property .+::\\$value/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access private property .+::\\$value/')]
   public function cannot_read_private_field() {
     $t= $this->type('class <T> {
       private int $value;
@@ -36,7 +36,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
     $t->newInstance()->value;
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access private property .+::\\$value/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access private property .+::\\$value/')]
   public function cannot_write_private_field() {
     $t= $this->type('class <T> {
       private int $value;
@@ -45,7 +45,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
     $t->newInstance()->value= 6100;
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access protected property .+::\\$value/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+::\\$value/')]
   public function cannot_read_protected_field() {
     $t= $this->type('class <T> {
       protected int $value;
@@ -54,7 +54,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
     $t->newInstance()->value;
   }
 
-  #[Test, Expect(class: Error::class, withMessage: '/Cannot access protected property .+::\\$value/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+::\\$value/')]
   public function cannot_write_protected_field() {
     $t= $this->type('class <T> {
       protected int $value;
@@ -87,7 +87,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
     Assert::equals(6100, $t->getField('value')->setAccessible(true)->get($t->newInstance()));
   }
 
-  #[Test, Values([[null], ['Test'], [[]]]), Expect(class: Error::class, withMessage: '/property .+::\$value of type int/')]
+  #[Test, Values([[null], ['Test'], [[]]]), Expect(class: Error::class, message: '/property .+::\$value of type int/')]
   public function type_checked_at_runtime($in) {
     $this->run('class <T> {
       private int $value;

@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 
 class BracesTest extends EmittingTest {
 
@@ -82,7 +82,7 @@ class BracesTest extends EmittingTest {
     Assert::equals(320, $r);
   }
 
-  #[Test, Values(['map' => ['(__LINE__)."test"' => '3test', '(__LINE__) + 1'    => 4, '(__LINE__) - 1'    => 2,]])]
+  #[Test, Values([['(__LINE__)."test"', '3test'], ['(__LINE__) + 1', 4], ['(__LINE__) - 1', 2]])]
   public function global_constant_in_braces_not_confused_with_cast($input, $expected) {
     $r= $this->run('class <T> {
       public function run() {
