@@ -38,7 +38,7 @@ class HelloWorld {
 }
 ```
 
-To run this code, use `xp HelloWorld` in a terminal window.
+To run this code, use `xp -m /path/to/xp/reflection HelloWorld` in a terminal window.
 
 Compilation
 -----------
