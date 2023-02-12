@@ -80,6 +80,10 @@ class GeneratedCode extends Result {
       }
     }
 
-    return new Reflection($type);
+    if (class_exists($type) || interface_exists($type) || trait_exists($type) || enum_exists($type)) {
+      return new Reflection($type);
+    } else {
+      return new Incomplete($type);
+    }
   }
 }
