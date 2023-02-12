@@ -21,7 +21,7 @@ The following code uses Hack language, PHP 8.2, 8.1, 8.0, PHP 7.4, PHP 7.3, PHP 
 ```php
 <?php // In a file "HelloWorld.php"
 
-use lang\Type;
+use lang\Reflection;
 use util\cmd\Console;
 
 #[Author('Timm Friebe')]
@@ -31,7 +31,7 @@ class HelloWorld {
 
   public static function main(array<string> $args): void {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
-    $author= Type::forName(self::class)->getAnnotation('author');
+    $author= Reflection::type(self::class)->annotation(Author::class)->argument(0);
 
     Console::writeLine($greet($args[0] ?? 'World', from: $author));
   }
