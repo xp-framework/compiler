@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.8.2 / 2023-02-12
+
 * Fixed emitted meta information for generic declarations - @thekid
 * Merged PR #153: Migrate to new testing library - @thekid
 
