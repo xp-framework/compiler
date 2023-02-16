@@ -996,7 +996,7 @@ abstract class PHP extends Emitter {
       $result->out->write(':null');
     } else if (
       $scope->member instanceof Literal &&
-      'class' !== $scope->member->literal &&
+      'class' !== $scope->member->expression &&
       $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
     ) {
       $result->out->write($scope->type.'::$'.$scope->member->expression);
