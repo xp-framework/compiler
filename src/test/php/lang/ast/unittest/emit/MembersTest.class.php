@@ -19,6 +19,19 @@ class MembersTest extends EmittingTest {
   }
 
   #[Test]
+  public function typed_class_property() {
+    $r= $this->run('class <T> {
+      private static string $MEMBER= "Test";
+
+      public function run() {
+        return self::$MEMBER;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test]
   public function class_method() {
     $r= $this->run('class <T> {
       private static function member() { return "Test"; }
@@ -35,6 +48,19 @@ class MembersTest extends EmittingTest {
   public function class_constant() {
     $r= $this->run('class <T> {
       private const MEMBER = "Test";
+
+      public function run() {
+        return self::MEMBER;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test]
+  public function typed_class_constant() {
+    $r= $this->run('class <T> {
+      private const string MEMBER = "Test";
 
       public function run() {
         return self::MEMBER;
@@ -145,6 +171,19 @@ class MembersTest extends EmittingTest {
   public function instance_property() {
     $r= $this->run('class <T> {
       private $member= "Test";
+
+      public function run() {
+        return $this->member;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test]
+  public function typed_instance_property() {
+    $r= $this->run('class <T> {
+      private string $member= "Test";
 
       public function run() {
         return $this->member;
