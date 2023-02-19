@@ -13,7 +13,7 @@ trait RewriteMultiCatch {
       $result->out->write('catch(\\Throwable '.$capture.') {');
     } else {
       $last= array_pop($catch->types);
-      $label= sprintf('c%u', crc32($last));
+      $label= $result->codegen->symbol();
       foreach ($catch->types as $type) {
         $result->out->write('catch('.$type.' '.$capture.') { goto '.$label.'; }');
       }
