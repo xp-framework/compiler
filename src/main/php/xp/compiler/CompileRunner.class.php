@@ -69,6 +69,7 @@ class CompileRunner {
     $in= $out= '-';
     $quiet= false;
     $augment= [];
+    $ext= \xp::CLASS_FILE_EXT;
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
         $target= $args[++$i];
@@ -78,6 +79,8 @@ class CompileRunner {
         $out= $args[++$i];
         $in= array_slice($args, $i + 1);
         break;
+      } else if ('-e' === $args[$i]) {
+        $ext= $args[++$i];
       } else if ('-n' === $args[$i]) {
         $out= null;
         $in= array_slice($args, $i + 1);
@@ -98,7 +101,7 @@ class CompileRunner {
     }
 
     $input= Input::newInstance($in);
-    $output= Output::newInstance($out);
+    $output= Output::newInstance($out)->using($ext);
 
     $t= new Timer();
     $total= $errors= 0;

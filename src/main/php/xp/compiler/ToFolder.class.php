@@ -18,9 +18,9 @@ class ToFolder extends ToFileSystem {
    */
   public function target($name) {
     if ('-' === $name) {
-      $f= new File($this->folder, 'out'.\xp::CLASS_FILE_EXT);
+      $f= new File($this->folder, 'out'.$this->extension);
     } else {
-      $f= new File($this->folder, str_replace('.php', \xp::CLASS_FILE_EXT, $name));
+      $f= new File($this->folder, str_replace('.php', $this->extension, $name));
     }
     $this->ensure($f->path);
     return $f->out();

@@ -28,10 +28,10 @@ class ToFolderTest {
 
   #[Test]
   public function dash_special_case() {
-    with ((new ToFolder($this->folder))->target('-'), function($out) {
+    with ((new ToFolder($this->folder))->using('.php')->target('-'), function($out) {
       $out->write('<?php ...');
     });
-    Assert::true((new File($this->folder, 'out'.\xp::CLASS_FILE_EXT))->exists());
+    Assert::true((new File($this->folder, 'out.php'))->exists());
   }
 
   #[Test]
