@@ -32,7 +32,7 @@ class RewriteMultiCatchTest extends EmitterTraitTest {
   #[Test]
   public function rewrites_catch_with_multiple_types_using_goto() {
     Assert::equals(
-      'try {}catch(\\Exception $t) { goto c2427456839; }catch(\\Error $t) { c2427456839:}',
+      'try {}catch(\\Exception $t) { goto _0; }catch(\\Error $t) { _0:}',
       $this->emit(new TryStatement([], [new CatchStatement(['\\Exception', '\\Error'], 't', [])], null))
     );
   }

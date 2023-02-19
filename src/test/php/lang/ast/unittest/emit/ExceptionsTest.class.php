@@ -206,4 +206,23 @@ class ExceptionsTest extends EmittingTest {
     }');
     $t->newInstance()->run('Test');
   }
+
+  #[Test]
+  public function try_catch_nested_inside_catch() {
+    $t= $this->type('class <T> {
+      public function run() {
+        try {
+          throw new \\lang\\IllegalArgumentException("test");
+        } catch (\\lang\\IllegalArgumentException $expected) {
+          try {
+            throw $expected;
+          } catch (\\lang\\IllegalArgumentException $expected) {
+            return $expected->getMessage();
+          }
+        }
+      }
+    }');
+
+    Assert::equals('test', $t->newInstance()->run());
+  }
 }
