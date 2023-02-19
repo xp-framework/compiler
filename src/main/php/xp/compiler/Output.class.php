@@ -3,6 +3,7 @@
 use util\cmd\Console;
 
 abstract class Output {
+  protected $extension= \xp::CLASS_FILE_EXT;
 
   /**
    * Returns output from the command line argument
@@ -22,6 +23,17 @@ abstract class Output {
     } else {
       return new ToFolder($arg);
     }
+  }
+
+  /**
+   * Change file extension, which defaults to `xp::CLASS_FILE_EXT`.
+   *
+   * @param  string $extension
+   * @return self
+   */
+  public function using($extension) {
+    $this->extension= '.' === $extension[0] ? $extension : '.'.$extension;
+    return $this;
   }
 
   /**

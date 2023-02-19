@@ -21,15 +21,21 @@ class ToArchive extends Output {
    * @return io.streams.OutputStream
    */
   public function target($name) {
-    return new class($this->archive, $name) implements OutputStream {
-      private static $replace= [DIRECTORY_SEPARATOR => '/', '.php' => \xp::CLASS_FILE_EXT];
+    return new class($this->archive, $name, $this->extension) implements OutputStream {
+      private $archive, $name, $replace;
       private $bytes= '';
-      private $archive, $name;
 
-      public function __construct($archive, $name) { $this->archive= $archive; $this->name= $name; }
+      public function __construct($archive, $name, $extension) {
+        $this->archive= $archive;
+        $this->name= $name;
+        $this->replace= [DIRECTORY_SEPARATOR => '/', '.php' => $extension];
+      }
+
       public function write($bytes) { $this->bytes.= $bytes; }
+
       public function flush() {  }
-      public function close() { $this->archive->addBytes(strtr($this->name, self::$replace), $this->bytes); }
+
+      public function close() { $this->archive->addBytes(strtr($this->name, $this->replace), $this->bytes); }
     };
   }
 
