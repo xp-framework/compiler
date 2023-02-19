@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.8.4 / 2023-02-19
+
+* Fixed optimization for `::class` constant resolution - @thekid
+
 ## 8.8.3 / 2023-02-12
 
 * Merged PR #155: Do not error at compile time for unresolved classes
