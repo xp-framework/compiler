@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.9.0 / 2023-02-19
+
 * Merged PR #159: Implement command line option to set file extension
   for compiled files. This makes integrating with PSR-4 autoloading an
   easy task, see https://www.php-fig.org/psr/psr-4/
