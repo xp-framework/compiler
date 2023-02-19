@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.8.5 / 2023-02-19
+
 * Fixed issue #160: Fatal error: Label 'c1107822099' already defined 
   (@thekid)
 
