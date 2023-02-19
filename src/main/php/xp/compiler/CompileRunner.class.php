@@ -40,6 +40,9 @@ use util\profiling\Timer;
  *   $ xp compile -t php:7.4 -a php:xp-meta -o dist src/main/php
  *   ```
  *
+ * Use *-e* to change the file extension for generated files inside folders
+ * and archives, which defaults to `.class.php`.
+ *
  * The *-o* and *-n* options accept multiple input sources following them.
  * The *-q* option suppresses all diagnostic output except for errors.
  * 

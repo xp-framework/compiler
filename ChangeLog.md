@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #159: Implement command line option to set file extension
+  for compiled files. This makes integrating with PSR-4 autoloading an
+  easy task, see https://www.php-fig.org/psr/psr-4/
+  (@thekid)
+
 ## 8.8.5 / 2023-02-19
 
 * Fixed issue #160: Fatal error: Label 'c1107822099' already defined 
