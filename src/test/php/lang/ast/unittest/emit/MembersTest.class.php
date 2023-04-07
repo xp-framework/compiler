@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ArrayType;
-use test\{Assert, Test, Values};
+use test\{Assert, Ignore, Test, Values};
 
 class MembersTest extends EmittingTest {
 
@@ -70,8 +70,78 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[Test]
+  #[Test, Values(['$this->$member', '$this->{$member}'])]
+  public function dynamic_instance_property($syntax) {
+    $r= $this->run('class <T> {
+      private $MEMBER= "Test";
+
+      public function run() {
+        $member= "MEMBER";
+        return '.$syntax.';
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test, Ignore('Unsupported!')]
   public function dynamic_class_property() {
+    $r= $this->run('class <T> {
+      private static $MEMBER= "Test";
+
+      public function run() {
+        $member= "MEMBER";
+        return self::${$member};
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test, Values(['$this->$method()', '$this->{$method}()'])]
+  public function dynamic_instance_method($syntax) {
+    $r= $this->run('class <T> {
+      private function test() { return "Test"; }
+
+      public function run() {
+        $method= "test";
+        return '.$syntax.';
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test, Values(['self::$method()', 'self::{$method}()'])]
+  public function dynamic_class_method($syntax) {
+    $r= $this->run('class <T> {
+      private static function test() { return "Test"; }
+
+      public function run() {
+        $method= "test";
+        return '.$syntax.';
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test, Ignore('Unsupported!')]
+  public function dynamic_class_constant() {
+    $r= $this->run('class <T> {
+      const MEMBER= "Test";
+
+      public function run() {
+        $member= "MEMBER";
+        return self::{$member};
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test]
+  public function property_of_dynamic_class() {
     $r= $this->run('class <T> {
       private static $MEMBER= "Test";
 
@@ -85,7 +155,7 @@ class MembersTest extends EmittingTest {
   }
 
   #[Test]
-  public function dynamic_class_method() {
+  public function method_of_dynamic_class() {
     $r= $this->run('class <T> {
       private static function member() { return "Test"; }
 
@@ -99,7 +169,7 @@ class MembersTest extends EmittingTest {
   }
 
   #[Test]
-  public function dynamic_class_constant() {
+  public function constant_of_dynamic_class() {
     $r= $this->run('class <T> {
       private const MEMBER = "Test";
 
