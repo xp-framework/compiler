@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal};
+use lang\ast\nodes\{Expression, InstanceExpression, ScopeExpression, Literal};
 
 /**
  * Rewrites callable expressions to `Callable::fromClosure()`
@@ -36,6 +36,10 @@ trait CallablesAsClosures {
       $result->out->write(',');
       $this->emitQuoted($result, $node->member);
       $result->out->write(']');
+    } else if ($node instanceof Expression) {
+
+      // Rewrite T::{<f>} => [T::class, <f>]
+      $this->emitOne($result, $node->inline);
     } else {
 
       // Emit other expressions as-is

@@ -7,6 +7,7 @@ use lang\ast\nodes\{
   BinaryExpression,
   Block,
   Comment,
+  Expression,
   InstanceExpression,
   Literal,
   Property,
@@ -104,8 +105,8 @@ abstract class PHP extends Emitter {
   protected function enclose($result, $node, $signature, $static, $emit) {
     $capture= [];
     foreach ($result->codegen->search($node, 'variable') as $var) {
-      if (isset($result->locals[$var->name])) {
-        $capture[$var->name]= true;
+      if (isset($result->locals[$var->pointer])) {
+        $capture[$var->pointer]= true;
       }
     }
     unset($capture['this']);
@@ -228,7 +229,18 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitVariable($result, $variable) {
-    $result->out->write('$'.$variable->name);
+    if ($variable->const) {
+      $result->out->write('$'.$variable->pointer);
+    } else {
+      $result->out->write('$');
+      $this->emitOne($result, $variable->pointer);
+    }
+  }
+
+  protected function emitExpression($result, $expression) {
+    $result->out->write('{');
+    $this->emitOne($result, $expression->inline);
+    $result->out->write('}');
   }
 
   protected function emitCast($result, $cast) {
@@ -674,10 +686,10 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitAssign($result, $target) {
-    if ('variable' === $target->kind) {
-      $result->out->write('$'.$target->name);
-      $result->locals[$target->name]= true;
-    } else if ('array' === $target->kind) {
+    if ($target instanceof Variable && $target->const) {
+      $result->out->write('$'.$target->pointer);
+      $result->locals[$target->pointer]= true;
+    } else if ($target instanceof ArrayLiteral) {
       $result->out->write('list(');
       foreach ($target->values as $pair) {
         if ($pair[0]) {
@@ -813,7 +825,8 @@ abstract class PHP extends Emitter {
       $result->out->write(' => ');
     }
 
-    if ('array' === $foreach->value->kind) {
+    // Support empty elements: `foreach (<expr> as [$a, , $b])`
+    if ($foreach->value instanceof ArrayLiteral) {
       $result->out->write('[');
       foreach ($foreach->value->values as $pair) {
         if ($pair[0]) {
@@ -960,6 +973,13 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitCallable($result, $callable) {
+
+    // Disambiguate the following:
+    //
+    // - `T::{$func}`, a dynamic class constant
+    // - `T::{$func}(...)`, a dynamic first-class callable
+    $callable->expression->line= -1;
+
     $this->emitOne($result, $callable->expression);
     $result->out->write('(...)');
   }
@@ -983,25 +1003,29 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitScope($result, $scope) {
+
+    // $x::<expr> vs. e.g. invoke()::<expr> vs. T::<expr>
     if ($scope->type instanceof Variable) {
       $this->emitOne($result, $scope->type);
       $result->out->write('::');
-      $this->emitOne($result, $scope->member);
     } else if ($scope->type instanceof Node) {
       $t= $result->temp();
-      $result->out->write('('.$t.'=');
+      $result->out->write('(null==='.$t.'=');
       $this->emitOne($result, $scope->type);
-      $result->out->write(')?'.$t.'::');
-      $this->emitOne($result, $scope->member);
-      $result->out->write(':null');
-    } else if (
+      $result->out->write(")?null:{$t}::");
+    } else {
+      $result->out->write("{$scope->type}::");
+    }
+
+    // Rewrite T::member to T::$member for XP enums
+    if (
       $scope->member instanceof Literal &&
+      is_string($scope->type) &&
       'class' !== $scope->member->expression &&
       $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
     ) {
-      $result->out->write($scope->type.'::$'.$scope->member->expression);
+      $result->out->write('$'.$scope->member->expression);
     } else {
-      $result->out->write($scope->type.'::');
       $this->emitOne($result, $scope->member);
     }
   }
@@ -1016,26 +1040,13 @@ abstract class PHP extends Emitter {
       $result->out->write('->');
     }
 
-    if ('literal' === $instance->member->kind) {
-      $result->out->write($instance->member->expression);
-    } else {
-      $result->out->write('{');
-      $this->emitOne($result, $instance->member);
-      $result->out->write('}');
-    }
+    $this->emitOne($result, $instance->member);
   }
 
   protected function emitNullsafeInstance($result, $instance) {
     $this->emitOne($result, $instance->expression);
     $result->out->write('?->');
-
-    if ('literal' === $instance->member->kind) {
-      $result->out->write($instance->member->expression);
-    } else {
-      $result->out->write('{');
-      $this->emitOne($result, $instance->member);
-      $result->out->write('}');
-    }
+    $this->emitOne($result, $instance->member);
   }
 
   protected function emitUnpack($result, $unpack) {

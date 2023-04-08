@@ -4,13 +4,12 @@ use lang\ast\Node;
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
- * PHP 8.0 syntax
+ * PHP 8.3 syntax
  *
- * @see  https://wiki.php.net/rfc#php_80
+ * @see  https://wiki.php.net/rfc#php_83
  */
-class PHP80 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteDynamicClassConstants, RewriteExplicitOctals, RewriteEnums;
-  use ReadonlyClasses, ReadonlyProperties, CallablesAsClosures, ArrayUnpackUsingMerge;
+class PHP83 extends PHP {
+  use RewriteBlockLambdaExpressions, ReadonlyClasses;
 
   /** Sets up type => literal mappings */
   public function __construct() {
@@ -23,31 +22,23 @@ class PHP80 extends PHP {
         if (null === ($l= $this->literal($t->element))) return null;
         return $t->element instanceof IsUnion ? $l.'|null' : '?'.$l;
       },
-      IsIntersection::class => function($t) { return null; },
+      IsIntersection::class => function($t) {
+        $i= '';
+        foreach ($t->components as $component) {
+          if (null === ($l= $this->literal($component))) return null;
+          $i.= '&'.$l;
+        }
+        return substr($i, 1);
+      },
       IsUnion::class        => function($t) {
         $u= '';
         foreach ($t->components as $component) {
-          if ('null' === $component->literal) {
-            $u.= '|null';
-          } else if (null !== ($l= $this->literal($component))) {
-            $u.= '|'.$l;
-          } else {
-            return null;  // One of the components didn't resolve
-          }
+          if (null === ($l= $this->literal($component))) return null;
+          $u.= '|'.$l;
         }
         return substr($u, 1);
       },
-      IsLiteral::class      => function($t) {
-        static $rewrite= [
-          'null'     => 1,
-          'never'    => 'void',
-          'true'     => 'bool',
-          'false'    => 'bool',
-        ];
-
-        $l= $t->literal();
-        return (1 === ($r= $rewrite[$l] ?? $l)) ? null : $r;
-      },
+      IsLiteral::class      => function($t) { return $t->literal(); },
       IsGeneric::class      => function($t) { return null; }
     ];
   }
