@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.10.0 / 2023-04-08
+
+* Merged PR #161: Support dynamic class constant fetch, the first PHP
+  8.3 feature: https://wiki.php.net/rfc/dynamic_class_constant_fetch
+  (@thekid)
+
 ## 8.9.0 / 2023-02-19
 
 * Merged PR #159: Implement command line option to set file extension
