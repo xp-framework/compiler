@@ -1,7 +1,16 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Node;
-use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
+use lang\ast\types\{
+  IsArray,
+  IsFunction,
+  IsGeneric,
+  IsIntersection,
+  IsLiteral,
+  IsMap,
+  IsNullable,
+  IsUnion,
+  IsValue
+};
 
 /**
  * PHP 8.2 syntax
