@@ -14,8 +14,8 @@ trait ArbitrayNewExpressions {
     if (!($new->type instanceof IsExpression)) return parent::emitNew($result, $new);
 
     // Emit supported `new $var`, rewrite unsupported `new ($expr)`
-    if ($new->type->expression instanceof Variable) {
-      $result->out->write('new $'.$new->type->expression->name.'(');
+    if ($new->type->expression instanceof Variable && $new->type->expression->const) {
+      $result->out->write('new $'.$new->type->expression->pointer.'(');
       $this->emitArguments($result, $new->arguments);
       $result->out->write(')');
     } else {

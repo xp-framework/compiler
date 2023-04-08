@@ -70,7 +70,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[Test, Values(['$this->$member', '$this->{$member}'])]
+  #[Test, Values(['$this->$member', '$this->{$member}', '$this->{strtoupper($member)}'])]
   public function dynamic_instance_property($syntax) {
     $r= $this->run('class <T> {
       private $MEMBER= "Test";
@@ -84,21 +84,21 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[Test, Ignore('Unsupported!')]
-  public function dynamic_class_property() {
+  #[Test, Values(['self::$$member', 'self::${$member}', 'self::${strtoupper($member)}'])]
+  public function dynamic_class_property($syntax) {
     $r= $this->run('class <T> {
       private static $MEMBER= "Test";
 
       public function run() {
         $member= "MEMBER";
-        return self::${$member};
+        return '.$syntax.';
       }
     }');
 
     Assert::equals('Test', $r);
   }
 
-  #[Test, Values(['$this->$method()', '$this->{$method}()'])]
+  #[Test, Values(['$this->$method()', '$this->{$method}()', '$this->{strtolower($method)}()'])]
   public function dynamic_instance_method($syntax) {
     $r= $this->run('class <T> {
       private function test() { return "Test"; }
@@ -112,7 +112,7 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[Test, Values(['self::$method()', 'self::{$method}()'])]
+  #[Test, Values(['self::$method()', 'self::{$method}()', 'self::{strtolower($method)}()'])]
   public function dynamic_class_method($syntax) {
     $r= $this->run('class <T> {
       private static function test() { return "Test"; }
@@ -126,14 +126,14 @@ class MembersTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[Test, Ignore('Unsupported!')]
-  public function dynamic_class_constant() {
+  #[Test, Values(['self::{$member}', 'self::{strtoupper($member)}'])]
+  public function dynamic_class_constant($syntax) {
     $r= $this->run('class <T> {
       const MEMBER= "Test";
 
       public function run() {
         $member= "MEMBER";
-        return self::{$member};
+        return '.$syntax.';
       }
     }');
 
