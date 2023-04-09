@@ -5,7 +5,7 @@ use test\{Assert, Test};
 use util\Date;
 
 /** @see https://wiki.php.net/rfc/arbitrary_static_variable_initializers */
-class StaticsTest extends EmittingTest {
+class StaticLocalsTest extends EmittingTest {
 
   /**
    * Calls the given type's `run()` method
