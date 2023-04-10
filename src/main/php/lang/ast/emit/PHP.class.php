@@ -21,6 +21,7 @@ use lang\ast\{Emitter, Node, Type, Result};
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
+  const CONSTANT = 2;
 
   protected $literals= [];
 
@@ -562,6 +563,14 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitConst($result, $const) {
+    $result->codegen->scope[0]->meta[self::CONSTANT][$const->name]= [
+      DETAIL_RETURNS     => $const->type ? $const->type->name() : 'var',
+      DETAIL_ANNOTATIONS => $const->annotations,
+      DETAIL_COMMENT     => $const->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
+    ];
+
     $const->comment && $this->emitOne($result, $const->comment);
     $const->annotations && $this->emitOne($result, $const->annotations);
     $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
