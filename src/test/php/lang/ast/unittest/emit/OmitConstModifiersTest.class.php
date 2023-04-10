@@ -1,11 +1,12 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\ast\emit\{OmitConstModifiers, PHP};
-use lang\ast\nodes\{Constant, Literal};
-use lang\ast\types\IsLiteral;
-use test\{Assert, Test};
+use lang\ast\nodes\{Constant, ClassDeclaration, Literal};
+use lang\ast\types\{IsLiteral, IsValue};
+use test\{Assert, Before, Test};
 
 class OmitConstModifiersTest extends EmitterTraitTest {
+  private $type;
 
   /** @return lang.ast.Emitter */
   protected function fixture() {
@@ -14,19 +15,20 @@ class OmitConstModifiersTest extends EmitterTraitTest {
     };
   }
 
+  #[Before]
+  public function type() {
+    $this->type= new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1);
+  }
+
   #[Test]
   public function omits_type() {
-    Assert::equals(
-      'const TEST="test";',
-      $this->emit(new Constant([], 'TEST', new IsLiteral('string'), new Literal('"test"')))
-    );
+    $const= new Constant([], 'TEST', new IsLiteral('string'), new Literal('"test"'));
+    Assert::equals('const TEST="test";', $this->emit($const, [$this->type]));
   }
 
   #[Test]
   public function omits_modifier() {
-    Assert::equals(
-      'const TEST="test";',
-      $this->emit(new Constant(['private'], 'TEST', new IsLiteral('string'), new Literal('"test"')))
-    );
+    $const= new Constant(['private'], 'TEST', new IsLiteral('string'), new Literal('"test"'));
+    Assert::equals('const TEST="test";', $this->emit($const, [$this->type]));
   }
 }
