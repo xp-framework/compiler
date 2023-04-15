@@ -182,4 +182,15 @@ class CallableSyntaxTest extends EmittingTest {
     }');
     Assert::equals($this, $f($this)->value);
   }
+
+  #[Test]
+  public function instance_method_reference() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+      public function run() {
+        $handles= [new Handle(0), new Handle(1), new Handle(2)];
+        return array_map(Handle->hashCode(...), $handles);
+      }
+    }');
+    Assert::equals(['#0', '#1', '#2'], $r);
+  }
 }

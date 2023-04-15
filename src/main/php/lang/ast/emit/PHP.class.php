@@ -974,6 +974,19 @@ abstract class PHP extends Emitter {
 
   protected function emitCallable($result, $callable) {
 
+    // T->func(...) is an instance method, create a trampoline
+    // See https://externals.io/message/120011
+    if (
+      $callable->expression instanceof InstanceExpression &&
+      $callable->expression->expression instanceof Literal
+    ) {
+      $type= $callable->expression->expression->expression;
+      $result->out->write('static function('.$type.' $_) { return $_->');
+      $this->emitOne($result, $callable->expression->member);
+      $result->out->write('(); }');
+      return;
+    }
+
     // Disambiguate the following:
     //
     // - `T::{$func}`, a dynamic class constant
