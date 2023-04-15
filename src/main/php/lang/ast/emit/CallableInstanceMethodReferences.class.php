@@ -15,9 +15,9 @@ trait CallableInstanceMethodReferences {
       $callable->expression->expression instanceof Literal
     ) {
       $type= $callable->expression->expression->expression;
-      $result->out->write('static function('.$type.' $_) { return $_->');
+      $result->out->write('static function('.$type.' $self, ... $args) { return $self->');
       $this->emitOne($result, $callable->expression->member);
-      $result->out->write('(); }');
+      $result->out->write('(...$args); }');
     } else {
       return parent::emitCallable($result, $callable);
     }

@@ -184,7 +184,7 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
-  public function instance_method_reference() {
+  public function instance_method_reference_map() {
     $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
       public function run() {
         $handles= [new Handle(0), new Handle(1), new Handle(2)];
@@ -192,5 +192,17 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
     Assert::equals(['#0', '#1', '#2'], $r);
+  }
+
+  #[Test]
+  public function instance_method_reference_sort() {
+    $r= $this->run('use util\Date; class <T> {
+      public function run() {
+        $dates= [new Date(43200), new Date(86400), new Date(0)];
+        usort($dates, Date->compareTo(...));
+        return array_map(Date->getTime(...), $dates);
+      }
+    }');
+    Assert::equals([86400, 43200, 0], $r);
   }
 }
