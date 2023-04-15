@@ -19,7 +19,7 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_81
  */
 class PHP81 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteDynamicClassConstants, ReadonlyClasses;
+  use RewriteBlockLambdaExpressions, RewriteDynamicClassConstants, ReadonlyClasses, CallableInstanceMethodReferences;
 
   /** Sets up type => literal mappings */
   public function __construct() {

@@ -18,7 +18,7 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_83
  */
 class PHP83 extends PHP {
-  use RewriteBlockLambdaExpressions, ReadonlyClasses;
+  use RewriteBlockLambdaExpressions, ReadonlyClasses, CallableInstanceMethodReferences;
 
   /** Sets up type => literal mappings */
   public function __construct() {

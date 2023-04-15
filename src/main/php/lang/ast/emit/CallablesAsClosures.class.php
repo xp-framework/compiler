@@ -10,6 +10,7 @@ use lang\ast\nodes\{Expression, InstanceExpression, ScopeExpression, Literal};
  * @see  https://wiki.php.net/rfc/first_class_callable_syntax
  */
 trait CallablesAsClosures {
+  use CallableInstanceMethodReferences { emitCallable as callableInstanceMethodReferences; }
 
   private function emitQuoted($result, $node) {
     if ($node instanceof Literal) {
@@ -48,6 +49,14 @@ trait CallablesAsClosures {
   }
 
   protected function emitCallable($result, $callable) {
+    if (
+      $callable->expression instanceof InstanceExpression &&
+      $callable->expression->expression instanceof Literal
+    ) {
+      $this->callableInstanceMethodReferences($result, $callable);
+      return;
+    }
+
     $result->out->write('\Closure::fromCallable(');
     $this->emitQuoted($result, $callable->expression);
     $result->out->write(')');

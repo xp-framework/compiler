@@ -10,6 +10,7 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_70
  */
 class PHP70 extends PHP {
+  use CallableInstanceMethodReferences { emitCallable as callableInstanceMethodReferences; }
   use 
     ArbitrayNewExpressions,
     ArrayUnpackUsingMerge,
@@ -61,6 +62,14 @@ class PHP70 extends PHP {
   }
 
   protected function emitCallable($result, $callable) {
+    if (
+      $callable->expression instanceof InstanceExpression &&
+      $callable->expression->expression instanceof Literal
+    ) {
+      $this->callableInstanceMethodReferences($result, $callable);
+      return;
+    }
+
     $t= $result->temp();
     $result->out->write('(is_callable('.$t.'=');
     if ($callable->expression instanceof Literal) {
