@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #163: Emit meta data for class constants. This makes types
+  accessible via reflection and is part of #157.
+  (@thekid)
+
 ## 8.10.0 / 2023-04-08
 
 * Merged PR #161: Support dynamic class constant fetch, the first PHP
