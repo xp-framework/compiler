@@ -18,8 +18,17 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_80
  */
 class PHP80 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteDynamicClassConstants, RewriteExplicitOctals, RewriteEnums;
-  use ReadonlyClasses, ReadonlyProperties, CallablesAsClosures, ArrayUnpackUsingMerge;
+  use
+    ArrayUnpackUsingMerge,
+    CallablesAsClosures,
+    OmitConstantTypes,
+    ReadonlyClasses,
+    ReadonlyProperties,
+    RewriteBlockLambdaExpressions,
+    RewriteDynamicClassConstants,
+    RewriteEnums,
+    RewriteExplicitOctals
+  ;
 
   /** Sets up type => literal mappings */
   public function __construct() {
