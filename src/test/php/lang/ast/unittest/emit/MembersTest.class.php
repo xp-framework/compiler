@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ArrayType;
+use lang\{ArrayType, Primitive, Reflection};
 use test\{Assert, Ignore, Test, Values};
 
 class MembersTest extends EmittingTest {
@@ -59,15 +59,13 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function typed_class_constant() {
-    $r= $this->run('class <T> {
+    $t= Reflection::type($this->type('class <T> {
       private const string MEMBER = "Test";
+    }'));
+    $const= $t->constant('MEMBER');
 
-      public function run() {
-        return self::MEMBER;
-      }
-    }');
-
-    Assert::equals('Test', $r);
+    Assert::equals('Test', $const->value());
+    Assert::equals(Primitive::$STRING, $const->constraint()->type());
   }
 
   #[Test, Values(['$this->$member', '$this->{$member}', '$this->{strtoupper($member)}'])]

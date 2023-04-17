@@ -9,6 +9,14 @@
 trait OmitConstModifiers {
 
   protected function emitConst($result, $const) {
+    $result->codegen->scope[0]->meta[self::CONSTANT][$const->name]= [
+      DETAIL_RETURNS     => $const->type ? $const->type->name() : 'var',
+      DETAIL_ANNOTATIONS => $const->annotations,
+      DETAIL_COMMENT     => $const->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
+    ];
+
     $result->out->write('const '.$const->name.'=');
     $this->emitOne($result, $const->expression);
     $result->out->write(';');
