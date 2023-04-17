@@ -11,7 +11,7 @@
     "php" : ">=7.0.0"
   },
   "require-dev" : {
-    "xp-framework/reflection": "dev-feature/typed_class_constants as 2.11.0",
+    "xp-framework/reflection": "^2.11",
     "xp-framework/test": "^1.0"
   },
   "bin": ["bin/xp.xp-framework.compiler.compile", "bin/xp.xp-framework.compiler.ast"],
