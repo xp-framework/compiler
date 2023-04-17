@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.11.0 / 2023-04-17
+
+* Merged PR #165: Omit constant types for all PHP versions < 8.3. This
+  is the second part of #157, and fully implements typed constants,
+  https://wiki.php.net/rfc/typed_class_constants
+  (@thekid)
 * Merged PR #163: Emit meta data for class constants. This makes types
   accessible via reflection and is part of #157.
   (@thekid)
