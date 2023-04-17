@@ -19,6 +19,7 @@ class PHP70 extends PHP {
     NullsafeAsTernaries,
     OmitArgumentNames,
     OmitConstModifiers,
+    OmitConstantTypes,
     OmitPropertyTypes,
     ReadonlyClasses,
     ReadonlyProperties,

@@ -95,6 +95,22 @@ abstract class PHP extends Emitter {
   }
 
   /**
+   * As of PHP 8.3: Constant type declarations support all type declarations
+   * supported by PHP with the exception of void and callable.
+   *
+   * @see    https://wiki.php.net/rfc/typed_class_constants#supported_types
+   * @param  ?lang.ast.Type $type
+   * @return ?string
+   */
+  protected function constantType($type) {
+    if (null === $type || $type instanceof IsFunction || 'callable' === $type->literal()) {
+      return null;
+    } else {
+      return $this->literal($type);
+    }
+  }
+
+  /**
    * Enclose a node inside a closure
    *
    * @param  lang.ast.Result $result
@@ -573,7 +589,7 @@ abstract class PHP extends Emitter {
 
     $const->comment && $this->emitOne($result, $const->comment);
     $const->annotations && $this->emitOne($result, $const->annotations);
-    $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
+    $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$this->constantType($const->type).' '.$const->name.'=');
     $this->emitOne($result, $const->expression);
     $result->out->write(';');
   }

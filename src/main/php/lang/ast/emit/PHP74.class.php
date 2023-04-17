@@ -17,6 +17,7 @@ class PHP74 extends PHP {
     NonCapturingCatchVariables,
     NullsafeAsTernaries,
     OmitArgumentNames,
+    OmitConstantTypes,
     ReadonlyClasses,
     ReadonlyProperties,
     RewriteBlockLambdaExpressions,
