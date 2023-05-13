@@ -446,7 +446,7 @@ abstract class PHP extends Emitter {
       foreach ($context->virtual as $name => $access) {
         $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[0]);
-        $result->out->write('break;');
+        $result->out->write(';break;');
       }
       isset($context->virtual[null]) || $result->out->write(
         'default: trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING);'
@@ -457,7 +457,7 @@ abstract class PHP extends Emitter {
       foreach ($context->virtual as $name => $access) {
         $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[1]);
-        $result->out->write('break;');
+        $result->out->write(';break;');
       }
       $result->out->write('}}');
     }
