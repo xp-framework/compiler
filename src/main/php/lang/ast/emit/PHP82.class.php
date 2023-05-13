@@ -19,7 +19,7 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_82
  */
 class PHP82 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteDynamicClassConstants, ReadonlyClasses, OmitConstantTypes;
+  use RewriteBlockLambdaExpressions, RewriteDynamicClassConstants, ReadonlyClasses, OmitConstantTypes, PropertyHooks;
 
   /** Sets up type => literal mappings */
   public function __construct() {

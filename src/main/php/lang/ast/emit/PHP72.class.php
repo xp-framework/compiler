@@ -20,13 +20,13 @@ class PHP72 extends PHP {
     OmitArgumentNames,
     OmitConstantTypes,
     OmitPropertyTypes,
-    ReadonlyProperties,
     ReadonlyClasses,
     RewriteAssignments,
     RewriteClassOnObjects,
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
+    RewriteProperties,
     RewriteThrowableExpressions
   ;
 

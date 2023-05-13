@@ -23,11 +23,11 @@ class PHP80 extends PHP {
     CallablesAsClosures,
     OmitConstantTypes,
     ReadonlyClasses,
-    ReadonlyProperties,
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteEnums,
-    RewriteExplicitOctals
+    RewriteExplicitOctals,
+    RewriteProperties
   ;
 
   /** Sets up type => literal mappings */

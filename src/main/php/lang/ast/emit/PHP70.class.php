@@ -22,13 +22,13 @@ class PHP70 extends PHP {
     OmitConstantTypes,
     OmitPropertyTypes,
     ReadonlyClasses,
-    ReadonlyProperties,
     RewriteAssignments,
     RewriteClassOnObjects,
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
     RewriteMultiCatch,
+    RewriteProperties,
     RewriteThrowableExpressions
   ;
 
