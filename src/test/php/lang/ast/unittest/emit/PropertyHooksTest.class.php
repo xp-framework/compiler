@@ -194,7 +194,18 @@ class PropertyHooksTest extends EmittingTest {
   }
 
   #[Test]
-  public function reflection_of_interface_fields() {
+  public function abstract_hook() {
+    $t= $this->type('abstract class <T> {
+      public string $test {
+        abstract get;
+      }
+    }');
+
+    Assert::equals('public string '.$t->getName().'::$test', $t->getField('test')->toString());
+  }
+
+  #[Test]
+  public function interface_hook() {
     $t= $this->type('interface <T> {
       public $test { get; }
     }');
