@@ -201,4 +201,27 @@ class PropertyHooksTest extends EmittingTest {
 
     Assert::equals('public var '.$t->getName().'::$test', $t->getField('test')->toString());
   }
+
+  #[Test]
+  public function line_number_in_thrown_expression() {
+    $r= $this->run('use lang\\IllegalArgumentException; class <T> {
+      public $test {
+        set(string $name) {
+          if (strlen($name) > 10) throw new IllegalArgumentException("Too long");
+          $field= $name;
+        }
+      }
+
+      public function run() {
+        try {
+          $this->test= "this is too long";
+          return null;
+        } catch (IllegalArgumentException $expected) {
+          return $expected->getLine();
+        }
+      }
+    }');
+
+    Assert::equals(4, $r);
+  }
 }

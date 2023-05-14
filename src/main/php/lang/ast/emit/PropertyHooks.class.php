@@ -3,12 +3,12 @@
 use lang\ast\nodes\{
   Assignment,
   Block,
-  Braced,
-  ClosureExpression,
   InstanceExpression,
   InvokeExpression,
   Literal,
+  Method,
   OffsetExpression,
+  Parameter,
   ReturnStatement,
   Signature,
   Variable
@@ -58,47 +58,53 @@ trait PropertyHooks {
       DETAIL_TARGET_ANNO => [],
       DETAIL_ARGUMENTS   => [$modifiers]
     ];
-    if ('interface' === $scope->type->kind) return;
 
-    // Declare virtual properties with __set and __get
     $literal= new Literal("'{$property->name}'");
     $virtual= new InstanceExpression(new Variable('this'), new OffsetExpression(new Literal('__virtual'), $literal));
 
-    if ($hook= $property->hooks['set'] ?? null) {
-      $set= new Block([$this->rewriteHook($hook->expression, $virtual, $literal)]);
-
-      if ($hook->parameter) {
-        if ('value' !== $hook->parameter->name) {
-          array_unshift($set->statements, new Assignment(
-            new Variable($hook->parameter->name),
-            '=',
-            new Variable('value')
-          ));
-        }
-
-        // Perform type checking if parameter is typed using an IIFE
-        if ($hook->parameter->type) {
-          array_unshift($set->statements, new InvokeExpression(
-            new Braced(new ClosureExpression(new Signature([$hook->parameter], null), [], [])),
-            [new Variable('value')]
-          ));
-        }
+    // Emit get and set hooks in-place. Ignore any unknown hooks
+    $get= $set= null;
+    foreach ($property->hooks as $type => $hook) {
+      $method= '__'.$type.'_'.$property->name;
+      if ('get' === $type) {
+        $this->emitOne($result, new Method(
+          $hook->modifiers,
+          $method,
+          new Signature([], null),
+          null === $hook->expression ? null : [$this->rewriteHook(
+            $hook->expression instanceof Block ? $hook->expression : new ReturnStatement($hook->expression),
+            $virtual,
+            $literal
+          )],
+          $hook->annotations
+        ));
+        $get= new ReturnStatement(new InvokeExpression(
+          new InstanceExpression(new Variable('this'), new Literal($method)),
+          []
+        ));
+      } else if ('set' === $type) {
+        $this->emitOne($result, new Method(
+          $hook->modifiers,
+          $method,
+          new Signature($hook->parameter ? [$hook->parameter] : [new Parameter('value', null)], null),
+          null === $hook->expression ? null : [$this->rewriteHook($hook->expression, $virtual, $literal)],
+          $hook->annotations
+        ));
+        $set= new InvokeExpression(
+          new InstanceExpression(new Variable('this'), new Literal($method)),
+          [new Variable('value')]
+        );
       }
-    } else {
-      $set= new Assignment($virtual, '=', new Variable('value'));
     }
 
-    if ($hook= $property->hooks['get'] ?? null) {
-      $get= $this->rewriteHook(
-        $hook->expression instanceof Block ? $hook->expression : new ReturnStatement($hook->expression),
-        $virtual,
-        $literal
-      );
-    } else {
-      $get= new ReturnStatement($virtual);
-    }
+    // Declare virtual properties with __set and __get as well as initializations
+    // except inside interfaces, which cannot contain properties.
+    if ('interface' === $scope->type->kind) return;
 
-    $scope->virtual[$property->name]= [$get, $set];
+    $scope->virtual[$property->name]= [
+      $get ?? new ReturnStatement($virtual),
+      $set ?? new Assignment($virtual, '=', new Variable('value'))
+    ];
     if (isset($property->expression)) {
       $scope->init[sprintf('$this->__virtual["%s"]', $property->name)]= $property->expression;
     }
