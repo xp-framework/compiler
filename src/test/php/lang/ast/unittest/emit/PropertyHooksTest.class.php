@@ -35,8 +35,8 @@ class PropertyHooksTest extends EmittingTest {
 
     Assert::equals('Test', $r);
   }
-#
-    #[Test]
+
+  #[Test]
   public function abbreviated_get() {
     $r= $this->run('class <T> {
       private $word= "Test";
@@ -191,5 +191,14 @@ class PropertyHooksTest extends EmittingTest {
     }');
 
     Assert::equals('test', $r);
+  }
+
+  #[Test]
+  public function reflection_of_interface_fields() {
+    $t= $this->type('interface <T> {
+      public $test { get; }
+    }');
+
+    Assert::equals('public var '.$t->getName().'::$test', $t->getField('test')->toString());
   }
 }

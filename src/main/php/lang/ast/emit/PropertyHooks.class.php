@@ -45,7 +45,22 @@ trait PropertyHooks {
 
     if (empty($property->hooks)) return parent::emitProperty($result, $property);
 
+    // Emit XP meta information for the reflection API
     $scope= $result->codegen->scope[0];
+    $modifiers= 0;
+    foreach ($property->modifiers as $name) {
+      $modifiers|= $lookup[$name];
+    }
+    $scope->meta[self::PROPERTY][$property->name]= [
+      DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
+      DETAIL_ANNOTATIONS => $property->annotations,
+      DETAIL_COMMENT     => $property->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => [$modifiers]
+    ];
+    if ('interface' === $scope->type->kind) return;
+
+    // Declare virtual properties with __set and __get
     $literal= new Literal("'{$property->name}'");
     $virtual= new InstanceExpression(new Variable('this'), new OffsetExpression(new Literal('__virtual'), $literal));
 
@@ -87,18 +102,5 @@ trait PropertyHooks {
     if (isset($property->expression)) {
       $scope->init[sprintf('$this->__virtual["%s"]', $property->name)]= $property->expression;
     }
-
-    // Emit XP meta information for the reflection API
-    $modifiers= 0;
-    foreach ($property->modifiers as $name) {
-      $modifiers|= $lookup[$name];
-    }
-    $scope->meta[self::PROPERTY][$property->name]= [
-      DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
-      DETAIL_ANNOTATIONS => $property->annotations,
-      DETAIL_COMMENT     => $property->comment,
-      DETAIL_TARGET_ANNO => [],
-      DETAIL_ARGUMENTS   => [$modifiers]
-    ];
   }
 }
