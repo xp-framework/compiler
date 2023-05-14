@@ -109,6 +109,23 @@ class PropertyHooksTest extends EmittingTest {
   }
 
   #[Test]
+  public function get_and_set_using_property() {
+    $r= $this->run('class <T> {
+      public $test {
+        get => $this->test;
+        set => $this->test= ucfirst($value);
+      }
+
+      public function run() {
+        $this->test= "test";
+        return $this->test;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test]
   public function implicit_set() {
     $r= $this->run('class <T> {
       public $test {

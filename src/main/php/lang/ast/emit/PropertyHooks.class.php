@@ -22,12 +22,20 @@ use lang\ast\nodes\{
  */
 trait PropertyHooks {
 
-  protected function rewriteHook($node, $virtual, $literal) {
-    if ($node instanceof Variable && 'field' === $node->pointer) return $virtual;
+  protected function rewriteHook($node, $name, $virtual, $literal) {
+
+    // Magic constant referencing property nae
     if ($node instanceof Literal && '__PROPERTY__' === $node->expression) return $literal;
 
+    // Special variable $field, $this->propertyName syntax
+    if ($node instanceof Variable && 'field' === $node->pointer || (
+      $node instanceof InstanceExpression &&
+      $node->expression instanceof Variable && 'this' === $node->expression->pointer &&
+      $node->member instanceof Literal && $name === $node->member->expression
+    )) return $virtual;
+
     foreach ($node->children() as &$child) {
-      $child= $this->rewriteHook($child, $virtual, $literal);
+      $child= $this->rewriteHook($child, $name, $virtual, $literal);
     }
     return $node;
   }
@@ -73,6 +81,7 @@ trait PropertyHooks {
           new Signature([], null),
           null === $hook->expression ? null : [$this->rewriteHook(
             $hook->expression instanceof Block ? $hook->expression : new ReturnStatement($hook->expression),
+            $property->name,
             $virtual,
             $literal
           )],
@@ -87,7 +96,12 @@ trait PropertyHooks {
           $hook->modifiers,
           $method,
           new Signature($hook->parameter ? [$hook->parameter] : [new Parameter('value', null)], null),
-          null === $hook->expression ? null : [$this->rewriteHook($hook->expression, $virtual, $literal)],
+          null === $hook->expression ? null : [$this->rewriteHook(
+            $hook->expression,
+            $property->name,
+            $virtual,
+            $literal
+          )],
           $hook->annotations
         ));
         $set= new InvokeExpression(
