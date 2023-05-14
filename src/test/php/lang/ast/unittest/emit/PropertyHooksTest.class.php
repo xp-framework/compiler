@@ -179,4 +179,17 @@ class PropertyHooksTest extends EmittingTest {
 
     Assert::equals('public string '.$t->getName().'::$test', $t->getField('test')->toString());
   }
+
+  #[Test]
+  public function property_constant() {
+    $r= $this->run('class <T> {
+      public $test { get => __PROPERTY__; }
+
+      public function run() {
+        return $this->test;
+      }
+    }');
+
+    Assert::equals('test', $r);
+  }
 }

@@ -18,8 +18,19 @@ use lang\ast\nodes\{
  * Property hooks
  *
  * @see  https://wiki.php.net/rfc/property-hooks
+ * @test lang.ast.unittest.emit.PropertyHooksTest
  */
 trait PropertyHooks {
+
+  protected function rewriteHook($node, $virtual, $literal) {
+    if ($node instanceof Variable && 'field' === $node->pointer) return $virtual;
+    if ($node instanceof Literal && '__PROPERTY__' === $node->expression) return $literal;
+
+    foreach ($node->children() as &$child) {
+      $child= $this->rewriteHook($child, $virtual, $literal);
+    }
+    return $node;
+  }
 
   protected function emitProperty($result, $property) {
     static $lookup= [
@@ -34,14 +45,12 @@ trait PropertyHooks {
 
     if (empty($property->hooks)) return parent::emitProperty($result, $property);
 
-    $virtual= new InstanceExpression(
-      new Variable('this'),
-      new OffsetExpression(new Literal('__virtual'), new Literal("'{$property->name}'"))
-    );
+    $scope= $result->codegen->scope[0];
+    $literal= new Literal("'{$property->name}'");
+    $virtual= new InstanceExpression(new Variable('this'), new OffsetExpression(new Literal('__virtual'), $literal));
 
-    // Execute `set` hook, then assign virtual property to special variable $field
     if ($hook= $property->hooks['set'] ?? null) {
-      $set= new Block([$hook->expression, new Assignment($virtual, '=', new Variable('field'))]);
+      $set= new Block([$this->rewriteHook($hook->expression, $virtual, $literal)]);
 
       if ($hook->parameter) {
         if ('value' !== $hook->parameter->name) {
@@ -64,20 +73,17 @@ trait PropertyHooks {
       $set= new Assignment($virtual, '=', new Variable('value'));
     }
 
-    // Assign special variable $field to virtual property, then execute `get` hook
     if ($hook= $property->hooks['get'] ?? null) {
-      $get= new Block([
-        new Assignment(new Variable('field'), '=', $virtual),
-        $hook->expression instanceof Block ? $hook->expression : new ReturnStatement($hook->expression)
-      ]);
+      $get= $this->rewriteHook(
+        $hook->expression instanceof Block ? $hook->expression : new ReturnStatement($hook->expression),
+        $virtual,
+        $literal
+      );
     } else {
       $get= new ReturnStatement($virtual);
     }
 
-    $scope= $result->codegen->scope[0];
     $scope->virtual[$property->name]= [$get, $set];
-
-    // Initialize via constructor
     if (isset($property->expression)) {
       $scope->init[sprintf('$this->__virtual["%s"]', $property->name)]= $property->expression;
     }
