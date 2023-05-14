@@ -196,9 +196,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function abstract_hook() {
     $t= $this->type('abstract class <T> {
-      public string $test {
-        abstract get;
-      }
+      public string $test { abstract get; }
     }');
 
     Assert::equals('public string '.$t->getName().'::$test', $t->getField('test')->toString());
@@ -207,10 +205,10 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function interface_hook() {
     $t= $this->type('interface <T> {
-      public $test { get; }
+      public string $test { get; }
     }');
 
-    Assert::equals('public var '.$t->getName().'::$test', $t->getField('test')->toString());
+    Assert::equals('public string '.$t->getName().'::$test', $t->getField('test')->toString());
   }
 
   #[Test]
