@@ -74,9 +74,10 @@ trait PropertyHooks {
     $get= $set= null;
     foreach ($property->hooks as $type => $hook) {
       $method= '__'.$type.'_'.$property->name;
+      $modifierList= $modifiers & MODIFIER_ABSTRACT ? ['abstract'] : $hook->modifiers;
       if ('get' === $type) {
         $this->emitOne($result, new Method(
-          $hook->modifiers,
+          $modifierList,
           $method,
           new Signature([], null),
           null === $hook->expression ? null : [$this->rewriteHook(
@@ -93,7 +94,7 @@ trait PropertyHooks {
         ));
       } else if ('set' === $type) {
         $this->emitOne($result, new Method(
-          $hook->modifiers,
+          $modifierList,
           $method,
           new Signature($hook->parameter ? [$hook->parameter] : [new Parameter('value', null)], null),
           null === $hook->expression ? null : [$this->rewriteHook(
