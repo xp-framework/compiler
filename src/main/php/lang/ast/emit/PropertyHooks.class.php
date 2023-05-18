@@ -86,7 +86,7 @@ trait PropertyHooks {
             $virtual,
             $literal
           )],
-          $hook->annotations
+          null // $hook->annotations
         ));
         $get= new ReturnStatement(new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
@@ -103,7 +103,7 @@ trait PropertyHooks {
             $virtual,
             $literal
           )],
-          $hook->annotations
+          null // $hook->annotations
         ));
         $set= new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
