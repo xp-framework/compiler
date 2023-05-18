@@ -316,7 +316,6 @@ abstract class PHP extends Emitter {
         $this->emitOne($result, $parameter->default);
       } else {
         $result->out->write('=null');
-        $result->codegen->scope[0]->init['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
       }
     }
     $result->locals[$parameter->name]= true;
@@ -634,13 +633,14 @@ abstract class PHP extends Emitter {
     $method->annotations && $this->emitOne($result, $method->annotations);
     $result->at($method->declared)->out->write(implode(' ', $method->modifiers).' function '.$method->name);
 
-    $promoted= [];
+    $promoted= $init= [];
     foreach ($method->signature->parameters as $param) {
       if (isset($param->promote)) $promoted[]= $param;
 
       // Create a parameter annotation named `default` for non-constant parameter defaults
       if (isset($param->default) && !$this->isConstant($result, $param->default)) {
         $param->annotate(new Annotation('default', [$param->default]));
+        $init[]= $param;
       }
 
       $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
@@ -652,11 +652,25 @@ abstract class PHP extends Emitter {
       $result->out->write(';');
     } else {
       $result->out->write(' {');
-      $this->emitInitializations($result, $result->codegen->scope[0]->init);
-      $result->codegen->scope[0]->init= [];
+
+      // Emit initializations if inside constructor
+      if ('__construct' === $method->name) {
+        $this->emitInitializations($result, $result->codegen->scope[0]->init);
+        $result->codegen->scope[0]->init= [];
+      }
+
+      // Emit non-constant parameter defaults
+      foreach ($init as $param) {
+        $result->out->write('null === $'.$param->name.' && $'.$param->name.'=');
+        $this->emitOne($result, $param->default);
+        $result->out->write(';');
+      }
+
+      // Emit promoted parameters
       foreach ($promoted as $param) {
         $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
       }
+
       $this->emitAll($result, $method->body);
       $result->out->write('}');
     }
