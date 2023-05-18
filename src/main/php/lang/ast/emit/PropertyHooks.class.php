@@ -41,24 +41,24 @@ trait PropertyHooks {
     return $node;
   }
 
-  protected function withScopeCheck($modifiers, $name, $node) {
+  protected function withScopeCheck($modifiers, $node) {
     if ($modifiers & MODIFIER_PRIVATE) {
       $check= (
         '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
         'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot access private property ".__CLASS__."::\\$%1$s");'
+        'throw new \\Error("Cannot access private property ".__CLASS__."::".$name);'
       );
     } else if ($modifiers & MODIFIER_PROTECTED) {
       $check= (
         '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
         'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot access protected property ".__CLASS__."::\\$%1$s");'
+        'throw new \\Error("Cannot access protected property ".__CLASS__."::".$name);'
       );
     } else {
       return $node;
     }
 
-    return new Block([new Code(sprintf($check, $name)), $node]);
+    return new Block([new Code($check), $node]);
   }
 
   protected function emitProperty($result, $property) {
@@ -109,7 +109,7 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $get= $this->withScopeCheck($modifiers, $property->name, new ReturnStatement(new InvokeExpression(
+        $get= $this->withScopeCheck($modifiers, new ReturnStatement(new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
           []
         )));
@@ -126,7 +126,7 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $set= $this->withScopeCheck($modifiers, $property->name, new InvokeExpression(
+        $set= $this->withScopeCheck($modifiers, new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
           [new Variable('value')]
         ));
