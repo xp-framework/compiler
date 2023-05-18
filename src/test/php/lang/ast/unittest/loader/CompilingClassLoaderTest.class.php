@@ -120,7 +120,7 @@ class CompilingClassLoaderTest {
     $code= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
       return $loader->loadClassBytes($types['Tests']);
     });
-    Assert::match('/<\?php .+ class Tests/', $code);
+    Assert::matches('/<\?php .+ class Tests/', $code);
   }
 
   #[Test]
