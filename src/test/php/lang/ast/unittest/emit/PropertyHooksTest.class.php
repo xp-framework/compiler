@@ -259,4 +259,74 @@ class PropertyHooksTest extends EmittingTest {
 
     Assert::equals(4, $r);
   }
+
+  #[Test]
+  public function accessing_private_property() {
+    $r= $this->run('class <T> {
+      private string $test { get => "Test"; }
+
+      public function run() {
+        return $this->test;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test]
+  public function accessing_protected_property() {
+    $r= $this->run('class <T> {
+      protected string $test { get => "Test"; }
+
+      public function run() {
+        return $this->test;
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test, Expect(class: Error::class, message: '/Cannot access private property .+test/')]
+  public function accessing_private_property_from_outside() {
+    $r= $this->run('class <T> {
+      private string $test { get => "Test"; }
+
+      public function run() {
+        return $this;
+      }
+    }');
+
+    $r->test;
+  }
+
+  #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+test/')]
+  public function accessing_protected_property_from_outside() {
+    $r= $this->run('class <T> {
+      protected string $test { get => "Test"; }
+
+      public function run() {
+        return $this;
+      }
+    }');
+
+    $r->test;
+  }
+
+  #[Test]
+  public function accessing_private_property_reflectively() {
+    $t= $this->type('class <T> {
+      private string $test { get => "Test"; }
+    }');
+
+    Assert::equals('Test', $t->getField('test')->setAccessible(true)->get($t->newInstance()));
+  }
+
+  #[Test]
+  public function accessing_protected_property_reflectively() {
+    $t= $this->type('class <T> {
+      protected string $test { get => "Test"; }
+    }');
+
+    Assert::equals('Test', $t->getField('test')->setAccessible(true)->get($t->newInstance()));
+  }
 }

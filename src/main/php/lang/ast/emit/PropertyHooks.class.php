@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\Code;
 use lang\ast\nodes\{
   Assignment,
   Block,
@@ -38,6 +39,26 @@ trait PropertyHooks {
       $child= $this->rewriteHook($child, $name, $virtual, $literal);
     }
     return $node;
+  }
+
+  protected function withScopeCheck($modifiers, $name, $node) {
+    if ($modifiers & MODIFIER_PRIVATE) {
+      $check= (
+        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
+        'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
+        'throw new \\Error("Cannot access private property ".__CLASS__."::\\$%1$s");'
+      );
+    } else if ($modifiers & MODIFIER_PROTECTED) {
+      $check= (
+        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
+        'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
+        'throw new \\Error("Cannot access protected property ".__CLASS__."::\\$%1$s");'
+      );
+    } else {
+      return $node;
+    }
+
+    return new Block([new Code(sprintf($check, $name)), $node]);
   }
 
   protected function emitProperty($result, $property) {
@@ -88,10 +109,10 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $get= new ReturnStatement(new InvokeExpression(
+        $get= $this->withScopeCheck($modifiers, $property->name, new ReturnStatement(new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
           []
-        ));
+        )));
       } else if ('set' === $type) {
         $this->emitOne($result, new Method(
           $modifierList,
@@ -105,10 +126,10 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $set= new InvokeExpression(
+        $set= $this->withScopeCheck($modifiers, $property->name, new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
           [new Variable('value')]
-        );
+        ));
       }
     }
 
