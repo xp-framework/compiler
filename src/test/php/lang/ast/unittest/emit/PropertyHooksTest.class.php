@@ -329,4 +329,20 @@ class PropertyHooksTest extends EmittingTest {
 
     Assert::equals('Test', $t->getField('test')->setAccessible(true)->get($t->newInstance()));
   }
+
+  #[Test]
+  public function get_parent_hook() {
+    $base= $this->type('class <T> {
+      public string $test { get => "Test"; }
+    }');
+    $r= $this->run('class <T> extends '.$base->literal().' {
+      public string $test { get => parent::$test::get()."!"; }
+
+      public function run() {
+        return $this->test;
+      }
+    }');
+
+    Assert::equals('Test!', $r);
+  }
 }

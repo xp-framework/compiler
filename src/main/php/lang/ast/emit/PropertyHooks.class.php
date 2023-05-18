@@ -11,6 +11,7 @@ use lang\ast\nodes\{
   OffsetExpression,
   Parameter,
   ReturnStatement,
+  ScopeExpression,
   Signature,
   Variable
 };
@@ -25,7 +26,7 @@ trait PropertyHooks {
 
   protected function rewriteHook($node, $name, $virtual, $literal) {
 
-    // Magic constant referencing property nae
+    // Magic constant referencing property name
     if ($node instanceof Literal && '__PROPERTY__' === $node->expression) return $literal;
 
     // Special variable $field, $this->propertyName syntax
@@ -34,6 +35,22 @@ trait PropertyHooks {
       $node->expression instanceof Variable && 'this' === $node->expression->pointer &&
       $node->member instanceof Literal && $name === $node->member->expression
     )) return $virtual;
+
+    // <T>::$field::hook() => <T>::__<hook>_<field>()
+    if (
+      $node instanceof ScopeExpression &&
+      $node->member instanceof InvokeExpression &&
+      $node->member->expression instanceof Literal &&
+      $node->type instanceof ScopeExpression &&
+      $node->type->member instanceof Variable &&
+      is_string($node->type->type) &&
+      is_string($node->type->member->pointer)
+    ) {
+      return new ScopeExpression($node->type->type, new InvokeExpression(
+        new Literal('__'.$node->member->expression->expression.'_'.$node->type->member->pointer),
+        $node->member->arguments
+      ));
+    }
 
     foreach ($node->children() as &$child) {
       $child= $this->rewriteHook($child, $name, $virtual, $literal);
