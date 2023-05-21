@@ -77,7 +77,8 @@ trait PropertyHooks {
       return new Block($nodes);
     }
 
-    return new Block([new Code($check), ...$nodes]);
+    array_unshift($nodes, new Code($check));
+    return new Block($nodes);
   }
 
   protected function emitProperty($result, $property) {
