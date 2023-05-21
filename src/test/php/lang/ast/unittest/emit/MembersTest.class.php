@@ -219,6 +219,23 @@ class MembersTest extends EmittingTest {
     Assert::equals([1, 2, 3], $r);
   }
 
+  #[Test]
+  public function return_by_reference() {
+    $r= $this->run('class <T> {
+      private $list= [];
+
+      public function &list() { return $this->list; }
+
+      public function run() {
+        $list= &$this->list();
+        $list[]= "Test";
+        return $this->list;
+      }
+
+    }');
+    Assert::equals(['Test'], $r);
+  }
+
   #[Test, Values(['variable', 'invocation', 'array'])]
   public function class_on_objects($via) {
     $t= $this->type('class <T> {

@@ -3,6 +3,15 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.12.0 / 2023-05-21
+
+* Merged PR #168: Return by reference from methods and functions, see
+  https://www.php.net/manual/en/language.references.return.php
+  (@thekid)
+* Make it possible to refer to constructor parameters inside property
+  initialization expressions.
+  (@thekid)
+
 ## 8.11.0 / 2023-04-17
 
 * Merged PR #165: Omit constant types for all PHP versions < 8.3. This
