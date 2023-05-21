@@ -653,12 +653,6 @@ abstract class PHP extends Emitter {
     } else {
       $result->out->write(' {');
 
-      // Emit initializations if inside constructor
-      if ('__construct' === $method->name) {
-        $this->emitInitializations($result, $result->codegen->scope[0]->init);
-        $result->codegen->scope[0]->init= [];
-      }
-
       // Emit non-constant parameter defaults
       foreach ($init as $param) {
         $result->out->write('null === $'.$param->name.' && $'.$param->name.'=');
@@ -669,6 +663,12 @@ abstract class PHP extends Emitter {
       // Emit promoted parameters
       foreach ($promoted as $param) {
         $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
+      }
+
+      // Emit initializations if inside constructor
+      if ('__construct' === $method->name) {
+        $this->emitInitializations($result, $result->codegen->scope[0]->init);
+        $result->codegen->scope[0]->init= [];
       }
 
       $this->emitAll($result, $method->body);
