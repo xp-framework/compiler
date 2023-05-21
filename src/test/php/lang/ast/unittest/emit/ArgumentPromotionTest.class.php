@@ -127,4 +127,13 @@ class ArgumentPromotionTest extends EmittingTest {
       ) { }
     }');
   }
+
+  #[Test]
+  public function initializations_have_access() {
+    $t= $this->type('class <T> {
+      public $first= $this->list[0] ?? null;
+      public function __construct(private array $list) { }
+    }');
+    Assert::equals('Test', $t->newInstance(['Test'])->first);
+  }
 }
