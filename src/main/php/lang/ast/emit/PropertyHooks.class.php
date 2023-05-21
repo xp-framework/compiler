@@ -58,7 +58,7 @@ trait PropertyHooks {
     return $node;
   }
 
-  protected function withScopeCheck($modifiers, $node) {
+  protected function withScopeCheck($modifiers, $nodes) {
     if ($modifiers & MODIFIER_PRIVATE) {
       $check= (
         '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
@@ -71,11 +71,13 @@ trait PropertyHooks {
         'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
         'throw new \\Error("Cannot access protected property ".__CLASS__."::".$name);'
       );
+    } else if (1 === sizeof($nodes)) {
+      return $nodes[0];
     } else {
-      return $node;
+      return new Block($nodes);
     }
 
-    return new Block([new Code($check), $node]);
+    return new Block([new Code($check), ...$nodes]);
   }
 
   protected function emitProperty($result, $property) {
@@ -117,7 +119,7 @@ trait PropertyHooks {
         $this->emitOne($result, new Method(
           $modifierList,
           $method,
-          new Signature([], null),
+          new Signature([], null, $hook->byref),
           null === $hook->expression ? null : [$this->rewriteHook(
             $hook->expression instanceof Block ? $hook->expression : new ReturnStatement($hook->expression),
             $property->name,
@@ -126,10 +128,13 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $get= $this->withScopeCheck($modifiers, new ReturnStatement(new InvokeExpression(
-          new InstanceExpression(new Variable('this'), new Literal($method)),
-          []
-        )));
+        $get= $this->withScopeCheck($modifiers, [
+          new Assignment(new Variable('r'), $hook->byref ? '=&' : '=', new InvokeExpression(
+            new InstanceExpression(new Variable('this'), new Literal($method)),
+            []
+          )),
+          new ReturnStatement(new Variable('r'))
+        ]);
       } else if ('set' === $type) {
         $this->emitOne($result, new Method(
           $modifierList,
@@ -143,10 +148,10 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $set= $this->withScopeCheck($modifiers, new InvokeExpression(
+        $set= $this->withScopeCheck($modifiers, [new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
           [new Variable('value')]
-        ));
+        )]);
       }
     }
 

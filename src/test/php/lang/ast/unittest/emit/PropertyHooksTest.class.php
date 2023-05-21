@@ -186,6 +186,23 @@ class PropertyHooksTest extends EmittingTest {
   }
 
   #[Test]
+  public function by_reference_supports_array_modifications() {
+    $r= $this->run('class <T> {
+      private $list= [];
+      public $test {
+        &get => $this->list;
+      }
+
+      public function run() {
+        $this->test[]= "Test";
+        return $this->test;
+      }
+    }');
+
+    Assert::equals(['Test'], $r);
+  }
+
+  #[Test]
   public function property_constant() {
     $r= $this->run('class <T> {
       public $test { get => __PROPERTY__; }

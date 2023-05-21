@@ -441,7 +441,7 @@ abstract class PHP extends Emitter {
       }
       $result->out->write('];');
 
-      $result->out->write('public function __get($name) { switch ($name) {');
+      $result->out->write('public function &__get($name) { switch ($name) {');
       foreach ($context->virtual as $name => $access) {
         $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[0]);
