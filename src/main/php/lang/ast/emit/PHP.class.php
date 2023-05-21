@@ -338,7 +338,7 @@ abstract class PHP extends Emitter {
     $result->stack[]= $result->locals;
     $result->locals= [];
 
-    $result->out->write('function '.$function->name); 
+    $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
     $this->emitSignature($result, $function->signature);
 
     $result->out->write('{');
@@ -631,7 +631,12 @@ abstract class PHP extends Emitter {
 
     $method->comment && $this->emitOne($result, $method->comment);
     $method->annotations && $this->emitOne($result, $method->annotations);
-    $result->at($method->declared)->out->write(implode(' ', $method->modifiers).' function '.$method->name);
+    $result->at($method->declared)->out->write(
+      implode(' ', $method->modifiers).
+      ' function '.
+      ($method->signature->byref ? '&' : '').
+      $method->name
+    );
 
     $promoted= $init= [];
     foreach ($method->signature->parameters as $param) {
