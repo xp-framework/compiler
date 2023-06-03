@@ -17,7 +17,7 @@ use lang\ast\types\IsGeneric;
 trait XpMeta {
 
   /** Stores lowercased, unnamespaced name in annotations for BC reasons! */
-  protected function annotations($result, $annotations) {
+  protected function annotations($result, $annotations, $resolve= null) {
     if (null === $annotations) return [];
 
     $lookup= [];
@@ -32,7 +32,7 @@ trait XpMeta {
       } else if (1 === sizeof($arguments) && isset($arguments[0])) {
         $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
-        $lookup[$name]= 1; // Resolve ambiguity
+        $lookup[$name][$resolve]= 1; // Resolve ambiguity
       } else {
         $result->out->write('[');
         foreach ($arguments as $name => $argument) {
@@ -53,13 +53,13 @@ trait XpMeta {
     $result->out->write('], DETAIL_TARGET_ANNO => [');
     foreach ($target as $name => $annotations) {
       $result->out->write("'$".$name."' => [");
-      foreach ($this->annotations($result, $annotations) as $key => $value) {
+      foreach ($this->annotations($result, $annotations, $name) as $key => $value) {
         $lookup[$key]= $value;
       }
       $result->out->write('],');
     }
     foreach ($lookup as $key => $value) {
-      $result->out->write("'".$key."' => '".$value."',");
+      $result->out->write("'{$key}' => ".var_export($value, true).',');
     }
     $result->out->write(']');
   }
