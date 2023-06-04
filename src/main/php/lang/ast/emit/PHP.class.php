@@ -376,6 +376,15 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitEnumCase($result, $case) {
+    $result->codegen->scope[0]->meta[self::CONSTANT][$case->name]= [
+      DETAIL_RETURNS     => 'self',
+      DETAIL_ANNOTATIONS => $case->annotations,
+      DETAIL_COMMENT     => $case->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
+    ];
+
+    $case->annotations && $this->emitOne($result, $case->annotations);
     $result->out->write('case '.$case->name);
     if ($case->expression) {
       $result->out->write('=');

@@ -2,8 +2,8 @@
 
 use lang\reflection\{Kind, InvocationFailed};
 use lang\{Enum, Error};
-use test\verify\Condition;
-use test\{Action, Assert, Expect, Ignore, Test, Values};
+use test\verify\{Condition, Runtime};
+use test\{Action, Assert, Expect, Test, Values};
 
 #[Condition(assert: 'function_exists("enum_exists")')]
 class EnumTest extends EmittingTest {
@@ -207,7 +207,7 @@ class EnumTest extends EmittingTest {
     Assert::equals(['Test' => []], $this->annotations($t));
   }
 
-  #[Test, Ignore('XP reflection does not support constant annotations')]
+  #[Test, Runtime(php: '>=8.1')]
   public function enum_member_annotations() {
     $t= $this->declare('enum %T { #[Test] case ONE; }');
     Assert::equals(['Test' => []], $this->annotations($t->constant('ONE')));
