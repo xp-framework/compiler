@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.13.0 / 2023-06-04
+
+* Merged PR #169: Refactor how annotations with non-constant arguments
+  are emitted. This enables a transition to `xp-framework/reflection`
+  as proposed in xp-framework/rfc#338
+  (@thekid)
+
 ## 8.12.0 / 2023-05-21
 
 * Merged PR #168: Return by reference from methods and functions, see
