@@ -16,6 +16,27 @@ trait AttributesAsComments {
     $result->out->write('\\'.$annotation->name);
     if (empty($annotation->arguments)) return;
 
+    // Check whether arguments are constant, enclose in `eval` array
+    // otherwise. This is not strictly necessary but will ensure
+    // forward compatibility with PHP 8
+    foreach ($annotation->arguments as $argument) {
+      if ($this->isConstant($result, $argument)) continue;
+
+      $escaping= new Escaping($result->out, ["'" => "\\'", '\\' => '\\\\']);
+      $result->out->write('(eval: [');
+      foreach ($annotation->arguments as $name => $argument) {
+        is_string($name) && $result->out->write("'{$name}'=>");
+
+        $result->out->write("'");
+        $result->out= $escaping;
+        $this->emitOne($result, $argument);
+        $result->out= $escaping->original();
+        $result->out->write("',");
+      }
+      $result->out->write('])');
+      return;
+    }
+
     // We can use named arguments here as PHP 8 attributes are parsed
     // by the XP reflection API when using PHP 7. However, we may not
     // emit trailing commas here!

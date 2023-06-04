@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\IllegalArgumentException;
+use lang\{Reflection, IllegalArgumentException};
 use test\{Assert, Expect, Test, Values};
 
 /**
@@ -11,138 +11,192 @@ use test\{Assert, Expect, Test, Values};
  */
 abstract class AnnotationSupport extends EmittingTest {
 
+  /**
+   * Declares annotations, optionally including a type
+   *
+   * @param  string $declaration
+   * @return lang.reflection.Type
+   */
+  private function declare($declaration) {
+    return Reflection::type($this->type(
+      $declaration.(strstr($declaration, '<T>') ? '' : ' class <T> { }')
+    ));
+  }
+
+  /**
+   * Returns annotations present in the given type
+   *
+   * @param  lang.reflection.Annotated $annotated
+   * @return [:var[]]
+   */
+  private function annotations($annotated) {
+    $r= [];
+    foreach ($annotated->annotations() as $name => $annotation) {
+      $r[$name]= $annotation->arguments();
+    }
+    return $r;
+  }
+
   #[Test]
   public function without_value() {
-    $t= $this->type('#[Test] class <T> { }');
-    Assert::equals(['test' => null], $t->getAnnotations());
+    Assert::equals(
+      ['Test' => []],
+      $this->annotations($this->declare('#[Test]'))
+    );
   }
 
   #[Test]
   public function within_namespace() {
-    $t= $this->type('namespace tests; #[Test] class <T> { }');
-    Assert::equals(['test' => null], $t->getAnnotations());
+    Assert::equals(
+      ['tests\\Test' => []],
+      $this->annotations($this->declare('namespace tests; #[Test]'))
+    );
   }
 
   #[Test]
   public function resolved_against_import() {
-    $t= $this->type('use unittest\Test; #[Test] class <T> { }');
-    Assert::equals(['test' => null], $t->getAnnotations());
+    Assert::equals(
+      ['unittest\\Test' => []],
+      $this->annotations($this->declare('use unittest\Test; #[Test]'))
+    );
   }
 
   #[Test]
   public function primitive_value() {
-    $t= $this->type('#[Author("Timm")] class <T> { }');
-    Assert::equals(['author' => 'Timm'], $t->getAnnotations());
+    Assert::equals(
+      ['Author' => ['Timm']],
+      $this->annotations($this->declare('#[Author("Timm")]'))
+    );
   }
 
   #[Test]
   public function array_value() {
-    $t= $this->type('#[Authors(["Timm", "Alex"])] class <T> { }');
-    Assert::equals(['authors' => ['Timm', 'Alex']], $t->getAnnotations());
+    Assert::equals(
+      ['Authors' => [['Timm', 'Alex']]],
+      $this->annotations($this->declare('#[Authors(["Timm", "Alex"])]'))
+    );
   }
 
   #[Test]
   public function map_value() {
-    $t= $this->type('#[Expect(["class" => \lang\IllegalArgumentException::class])] class <T> { }');
-    Assert::equals(['expect' => ['class' => IllegalArgumentException::class]], $t->getAnnotations());
+    Assert::equals(
+      ['Expect' => [['class' => IllegalArgumentException::class]]],
+      $this->annotations($this->declare('#[Expect(["class" => \lang\IllegalArgumentException::class])]'))
+    );
   }
 
   #[Test]
   public function named_argument() {
-    $t= $this->type('#[Expect(class: \lang\IllegalArgumentException::class)] class <T> { }');
-    Assert::equals(['expect' => ['class' => IllegalArgumentException::class]], $t->getAnnotations());
+    Assert::equals(
+      ['Expect' => ['class' => IllegalArgumentException::class]],
+      $this->annotations($this->declare('#[Expect(class: \lang\IllegalArgumentException::class)]'))
+    );
   }
 
   #[Test]
   public function closure_value() {
-    $t= $this->type('#[Verify(function($arg) { return $arg; })] class <T> { }');
-    $f= $t->getAnnotation('verify');
-    Assert::equals('test', $f('test'));
+    $verify= $this->annotations($this->declare('#[Verify(function($arg) { return $arg; })]'))['Verify'];
+    Assert::equals('test', $verify[0]('test'));
   }
 
   #[Test]
   public function arrow_function_value() {
-    $t= $this->type('#[Verify(fn($arg) => $arg)] class <T> { }');
-    $f= $t->getAnnotation('verify');
-    Assert::equals('test', $f('test'));
+    $verify= $this->annotations($this->declare('#[Verify(fn($arg) => $arg)]'))['Verify'];
+    Assert::equals('test', $verify[0]('test'));
   }
 
   #[Test]
   public function array_of_arrow_function_value() {
-    $t= $this->type('#[Verify([fn($arg) => $arg])] class <T> { }');
-    $f= $t->getAnnotation('verify');
-    Assert::equals('test', $f[0]('test'));
+    $verify= $this->annotations($this->declare('#[Verify([fn($arg) => $arg])]'))['Verify'];
+    Assert::equals('test', $verify[0][0]('test'));
   }
 
   #[Test]
   public function named_arrow_function_value() {
-    $t= $this->type('#[Verify(func: fn($arg) => $arg)] class <T> { }');
-    $f= $t->getAnnotation('verify');
-    Assert::equals('test', $f['func']('test'));
+    $verify= $this->annotations($this->declare('#[Verify(func: fn($arg) => $arg)]'))['Verify'];
+    Assert::equals('test', $verify['func']('test'));
   }
 
   #[Test]
   public function single_quoted_string_inside_non_constant_expression() {
-    $t= $this->type('#[Verify(fn($arg) => \'php\\\\\'.$arg)] class <T> { }');
-    $f= $t->getAnnotation('verify');
-    Assert::equals('php\\test', $f('test'));
+    $verify= $this->annotations($this->declare('#[Verify(fn($arg) => \'php\\\\\'.$arg)]'))['Verify'];
+    Assert::equals('php\\test', $verify[0]('test'));
   }
 
   #[Test]
   public function has_access_to_class() {
-    $t= $this->type('#[Expect(self::SUCCESS)] class <T> { const SUCCESS = true; }');
-    Assert::equals(['expect' => true], $t->getAnnotations());
+    Assert::equals(
+      ['Expect' => [true]],
+      $this->annotations($this->declare('#[Expect(self::SUCCESS)] class <T> { const SUCCESS = true; }'))
+    );
   }
 
   #[Test]
   public function method() {
-    $t= $this->type('class <T> { #[Test] public function fixture() { } }');
-    Assert::equals(['test' => null], $t->getMethod('fixture')->getAnnotations());
+    $t= $this->declare('class <T> { #[Test] public function fixture() { } }');
+    Assert::equals(
+      ['Test' => []],
+      $this->annotations($t->method('fixture'))
+    );
   }
 
   #[Test]
   public function field() {
-    $t= $this->type('class <T> { #[Test] public $fixture; }');
-    Assert::equals(['test' => null], $t->getField('fixture')->getAnnotations());
+    $t= $this->declare('class <T> { #[Test] public $fixture; }');
+    Assert::equals(
+      ['Test' => []],
+      $this->annotations($t->property('fixture'))
+    );
   }
 
   #[Test]
   public function param() {
-    $t= $this->type('class <T> { public function fixture(#[Test] $param) { } }');
-    Assert::equals(['test' => null], $t->getMethod('fixture')->getParameter(0)->getAnnotations());
+    $t= $this->declare('class <T> { public function fixture(#[Test] $param) { } }');
+    Assert::equals(
+      ['Test' => []],
+      $this->annotations($t->method('fixture')->parameter(0))
+    );
   }
 
   #[Test]
   public function params() {
-    $t= $this->type('class <T> { public function fixture(#[Inject(["name" => "a"])] $a, #[Inject] $b) { } }');
-    $m= $t->getMethod('fixture');
+    $t= $this->declare('class <T> { public function fixture(#[Inject(["name" => "a"])] $a, #[Inject] $b) { } }');
     Assert::equals(
-      [['inject' => ['name' => 'a']], ['inject' => null]],
-      [$m->getParameter(0)->getAnnotations(), $m->getParameter(1)->getAnnotations()]
+      ['Inject' => [['name' => 'a']]],
+      $this->annotations($t->method('fixture')->parameter(0))
+    );
+    Assert::equals(
+      ['Inject' => []],
+      $this->annotations($t->method('fixture')->parameter(1))
     );
   }
 
   #[Test]
   public function multiple_class_annotations() {
-    $t= $this->type('#[Resource("/"), Authenticated] class <T> { }');
-    Assert::equals(['resource' => '/', 'authenticated' => null], $t->getAnnotations());
+    Assert::equals(
+      ['Resource' => ['/'], 'Authenticated' => []],
+      $this->annotations($this->declare('#[Resource("/"), Authenticated]'))
+    );
   }
 
   #[Test]
   public function multiple_member_annotations() {
-    $t= $this->type('class <T> { #[Test, Values([1, 2, 3])] public function fixture() { } }');
-    Assert::equals(['test' => null, 'values' => [1, 2, 3]], $t->getMethod('fixture')->getAnnotations());
+    $t= $this->declare('class <T> { #[Test, Values([1, 2, 3])] public function fixture() { } }');
+    Assert::equals(
+      ['Test' => [], 'Values' => [[1, 2, 3]]],
+      $this->annotations($t->method('fixture'))
+    );
   }
 
   #[Test]
   public function multiline_annotations() {
-    $t= $this->type('
+    $annotations= $this->annotations($this->declare('
       #[Authors([
         "Timm",
         "Mr. Midori",
       ])]
       class <T> { }'
-    );
-    Assert::equals(['authors' => ['Timm', 'Mr. Midori']], $t->getAnnotations());
+    ));
+    Assert::equals(['Authors' => [['Timm', 'Mr. Midori']]], $annotations);
   }
 }
