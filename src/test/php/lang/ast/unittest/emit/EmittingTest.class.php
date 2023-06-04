@@ -1,10 +1,10 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\streams\MemoryOutputStream;
-use lang\DynamicClassLoader;
 use lang\ast\emit\GeneratedCode;
 use lang\ast\emit\php\XpMeta;
 use lang\ast\{CompilingClassLoader, Emitter, Language, Result, Tokens};
+use lang\{DynamicClassLoader, Reflection};
 use test\{Args, After, Assert, TestCase};
 use util\cmd\Console;
 
@@ -72,6 +72,7 @@ abstract class EmittingTest {
   /**
    * Declare a type
    *
+   * @deprecated Use `declare()` instead
    * @param  string $code
    * @return lang.XPClass
    */
@@ -95,6 +96,40 @@ abstract class EmittingTest {
     $class= ($package= $tree->scope()->package) ? strtr(substr($package, 1), '\\', '.').'.'.$name : $name;
     $this->cl->setClassBytes($class, $out->bytes());
     return $this->cl->loadClass($class);
+  }
+
+  /**
+   * Declare a type with a unique type name (which may be referenced by `%T`)
+   * and return a reflection instance referencing it.
+   *
+   * @param  string $code
+   * @return lang.reflection.Type
+   */
+  protected function declare($code) {
+    $name= 'T'.(self::$id++);
+    $declaration= strstr($code, '%T')
+      ? str_replace('%T', $name, $code)
+      : $code.' class '.$name.' { }'
+    ;
+
+    $tree= $this->language->parse(new Tokens($declaration, static::class))->tree();
+    if (isset($this->output['ast'])) {
+      Console::writeLine();
+      Console::writeLine('=== ', static::class, ' ===');
+      Console::writeLine($tree);
+    }
+
+    $out= new MemoryOutputStream();
+    $this->emitter->emitAll(new GeneratedCode($out, ''), $tree->children());
+    if (isset($this->output['code'])) {
+      Console::writeLine();
+      Console::writeLine('=== ', static::class, ' ===');
+      Console::writeLine($out->bytes());
+    }
+
+    $class= ($package= $tree->scope()->package) ? strtr(substr($package, 1), '\\', '.').'.'.$name : $name;
+    $this->cl->setClassBytes($class, $out->bytes());
+    return Reflection::type($this->cl->loadClass0($class));
   }
 
   /**
