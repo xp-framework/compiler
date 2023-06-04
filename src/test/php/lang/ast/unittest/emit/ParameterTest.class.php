@@ -5,21 +5,7 @@ use test\verify\Runtime;
 use test\{Action, Assert, Test, Values};
 
 class ParameterTest extends EmittingTest {
-  use NullableSupport;
-
-  /**
-   * Returns annotations present in the given type
-   *
-   * @param  lang.reflection.Annotated $annotated
-   * @return [:var[]]
-   */
-  private function annotations($annotated) {
-    $r= [];
-    foreach ($annotated->annotations() as $name => $annotation) {
-      $r[$name]= $annotation->arguments();
-    }
-    return $r;
-  }
+  use AnnotationsOf, NullableSupport;
 
   /**
    * Helper to declare a type and return a parameter reflection object

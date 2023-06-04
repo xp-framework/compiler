@@ -10,20 +10,7 @@ use test\{Assert, Expect, Test, Values};
  * - AttributesTest - emits PHP 8 attributes
  */
 abstract class AnnotationSupport extends EmittingTest {
-
-  /**
-   * Returns annotations present in the given type
-   *
-   * @param  lang.reflection.Annotated $annotated
-   * @return [:var[]]
-   */
-  private function annotations($annotated) {
-    $r= [];
-    foreach ($annotated->annotations() as $name => $annotation) {
-      $r[$name]= $annotation->arguments();
-    }
-    return $r;
-  }
+  use AnnotationsOf;
 
   #[Test]
   public function without_value() {

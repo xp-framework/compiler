@@ -7,20 +7,7 @@ use test\{Action, Assert, Expect, Ignore, Test, Values};
 
 #[Condition(assert: 'function_exists("enum_exists")')]
 class EnumTest extends EmittingTest {
-
-  /**
-   * Returns annotations present in the given type
-   *
-   * @param  lang.reflection.Annotated $annotated
-   * @return [:var[]]
-   */
-  private function annotations($annotated) {
-    $r= [];
-    foreach ($annotated->annotations() as $name => $annotation) {
-      $r[$name]= $annotation->arguments();
-    }
-    return $r;
-  }
+  use AnnotationsOf;
 
   #[Test]
   public function enum_type() {
