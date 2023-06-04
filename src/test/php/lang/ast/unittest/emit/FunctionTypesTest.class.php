@@ -13,25 +13,25 @@ class FunctionTypesTest extends EmittingTest {
 
   #[Test]
   public function function_without_parameters() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private (function(): string) $test;
     }');
 
     Assert::equals(
       new FunctionType([], Primitive::$STRING),
-      $t->getField('test')->getType()
+      $t->property('test')->constraint()->type()
     );
   }
 
   #[Test]
   public function function_with_parameters() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private (function(int, string): string) $test;
     }');
 
     Assert::equals(
       new FunctionType([Primitive::$INT, Primitive::$STRING], Primitive::$STRING),
-      $t->getField('test')->getType()
+      $t->property('test')->constraint()->type()
     );
   }
 }

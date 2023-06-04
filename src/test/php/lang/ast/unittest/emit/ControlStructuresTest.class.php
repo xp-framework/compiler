@@ -7,7 +7,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items'],])]
   public function if_else_cascade($input, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         if (0 === $arg) {
           return "no items";
@@ -24,7 +24,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items'],])]
   public function switch_case($input, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         switch ($arg) {
           case 0: return "no items";
@@ -39,7 +39,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
   public function switch_case_goto_label_ambiguity($whence, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         $position= 1;
         switch ($arg) {
@@ -55,7 +55,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[SEEK_SET, 10], [SEEK_CUR, 11]])]
   public function switch_case_constant_ambiguity($whence, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       const SET = SEEK_SET;
       const CURRENT = SEEK_CUR;
       public function run($arg) {
@@ -73,7 +73,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[0, 'no items'], [1, 'one item'], [2, '2 items'], [3, '3 items']])]
   public function match($input, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         return match ($arg) {
           0 => "no items",
@@ -88,7 +88,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[200, 'OK'], [302, 'Redirect'], [404, 'Error #404']])]
   public function match_with_multiple_cases($input, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         return match ($arg) {
           200, 201, 202, 203, 204 => "OK",
@@ -103,7 +103,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([['PING', '+PONG'], ['MSG', '+OK Re: Test'], ['XFER', '-ERR Unknown XFER']])]
   public function match_with_multiple_statements($input, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($type) {
         $value= "Test";
         return match ($type) {
@@ -124,7 +124,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Values([[0, 'no items'], [1, 'one item'], [5, '5 items'], [10, '10+ items'],])]
   public function match_with_binary($input, $expected) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         return match (true) {
           $arg >= 10 => "10+ items",
@@ -140,7 +140,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test]
   public function match_allows_dropping_true() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         return match {
           $arg >= 10 => "10+ items",
@@ -156,7 +156,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Expect(class: Throwable::class, message: '/Unhandled match (value of type .+|case .+)/')]
   public function unhandled_match() {
-    $this->run('class <T> {
+    $this->run('class %T {
       public function run($arg) {
         $position= 1;
         return match ($arg) {
@@ -169,7 +169,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test, Expect(class: Throwable::class, message: '/Unknown seek mode .+/')]
   public function match_with_throw_expression() {
-    $this->run('class <T> {
+    $this->run('class %T {
       public function run($arg) {
         $position= 1;
         return match ($arg) {
@@ -183,7 +183,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test]
   public function match_without_arg_inside_fn() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return fn($arg) => match {
           $arg >= 10 => "10+ items",
@@ -199,7 +199,7 @@ class ControlStructuresTest extends EmittingTest {
 
   #[Test]
   public function match_with_arg_inside_fn() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return fn($arg) => match ($arg) {
           0 => "no items",

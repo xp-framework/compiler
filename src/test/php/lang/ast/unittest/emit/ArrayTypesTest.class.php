@@ -11,37 +11,37 @@ class ArrayTypesTest extends EmittingTest {
 
   #[Test]
   public function int_array_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private array<int> $test;
     }');
 
-    Assert::equals('int[]', $t->getField('test')->getType()->getName());
+    Assert::equals('int[]', $t->property('test')->constraint()->type()->getName());
   }
 
   #[Test]
   public function int_map_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private array<string, int> $test;
     }');
 
-    Assert::equals('[:int]', $t->getField('test')->getType()->getName());
+    Assert::equals('[:int]', $t->property('test')->constraint()->type()->getName());
   }
 
   #[Test]
   public function nested_map_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private array<string, array<int>> $test;
     }');
 
-    Assert::equals('[:int[]]', $t->getField('test')->getType()->getName());
+    Assert::equals('[:int[]]', $t->property('test')->constraint()->type()->getName());
   }
 
   #[Test]
   public function var_map_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private array<string, mixed> $test;
     }');
 
-    Assert::equals('[:var]', $t->getField('test')->getType()->getName());
+    Assert::equals('[:var]', $t->property('test')->constraint()->type()->getName());
   }
 }

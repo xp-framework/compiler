@@ -8,15 +8,29 @@ class ParameterTest extends EmittingTest {
   use NullableSupport;
 
   /**
+   * Returns annotations present in the given type
+   *
+   * @param  lang.reflection.Annotated $annotated
+   * @return [:var[]]
+   */
+  private function annotations($annotated) {
+    $r= [];
+    foreach ($annotated->annotations() as $name => $annotation) {
+      $r[$name]= $annotation->arguments();
+    }
+    return $r;
+  }
+
+  /**
    * Helper to declare a type and return a parameter reflection object
    *
    * @param  string $declaration
-   * @return lang.reflect.Parameter
+   * @return lang.reflection.Parameter
    */
   private function param($declaration) {
-    return $this->type('use lang\Value; class <T> { public function fixture('.$declaration.') { } }')
-      ->getMethod('fixture')
-      ->getParameter(0)
+    return $this->declare('use lang\Value; class %T { public function fixture('.$declaration.') { } }')
+      ->method('fixture')
+      ->parameter(0)
     ;
   }
 
@@ -30,113 +44,104 @@ class ParameterTest extends EmittingTest {
 
   #[Test]
   public function name() {
-    Assert::equals('param', $this->param('$param')->getName());
+    Assert::equals('param', $this->param('$param')->name());
   }
 
   #[Test]
   public function without_type() {
-    Assert::equals(Type::$VAR, $this->param('$param')->getType());
+    Assert::equals(Type::$VAR, $this->param('$param')->constraint()->type());
   }
 
   #[Test, Values(from: 'special')]
   public function with_special_type($declaration, $type) {
-    Assert::equals($type, $this->param($declaration)->getType());
+    Assert::equals($type, $this->param($declaration)->constraint()->type());
   }
 
   #[Test]
   public function value_typed() {
-    Assert::equals(new XPClass(Value::class), $this->param('Value $param')->getType());
+    Assert::equals(new XPClass(Value::class), $this->param('Value $param')->constraint()->type());
   }
 
   #[Test]
   public function value_type_with_null() {
-    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('Value $param= null')->getType());
+    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('Value $param= null')->constraint()->type());
   }
 
   #[Test]
   public function nullable_value_type() {
-    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('?Value $param')->getType());
+    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('?Value $param')->constraint()->type());
   }
 
   #[Test]
   public function string_typed() {
-    Assert::equals(Primitive::$STRING, $this->param('string $param')->getType());
+    Assert::equals(Primitive::$STRING, $this->param('string $param')->constraint()->type());
   }
 
   #[Test]
   public function string_typed_with_null() {
-    Assert::equals($this->nullable(Primitive::$STRING), $this->param('string $param= null')->getType());
+    Assert::equals($this->nullable(Primitive::$STRING), $this->param('string $param= null')->constraint()->type());
   }
 
   #[Test]
   public function nullable_string_type() {
-    Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->getType());
-  }
-
-  #[Test, Runtime(php: '>=7.1')]
-  public function nullable_string_type_restriction() {
-    Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->getTypeRestriction());
+    Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param')->constraint()->type());
   }
 
   #[Test]
   public function array_typed() {
-    Assert::equals(new ArrayType(Primitive::$INT), $this->param('array<int> $param')->getType());
-  }
-
-  #[Test]
-  public function array_typed_restriction() {
-    Assert::equals(Type::$ARRAY, $this->param('array<int> $param')->getTypeRestriction());
+    Assert::equals(
+      new ArrayType(Primitive::$INT),
+      $this->param('array<int> $param')->constraint()->type()
+    );
   }
 
   #[Test]
   public function map_typed() {
-    Assert::equals(new MapType(Primitive::$INT), $this->param('array<string, int> $param')->getType());
-  }
-
-  #[Test]
-  public function map_typed_restriction() {
-    Assert::equals(Type::$ARRAY, $this->param('array<string, int> $param')->getTypeRestriction());
+    Assert::equals(
+      new MapType(Primitive::$INT),
+      $this->param('array<string, int> $param')->constraint()->type()
+    );
   }
 
   #[Test]
   public function simple_annotation() {
-    Assert::equals(['inject' => null], $this->param('#[Inject] $param')->getAnnotations());
+    Assert::equals(['Inject' => []], $this->annotations($this->param('#[Inject] $param')));
   }
 
   #[Test]
   public function annotation_with_value() {
-    Assert::equals(['inject' => 'dsn'], $this->param('#[Inject("dsn")] $param')->getAnnotations());
+    Assert::equals(['Inject' => ['dsn']], $this->annotations($this->param('#[Inject("dsn")] $param')));
   }
 
   #[Test]
   public function multiple_annotations() {
     Assert::equals(
-      ['inject' => null, 'name' => 'dsn'],
-      $this->param('#[Inject, Name("dsn")] $param')->getAnnotations()
+      ['Inject' => [], 'Name' => ['dsn']],
+      $this->annotations($this->param('#[Inject, Name("dsn")] $param'))
     );
   }
 
   #[Test]
   public function required_parameter() {
-    Assert::equals(false, $this->param('$param')->isOptional());
+    Assert::equals(false, $this->param('$param')->optional());
   }
 
   #[Test]
   public function optional_parameter() {
-    Assert::equals(true, $this->param('$param= true')->isOptional());
+    Assert::equals(true, $this->param('$param= true')->optional());
   }
 
   #[Test]
   public function optional_parameters_default_value() {
-    Assert::equals(true, $this->param('$param= true')->getDefaultValue());
+    Assert::equals(true, $this->param('$param= true')->default());
   }
 
   #[Test]
   public function trailing_comma_allowed() {
-    $p= $this->type('class <T> { public function fixture($param, ) { } }')
-      ->getMethod('fixture')
-      ->getParameters()
+    $p= $this->declare('class %T { public function fixture($param, ) { } }')
+      ->method('fixture')
+      ->parameters()
     ;
-    Assert::equals(1, sizeof($p), 'number of parameters');
+    Assert::equals(1, $p->size(), 'number of parameters');
   }
 }

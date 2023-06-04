@@ -70,35 +70,6 @@ abstract class EmittingTest {
   }
 
   /**
-   * Declare a type
-   *
-   * @deprecated Use `declare()` instead
-   * @param  string $code
-   * @return lang.XPClass
-   */
-  protected function type($code) {
-    $name= 'T'.(self::$id++);
-    $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
-    if (isset($this->output['ast'])) {
-      Console::writeLine();
-      Console::writeLine('=== ', static::class, ' ===');
-      Console::writeLine($tree);
-    }
-
-    $out= new MemoryOutputStream();
-    $this->emitter->emitAll(new GeneratedCode($out, ''), $tree->children());
-    if (isset($this->output['code'])) {
-      Console::writeLine();
-      Console::writeLine('=== ', static::class, ' ===');
-      Console::writeLine($out->bytes());
-    }
-
-    $class= ($package= $tree->scope()->package) ? strtr(substr($package, 1), '\\', '.').'.'.$name : $name;
-    $this->cl->setClassBytes($class, $out->bytes());
-    return $this->cl->loadClass($class);
-  }
-
-  /**
    * Declare a type with a unique type name (which may be referenced by `%T`)
    * and return a reflection instance referencing it.
    *
@@ -140,7 +111,7 @@ abstract class EmittingTest {
    * @return var
    */
   protected function run($code, ... $args) {
-    return $this->type($code)->newInstance()->run(...$args);
+    return $this->declare($code)->newInstance()->run(...$args);
   }
 
   #[After]

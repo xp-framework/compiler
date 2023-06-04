@@ -7,7 +7,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function class_property() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static $MEMBER= "Test";
 
       public function run() {
@@ -20,7 +20,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function typed_class_property() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static string $MEMBER= "Test";
 
       public function run() {
@@ -33,7 +33,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function class_method() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static function member() { return "Test"; }
 
       public function run() {
@@ -46,7 +46,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function class_constant() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private const MEMBER = "Test";
 
       public function run() {
@@ -59,9 +59,9 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function typed_class_constant() {
-    $t= Reflection::type($this->type('class <T> {
+    $t= $this->declare('class %T {
       private const string MEMBER = "Test";
-    }'));
+    }');
     $const= $t->constant('MEMBER');
 
     Assert::equals('Test', $const->value());
@@ -70,7 +70,7 @@ class MembersTest extends EmittingTest {
 
   #[Test, Values(['$this->$member', '$this->{$member}', '$this->{strtoupper($member)}'])]
   public function dynamic_instance_property($syntax) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $MEMBER= "Test";
 
       public function run() {
@@ -84,7 +84,7 @@ class MembersTest extends EmittingTest {
 
   #[Test, Values(['self::$$member', 'self::${$member}', 'self::${strtoupper($member)}'])]
   public function dynamic_class_property($syntax) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static $MEMBER= "Test";
 
       public function run() {
@@ -98,7 +98,7 @@ class MembersTest extends EmittingTest {
 
   #[Test, Values(['$this->$method()', '$this->{$method}()', '$this->{strtolower($method)}()'])]
   public function dynamic_instance_method($syntax) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private function test() { return "Test"; }
 
       public function run() {
@@ -112,7 +112,7 @@ class MembersTest extends EmittingTest {
 
   #[Test, Values(['self::$method()', 'self::{$method}()', 'self::{strtolower($method)}()'])]
   public function dynamic_class_method($syntax) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static function test() { return "Test"; }
 
       public function run() {
@@ -126,7 +126,7 @@ class MembersTest extends EmittingTest {
 
   #[Test, Values(['self::{$member}', 'self::{strtoupper($member)}'])]
   public function dynamic_class_constant($syntax) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       const MEMBER= "Test";
 
       public function run() {
@@ -140,7 +140,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function property_of_dynamic_class() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static $MEMBER= "Test";
 
       public function run() {
@@ -154,7 +154,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function method_of_dynamic_class() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static function member() { return "Test"; }
 
       public function run() {
@@ -168,7 +168,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function constant_of_dynamic_class() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private const MEMBER = "Test";
 
       public function run() {
@@ -182,7 +182,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function object_class_constant() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private const MEMBER = "Test";
 
       public function run() {
@@ -195,7 +195,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function list_property() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $list= [1, 2, 3];
 
       public function run() {
@@ -208,7 +208,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function list_method() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private function list() { return [1, 2, 3]; }
 
       public function run() {
@@ -221,7 +221,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function return_by_reference() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $list= [];
 
       public function &list() { return $this->list; }
@@ -238,7 +238,7 @@ class MembersTest extends EmittingTest {
 
   #[Test, Values(['variable', 'invocation', 'array'])]
   public function class_on_objects($via) {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private function this() { return $this; }
 
       public function variable() { return $this::class; }
@@ -249,12 +249,12 @@ class MembersTest extends EmittingTest {
     }');
 
     $fixture= $t->newInstance();
-    Assert::equals(get_class($fixture), $t->getMethod($via)->invoke($fixture));
+    Assert::equals(get_class($fixture), $t->method($via)->invoke($fixture));
   }
 
   #[Test]
   public function instance_property() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $member= "Test";
 
       public function run() {
@@ -267,7 +267,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function typed_instance_property() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private string $member= "Test";
 
       public function run() {
@@ -280,7 +280,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function instance_method() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private function member() { return "Test"; }
 
       public function run() {
@@ -293,7 +293,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function static_initializer_run() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static $MEMBER;
 
       static function __static() {
@@ -310,7 +310,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function enum_members() {
-    $r= $this->run('class <T> extends \lang\Enum {
+    $r= $this->run('class %T extends \lang\Enum {
       public static $MON, $TUE, $WED, $THU, $FRI, $SAT, $SUN;
 
       public function run() {
@@ -323,11 +323,11 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function allow_constant_syntax_for_members() {
-    $r= $this->run('use lang\{Enum, CommandLine}; class <T> extends Enum {
+    $r= $this->run('use lang\{Enum, CommandLine}; class %T extends Enum {
       public static $MON, $TUE, $WED, $THU, $FRI, $SAT, $SUN;
 
       public function run() {
-        return [self::MON->name(), <T>::TUE->name(), CommandLine::WINDOWS->name()];
+        return [self::MON->name(), %T::TUE->name(), CommandLine::WINDOWS->name()];
       }
     }');
 
@@ -336,7 +336,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function method_with_static() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         static $var= "Test";
         return $var;
@@ -348,7 +348,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function method_with_static_without_initializer() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         static $var;
         return $var;
@@ -360,7 +360,7 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function chaining_sccope_operators() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private const TYPE = self::class;
 
       private const NAME = "Test";
@@ -380,26 +380,26 @@ class MembersTest extends EmittingTest {
 
   #[Test]
   public function self_return_type() {
-    $t= $this->type('
-      class <T> { public function run(): self { return $this; } }
+    $t= $this->declare('
+      class %T { public function run(): self { return $this; } }
     ');
-    Assert::equals($t, $t->getMethod('run')->getReturnType());
+    Assert::equals($t->class(), $t->method('run')->returns()->type());
   }
 
   #[Test]
   public function static_return_type() {
-    $t= $this->type('
-      class <T>Base { public function run(): static { return $this; } }
-      class <T> extends <T>Base { }
+    $t= $this->declare('
+      class %TBase { public function run(): static { return $this; } }
+      class %T extends %TBase { }
     ');
-    Assert::equals($t, $t->getMethod('run')->getReturnType());
+    Assert::equals($t->parent()->class(), $t->method('run')->returns()->type());
   }
 
   #[Test]
   public function array_of_self_return_type() {
-    $t= $this->type('
-      class <T> { public function run(): array<self> { return [$this]; } }
+    $t= $this->declare('
+      class %T { public function run(): array<self> { return [$this]; } }
     ');
-    Assert::equals(new ArrayType($t), $t->getMethod('run')->getReturnType());
+    Assert::equals(new ArrayType($t->class()), $t->method('run')->returns()->type());
   }
 }

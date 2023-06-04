@@ -6,7 +6,7 @@ class GotoTest extends EmittingTest {
 
   #[Test]
   public function skip_forward() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         goto skip;
         return false;
@@ -19,7 +19,7 @@ class GotoTest extends EmittingTest {
 
   #[Test]
   public function skip_backward() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $return= false;
         retry: if ($return) return true;

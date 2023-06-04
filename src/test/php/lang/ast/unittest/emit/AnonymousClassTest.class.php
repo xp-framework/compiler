@@ -14,7 +14,7 @@ class AnonymousClassTest extends EmittingTest {
 
   #[Test]
   public function parentless() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return new class() {
           public function id() { return "test"; }
@@ -26,7 +26,7 @@ class AnonymousClassTest extends EmittingTest {
 
   #[Test]
   public function extending_base_class() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return new class() extends \\util\\AbstractDeferredInvokationHandler {
           public function initialize() {
@@ -40,7 +40,7 @@ class AnonymousClassTest extends EmittingTest {
 
   #[Test]
   public function implementing_interface() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return new class() implements \\lang\\Runnable {
           public function run() {
@@ -54,7 +54,7 @@ class AnonymousClassTest extends EmittingTest {
 
   #[Test]
   public function method_annotations() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return new class() {
 
@@ -69,22 +69,22 @@ class AnonymousClassTest extends EmittingTest {
 
   #[Test]
   public function extending_enclosing_class() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public static function run() {
         return new class() extends self { };
       }
     }');
-    Assert::instance($t, Reflection::type($t)->method('run')->invoke(null));
+    Assert::instance($t->class(), $t->method('run')->invoke(null));
   }
 
   #[Test]
   public function referencing_enclosing_class() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       const ID= 6100;
 
       public static function run() {
         return new class() extends self {
-          public static $id= <T>::ID;
+          public static $id= %T::ID;
         };
       }
     }');
