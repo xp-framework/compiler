@@ -6,7 +6,7 @@
   "description" : "XP Compiler",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "^11.6",
+    "xp-framework/core": "^11.6 | ^10.16",
     "xp-framework/ast": "^10.1",
     "php" : ">=7.0.0"
   },
