@@ -71,6 +71,17 @@ abstract class EmittingTest {
 
   /**
    * Declare a type with a unique type name (which may be referenced by `%T`)
+   * and return a type referencing it.
+   *
+   * @param  string $code
+   * @return lang.XPClass
+   */
+  protected function type($code) {
+    return $this->declare($code)->class();
+  }
+
+  /**
+   * Declare a type with a unique type name (which may be referenced by `%T`)
    * and return a reflection instance referencing it.
    *
    * @param  string $code
@@ -78,10 +89,13 @@ abstract class EmittingTest {
    */
   protected function declare($code) {
     $name= 'T'.(self::$id++);
-    $declaration= strstr($code, '%T')
-      ? str_replace('%T', $name, $code)
-      : $code.' class '.$name.' { }'
-    ;
+    if (strstr($code, '%T')) {
+      $declaration= str_replace('%T', $name, $code);
+    } else if (strstr($code, '<T>')) {
+      $declaration= str_replace('<T>', $name, $code);  // deprecated
+    } else {
+      $declaration= $code.' class '.$name.' { }';
+    }
 
     $tree= $this->language->parse(new Tokens($declaration, static::class))->tree();
     if (isset($this->output['ast'])) {
