@@ -14,7 +14,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function method_call_on_null() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $object= null;
         return $object?->method();
@@ -26,7 +26,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function method_call_on_object() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $object= new class() {
           public function method() { return true; }
@@ -40,7 +40,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function member_access_on_null() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $object= null;
         return $object?->member;
@@ -52,7 +52,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function member_access_on_object() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $object= new class() {
           public $member= true;
@@ -67,17 +67,17 @@ class NullSafeTest extends EmittingTest {
   #[Test]
   public function chained_method_call() {
     $r= $this->run('
-      class <T>Invocation {
+      class %TInvocation {
         public static $invoked= [];
         public function __construct(private $name, private $chained) { }
         public function chained() { self::$invoked[]= $this->name; return $this->chained; }
       }
 
-      class <T> {
+      class %T {
         public function run() {
-          $invokation= new <T>Invocation("outer", new <T>Invocation("inner", null));
+          $invokation= new %TInvocation("outer", new %TInvocation("inner", null));
           $return= $invokation?->chained()?->chained()?->chained();
-          return [$return, <T>Invocation::$invoked];
+          return [$return, %TInvocation::$invoked];
         }
       }
     ');
@@ -87,7 +87,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function dynamic_member_access_on_object() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $object= new class() {
           public $member= true;
@@ -104,7 +104,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function short_circuiting_chain() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $null= null;
         return $null?->method($undefined->method());
@@ -116,7 +116,7 @@ class NullSafeTest extends EmittingTest {
 
   #[Test]
   public function short_circuiting_parameter() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private function pass($object) {
         return $object;
       }

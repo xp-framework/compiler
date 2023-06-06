@@ -7,7 +7,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function array_literal() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return [1, 2, 3];
       }
@@ -18,7 +18,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function map_literal() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return ["a" => 1, "b" => 2];
       }
@@ -29,7 +29,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function append() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $r= [1, 2];
         $r[]= 3;
@@ -42,7 +42,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test, Values(['[1, , 3]', '[1, , ]', '[, 1]']), Expect(class: IllegalStateException::class, message: 'Cannot use empty array elements in arrays')]
   public function arrays_cannot_have_empty_elements($input) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return '.$input.';
       }
@@ -51,7 +51,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function destructuring() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         [$a, $b]= [1, 2];
         return [$a, $b];
@@ -63,7 +63,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function nested_destructuring() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         [[$a, $b], $c]= [[1, 2], 3];
         return [$a, $b, $c];
@@ -75,7 +75,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function destructuring_with_empty_between() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         [$a, , $b]= [1, 2, 3];
         return [$a, $b];
@@ -87,7 +87,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function destructuring_with_empty_start() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         [, $a, $b]= [1, 2, 3];
         return [$a, $b];
@@ -99,7 +99,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function destructuring_map() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         ["two" => $a, "one" => $b]= ["one" => 1, "two" => 2];
         return [$a, $b];
@@ -111,7 +111,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function destructuring_map_with_expression() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $one= "one";
       public function run() {
         $two= "two";
@@ -125,7 +125,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function nested_destructuring_with_map() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         ["nested" => ["one" => $a], "three" => $b]= ["nested" => ["one" => 1], "three" => 3];
         return [$a, $b];
@@ -137,7 +137,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test, Values(['$list', '$this->instance', 'self::$static'])]
   public function reference_destructuring($reference) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $instance= [1, 2];
       private static $static= [1, 2];
 
@@ -155,7 +155,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function list_destructuring() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         list($a, $b)= [1, 2];
         return [$a, $b];
@@ -167,7 +167,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function swap_using_destructuring() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $a= 1;
         $b= 2;
@@ -181,7 +181,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function result_of_destructuring() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return [$a, $b]= [1, 2];
       }
@@ -192,7 +192,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test, Values([null, true, false, 0, 0.5, '', 'Test'])]
   public function destructuring_with_non_array($value) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run($arg) {
         $r= [$a, $b]= $arg;
         return [$a, $b, $r];
@@ -204,7 +204,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function init_with_variable() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $KEY= "key";
         return [$KEY => "value"];
@@ -216,7 +216,7 @@ class ArraysTest extends EmittingTest {
 
   #[Test]
   public function init_with_member_variable() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private static $KEY= "key";
       public function run() {
         return [self::$KEY => "value"];

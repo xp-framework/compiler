@@ -6,7 +6,7 @@ class UnicodeEscapesTest extends EmittingTest {
 
   #[Test]
   public function spanish_ñ() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return "ma\u{00F1}ana";
       }
@@ -17,7 +17,7 @@ class UnicodeEscapesTest extends EmittingTest {
 
   #[Test]
   public function emoji() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return "Smile! \u{1F602}";
       }

@@ -6,12 +6,12 @@
   "description" : "XP Compiler",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "^11.0 | ^10.0",
+    "xp-framework/core": "^11.6 | ^10.16",
     "xp-framework/ast": "dev-feature/property-hooks as 10.2.0",
     "php" : ">=7.0.0"
   },
   "require-dev" : {
-    "xp-framework/reflection": "^2.11",
+    "xp-framework/reflection": "^2.13",
     "xp-framework/test": "^1.5"
   },
   "bin": ["bin/xp.xp-framework.compiler.compile", "bin/xp.xp-framework.compiler.ast"],

@@ -8,7 +8,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function instance_method() {
     Assert::equals('instance', $this->run(
-      'class <T> {
+      'class %T {
 
         public function instanceMethod() { return "instance"; }
 
@@ -22,7 +22,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function instance_method_dynamic_variable() {
     Assert::equals('instance', $this->run(
-      'class <T> {
+      'class %T {
 
         public function instanceMethod() { return "instance"; }
 
@@ -37,7 +37,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function instance_method_dynamic_expression() {
     Assert::equals('instance', $this->run(
-      'class <T> {
+      'class %T {
 
         public function instanceMethod() { return "instance"; }
 
@@ -52,7 +52,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function static_method() {
     Assert::equals('static', $this->run(
-      'class <T> {
+      'class %T {
 
         public function staticMethod() { return "static"; }
 
@@ -66,7 +66,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function static_method_dynamic() {
     Assert::equals('static', $this->run(
-      'class <T> {
+      'class %T {
 
         public static function staticMethod() { return "static"; }
 
@@ -81,7 +81,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function closure() {
     Assert::equals('closure', $this->run(
-      'class <T> {
+      'class %T {
 
         public function run() {
           $f= function() { return "closure"; };
@@ -95,7 +95,7 @@ class InvocationTest extends EmittingTest {
   public function global_function() {
     Assert::equals('function', $this->run(
       'function fixture() { return "function"; }
-      class <T> {
+      class %T {
 
         public function run() {
           return fixture();
@@ -107,7 +107,7 @@ class InvocationTest extends EmittingTest {
   #[Test]
   public function function_self_reference() {
     Assert::equals(13, $this->run(
-      'class <T> {
+      'class %T {
 
         public function run() {
           $fib= function($i) use(&$fib) {
@@ -126,7 +126,7 @@ class InvocationTest extends EmittingTest {
   #[Test, Values(['"html(<) = &lt;", flags: ENT_HTML5', '"html(<) = &lt;", ENT_HTML5, double: true', 'string: "html(<) = &lt;", flags: ENT_HTML5', 'string: "html(<) = &lt;", flags: ENT_HTML5, double: true',])]
   public function named_arguments_in_exact_order($arguments) {
     Assert::equals('html(&lt;) = &amp;lt;', $this->run(
-      'class <T> {
+      'class %T {
 
         public function escape($string, $flags= ENT_HTML5, $double= true) {
           return htmlspecialchars($string, $flags, null, $double);
@@ -142,7 +142,7 @@ class InvocationTest extends EmittingTest {
   #[Test, Runtime(php: '>=8.0')]
   public function named_arguments_in_reverse_order() {
     Assert::equals('html(&lt;) = &amp;lt;', $this->run(
-      'class <T> {
+      'class %T {
 
         public function escape($string, $flags= ENT_HTML5, $double= true) {
           return htmlspecialchars($string, $flags, null, $double);
@@ -158,7 +158,7 @@ class InvocationTest extends EmittingTest {
   #[Test, Runtime(php: '>=8.0')]
   public function named_arguments_omitting_one() {
     Assert::equals('html(&lt;) = &lt;', $this->run(
-      'class <T> {
+      'class %T {
 
         public function escape($string, $flags= ENT_HTML5, $double= true) {
           return htmlspecialchars($string, $flags, null, $double);

@@ -6,7 +6,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_value() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         foreach ([1, 2, 3] as $number) {
@@ -21,7 +21,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_key_and_value() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         foreach (["a" => 1, "b" => 2, "c" => 3] as $key => $number) {
@@ -36,7 +36,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_single_expression() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         foreach ([1, 2, 3] as $number) $result.= ",".$number;
@@ -49,7 +49,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_destructuring() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         foreach ([[1, 2], [3, 4]] as [$a, $b]) $result.= ",".$a." & ".$b;
@@ -62,7 +62,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_destructuring_and_missing_expressions() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         foreach ([[1, 2, 3], [4, 5, 6]] as [$a, , $b]) $result.= ",".$a." & ".$b;
@@ -75,7 +75,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_destructuring_keys() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         foreach ([["a" => 1, "b" => 2], ["a" => 3, "b" => 4]] as ["a" => $a, "b" => $b]) $result.= ",".$a." & ".$b;
@@ -88,7 +88,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function foreach_with_destructuring_references() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private $list= [[1, 2], [3, 4]];
 
       public function run() {
@@ -105,7 +105,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function for_loop() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         for ($i= 1; $i < 4; $i++) {
@@ -120,7 +120,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function while_loop() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         $i= 0;
@@ -136,7 +136,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function do_loop() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $result= "";
         $i= 1;
@@ -152,7 +152,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function break_while_loop() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $i= 0;
         $r= [];
@@ -172,7 +172,7 @@ class LoopsTest extends EmittingTest {
 
   #[Test]
   public function continue_while_loop() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $i= 0;
         $r= [];
