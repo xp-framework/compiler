@@ -12,7 +12,7 @@ class ClassLiteralTest extends EmittingTest {
 
   #[Test]
   public function on_name() {
-    $r= $this->run('use lang\Primitive; class <T> {
+    $r= $this->run('use lang\Primitive; class %T {
       public function run() { return Primitive::class; }
     }');
     Assert::equals(Primitive::class, $r);
@@ -20,33 +20,33 @@ class ClassLiteralTest extends EmittingTest {
 
   #[Test]
   public function on_self() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run() { return self::class; }
     }');
-    Assert::equals($t->getName(), $t->newInstance()->run());
+    Assert::equals($t->literal(), $t->newInstance()->run());
   }
 
   #[Test]
   public function on_object() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run() { return $this::class; }
     }');
-    Assert::equals($t->getName(), $t->newInstance()->run());
+    Assert::equals($t->literal(), $t->newInstance()->run());
   }
 
   #[Test]
   public function on_instantiation() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run() { return new self()::class; }
     }');
-    Assert::equals($t->getName(), $t->newInstance()->run());
+    Assert::equals($t->literal(), $t->newInstance()->run());
   }
 
   #[Test]
   public function on_braced_expression() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run() { return (new self())::class; }
     }');
-    Assert::equals($t->getName(), $t->newInstance()->run());
+    Assert::equals($t->literal(), $t->newInstance()->run());
   }
 }

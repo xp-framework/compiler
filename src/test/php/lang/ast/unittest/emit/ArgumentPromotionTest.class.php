@@ -16,7 +16,7 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function in_constructor() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function __construct(private $id= "test") {
         // Empty
       }
@@ -30,7 +30,7 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function can_be_used_in_constructor() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function __construct(private $id= "test") {
         $this->id.= "ed";
       }
@@ -44,7 +44,7 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function parameter_accessible() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function __construct(private $id= "test") {
         if (null === $id) {
           throw new \\lang\\IllegalArgumentException("ID not set");
@@ -60,7 +60,7 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function in_method() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function withId(private $id) {
         return $this;
       }
@@ -74,36 +74,42 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function type_information() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function __construct(private int $id, private string $name) { }
     }');
     Assert::equals(
       [Primitive::$INT, Primitive::$STRING],
-      [$t->getField('id')->getType(), $t->getField('name')->getType()]
+      [$t->property('id')->constraint()->type(), $t->property('name')->constraint()->type()]
     );
   }
 
   #[Test, Expect(class: Errors::class, message: '/Variadic parameters cannot be promoted/')]
   public function variadic_parameters_cannot_be_promoted() {
-    $this->type('class <T> {
+    $this->declare('class %T {
       public function __construct(private string... $in) { }
     }');
   }
 
   #[Test]
   public function can_be_mixed_with_normal_arguments() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function __construct(public string $name, string $initial= null) {
         if (null !== $initial) $this->name.= " ".$initial.".";
       }
     }');
-    Assert::equals(['name'], array_map(function($f) { return $f->getName(); }, $t->getFields()));
+
+    $names= [];
+    foreach ($t->properties() as $property) {
+      $names[]= $property->name();
+    }
+
+    Assert::equals(['name'], $names);
     Assert::equals('Timm J.', $t->newInstance('Timm', 'J')->name);
   }
 
   #[Test]
   public function promoted_by_reference_argument() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function __construct(public array &$list) { }
 
       public static function test() {
@@ -114,12 +120,12 @@ class ArgumentPromotionTest extends EmittingTest {
       }
     }');
 
-    Assert::equals([1, 2, 3, 4], $t->getMethod('test')->invoke(null, []));
+    Assert::equals([1, 2, 3, 4], $t->method('test')->invoke(null, []));
   }
 
   #[Test]
   public function allows_trailing_comma() {
-    $this->type('class <T> {
+    $this->declare('class %T {
       public function __construct(
         public float $x = 0.0,
         public float $y = 0.0,
@@ -130,7 +136,7 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function initializations_have_access() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public $first= $this->list[0] ?? null;
       public function __construct(private array $list) { }
     }');

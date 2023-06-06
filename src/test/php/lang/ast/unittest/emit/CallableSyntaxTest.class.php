@@ -23,14 +23,14 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function native_function() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public function run() { return strlen(...); }
     }');
   }
 
   #[Test]
   public function instance_method() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public function length($arg) { return strlen($arg); }
       public function run() { return $this->length(...); }
     }');
@@ -38,7 +38,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function class_method() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public static function length($arg) { return strlen($arg); }
       public function run() { return self::length(...); }
     }');
@@ -46,7 +46,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function private_method() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       private function length($arg) { return strlen($arg); }
       public function run() { return $this->length(...); }
     }');
@@ -54,7 +54,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function string_reference() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public function run() {
         $func= "strlen";
         return $func(...);
@@ -64,7 +64,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function fn_reference() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public function run() {
         $func= fn($arg) => strlen($arg);
         return $func(...);
@@ -74,7 +74,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function instance_property_reference() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       private $func= "strlen";
       public function run() {
         return ($this->func)(...);
@@ -84,7 +84,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test, Values(['$this->$func(...)', '$this->{$func}(...)'])]
   public function variable_instance_method($expr) {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       private function length($arg) { return strlen($arg); }
       public function run() {
         $func= "length";
@@ -95,7 +95,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test, Values(['self::$func(...)', 'self::{$func}(...)'])]
   public function variable_class_method($expr) {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       private static function length($arg) { return strlen($arg); }
       public function run() {
         $func= "length";
@@ -106,7 +106,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function variable_class_method_with_variable_class() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       private static function length($arg) { return strlen($arg); }
       public function run() {
         $func= "length";
@@ -118,14 +118,14 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function string_function_reference() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public function run() { return "strlen"(...); }
     }');
   }
 
   #[Test]
   public function array_instance_method_reference() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public function length($arg) { return strlen($arg); }
       public function run() { return [$this, "length"](...); }
     }');
@@ -133,7 +133,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function array_class_method_reference() {
-    $this->verify('class <T> {
+    $this->verify('class %T {
       public static function length($arg) { return strlen($arg); }
       public function run() { return [self::class, "length"](...); }
     }');
@@ -141,7 +141,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test, Expect(Error::class), Values(['nonexistant', '$this->nonexistant', 'self::nonexistant', '$nonexistant', '$null'])]
   public function non_existant($expr) {
-    $this->run('class <T> {
+    $this->run('class %T {
       public function run() {
         $null= null;
         $nonexistant= "nonexistant";
@@ -152,7 +152,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function instantiation() {
-    $f= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
       public function run() {
         return new Handle(...);
       }
@@ -162,7 +162,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function instantiation_in_map() {
-    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class %T {
       public function run() {
         return array_map(new Handle(...), [0, 1, 2]);
       }
@@ -172,7 +172,7 @@ class CallableSyntaxTest extends EmittingTest {
 
   #[Test]
   public function anonymous_instantiation() {
-    $f= $this->run('class <T> {
+    $f= $this->run('class %T {
       public function run() {
         return new class(...) {
           public $value;

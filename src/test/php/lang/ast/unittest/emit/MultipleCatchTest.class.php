@@ -12,7 +12,7 @@ class MultipleCatchTest extends EmittingTest {
 
   #[Test, Values([IllegalArgumentException::class, IllegalStateException::class])]
   public function catch_both($type) {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run($t) {
         try {
           throw new $t("test");

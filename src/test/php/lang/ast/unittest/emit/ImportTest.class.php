@@ -16,7 +16,7 @@ class ImportTest extends EmittingTest {
     Assert::equals(Date::class, $this->run('
       use util\Date;
 
-      class <T> {
+      class %T {
         public function run() { return Date::class; }
       }'
     ));
@@ -27,7 +27,7 @@ class ImportTest extends EmittingTest {
     Assert::equals(Date::class, $this->run('
       use util\Date as D;
 
-      class <T> {
+      class %T {
         public function run() { return D::class; }
       }'
     ));
@@ -38,7 +38,7 @@ class ImportTest extends EmittingTest {
     Assert::equals('imported', $this->run('
       use const lang\ast\unittest\emit\FIXTURE;
 
-      class <T> {
+      class %T {
         public function run() { return FIXTURE; }
       }'
     ));
@@ -49,7 +49,7 @@ class ImportTest extends EmittingTest {
     Assert::equals('imported', $this->run('
       use function lang\ast\unittest\emit\fixture;
 
-      class <T> {
+      class %T {
         public function run() { return fixture(); }
       }'
     ));
@@ -60,7 +60,7 @@ class ImportTest extends EmittingTest {
     Assert::equals(Traversable::class, $this->run('namespace test;
       use Traversable;
 
-      class <T> {
+      class %T {
         public function run() { return Traversable::class; }
       }'
     ));
@@ -71,7 +71,7 @@ class ImportTest extends EmittingTest {
     Assert::equals([Traversable::class, Iterator::class], $this->run('namespace test;
       use Traversable, Iterator;
 
-      class <T> {
+      class %T {
         public function run() { return [Traversable::class, Iterator::class]; }
       }'
     ));

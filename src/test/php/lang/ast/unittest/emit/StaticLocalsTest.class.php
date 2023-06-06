@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\reflect\TargetInvocationException;
+use lang\reflection\InvocationFailed;
 use test\{Assert, Test};
 use util\Date;
 
@@ -15,12 +15,12 @@ class StaticLocalsTest extends EmittingTest {
    * @return var[]
    */
   private function apply($t, ... $args) {
-    return $t->getMethod('run')->invoke($t->newInstance(), $args);
+    return $t->method('run')->invoke($t->newInstance(), $args);
   }
 
   #[Test]
   public function constant_static() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run() {
         static $i= 0;
 
@@ -35,7 +35,7 @@ class StaticLocalsTest extends EmittingTest {
 
   #[Test]
   public function initialization_to_new() {
-    $t= $this->type('use util\\{Date, Dates}; class <T> {
+    $t= $this->declare('use util\\{Date, Dates}; class %T {
       public function run() {
         static $t= new Date(0);
 
@@ -49,7 +49,7 @@ class StaticLocalsTest extends EmittingTest {
 
   #[Test]
   public function initialization_to_parameter() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function run($initial) {
         static $t= $initial;
 
@@ -64,7 +64,7 @@ class StaticLocalsTest extends EmittingTest {
 
   #[Test]
   public function initialization_when_throwing() {
-    $t= $this->type('use lang\\IllegalArgumentException; class <T> {
+    $t= $this->declare('use lang\\IllegalArgumentException; class %T {
       public function run($initial) {
         static $t= $initial ?? throw new IllegalArgumentException("May not be null");
 
@@ -73,7 +73,7 @@ class StaticLocalsTest extends EmittingTest {
     }');
 
     // This does not initialize the static
-    Assert::throws(TargetInvocationException::class, function() use($t) {
+    Assert::throws(InvocationFailed::class, function() use($t) {
       $this->apply($t, null);
     });
 

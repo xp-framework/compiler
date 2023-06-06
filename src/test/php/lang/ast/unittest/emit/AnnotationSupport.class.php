@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\{Reflection, IllegalArgumentException};
+use lang\IllegalArgumentException;
 use test\{Assert, Expect, Test, Values};
 
 /**
@@ -10,32 +10,7 @@ use test\{Assert, Expect, Test, Values};
  * - AttributesTest - emits PHP 8 attributes
  */
 abstract class AnnotationSupport extends EmittingTest {
-
-  /**
-   * Declares annotations, optionally including a type
-   *
-   * @param  string $declaration
-   * @return lang.reflection.Type
-   */
-  private function declare($declaration) {
-    return Reflection::type($this->type(
-      $declaration.(strstr($declaration, '<T>') ? '' : ' class <T> { }')
-    ));
-  }
-
-  /**
-   * Returns annotations present in the given type
-   *
-   * @param  lang.reflection.Annotated $annotated
-   * @return [:var[]]
-   */
-  private function annotations($annotated) {
-    $r= [];
-    foreach ($annotated->annotations() as $name => $annotation) {
-      $r[$name]= $annotation->arguments();
-    }
-    return $r;
-  }
+  use AnnotationsOf;
 
   #[Test]
   public function without_value() {
@@ -127,13 +102,13 @@ abstract class AnnotationSupport extends EmittingTest {
   public function has_access_to_class() {
     Assert::equals(
       ['Expect' => [true]],
-      $this->annotations($this->declare('#[Expect(self::SUCCESS)] class <T> { const SUCCESS = true; }'))
+      $this->annotations($this->declare('#[Expect(self::SUCCESS)] class %T { const SUCCESS = true; }'))
     );
   }
 
   #[Test]
   public function method() {
-    $t= $this->declare('class <T> { #[Test] public function fixture() { } }');
+    $t= $this->declare('class %T { #[Test] public function fixture() { } }');
     Assert::equals(
       ['Test' => []],
       $this->annotations($t->method('fixture'))
@@ -142,7 +117,7 @@ abstract class AnnotationSupport extends EmittingTest {
 
   #[Test]
   public function field() {
-    $t= $this->declare('class <T> { #[Test] public $fixture; }');
+    $t= $this->declare('class %T { #[Test] public $fixture; }');
     Assert::equals(
       ['Test' => []],
       $this->annotations($t->property('fixture'))
@@ -151,7 +126,7 @@ abstract class AnnotationSupport extends EmittingTest {
 
   #[Test]
   public function param() {
-    $t= $this->declare('class <T> { public function fixture(#[Test] $param) { } }');
+    $t= $this->declare('class %T { public function fixture(#[Test] $param) { } }');
     Assert::equals(
       ['Test' => []],
       $this->annotations($t->method('fixture')->parameter(0))
@@ -160,7 +135,7 @@ abstract class AnnotationSupport extends EmittingTest {
 
   #[Test]
   public function params() {
-    $t= $this->declare('class <T> { public function fixture(#[Inject(["name" => "a"])] $a, #[Inject] $b) { } }');
+    $t= $this->declare('class %T { public function fixture(#[Inject(["name" => "a"])] $a, #[Inject] $b) { } }');
     Assert::equals(
       ['Inject' => [['name' => 'a']]],
       $this->annotations($t->method('fixture')->parameter(0))
@@ -181,7 +156,7 @@ abstract class AnnotationSupport extends EmittingTest {
 
   #[Test]
   public function multiple_member_annotations() {
-    $t= $this->declare('class <T> { #[Test, Values([1, 2, 3])] public function fixture() { } }');
+    $t= $this->declare('class %T { #[Test, Values([1, 2, 3])] public function fixture() { } }');
     Assert::equals(
       ['Test' => [], 'Values' => [[1, 2, 3]]],
       $this->annotations($t->method('fixture'))
@@ -195,7 +170,7 @@ abstract class AnnotationSupport extends EmittingTest {
         "Timm",
         "Mr. Midori",
       ])]
-      class <T> { }'
+      class %T { }'
     ));
     Assert::equals(['Authors' => [['Timm', 'Mr. Midori']]], $annotations);
   }

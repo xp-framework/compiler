@@ -7,7 +7,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_without_argument() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         yield;
         yield;
@@ -18,7 +18,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_values() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         yield 1;
         yield 2;
@@ -30,7 +30,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_keys_and_values() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         yield "color" => "orange";
         yield "price" => 12.99;
@@ -41,7 +41,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_from_array() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         yield from [1, 2, 3];
       }
@@ -51,7 +51,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_from_generator() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private function values() {
         yield 1;
         yield 2;
@@ -67,7 +67,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_from_and_yield() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         yield 1;
         yield from [2, 3];
@@ -79,7 +79,7 @@ class YieldTest extends EmittingTest {
 
   #[Test]
   public function yield_send() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         while ($line= yield) {
           echo $line, "\n";

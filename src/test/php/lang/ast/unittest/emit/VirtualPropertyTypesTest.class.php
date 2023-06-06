@@ -11,25 +11,25 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test]
   public function type_available_via_reflection() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private int $value;
     }');
 
-    Assert::equals(Primitive::$INT, $t->getField('value')->getType());
+    Assert::equals(Primitive::$INT, $t->property('value')->constraint()->type());
   }
 
   #[Test]
   public function modifiers_available_via_reflection() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private int $value;
     }');
 
-    Assert::equals(MODIFIER_PRIVATE, $t->getField('value')->getModifiers());
+    Assert::equals(MODIFIER_PRIVATE, $t->property('value')->modifiers()->bits());
   }
 
   #[Test, Expect(class: Error::class, message: '/Cannot access private property .+::\\$value/')]
   public function cannot_read_private_field() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private int $value;
     }');
 
@@ -38,7 +38,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Expect(class: Error::class, message: '/Cannot access private property .+::\\$value/')]
   public function cannot_write_private_field() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private int $value;
     }');
 
@@ -47,7 +47,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+::\\$value/')]
   public function cannot_read_protected_field() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       protected int $value;
     }');
 
@@ -56,7 +56,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Expect(class: Error::class, message: '/Cannot access protected property .+::\\$value/')]
   public function cannot_write_protected_field() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       protected int $value;
     }');
 
@@ -65,10 +65,10 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test]
   public function can_access_protected_field_from_subclass() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       protected int $value;
     }');
-    $i= newinstance($t->getName(), [], [
+    $i= newinstance($t->literal(), [], [
       'run' => function() {
         $this->value= 6100;
         return $this->value;
@@ -80,16 +80,16 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test]
   public function initial_value_available_via_reflection() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private int $value = 6100;
     }');
 
-    Assert::equals(6100, $t->getField('value')->setAccessible(true)->get($t->newInstance()));
+    Assert::equals(6100, $t->property('value')->get($t->newInstance(), $t));
   }
 
   #[Test, Values([[null], ['Test'], [[]]]), Expect(class: Error::class, message: '/property .+::\$value of type int/')]
   public function type_checked_at_runtime($in) {
-    $this->run('class <T> {
+    $this->run('class %T {
       private int $value;
 
       public function run($arg) {
@@ -101,7 +101,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
   #[Test]
   public function value_type_test() {
     $handle= new Handle(0);
-    $r= $this->run('use lang\ast\unittest\emit\Handle; class <T> {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class %T {
       private Handle $value;
 
       public function run($arg) {
@@ -115,7 +115,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Values(['', 'Test', 1, 1.5, true, false])]
   public function string_type_coercion($in) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private string $value;
 
       public function run($arg) {
@@ -129,7 +129,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Values(['', 'Test', 1, 1.5, true, false])]
   public function bool_type_coercion($in) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private bool $value;
 
       public function run($arg) {
@@ -143,7 +143,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Values(['1', '1.5', 1, 1.5, true, false])]
   public function int_type_coercion($in) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private int $value;
 
       public function run($arg) {
@@ -157,7 +157,7 @@ class VirtualPropertyTypesTest extends EmittingTest {
 
   #[Test, Values(['1', '1.5', 1, 1.5, true, false])]
   public function float_type_coercion($in) {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private float $value;
 
       public function run($arg) {

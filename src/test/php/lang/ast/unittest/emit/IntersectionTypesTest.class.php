@@ -13,73 +13,73 @@ class IntersectionTypesTest extends EmittingTest {
 
   #[Test]
   public function field_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private Traversable&Countable $test;
     }');
 
     Assert::equals(
       new TypeIntersection([new XPClass('Traversable'), new XPClass('Countable')]),
-      $t->getField('test')->getType()
+      $t->property('test')->constraint()->type()
     );
   }
 
   #[Test]
   public function parameter_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function test(Traversable&Countable $arg) { }
     }');
 
     Assert::equals(
       new TypeIntersection([new XPClass('Traversable'), new XPClass('Countable')]),
-      $t->getMethod('test')->getParameter(0)->getType()
+      $t->method('test')->parameter(0)->constraint()->type()
     );
   }
 
   #[Test]
   public function return_type() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function test(): Traversable&Countable { }
     }');
 
     Assert::equals(
       new TypeIntersection([new XPClass('Traversable'), new XPClass('Countable')]),
-      $t->getMethod('test')->getReturnType()
+      $t->method('test')->returns()->type()
     );
   }
 
   #[Test, Runtime(php: '>=8.1.0-dev')]
   public function field_type_restriction_with_php81() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private Traversable&Countable $test;
     }');
 
     Assert::equals(
       new TypeIntersection([new XPClass('Traversable'), new XPClass('Countable')]),
-      $t->getField('test')->getTypeRestriction()
+      $t->property('test')->constraint()->type()
     );
   }
 
-  #[Test, Runtime(php: '>=8.1.0-dev')]
+  #[Test, Runtime(php: '>=8.1.0')]
   public function parameter_type_restriction_with_php81() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function test(Traversable&Countable $arg) { }
     }');
 
     Assert::equals(
       new TypeIntersection([new XPClass('Traversable'), new XPClass('Countable')]),
-      $t->getMethod('test')->getParameter(0)->getTypeRestriction()
+      $t->method('test')->parameter(0)->constraint()->type()
     );
   }
 
-  #[Test, Runtime(php: '>=8.1.0-dev')]
+  #[Test, Runtime(php: '>=8.1.0')]
   public function return_type_restriction_with_php81() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       public function test(): Traversable&Countable { }
     }');
 
     Assert::equals(
       new TypeIntersection([new XPClass('Traversable'), new XPClass('Countable')]),
-      $t->getMethod('test')->getReturnTypeRestriction()
+      $t->method('test')->returns()->type()
     );
   }
 }
