@@ -24,6 +24,7 @@ class PHP74 extends PHP {
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteProperties,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 

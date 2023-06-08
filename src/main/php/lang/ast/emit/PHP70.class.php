@@ -29,6 +29,7 @@ class PHP70 extends PHP {
     RewriteLambdaExpressions,
     RewriteMultiCatch,
     RewriteProperties,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 

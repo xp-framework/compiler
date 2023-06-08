@@ -27,6 +27,7 @@ class PHP72 extends PHP {
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
     RewriteProperties,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 
