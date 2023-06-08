@@ -27,6 +27,7 @@ class PHP73 extends PHP {
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 

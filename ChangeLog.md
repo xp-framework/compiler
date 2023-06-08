@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented feature #162: Arbitrary static variable initializers, see
+  https://wiki.php.net/rfc/arbitrary_static_variable_initializers
+  (@thekid)
+
 ## 8.13.0 / 2023-06-04
 
 * Merged PR #169: Refactor how annotations with non-constant arguments

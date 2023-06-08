@@ -27,6 +27,7 @@ class PHP71 extends PHP {
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 

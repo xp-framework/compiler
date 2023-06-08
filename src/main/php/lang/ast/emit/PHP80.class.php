@@ -27,7 +27,8 @@ class PHP80 extends PHP {
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteEnums,
-    RewriteExplicitOctals
+    RewriteExplicitOctals,
+    RewriteStaticVariableInitializations
   ;
 
   /** Sets up type => literal mappings */

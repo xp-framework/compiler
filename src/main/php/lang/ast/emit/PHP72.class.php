@@ -27,6 +27,7 @@ class PHP72 extends PHP {
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 
