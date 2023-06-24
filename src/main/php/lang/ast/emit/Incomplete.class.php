@@ -18,4 +18,14 @@ class Incomplete extends Type {
   public function rewriteEnumCase($member) {
     return false;
   }
+
+  /**
+   * Returns the (fully qualified) default implementations' trait name for
+   * interfaces, or `null`.
+   *
+   * @return ?string
+   */
+  public function defaultImplementations() {
+    return null;
+  }
 }

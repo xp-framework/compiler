@@ -20,17 +20,21 @@ class Declaration extends Type {
   public function name() { return ltrim($this->type->name, '\\'); }
 
   /**
-   * Returns whether this is an interface with default implementations
+   * Returns the (fully qualified) default implementations' trait name for
+   * interfaces, or `null`.
    *
-   * @return bool
+   * @return ?string
    */
   public function defaultImplementations() {
-    if ('interface' === $this->type->kind) {
-      foreach ($this->type->body as $member) {
-        if ($member instanceof Method && null !== $member->body) return true;
+    if ('interface' !== $this->type->kind) return null;
+
+    foreach ($this->type->body as $member) {
+      if ($member instanceof Method && null !== $member->body) {
+        $p= strrpos($this->type->name, '\\');
+        return substr($this->type->name, 0, $p).'\\__'.substr($this->type->name, $p + 1).'_Defaults';
       }
     }
-    return false;
+    return null;
   }
 
   /**

@@ -24,12 +24,19 @@ class Reflection extends Type {
   public function name() { return $this->reflect->name; }
 
   /**
-   * Returns whether this is an interface with default implementations
+   * Returns the (fully qualified) default implementations' trait name for
+   * interfaces, or `null`.
    *
-   * @return bool
+   * @return ?string
    */
   public function defaultImplementations() {
-    return $this->reflect->isInterface() && trait_exists('__'.$this->reflect->name.'_Defaults', false);
+    if (!$this->reflect->isInterface()) return null;
+
+    $defaults= false === ($p= strrpos($this->reflect->name, '\\'))
+      ? "__{$this->reflect->name}_Defaults"
+      : substr($this->reflect->name, 0, $p).'\\__'.substr($this->reflect->name, $p + 1).'_Defaults'
+    ;
+    return trait_exists($defaults, false) ? '\\'.$defaults : null;
   }
 
   /**

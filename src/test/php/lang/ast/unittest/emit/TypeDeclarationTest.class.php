@@ -69,9 +69,9 @@ class TypeDeclarationTest extends EmittingTest {
     );
   }
 
-  #[Test]
-  public function interface_type_with_default_method() {
-    $i= $this->type('interface <T> {
+  #[Test, Values(['', 'namespace test;'])]
+  public function interface_type_with_default_method($namespace) {
+    $i= $this->type($namespace.' interface <T> {
       public function all();
       public function filter($filter) {
         foreach ($this->all() as $element) {
@@ -79,7 +79,7 @@ class TypeDeclarationTest extends EmittingTest {
         }
       }
     }');
-    $t= $this->type('class <T> implements '.$i->literal().'{
+    $t= $this->type($namespace.' class <T> implements \\'.$i->literal().'{
       public function all() { return [1, 2, 3]; }
     }');
     Assert::equals([2], iterator_to_array($t->newInstance()->filter(function($i) { return $i % 2; })));

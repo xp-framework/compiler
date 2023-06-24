@@ -430,7 +430,9 @@ abstract class PHP extends Emitter {
       $list= '';
       foreach ($class->implements as $type) {
         $list.= ', '.$type->literal();
-        $result->lookup($type->literal())->defaultImplementations() && $defaults[]= $type;
+        if ($default= $result->lookup($type->literal())->defaultImplementations()) {
+          $defaults[]= $default;
+        }
       }
       $result->out->write(' implements '.substr($list, 2));
     }
@@ -476,9 +478,8 @@ abstract class PHP extends Emitter {
       $result->out->write('}');
     }
 
-    foreach ($defaults as $trait) {
-      $result->out->write('use __'.substr($trait->literal(), 1).'_Defaults;');
-    }
+    // Use interface default implementations
+    $defaults && $result->out->write('use '.implode(', ', $defaults).';');
 
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $context->statics);
@@ -553,11 +554,9 @@ abstract class PHP extends Emitter {
 
     // Emit default implementations
     if (isset($result->locals[3])) {
-      $this->emitOne($result, new TraitDeclaration(
-        [],
-        new IsValue('\\__'.$interface->declaration().'_Defaults'),
-        $result->locals[3]
-      ));
+      $p= strrpos($interface->name, '\\');
+      $name= substr($interface->name, 0, $p).'\\__'.substr($interface->name, $p + 1).'_Defaults';
+      $this->emitOne($result, new TraitDeclaration([], new IsValue($name), $result->locals[3]));
     }
 
     $result->codegen->leave();
