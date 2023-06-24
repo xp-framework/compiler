@@ -15,7 +15,7 @@ class EchoTest extends EmittingTest {
   private function assertEchoes($expected, $statement) {
     ob_start();
     try {
-      $this->run('class <T> {
+      $this->run('class %T {
         private function hello() { return "Hello"; }
         public function run() { '.$statement.' }
       }');

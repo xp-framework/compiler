@@ -1,7 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{InstanceExpression, ScopeExpression, Literal, Variable};
+use lang\ast\nodes\{Expression, InstanceExpression, ScopeExpression, Literal, Variable};
 use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
 
 /**
@@ -19,6 +19,7 @@ class PHP70 extends PHP {
     NullsafeAsTernaries,
     OmitArgumentNames,
     OmitConstModifiers,
+    OmitConstantTypes,
     OmitPropertyTypes,
     ReadonlyClasses,
     ReadonlyProperties,
@@ -28,6 +29,7 @@ class PHP70 extends PHP {
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
     RewriteMultiCatch,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 
@@ -74,6 +76,9 @@ class PHP70 extends PHP {
       $this->emitOne($result, $callable->expression->expression);
       if ($callable->expression->member instanceof Literal) {
         $result->out->write(',"'.trim($callable->expression->member, '"\'').'"');
+      } else if ($callable->expression->member instanceof Expression) {
+        $result->out->write(',');
+        $this->emitOne($result, $callable->expression->member->inline);
       } else {
         $result->out->write(',');
         $this->emitOne($result, $callable->expression->member);
@@ -90,6 +95,9 @@ class PHP70 extends PHP {
       }
       if ($callable->expression->member instanceof Literal) {
         $result->out->write(',"'.trim($callable->expression->member, '"\'').'"');
+      } else if ($callable->expression->member instanceof Expression) {
+        $result->out->write(',');
+        $this->emitOne($result, $callable->expression->member->inline);
       } else {
         $result->out->write(',');
         $this->emitOne($result, $callable->expression->member);

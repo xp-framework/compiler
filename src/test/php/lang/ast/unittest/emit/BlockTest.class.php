@@ -6,7 +6,7 @@ class BlockTest extends EmittingTest {
 
   #[Test]
   public function empty_block() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         {
         }
@@ -19,7 +19,7 @@ class BlockTest extends EmittingTest {
 
   #[Test]
   public function block_with_assignment() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         {
           $result= true;

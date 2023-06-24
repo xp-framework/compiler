@@ -3,6 +3,63 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented feature #162: Arbitrary static variable initializers, see
+  https://wiki.php.net/rfc/arbitrary_static_variable_initializers
+  (@thekid)
+
+## 8.13.0 / 2023-06-04
+
+* Merged PR #169: Refactor how annotations with non-constant arguments
+  are emitted. This enables a transition to `xp-framework/reflection`
+  as proposed in xp-framework/rfc#338
+  (@thekid)
+
+## 8.12.0 / 2023-05-21
+
+* Merged PR #168: Return by reference from methods and functions, see
+  https://www.php.net/manual/en/language.references.return.php
+  (@thekid)
+* Make it possible to refer to constructor parameters inside property
+  initialization expressions.
+  (@thekid)
+
+## 8.11.0 / 2023-04-17
+
+* Merged PR #165: Omit constant types for all PHP versions < 8.3. This
+  is the second part of #157, and fully implements typed constants,
+  https://wiki.php.net/rfc/typed_class_constants
+  (@thekid)
+* Merged PR #163: Emit meta data for class constants. This makes types
+  accessible via reflection and is part of #157.
+  (@thekid)
+
+## 8.10.0 / 2023-04-08
+
+* Merged PR #161: Support dynamic class constant fetch, the first PHP
+  8.3 feature: https://wiki.php.net/rfc/dynamic_class_constant_fetch
+  (@thekid)
+
+## 8.9.0 / 2023-02-19
+
+* Merged PR #159: Implement command line option to set file extension
+  for compiled files. This makes integrating with PSR-4 autoloading an
+  easy task, see https://www.php-fig.org/psr/psr-4/
+  (@thekid)
+
+## 8.8.5 / 2023-02-19
+
+* Fixed issue #160: Fatal error: Label 'c1107822099' already defined 
+  (@thekid)
+
+## 8.8.4 / 2023-02-19
+
+* Fixed optimization for `::class` constant resolution - @thekid
+
+## 8.8.3 / 2023-02-12
+
+* Merged PR #155: Do not error at compile time for unresolved classes
+  (@thekid)
+
 ## 8.8.2 / 2023-02-12
 
 * Fixed emitted meta information for generic declarations - @thekid

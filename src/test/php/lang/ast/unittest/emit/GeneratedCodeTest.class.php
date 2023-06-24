@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\emit\{Declaration, Escaping, GeneratedCode, InType, Reflection};
+use lang\ast\emit\{Declaration, Escaping, GeneratedCode, InType, Reflection, Incomplete};
 use lang\ast\nodes\ClassDeclaration;
 use lang\ast\types\IsValue;
 use lang\{ClassNotFoundException, Value};
@@ -83,10 +83,10 @@ class GeneratedCodeTest {
     Assert::equals(new Reflection(Value::class), $r->lookup('\\lang\\Value'));
   }
 
-  #[Test, Expect(ClassNotFoundException::class)]
+  #[Test]
   public function lookup_non_existant() {
     $r= new GeneratedCode(new MemoryOutputStream());
-    $r->lookup('\\NotFound');
+    Assert::instance(Incomplete::class, $r->lookup('\\NotFound'));
   }
 
   #[Test]

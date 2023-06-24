@@ -7,7 +7,7 @@ class InstantiationTest extends EmittingTest {
 
   #[Test]
   public function new_type() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return new \\util\\Date();
       }
@@ -17,7 +17,7 @@ class InstantiationTest extends EmittingTest {
 
   #[Test]
   public function new_var() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $class= \\util\\Date::class;
         return new $class();
@@ -27,8 +27,32 @@ class InstantiationTest extends EmittingTest {
   }
 
   #[Test]
+  public function new_dynamic_var() {
+    $r= $this->run('class %T {
+      public function run() {
+        $class= \\util\\Date::class;
+        $var= "class";
+        return new $$var();
+      }
+    }');
+    Assert::instance(Date::class, $r);
+  }
+
+  #[Test]
+  public function new_var_expr() {
+    $r= $this->run('class %T {
+      public function run() {
+        $class= \\util\\Date::class;
+        $var= "class";
+        return new ${$var}();
+      }
+    }');
+    Assert::instance(Date::class, $r);
+  }
+
+  #[Test]
   public function new_expr() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       private function factory() { return \\util\\Date::class; }
 
       public function run() {
@@ -40,7 +64,7 @@ class InstantiationTest extends EmittingTest {
 
   #[Test]
   public function passing_argument() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public $value;
 
       public function __construct($value= null) { $this->value= $value; }

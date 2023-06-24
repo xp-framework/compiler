@@ -38,19 +38,19 @@ class TransformationsTest extends EmittingTest {
 
   #[Test]
   public function leaves_class_without_annotations() {
-    $t= $this->type('class <T> {
+    $t= $this->declare('class %T {
       private int $id;
 
       public function __construct(int $id) {
         $this->id= $id;
       }
     }');
-    Assert::false($t->hasMethod('id'));
+    Assert::equals(null, $t->method('id'));
   }
 
   #[Test]
   public function generates_string_representation() {
-    $t= $this->type('#[Repr] class <T> {
+    $t= $this->declare('#[Repr] class %T {
       private int $id;
       private string $name;
 
@@ -59,16 +59,16 @@ class TransformationsTest extends EmittingTest {
         $this->name= $name;
       }
     }');
-    Assert::true($t->hasMethod('toString'));
+    Assert::notEquals(null, $t->method('toString'));
     Assert::equals(
       "T@[\n  id => 1\n  name => \"Test\"\n]",
-      $t->getMethod('toString')->invoke($t->newInstance(1, 'Test'))
+      $t->method('toString')->invoke($t->newInstance(1, 'Test'))
     );
   }
 
   #[Test, Values([['id', 1], ['name', 'Test']])]
   public function generates_accessor($name, $expected) {
-    $t= $this->type('#[Getters] class <T> {
+    $t= $this->declare('#[Getters] class %T {
       private int $id;
       private string $name;
 
@@ -77,13 +77,13 @@ class TransformationsTest extends EmittingTest {
         $this->name= $name;
       }
     }');
-    Assert::true($t->hasMethod($name));
-    Assert::equals($expected, $t->getMethod($name)->invoke($t->newInstance(1, 'Test')));
+    Assert::notEquals(null, $t->method($name));
+    Assert::equals($expected, $t->method($name)->invoke($t->newInstance(1, 'Test')));
   }
 
   #[Test]
   public function generates_both() {
-    $t= $this->type('#[Repr, Getters] class <T> {
+    $t= $this->declare('#[Repr, Getters] class %T {
       private int $id;
       private string $name;
 
@@ -94,11 +94,11 @@ class TransformationsTest extends EmittingTest {
     }');
 
     $instance= $t->newInstance(1, 'Test');
-    Assert::equals(1, $t->getMethod('id')->invoke($instance));
-    Assert::equals('Test', $t->getMethod('name')->invoke($instance));
+    Assert::equals(1, $t->method('id')->invoke($instance));
+    Assert::equals('Test', $t->method('name')->invoke($instance));
     Assert::equals(
       "T@[\n  id => 1\n  name => \"Test\"\n]",
-      $t->getMethod('toString')->invoke($instance)
+      $t->method('toString')->invoke($instance)
     );
   }
 }

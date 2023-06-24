@@ -7,6 +7,7 @@ use lang\ast\nodes\{
   BinaryExpression,
   Block,
   Comment,
+  Expression,
   InstanceExpression,
   Literal,
   Property,
@@ -21,6 +22,7 @@ use lang\ast\{Emitter, Node, Type, Result};
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
   const METHOD   = 1;
+  const CONSTANT = 2;
 
   protected $literals= [];
 
@@ -94,6 +96,22 @@ abstract class PHP extends Emitter {
   }
 
   /**
+   * As of PHP 8.3: Constant type declarations support all type declarations
+   * supported by PHP with the exception of void and callable.
+   *
+   * @see    https://wiki.php.net/rfc/typed_class_constants#supported_types
+   * @param  ?lang.ast.Type $type
+   * @return ?string
+   */
+  protected function constantType($type) {
+    if (null === $type || $type instanceof IsFunction || 'callable' === $type->literal()) {
+      return null;
+    } else {
+      return $this->literal($type);
+    }
+  }
+
+  /**
    * Enclose a node inside a closure
    *
    * @param  lang.ast.Result $result
@@ -105,8 +123,8 @@ abstract class PHP extends Emitter {
   protected function enclose($result, $node, $signature, $static, $emit) {
     $capture= [];
     foreach ($result->codegen->search($node, 'variable') as $var) {
-      if (isset($result->locals[$var->name])) {
-        $capture[$var->name]= true;
+      if (isset($result->locals[$var->pointer])) {
+        $capture[$var->pointer]= true;
       }
     }
     unset($capture['this']);
@@ -216,20 +234,26 @@ abstract class PHP extends Emitter {
     foreach ($static->initializations as $variable => $initial) {
       $result->out->write('static $'.$variable);
       if ($initial) {
-        if ($this->isConstant($result, $initial)) {
-          $result->out->write('=');
-          $this->emitOne($result, $initial);
-        } else {
-          $result->out->write('= null; null === $'.$variable.' && $'.$variable.'= ');
-          $this->emitOne($result, $initial);
-        }
+        $result->out->write('=');
+        $this->emitOne($result, $initial);
       }
       $result->out->write(';');
     }
   }
 
   protected function emitVariable($result, $variable) {
-    $result->out->write('$'.$variable->name);
+    if ($variable->const) {
+      $result->out->write('$'.$variable->pointer);
+    } else {
+      $result->out->write('$');
+      $this->emitOne($result, $variable->pointer);
+    }
+  }
+
+  protected function emitExpression($result, $expression) {
+    $result->out->write('{');
+    $this->emitOne($result, $expression->inline);
+    $result->out->write('}');
   }
 
   protected function emitCast($result, $cast) {
@@ -288,7 +312,6 @@ abstract class PHP extends Emitter {
         $this->emitOne($result, $parameter->default);
       } else {
         $result->out->write('=null');
-        $result->codegen->scope[0]->init['null === $'.$parameter->name.' && $'.$parameter->name]= $parameter->default;
       }
     }
     $result->locals[$parameter->name]= true;
@@ -311,7 +334,7 @@ abstract class PHP extends Emitter {
     $result->stack[]= $result->locals;
     $result->locals= [];
 
-    $result->out->write('function '.$function->name); 
+    $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
     $this->emitSignature($result, $function->signature);
 
     $result->out->write('{');
@@ -349,6 +372,15 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitEnumCase($result, $case) {
+    $result->codegen->scope[0]->meta[self::CONSTANT][$case->name]= [
+      DETAIL_RETURNS     => 'self',
+      DETAIL_ANNOTATIONS => $case->annotations,
+      DETAIL_COMMENT     => $case->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
+    ];
+
+    $case->annotations && $this->emitOne($result, $case->annotations);
     $result->out->write('case '.$case->name);
     if ($case->expression) {
       $result->out->write('=');
@@ -420,7 +452,7 @@ abstract class PHP extends Emitter {
       foreach ($context->virtual as $name => $access) {
         $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[0]);
-        $result->out->write('break;');
+        $result->out->write(';break;');
       }
       isset($context->virtual[null]) || $result->out->write(
         'default: trigger_error("Undefined property ".__CLASS__."::".$name, E_USER_WARNING);'
@@ -431,7 +463,7 @@ abstract class PHP extends Emitter {
       foreach ($context->virtual as $name => $access) {
         $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[1]);
-        $result->out->write('break;');
+        $result->out->write(';break;');
       }
       $result->out->write('}}');
     }
@@ -474,24 +506,18 @@ abstract class PHP extends Emitter {
       if ($this->isConstant($result, $argument)) continue;
 
       // Found first non-constant argument, enclose in `eval`
-      $result->out->write('(eval: \'');
-      $result->out= new Escaping($result->out, ["'" => "\\'", '\\' => '\\\\']);
+      $escaping= new Escaping($result->out, ["'" => "\\'", '\\' => '\\\\']);
+      $result->out->write('(eval: [');
+      foreach ($annotation->arguments as $name => $argument) {
+        is_string($name) && $result->out->write("'{$name}'=>");
 
-      // If exactly one unnamed argument exists, emit its value directly
-      if (1 === sizeof($annotation->arguments) && 0 === key($annotation->arguments)) {
-        $this->emitOne($result, current($annotation->arguments));
-      } else {
-        $result->out->write('[');
-        foreach ($annotation->arguments as $key => $argument) {
-          $result->out->write("'{$key}'=>");
-          $this->emitOne($result, $argument);
-          $result->out->write(',');
-        }
-        $result->out->write(']');
+        $result->out->write("'");
+        $result->out= $escaping;
+        $this->emitOne($result, $argument);
+        $result->out= $escaping->original();
+        $result->out->write("',");
       }
-
-      $result->out= $result->out->original();
-      $result->out->write('\')');
+      $result->out->write('])');
       return;
     }
 
@@ -568,9 +594,17 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitConst($result, $const) {
+    $result->codegen->scope[0]->meta[self::CONSTANT][$const->name]= [
+      DETAIL_RETURNS     => $const->type ? $const->type->name() : 'var',
+      DETAIL_ANNOTATIONS => $const->annotations,
+      DETAIL_COMMENT     => $const->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
+    ];
+
     $const->comment && $this->emitOne($result, $const->comment);
     $const->annotations && $this->emitOne($result, $const->annotations);
-    $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$const->name.'=');
+    $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$this->constantType($const->type).' '.$const->name.'=');
     $this->emitOne($result, $const->expression);
     $result->out->write(';');
   }
@@ -613,15 +647,21 @@ abstract class PHP extends Emitter {
 
     $method->comment && $this->emitOne($result, $method->comment);
     $method->annotations && $this->emitOne($result, $method->annotations);
-    $result->at($method->declared)->out->write(implode(' ', $method->modifiers).' function '.$method->name);
+    $result->at($method->declared)->out->write(
+      implode(' ', $method->modifiers).
+      ' function '.
+      ($method->signature->byref ? '&' : '').
+      $method->name
+    );
 
-    $promoted= [];
+    $promoted= $init= [];
     foreach ($method->signature->parameters as $param) {
       if (isset($param->promote)) $promoted[]= $param;
 
       // Create a parameter annotation named `default` for non-constant parameter defaults
       if (isset($param->default) && !$this->isConstant($result, $param->default)) {
         $param->annotate(new Annotation('default', [$param->default]));
+        $init[]= $param;
       }
 
       $meta[DETAIL_TARGET_ANNO][$param->name]= $param->annotations;
@@ -637,11 +677,25 @@ abstract class PHP extends Emitter {
       $default= $method;
     } else {
       $result->out->write(' {');
-      $this->emitInitializations($result, $result->codegen->scope[0]->init);
-      $result->codegen->scope[0]->init= [];
+
+      // Emit non-constant parameter defaults
+      foreach ($init as $param) {
+        $result->out->write('null === $'.$param->name.' && $'.$param->name.'=');
+        $this->emitOne($result, $param->default);
+        $result->out->write(';');
+      }
+
+      // Emit promoted parameters
       foreach ($promoted as $param) {
         $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
       }
+
+      // Emit initializations if inside constructor
+      if ('__construct' === $method->name) {
+        $this->emitInitializations($result, $result->codegen->scope[0]->init);
+        $result->codegen->scope[0]->init= [];
+      }
+
       $this->emitAll($result, $method->body);
       $result->out->write('}');
       $default= null;
@@ -701,10 +755,10 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitAssign($result, $target) {
-    if ('variable' === $target->kind) {
-      $result->out->write('$'.$target->name);
-      $result->locals[$target->name]= true;
-    } else if ('array' === $target->kind) {
+    if ($target instanceof Variable && $target->const) {
+      $result->out->write('$'.$target->pointer);
+      $result->locals[$target->pointer]= true;
+    } else if ($target instanceof ArrayLiteral) {
       $result->out->write('list(');
       foreach ($target->values as $pair) {
         if ($pair[0]) {
@@ -840,7 +894,8 @@ abstract class PHP extends Emitter {
       $result->out->write(' => ');
     }
 
-    if ('array' === $foreach->value->kind) {
+    // Support empty elements: `foreach (<expr> as [$a, , $b])`
+    if ($foreach->value instanceof ArrayLiteral) {
       $result->out->write('[');
       foreach ($foreach->value->values as $pair) {
         if ($pair[0]) {
@@ -987,6 +1042,13 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitCallable($result, $callable) {
+
+    // Disambiguate the following:
+    //
+    // - `T::{$func}`, a dynamic class constant
+    // - `T::{$func}(...)`, a dynamic first-class callable
+    $callable->expression->line= -1;
+
     $this->emitOne($result, $callable->expression);
     $result->out->write('(...)');
   }
@@ -1010,21 +1072,29 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitScope($result, $scope) {
+
+    // $x::<expr> vs. e.g. invoke()::<expr> vs. T::<expr>
     if ($scope->type instanceof Variable) {
       $this->emitOne($result, $scope->type);
       $result->out->write('::');
-      $this->emitOne($result, $scope->member);
     } else if ($scope->type instanceof Node) {
       $t= $result->temp();
-      $result->out->write('('.$t.'=');
+      $result->out->write('(null==='.$t.'=');
       $this->emitOne($result, $scope->type);
-      $result->out->write(')?'.$t.'::');
-      $this->emitOne($result, $scope->member);
-      $result->out->write(':null');
-    } else if ($scope->member instanceof Literal && $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)) {
-      $result->out->write($scope->type.'::$'.$scope->member->expression);
+      $result->out->write(")?null:{$t}::");
     } else {
-      $result->out->write($scope->type.'::');
+      $result->out->write("{$scope->type}::");
+    }
+
+    // Rewrite T::member to T::$member for XP enums
+    if (
+      $scope->member instanceof Literal &&
+      is_string($scope->type) &&
+      'class' !== $scope->member->expression &&
+      $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
+    ) {
+      $result->out->write('$'.$scope->member->expression);
+    } else {
       $this->emitOne($result, $scope->member);
     }
   }
@@ -1039,26 +1109,13 @@ abstract class PHP extends Emitter {
       $result->out->write('->');
     }
 
-    if ('literal' === $instance->member->kind) {
-      $result->out->write($instance->member->expression);
-    } else {
-      $result->out->write('{');
-      $this->emitOne($result, $instance->member);
-      $result->out->write('}');
-    }
+    $this->emitOne($result, $instance->member);
   }
 
   protected function emitNullsafeInstance($result, $instance) {
     $this->emitOne($result, $instance->expression);
     $result->out->write('?->');
-
-    if ('literal' === $instance->member->kind) {
-      $result->out->write($instance->member->expression);
-    } else {
-      $result->out->write('{');
-      $this->emitOne($result, $instance->member);
-      $result->out->write('}');
-    }
+    $this->emitOne($result, $instance->member);
   }
 
   protected function emitUnpack($result, $unpack) {

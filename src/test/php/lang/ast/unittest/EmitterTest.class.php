@@ -74,7 +74,10 @@ class EmitterTest {
   #[Test]
   public function transform_modifying_node() {
     $fixture= $this->newEmitter();
-    $fixture->transform('variable', function($codegen, $var) { $var->name= '_'.$var->name; return $var; });
+    $fixture->transform('variable', function($codegen, $var) {
+      $var->pointer= '_'.$var->pointer;
+      return $var;
+    });
     $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
     Assert::equals('<?php $_a;', $out->bytes());
@@ -83,7 +86,9 @@ class EmitterTest {
   #[Test]
   public function transform_to_node() {
     $fixture= $this->newEmitter();
-    $fixture->transform('variable', function($codegen, $var) { return new Code('$variables["'.$var->name.'"]'); });
+    $fixture->transform('variable', function($codegen, $var) {
+      return new Code('$variables["'.$var->pointer.'"]');
+    });
     $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
     Assert::equals('<?php $variables["a"];', $out->bytes());
@@ -92,7 +97,9 @@ class EmitterTest {
   #[Test]
   public function transform_to_array() {
     $fixture= $this->newEmitter();
-    $fixture->transform('variable', function($codegen, $var) { return [new Code('$variables["'.$var->name.'"]')]; });
+    $fixture->transform('variable', function($codegen, $var) {
+      return [new Code('$variables["'.$var->pointer.'"]')];
+    });
     $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
     Assert::equals('<?php $variables["a"];;', $out->bytes());

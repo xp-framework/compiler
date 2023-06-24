@@ -53,4 +53,4 @@ jobs:
         echo "vendor/autoload.php" > composer.pth
 
     - name: Run test suite
-      run: sh xp-run xp.test.Runner src/test/php
+      run: sh xp-run xp.test.Runner -r Dots src/test/php

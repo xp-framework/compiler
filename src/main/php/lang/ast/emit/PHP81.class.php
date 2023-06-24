@@ -1,7 +1,16 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Node;
-use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNullable, IsValue, IsLiteral, IsGeneric};
+use lang\ast\types\{
+  IsArray,
+  IsFunction,
+  IsGeneric,
+  IsIntersection,
+  IsLiteral,
+  IsMap,
+  IsNullable,
+  IsUnion,
+  IsValue
+};
 
 /**
  * PHP 8.1 syntax
@@ -10,7 +19,13 @@ use lang\ast\types\{IsUnion, IsIntersection, IsFunction, IsArray, IsMap, IsNulla
  * @see  https://wiki.php.net/rfc#php_81
  */
 class PHP81 extends PHP {
-  use RewriteBlockLambdaExpressions, ReadonlyClasses;
+  use
+    RewriteBlockLambdaExpressions,
+    RewriteDynamicClassConstants,
+    RewriteStaticVariableInitializations,
+    ReadonlyClasses,
+    OmitConstantTypes
+  ;
 
   /** Sets up type => literal mappings */
   public function __construct() {

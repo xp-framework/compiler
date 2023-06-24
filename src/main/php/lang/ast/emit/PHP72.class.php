@@ -18,6 +18,7 @@ class PHP72 extends PHP {
     NonCapturingCatchVariables,
     NullsafeAsTernaries,
     OmitArgumentNames,
+    OmitConstantTypes,
     OmitPropertyTypes,
     ReadonlyProperties,
     ReadonlyClasses,
@@ -26,6 +27,7 @@ class PHP72 extends PHP {
     RewriteEnums,
     RewriteExplicitOctals,
     RewriteLambdaExpressions,
+    RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
 

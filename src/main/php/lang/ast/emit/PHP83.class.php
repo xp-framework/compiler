@@ -13,19 +13,12 @@ use lang\ast\types\{
 };
 
 /**
- * PHP 8.2 syntax
+ * PHP 8.3 syntax
  *
- * @test lang.ast.unittest.emit.PHP82Test
- * @see  https://wiki.php.net/rfc#php_82
+ * @see  https://wiki.php.net/rfc#php_83
  */
-class PHP82 extends PHP {
-  use
-    RewriteBlockLambdaExpressions, 
-    RewriteDynamicClassConstants, 
-    RewriteStaticVariableInitializations, 
-    ReadonlyClasses, 
-    OmitConstantTypes
-  ;
+class PHP83 extends PHP {
+  use RewriteBlockLambdaExpressions, ReadonlyClasses;
 
   /** Sets up type => literal mappings */
   public function __construct() {

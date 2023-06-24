@@ -16,29 +16,29 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack language, PHP 8.2, 8.1, 8.0, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 7.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.3, PHP 8.2, 8.1, 8.0, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 7.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
 
-use lang\Type;
+use lang\Reflection;
 use util\cmd\Console;
 
 #[Author('Timm Friebe')]
 #[Permissions(0o777)]
 class HelloWorld {
-  public const GREETING = 'Hello';
+  public const string GREETING = 'Hello';
 
   public static function main(array<string> $args): void {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
-    $author= Type::forName(self::class)->getAnnotation('author');
+    $author= Reflection::type(self::class)->annotation(Author::class)->argument(0);
 
     Console::writeLine($greet($args[0] ?? 'World', from: $author));
   }
 }
 ```
 
-To run this code, use `xp HelloWorld` in a terminal window.
+To run this code, use `xp -m /path/to/xp/reflection HelloWorld` in a terminal window.
 
 Compilation
 -----------
@@ -75,7 +75,9 @@ Features supported
 
 XP Compiler supports features such as annotations, arrow functions, enums, property type-hints, the null-safe instance operator as well as all PHP 7 and PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
 
-Additional syntax can be added by installing compiler plugins from [here](https://github.com/xp-lang):
+### More features
+
+Additional syntax like an `is` operator, generics or record types can be added by installing compiler plugins from [here](https://github.com/xp-lang):
 
 ```bash
 $ composer require xp-lang/php-is-operator
@@ -90,8 +92,9 @@ lang.ast.emit.PHP71
 lang.ast.emit.PHP72
 lang.ast.emit.PHP74
 lang.ast.emit.PHP80
-lang.ast.emit.PHP81 [*]
-lang.ast.emit.PHP82
+lang.ast.emit.PHP81
+lang.ast.emit.PHP82 [*]
+lang.ast.emit.PHP83
 lang.ast.syntax.php.Using [*]
 
 @FileSystemCL<./vendor/xp-lang/php-is-operator/src/main/php>

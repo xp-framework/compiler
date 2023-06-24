@@ -6,7 +6,7 @@ class NullCoalesceTest extends EmittingTest {
 
   #[Test]
   public function on_null() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return null ?? true;
       }
@@ -17,7 +17,7 @@ class NullCoalesceTest extends EmittingTest {
 
   #[Test]
   public function on_unset_array_key() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         return $array["key"] ?? true;
       }
@@ -28,7 +28,7 @@ class NullCoalesceTest extends EmittingTest {
 
   #[Test]
   public function assignment_operator() {
-    $r= $this->run('class <T> {
+    $r= $this->run('class %T {
       public function run() {
         $array["key"] ??= true;
         return $array;
