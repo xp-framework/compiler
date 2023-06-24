@@ -553,10 +553,10 @@ abstract class PHP extends Emitter {
     $this->emitMeta($result, $interface->name, $interface->annotations, $interface->comment);
 
     // Emit default implementations
-    if (isset($result->locals[3])) {
+    if ($defaults= $result->codegen->scope[0]->defaultImplementations) {
       $p= strrpos($interface->name, '\\');
       $name= substr($interface->name, 0, $p).'\\__'.substr($interface->name, $p + 1).'_Defaults';
-      $this->emitOne($result, new TraitDeclaration([], new IsValue($name), $result->locals[3]));
+      $this->emitOne($result, new TraitDeclaration([], new IsValue($name), $defaults));
     }
 
     $result->codegen->leave();
@@ -670,10 +670,9 @@ abstract class PHP extends Emitter {
 
     if (null === $method->body) {
       $result->out->write(';');
-      $default= null;
     } else if ('interface' === $result->codegen->scope[0]->type->kind) {
       $result->out->write(';');
-      $default= $method;
+      $result->codegen->scope[0]->defaultImplementations[]= $method;
     } else {
       $result->out->write(' {');
 
@@ -697,7 +696,6 @@ abstract class PHP extends Emitter {
 
       $this->emitAll($result, $method->body);
       $result->out->write('}');
-      $default= null;
     }
 
     foreach ($promoted as $param) {
@@ -705,10 +703,6 @@ abstract class PHP extends Emitter {
     }
 
     $result->locals= array_pop($result->stack);
-
-    // Copy default implementations to class scope
-    $default && $result->locals[3][]= $default;
-
     $result->codegen->scope[0]->meta[self::METHOD][$method->name]= $meta;
   }
 

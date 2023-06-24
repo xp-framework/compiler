@@ -6,6 +6,7 @@ class InType {
   public $init= [];
   public $statics= [];
   public $virtual= [];
+  public $defaultImplementations= [];
 
   public function __construct($type) {
     $this->type= $type;
