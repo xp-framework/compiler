@@ -637,6 +637,7 @@ abstract class PHP extends Emitter {
       // check, it does not come with a measurable performance impact doing so here,
       // and we prevent uncatchable errors this way.
       if (!$method->annotations->named(Override::class)) goto declaration;
+      if ($result->codegen->scope[0]->type->is('trait')) goto declaration;
 
       // Check parent class
       if (($parent= $result->codegen->lookup('parent')) && $parent->providesMethod($method->name)) goto declaration;

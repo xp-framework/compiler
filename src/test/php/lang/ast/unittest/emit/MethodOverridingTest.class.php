@@ -69,4 +69,12 @@ class MethodOverridingTest extends EmittingTest {
       }'
     ));
   }
+
+  #[Test]
+  public function override_inside_traits() {
+    Assert::null($this->verify('trait %T {
+      #[Override]
+      public function run() { }
+    }'));
+  }
 }
