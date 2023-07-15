@@ -70,7 +70,7 @@ abstract class PHP extends Emitter {
       return (
         $node->member instanceof Literal &&
         is_string($node->type) &&
-        !$result->lookup($node->type)->rewriteEnumCase($node->member->expression)
+        !$result->codegen->lookup($node->type)->rewriteEnumCase($node->member->expression)
       );
     } else if ($node instanceof BinaryExpression) {
       return $this->isConstant($result, $node->left) && $this->isConstant($result, $node->right);
@@ -1064,7 +1064,7 @@ abstract class PHP extends Emitter {
       $scope->member instanceof Literal &&
       is_string($scope->type) &&
       'class' !== $scope->member->expression &&
-      $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
+      $result->codegen->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
     ) {
       $result->out->write('$'.$scope->member->expression);
     } else {
