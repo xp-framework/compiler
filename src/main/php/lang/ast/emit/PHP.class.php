@@ -640,9 +640,9 @@ abstract class PHP extends Emitter {
     foreach ($method->signature->parameters as $param) {
       if (isset($param->promote)) $promoted[]= $param;
 
-      // Create a parameter annotation named `default` for non-constant parameter defaults
+      // Create a parameter annotation named `Default` for non-constant parameter defaults
       if (isset($param->default) && !$this->isConstant($result, $param->default)) {
-        $param->annotate(new Annotation('default', [$param->default]));
+        $param->annotate(new Annotation('Default', [$param->default]));
         $init[]= $param;
       }
 
