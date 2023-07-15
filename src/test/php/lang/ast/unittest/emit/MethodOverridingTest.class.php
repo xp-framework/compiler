@@ -68,6 +68,17 @@ class MethodOverridingTest extends EmittingTest {
   }
 
   #[Test]
+  public function without_parent_in_anonymous_class() {
+    Assert::equals(
+      'class@anonymous::fixture() has #[\Override] attribute, but no matching parent method exists',
+      $this->verify('new class() {
+        #[Override]
+        public function fixture() { }
+      };'
+    ));
+  }
+
+  #[Test]
   public function overriding_non_existant_method() {
     Assert::equals(
       'T::nonExistant() has #[\Override] attribute, but no matching parent method exists',

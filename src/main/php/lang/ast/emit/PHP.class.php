@@ -650,7 +650,7 @@ abstract class PHP extends Emitter {
       throw new Error(
         sprintf(
           '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
-          substr($result->codegen->scope[0]->type->name, 1),
+          substr($result->codegen->scope[0]->type->name ?? '$class@anonymous', 1),
           $method->name
         ),
         $result->codegen->source,
