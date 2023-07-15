@@ -1,7 +1,8 @@
 <?php namespace lang\ast\emit;
 
-use Override;
+use Override, UnitEnum, ReflectionClass, ReflectionException;
 use lang\Reflection as Reflect;
+use lang\ast\Error;
 use lang\{Enum, ClassNotFoundException};
 
 class Reflection extends Type {
@@ -10,14 +11,14 @@ class Reflection extends Type {
 
   /** @codeCoverageIgnore */
   static function __static() {
-    self::$UNITENUM= interface_exists(\UnitEnum::class, false);  // Compatibility with XP < 10.8.0
+    self::$UNITENUM= interface_exists(UnitEnum::class, false);  // Compatibility with XP < 10.8.0
   }
 
   /** @param string $type */
   public function __construct($type) {
     try {
-      $this->reflect= new \ReflectionClass($type);
-    } catch (\ReflectionException $e) {
+      $this->reflect= new ReflectionClass($type);
+    } catch (ReflectionException $e) {
       throw new ClassNotFoundException($type);
     }
   }
@@ -92,9 +93,9 @@ class Reflection extends Type {
   public function rewriteEnumCase($member) {
     if ($this->reflect->isSubclassOf(Enum::class)) {
       return $this->reflect->getStaticPropertyValue($member, null) instanceof Enum;
-    } else if (!self::$ENUMS && self::$UNITENUM && $this->reflect->isSubclassOf(\UnitEnum::class)) {
+    } else if (!self::$ENUMS && self::$UNITENUM && $this->reflect->isSubclassOf(UnitEnum::class)) {
       $value= $this->reflect->getConstant($member) ?: $this->reflect->getStaticPropertyValue($member, null);
-      return $value instanceof \UnitEnum;
+      return $value instanceof UnitEnum;
     }
     return false;
   }
