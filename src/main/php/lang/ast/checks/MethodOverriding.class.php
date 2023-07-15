@@ -2,7 +2,12 @@
 
 use Override;
 
-/** @see https://wiki.php.net/rfc/marking_overriden_methods */
+/**
+ * Checks `#[Override]`
+ *
+ * @see  https://wiki.php.net/rfc/marking_overriden_methods
+ * @test lang.ast.unittest.checks.MethodOverridingTest
+ */
 class MethodOverriding extends Check {
 
   /** @return string */
@@ -19,7 +24,7 @@ class MethodOverriding extends Check {
     if ($method->annotations && $method->annotations->named(Override::class)) {
 
       // Check parent class
-      if ($parent= $codegen->lookup('parent') && $parent->providesMethod($method->name)) return;
+      if (($parent= $codegen->lookup('parent')) && $parent->providesMethod($method->name)) return;
 
       // Check all implemented interfaces
       foreach ($codegen->lookup('self')->implementedInterfaces() as $interface) {
@@ -27,7 +32,7 @@ class MethodOverriding extends Check {
       }
 
       yield sprintf(
-        '%s:%s() has #[\\Override] attribute, but no matching parent method exists',
+        '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
         substr($codegen->scope[0]->type->name, 1),
         $method->name
       );
