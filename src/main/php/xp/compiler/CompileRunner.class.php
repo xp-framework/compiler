@@ -51,6 +51,18 @@ use util\profiling\Timer;
  */
 class CompileRunner {
 
+  /** Returns a check to be added to the emitting process */
+  private static function check(string $name): XPClass {
+    $p= strpos($name, '.');
+    if (false !== $p) return XPClass::forName($name);
+
+    // Translate method-overriding to lang.ast.checks.MethodOverriding
+    return XPClass::forName(sprintf(
+      'lang.ast.checks.%s',
+      implode('', array_map('ucfirst', explode('-', $name)))
+    ));
+  }
+
   /** Returns an emitter to be augment by a given name */
   private static function emitter(string $name): XPClass {
     $p= strpos($name, ':');
@@ -71,7 +83,7 @@ class CompileRunner {
     $target= 'php:'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
     $in= $out= '-';
     $quiet= false;
-    $augment= [];
+    $augment= $checks= [];
     $ext= \xp::CLASS_FILE_EXT;
     for ($i= 0; $i < sizeof($args); $i++) {
       if ('-t' === $args[$i]) {
@@ -90,6 +102,8 @@ class CompileRunner {
         break;
       } else if ('-a' === $args[$i]) {
         $augment[]= self::emitter($args[++$i]);
+      } else if ('-c' === $args[$i]) {
+        $checks[]= self::check($args[++$i]);
       } else {
         $in= $args[$i];
         $out= $args[$i + 1] ?? '-';
@@ -102,6 +116,9 @@ class CompileRunner {
     foreach ($lang->extensions() as $extension) {
       $extension->setup($lang, $emit);
     }
+    foreach ($checks as $check) {
+      $check->newInstance()->attachTo($emit);
+    }
 
     $input= Input::newInstance($in);
     $output= Output::newInstance($out)->using($ext);
@@ -113,7 +130,8 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $emit->write($lang->parse(new Tokens($source, $file))->stream(), $output->target((string)$path));
+        $parse= $lang->parse(new Tokens($source, $file));
+        $emit->write($parse->stream(), $output->target((string)$path), $parse->file);
 
         $t->stop();
         $quiet || Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());
