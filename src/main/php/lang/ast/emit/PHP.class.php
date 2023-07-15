@@ -658,7 +658,7 @@ abstract class PHP extends Emitter {
 
       // Emit non-constant parameter defaults
       foreach ($init as $param) {
-        $result->out->write('null === $'.$param->name.' && $'.$param->name.'=');
+        $result->out->write('$'.$param->name.' ?? $'.$param->name.'=');
         $this->emitOne($result, $param->default);
         $result->out->write(';');
       }
