@@ -13,7 +13,6 @@ class PHP74 extends PHP {
     ArrayUnpackUsingMerge,
     AttributesAsComments,
     CallablesAsClosures,
-    CheckOverride,
     MatchAsTernaries,
     NonCapturingCatchVariables,
     NullsafeAsTernaries,

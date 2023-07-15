@@ -14,7 +14,6 @@ class PHP70 extends PHP {
     ArbitrayNewExpressions,
     ArrayUnpackUsingMerge,
     AttributesAsComments,
-    CheckOverride,
     ForeachDestructuringAsStatement,
     MatchAsTernaries,
     NullsafeAsTernaries,

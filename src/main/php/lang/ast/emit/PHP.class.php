@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use Override;
 use lang\ast\emit\Escaping;
 use lang\ast\nodes\{
   Annotation,
@@ -16,7 +17,7 @@ use lang\ast\nodes\{
   Variable
 };
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpression};
-use lang\ast\{Emitter, Node, Type, Result};
+use lang\ast\{Emitter, Error, Node, Type, Result};
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
@@ -628,8 +629,35 @@ abstract class PHP extends Emitter {
     ];
 
     $method->comment && $this->emitOne($result, $method->comment);
-    $method->annotations && $this->emitOne($result, $method->annotations);
-    $result->at($method->declared)->out->write(
+
+    if ($method->annotations) {
+      $this->emitOne($result, $method->annotations);
+
+      // Verify `Override` if existant. Although PHP 8.3+ includes this compile-time
+      // check, it does not come with a measurable performance impact doing so here,
+      // and we prevent uncatchable errors this way.
+      if (!$method->annotations->named(Override::class)) goto declaration;
+
+      // Check parent class
+      if (($parent= $result->codegen->lookup('parent')) && $parent->providesMethod($method->name)) goto declaration;
+
+      // Check all implemented interfaces
+      foreach ($result->codegen->lookup('self')->implementedInterfaces() as $interface) {
+        if ($result->codegen->lookup($interface)->providesMethod($method->name)) goto declaration;
+      }
+
+      throw new Error(
+        sprintf(
+          '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
+          substr($result->codegen->scope[0]->type->name, 1),
+          $method->name
+        ),
+        $result->codegen->source,
+        $method->line
+      );
+    }
+
+    declaration: $result->at($method->declared)->out->write(
       implode(' ', $method->modifiers).
       ' function '.
       ($method->signature->byref ? '&' : '').

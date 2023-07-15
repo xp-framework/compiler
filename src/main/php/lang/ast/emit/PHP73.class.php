@@ -15,7 +15,6 @@ class PHP73 extends PHP {
     ArrayUnpackUsingMerge,
     AttributesAsComments,
     CallablesAsClosures,
-    CheckOverride,
     MatchAsTernaries,
     NonCapturingCatchVariables,
     NullsafeAsTernaries,

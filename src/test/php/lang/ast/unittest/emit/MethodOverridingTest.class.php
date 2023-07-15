@@ -1,6 +1,5 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\Runtime;
 use lang\ast\Error;
 use test\{Assert, Test};
 
@@ -20,18 +19,6 @@ class MethodOverridingTest extends EmittingTest {
    * @return ?string
    */
   private function verify($code) {
-
-    // PHP >= 8.3: PHP will raise errors for us
-    if (PHP_VERSION_ID >= 80300) {
-      $rt= Runtime::getInstance()->newInstance(null, 'class', 'xp.runtime.Evaluate', [str_replace('%T', 'T', $code)]);
-      $rt->in->close();
-      $err= $rt->err->readLine();
-      $rt->close();
-
-      return false === $err ? null : preg_replace('/Uncaught error: Compile error \((.+)\)/', '$1', $err);
-    }
-
-    // PHP < 8.3: XP compiler will raise errors for us
     try {
       $t= $this->declare($code);
       return null;
