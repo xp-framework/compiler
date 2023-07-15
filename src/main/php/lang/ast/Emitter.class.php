@@ -172,7 +172,6 @@ abstract class Emitter {
 
   /**
    * Emitter entry point, takes nodes and emits them to the given target.
-   * 
    *
    * @param  iterable $nodes
    * @param  io.streams.OutputStream $target
