@@ -23,6 +23,16 @@ class Incomplete extends Type {
   }
 
   /**
+   * Returns all methods annotated with a given annotation
+   *
+   * @param  string $annotation
+   * @return iterable
+   */
+  public function methodsAnnotated($annotation) {
+    return [];
+  }
+
+  /**
    * Returns whether a given member is an enum case
    *
    * @param  string $member

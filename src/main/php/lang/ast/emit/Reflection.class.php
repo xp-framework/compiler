@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use lang\reflection\Type as Reflect;
 use lang\{Enum, ClassNotFoundException};
 
 class Reflection extends Type {
@@ -34,6 +35,18 @@ class Reflection extends Type {
    */
   public function providesMethod($named) {
     return $this->reflect->hasMethod($named);
+  }
+
+  /**
+   * Returns all methods annotated with a given annotation
+   *
+   * @param  string $annotation
+   * @return iterable
+   */
+  public function methodsAnnotated($annotation) {
+    foreach ((new Reflect($this->reflect))->methods()->annotated($annotation) as $method) {
+      yield $method->name() => $this->reflect->getMethod($method->name())->getStartLine();
+    }
   }
 
   /**

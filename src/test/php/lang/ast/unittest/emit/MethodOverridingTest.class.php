@@ -96,4 +96,17 @@ class MethodOverridingTest extends EmittingTest {
       public function run() { }
     }'));
   }
+
+  #[Test]
+  public function without_parent_with_method_from_trait() {
+    $trait= $this->declare('trait %T {
+      #[Override]
+      public function run() { }
+    }');
+
+    Assert::equals(
+      'T::run() has #[\Override] attribute, but no matching parent method exists',
+      $this->verify('class %T { use '.$trait->literal().'; }')
+    );
+  }
 }

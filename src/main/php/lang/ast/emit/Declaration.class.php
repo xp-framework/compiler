@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{EnumCase, InterfaceDeclaration, Property};
+use lang\ast\nodes\{EnumCase, InterfaceDeclaration, Property, Method};
 
 class Declaration extends Type {
   private $type;
@@ -36,6 +36,20 @@ class Declaration extends Type {
    */
   public function providesMethod($named) {
     return isset($this->body["{$named}()"]);
+  }
+
+  /**
+   * Returns all methods annotated with a given annotation
+   *
+   * @param  string $annotation
+   * @return iterable
+   */
+  public function methodsAnnotated($annotation) {
+    foreach ($this->body as $member) {
+      if ($member instanceof Method && $member->annotations && $member->annotations->named($annotation)) {
+        yield $member->name => $member->line;
+      }
+    }
   }
 
   /**

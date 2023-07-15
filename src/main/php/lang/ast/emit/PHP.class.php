@@ -155,6 +155,39 @@ abstract class PHP extends Emitter {
   }
 
   /**
+   * Verify `Override` if existant. Although PHP 8.3+ includes this compile-time
+   * check, it does not come with a measurable performance impact doing so here,
+   * and we prevent uncatchable errors this way.
+   *
+   * @param  lang.ast.CodeGen $codegen
+   * @param  string $method
+   * @param  int $line
+   * @return void
+   * @throws lang.ast.Error
+   */
+  protected function checkOverride($codegen, $method, $line) {
+    if ($codegen->scope[0]->type->is('trait')) return;
+
+    // Check parent class
+    if (($parent= $codegen->lookup('parent')) && $parent->providesMethod($method)) return;
+
+    // Check all implemented interfaces
+    foreach ($codegen->lookup('self')->implementedInterfaces() as $interface) {
+      if ($codegen->lookup($interface)->providesMethod($method)) return;
+    }
+
+    throw new Error(
+      sprintf(
+        '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
+        substr($codegen->scope[0]->type->name ?? '$class@anonymous', 1),
+        $method
+      ),
+      $codegen->source,
+      $line
+    );
+  }
+
+  /**
    * Emits local initializations
    *
    * @param  lang.ast.Result $result
@@ -565,6 +598,14 @@ abstract class PHP extends Emitter {
 
   protected function emitUse($result, $use) {
     $result->out->write('use '.implode(',', $use->types));
+
+    // Verify Override
+    foreach ($use->types as $type) {
+      foreach ($result->codegen->lookup($type)->methodsAnnotated(Override::class) as $method => $line) {
+        $this->checkOverride($result->codegen, $method, $line);
+      }
+    }
+
     if ($use->aliases) {
       $result->out->write('{');
       foreach ($use->aliases as $reference => $alias) {
@@ -629,36 +670,16 @@ abstract class PHP extends Emitter {
     ];
 
     $method->comment && $this->emitOne($result, $method->comment);
-
     if ($method->annotations) {
       $this->emitOne($result, $method->annotations);
-
-      // Verify `Override` if existant. Although PHP 8.3+ includes this compile-time
-      // check, it does not come with a measurable performance impact doing so here,
-      // and we prevent uncatchable errors this way.
-      if (!$method->annotations->named(Override::class)) goto declaration;
-      if ($result->codegen->scope[0]->type->is('trait')) goto declaration;
-
-      // Check parent class
-      if (($parent= $result->codegen->lookup('parent')) && $parent->providesMethod($method->name)) goto declaration;
-
-      // Check all implemented interfaces
-      foreach ($result->codegen->lookup('self')->implementedInterfaces() as $interface) {
-        if ($result->codegen->lookup($interface)->providesMethod($method->name)) goto declaration;
-      }
-
-      throw new Error(
-        sprintf(
-          '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
-          substr($result->codegen->scope[0]->type->name ?? '$class@anonymous', 1),
-          $method->name
-        ),
-        $result->codegen->source,
+      $method->annotations->named(Override::class) && $this->checkOverride(
+        $result->codegen,
+        $method->name,
         $method->line
       );
     }
 
-    declaration: $result->at($method->declared)->out->write(
+    $result->at($method->declared)->out->write(
       implode(' ', $method->modifiers).
       ' function '.
       ($method->signature->byref ? '&' : '').

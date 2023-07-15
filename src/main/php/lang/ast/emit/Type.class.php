@@ -23,6 +23,14 @@ abstract class Type {
   public abstract function providesMethod($named);
 
   /**
+   * Returns all methods annotated with a given annotation
+   *
+   * @param  string $annotation
+   * @return iterable
+   */
+  public abstract function methodsAnnotated($annotation);
+
+  /**
    * Returns whether a given member is an enum case
    *
    * @param  string $member
