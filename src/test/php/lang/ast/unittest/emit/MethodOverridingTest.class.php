@@ -20,7 +20,7 @@ class MethodOverridingTest extends EmittingTest {
    */
   private function verify($code) {
     try {
-      $t= $this->declare($code);
+      $this->declare($code);
       return null;
     } catch (Error $e) {
       return preg_replace('/T[0-9]+/', 'T', $e->getMessage());
