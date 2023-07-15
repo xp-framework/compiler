@@ -39,4 +39,15 @@ class MethodOverridingTest extends CheckTest {
       }'
     ));
   }
+
+  #[Test]
+  public function overriding_non_existant_method() {
+    Assert::equals(
+      '%T::nonExistant() has #[\Override] attribute, but no matching parent method exists [line 2 of %T]',
+      $this->verify('class %T extends \lang\Throwable {
+        #[Override]
+        public function nonExistant() { }
+      }'
+    ));
+  }
 }
