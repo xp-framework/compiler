@@ -5,6 +5,7 @@ use lang\ast\emit\{Reflection, Declaration, Incomplete};
 class CodeGen {
   private $id= 0;
   public $scope= [];
+  public $source= '(unknown)';
 
   /** Creates a new, unique symbol */
   public function symbol() { return '_'.($this->id++); }

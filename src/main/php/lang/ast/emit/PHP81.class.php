@@ -20,6 +20,7 @@ use lang\ast\types\{
  */
 class PHP81 extends PHP {
   use
+    CheckOverride,
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,

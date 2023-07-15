@@ -23,6 +23,19 @@ class Reflection extends Type {
   /** @return string */
   public function name() { return $this->reflect->name; }
 
+  /** @return iterable */
+  public function implementedInterfaces() { return $this->type->getInterfaceNames(); }
+
+  /**
+   * Checks whether a given method exists
+   *
+   * @param  string $named
+   * @return bool
+   */
+  public function providesMethod($named) {
+    return $this->reflect->hasMethod($named);
+  }
+
   /**
    * Returns whether a given member is an enum case
    *

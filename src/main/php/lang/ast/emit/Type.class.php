@@ -11,6 +11,17 @@ abstract class Type {
   /** @return string */
   public abstract function name();
 
+  /** @return iterable */
+  public abstract function implementedInterfaces();
+
+  /**
+   * Checks whether a given method exists
+   *
+   * @param  string $named
+   * @return bool
+   */
+  public abstract function providesMethod($named);
+
   /**
    * Returns whether a given member is an enum case
    *
