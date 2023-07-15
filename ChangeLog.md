@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #171: Refactor scope lookup from Result to CodeGen - @thekid
+
 ## 8.14.0 / 2023-07-15
 
 * Fixed error *Cannot access offset of type array on array* when using
