@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use Override;
 use lang\ast\Error;
 use lang\ast\nodes\{EnumCase, InterfaceDeclaration, TraitDeclaration, Property, Method};
 
@@ -26,7 +27,7 @@ class Declaration extends Type {
    */
   public function checkOverrides($type) {
     foreach ($this->type->body as $member) {
-      if ($member instanceof Method && $member->annotations && $member->annotations->named($annotation)) {
+      if ($member instanceof Method && $member->annotations && $member->annotations->named(Override::class)) {
         $type->checkOverride($member->name, $member->line);
       }
     }
