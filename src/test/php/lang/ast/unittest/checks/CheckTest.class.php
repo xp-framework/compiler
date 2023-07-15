@@ -17,7 +17,13 @@ abstract class CheckTest {
   /** @return lang.ast.checks.Check */
   protected abstract function check();
 
-  protected function compile($code) {
+  /**
+   * Verifies code, yielding any errors
+   *
+   * @param  string $code
+   * @return ?string
+   */
+  protected function verify($code) {
     $name= 'C'.(self::$id++);
     try {
       $this->emitter->write(

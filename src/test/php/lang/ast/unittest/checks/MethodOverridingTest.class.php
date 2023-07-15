@@ -10,12 +10,12 @@ class MethodOverridingTest extends CheckTest {
 
   #[Test]
   public function without_annotations() {
-    Assert::null($this->compile('class %T { public function fixture() { } }'));
+    Assert::null($this->verify('class %T { public function fixture() { } }'));
   }
 
   #[Test]
   public function correctly_overwriting_parent_method() {
-    Assert::null($this->compile('class %T extends \lang\Throwable {
+    Assert::null($this->verify('class %T extends \lang\Throwable {
       #[Override]
       public function compoundMessage() { }
     }'));
@@ -23,7 +23,7 @@ class MethodOverridingTest extends CheckTest {
 
   #[Test]
   public function correctly_implementing_interface_method() {
-    Assert::null($this->compile('class %T implements \lang\Runnable {
+    Assert::null($this->verify('class %T implements \lang\Runnable {
       #[Override]
       public function run() { }
     }'));
@@ -33,7 +33,7 @@ class MethodOverridingTest extends CheckTest {
   public function without_parent() {
     Assert::equals(
       '%T::fixture() has #[\Override] attribute, but no matching parent method exists [line 2 of %T]',
-      $this->compile('class %T {
+      $this->verify('class %T {
         #[Override]
         public function fixture() { }
       }'
