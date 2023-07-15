@@ -15,6 +15,23 @@ class Declaration extends Type {
   /** @return string */
   public function name() { return ltrim($this->type->name, '\\'); }
 
+  /** @return iterable */
+  public function implementedInterfaces() {
+    foreach ($this->type->implements as $interface) {
+      yield $interface->literal();
+    }
+  }
+
+  /**
+   * Checks whether a given method exists
+   *
+   * @param  string $named
+   * @return bool
+   */
+  public function providesMethod($named) {
+    return isset($this->body["{$named}()"]);
+  }
+
   /**
    * Returns whether a given member is an enum case
    *

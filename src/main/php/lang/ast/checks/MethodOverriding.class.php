@@ -17,13 +17,20 @@ class MethodOverriding extends Check {
    */
   public function check($codegen, $method) {
     if ($method->annotations && $method->annotations->named(Override::class)) {
-      if (!($parent= $codegen->lookup('parent')) || !$parent->providesMethod($method->name)) {
-        yield sprintf(
-          '%s:%s() has #[\\Override] attribute, but no matching parent method exists',
-          substr($codegen->scope[0]->type->name, 1),
-          $method->name
-        );
+
+      // Check parent class
+      if ($parent= $codegen->lookup('parent') && $parent->providesMethod($method->name)) return;
+
+      // Check all implemented interfaces
+      foreach ($codegen->lookup('self')->implementedInterfaces() as $interface) {
+        if ($codegen->lookup($interface)->providesMethod($method->name)) return null;
       }
+
+      yield sprintf(
+        '%s:%s() has #[\\Override] attribute, but no matching parent method exists',
+        substr($codegen->scope[0]->type->name, 1),
+        $method->name
+      );
     }
   }
 }
