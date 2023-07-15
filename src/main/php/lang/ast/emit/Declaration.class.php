@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{EnumCase, Property};
+use lang\ast\nodes\{EnumCase, InterfaceDeclaration, Property};
 
 class Declaration extends Type {
   private $type;
@@ -17,8 +17,14 @@ class Declaration extends Type {
 
   /** @return iterable */
   public function implementedInterfaces() {
-    foreach ($this->type->implements as $interface) {
-      yield $interface->literal();
+    if ($this->type instanceof InterfaceDeclaration) {
+      foreach ($this->type->parents as $interface) {
+        yield $interface->literal();
+      }
+    } else {
+      foreach ($this->type->implements as $interface) {
+        yield $interface->literal();
+      }
     }
   }
 

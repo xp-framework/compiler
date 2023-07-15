@@ -49,6 +49,14 @@ class MethodOverridingTest extends EmittingTest {
   }
 
   #[Test]
+  public function correctly_overwriting_interface_method() {
+    Assert::null($this->verify('interface %T extends \lang\Runnable {
+      #[Override]
+      public function run();
+    }'));
+  }
+
+  #[Test]
   public function without_parent() {
     Assert::equals(
       'T::fixture() has #[\Override] attribute, but no matching parent method exists',

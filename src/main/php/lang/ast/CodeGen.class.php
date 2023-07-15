@@ -48,7 +48,7 @@ class CodeGen {
     if ('self' === $type || 'static' === $type) {
       return new Declaration($enclosing->type);
     } else if ('parent' === $type) {
-      return $enclosing->type->parent ? $this->lookup($enclosing->type->parent->literal()) : null;
+      return isset($enclosing->type->parent) ? $this->lookup($enclosing->type->parent->literal()) : null;
     }
 
     foreach ($this->scope as $scope) {
