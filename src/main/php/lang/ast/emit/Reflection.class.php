@@ -70,7 +70,9 @@ class Reflection extends Type {
     if ($this->reflect->isTrait()) {
       return;
     } else if ($parent= $this->reflect->getParentClass()) {
-      if ($parent->hasMethod($method)) return;
+      if ($parent->hasMethod($method)) {
+        if (!$this->reflect->getMethod($named)->isPrivate()) return;
+      }
     } else {
       foreach ($this->type->getInterfaces() as $interface) {
         if ($interface->hasMethod($method)) return;

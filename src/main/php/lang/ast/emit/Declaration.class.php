@@ -55,8 +55,13 @@ class Declaration extends Type {
       }
     } else {
 
-      // Check parent, then check all implemented interfaces
-      if ($this->type->parent && $this->codegen->lookup('parent')->providesMethod($method, MODIFIER_PUBLIC)) return;
+      // Check parent for non-private methods
+      if ($this->type->parent && $this->codegen->lookup($this->type->parent->literal())->providesMethod(
+        $method,
+        MODIFIER_PUBLIC | MODIFIER_PROTECTED
+      )) return;
+
+      // Finally, check all implemented interfaces
       foreach ($this->type->implements as $interface) {
         if ($this->codegen->lookup($interface->literal())->providesMethod($method)) return;
       }
