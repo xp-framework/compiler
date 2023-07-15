@@ -155,39 +155,6 @@ abstract class PHP extends Emitter {
   }
 
   /**
-   * Verify `Override` if existant. Although PHP 8.3+ includes this compile-time
-   * check, it does not come with a measurable performance impact doing so here,
-   * and we prevent uncatchable errors this way.
-   *
-   * @param  lang.ast.CodeGen $codegen
-   * @param  string $method
-   * @param  int $line
-   * @return void
-   * @throws lang.ast.Error
-   */
-  protected function checkOverride($codegen, $method, $line) {
-    if ($codegen->scope[0]->type->is('trait')) return;
-
-    // Check parent class
-    if (($parent= $codegen->lookup('parent')) && $parent->providesMethod($method)) return;
-
-    // Check all implemented interfaces
-    foreach ($codegen->lookup('self')->implementedInterfaces() as $interface) {
-      if ($codegen->lookup($interface)->providesMethod($method)) return;
-    }
-
-    throw new Error(
-      sprintf(
-        '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
-        substr($codegen->scope[0]->type->name ?? '$class@anonymous', 1),
-        $method
-      ),
-      $codegen->source,
-      $line
-    );
-  }
-
-  /**
    * Emits local initializations
    *
    * @param  lang.ast.Result $result
@@ -601,9 +568,7 @@ abstract class PHP extends Emitter {
 
     // Verify Override
     foreach ($use->types as $type) {
-      foreach ($result->codegen->lookup($type)->methodsAnnotated(Override::class) as $method => $line) {
-        $this->checkOverride($result->codegen, $method, $line);
-      }
+      $result->codegen->lookup($type)->checkOverrides($result->codegen->lookup('self'));
     }
 
     if ($use->aliases) {
@@ -672,8 +637,7 @@ abstract class PHP extends Emitter {
     $method->comment && $this->emitOne($result, $method->comment);
     if ($method->annotations) {
       $this->emitOne($result, $method->annotations);
-      $method->annotations->named(Override::class) && $this->checkOverride(
-        $result->codegen,
+      $method->annotations->named(Override::class) && $result->codegen->lookup('self')->checkOverride(
         $method->name,
         $method->line
       );

@@ -46,14 +46,14 @@ class CodeGen {
     $enclosing= $this->scope[0] ?? null;
 
     if ('self' === $type || 'static' === $type) {
-      return new Declaration($enclosing->type);
+      return new Declaration($enclosing->type, $this);
     } else if ('parent' === $type) {
       return isset($enclosing->type->parent) ? $this->lookup($enclosing->type->parent->literal()) : null;
     }
 
     foreach ($this->scope as $scope) {
       if ($scope->type->name && $type === $scope->type->name->literal()) {
-        return new Declaration($scope->type);
+        return new Declaration($scope->type, $this);
       }
     }
 

@@ -9,9 +9,6 @@ class Incomplete extends Type {
   /** @return string */
   public function name() { return $this->name; }
 
-  /** @return iterable */
-  public function implementedInterfaces() { return []; }
-
   /**
    * Checks whether a given method exists
    *
@@ -23,13 +20,26 @@ class Incomplete extends Type {
   }
 
   /**
-   * Returns all methods annotated with a given annotation
+   * Checks `#[Override]`
    *
-   * @param  string $annotation
-   * @return iterable
+   * @param  lang.ast.emit.Type $type
+   * @return void
+   * @throws lang.ast.Error
    */
-  public function methodsAnnotated($annotation) {
-    return [];
+  public function checkOverrides($type) {
+    // NOOP
+  }
+
+  /**
+   * Checks `#[Override]` for a given method
+   *
+   * @param  string $method
+   * @param  int $line
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public function checkOverride($method, $line) {
+    // NOOP
   }
 
   /**

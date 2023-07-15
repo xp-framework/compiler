@@ -1,31 +1,74 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{EnumCase, InterfaceDeclaration, Property, Method};
+use lang\ast\Error;
+use lang\ast\nodes\{EnumCase, InterfaceDeclaration, TraitDeclaration, Property, Method};
 
 class Declaration extends Type {
-  private $type;
+  private $type, $codegen;
 
   static function __static() { }
 
   /** @param  lang.ast.nodes.TypeDeclaration $type */
-  public function __construct($type) {
+  public function __construct($type, $codegen) {
     $this->type= $type;
+    $this->codegen= $codegen;
   }
 
   /** @return string */
   public function name() { return ltrim($this->type->name, '\\'); }
 
-  /** @return iterable */
-  public function implementedInterfaces() {
-    if ($this->type instanceof InterfaceDeclaration) {
-      foreach ($this->type->parents as $interface) {
-        yield $interface->literal();
-      }
-    } else {
-      foreach ($this->type->implements as $interface) {
-        yield $interface->literal();
+  /**
+   * Checks `#[Override]`
+   *
+   * @param  lang.ast.emit.Type $type
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public function checkOverrides($type) {
+    foreach ($this->type->body as $member) {
+      if ($member instanceof Method && $member->annotations && $member->annotations->named($annotation)) {
+        $type->checkOverride($member->name, $member->line);
       }
     }
+  }
+
+  /**
+   * Checks `#[Override]` for a given method
+   *
+   * @param  string $method
+   * @param  int $line
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public function checkOverride($method, $line) {
+    if ($this->type instanceof TraitDeclaration) {
+
+      // Do not check traits, this is done when including them into the type
+      return;
+    } else if ($this->type instanceof InterfaceDeclaration) {
+
+      // Check parent interfaces
+      foreach ($this->type->parents as $interface) {
+        if ($this->codegen->lookup($interface->literal())->providesMethod($method)) return;
+      }
+    } else {
+
+      // Check parent, then check all implemented interfaces
+      if ($this->type->parent && $this->codegen->lookup('parent')->providesMethod($method)) return;
+      foreach ($this->type->implements as $interface) {
+        if ($this->codegen->lookup($interface->literal())->providesMethod($method)) return;
+      }
+    }
+
+    throw new Error(
+      sprintf(
+        '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
+        isset($this->type->name) ? substr($this->type->name->literal(), 1) : 'class@anonymous',
+        $method
+      ),
+      $this->codegen->source,
+      $line
+    );
   }
 
   /**
@@ -35,21 +78,7 @@ class Declaration extends Type {
    * @return bool
    */
   public function providesMethod($named) {
-    return isset($this->body["{$named}()"]);
-  }
-
-  /**
-   * Returns all methods annotated with a given annotation
-   *
-   * @param  string $annotation
-   * @return iterable
-   */
-  public function methodsAnnotated($annotation) {
-    foreach ($this->body as $member) {
-      if ($member instanceof Method && $member->annotations && $member->annotations->named($annotation)) {
-        yield $member->name => $member->line;
-      }
-    }
+    return isset($this->type->body["{$named}()"]);
   }
 
   /**

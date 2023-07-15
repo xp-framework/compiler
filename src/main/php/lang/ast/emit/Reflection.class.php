@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use Override;
 use lang\Reflection as Reflect;
 use lang\{Enum, ClassNotFoundException};
 
@@ -24,9 +25,6 @@ class Reflection extends Type {
   /** @return string */
   public function name() { return $this->reflect->name; }
 
-  /** @return iterable */
-  public function implementedInterfaces() { return $this->type->getInterfaceNames(); }
-
   /**
    * Checks whether a given method exists
    *
@@ -38,18 +36,51 @@ class Reflection extends Type {
   }
 
   /**
-   * Returns all methods annotated with a given annotation
+   * Checks `#[Override]`
    *
-   * @param  string $annotation
-   * @return iterable
+   * @param  lang.ast.emit.Type $type
+   * @return void
+   * @throws lang.ast.Error
    */
-  public function methodsAnnotated($annotation) {
+  public function checkOverrides($type) {
     $meta= Reflect::meta();
     foreach ($this->reflect->getMethods() as $method) {
-      if (isset($meta->methodAnnotations($method)[$annotation])) {
-        yield $method->getName() => $method->getStartLine();
+      if (isset($meta->methodAnnotations($method)[Override::class])) {
+        $type->checkOverride($method->getName(), $method->getStartLine());
       }
     }
+  }
+
+  /**
+   * Checks `#[Override]` for a given method
+   *
+   * @param  string $method
+   * @param  int $line
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public function checkOverride($method, $line) {
+
+    // Ignore traits, check parents and interfaces for all other types
+    if ($this->reflect->isTrait()) {
+      return;
+    } else if ($parent= $this->reflect->getParentClass()) {
+      if ($parent->hasMethod($method)) return;
+    } else {
+      foreach ($this->type->getInterfaces() as $interface) {
+        if ($interface->hasMethod($method)) return;
+      }
+    }
+
+    throw new Error(
+      sprintf(
+        '%s::%s() has #[\\Override] attribute, but no matching parent method exists',
+        $this->reflect->isAnonymous() ? 'class@anonymous' : $this->reflect->getName(),
+        $method
+      ),
+      $this->reflect->getFileName(),
+      $line
+    );
   }
 
   /**

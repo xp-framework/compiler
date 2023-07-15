@@ -11,9 +11,6 @@ abstract class Type {
   /** @return string */
   public abstract function name();
 
-  /** @return iterable */
-  public abstract function implementedInterfaces();
-
   /**
    * Checks whether a given method exists
    *
@@ -23,12 +20,23 @@ abstract class Type {
   public abstract function providesMethod($named);
 
   /**
-   * Returns all methods annotated with a given annotation
+   * Checks `#[Override]`
    *
-   * @param  string $annotation
-   * @return iterable
+   * @param  self $type
+   * @return void
+   * @throws lang.ast.Error
    */
-  public abstract function methodsAnnotated($annotation);
+  public abstract function checkOverrides($type);
+
+  /**
+   * Checks `#[Override]` for a given method
+   *
+   * @param  string $method
+   * @param  int $line
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public abstract function checkOverride($method, $line);
 
   /**
    * Returns whether a given member is an enum case
