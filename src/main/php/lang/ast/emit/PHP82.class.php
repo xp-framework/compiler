@@ -20,10 +20,10 @@ use lang\ast\types\{
  */
 class PHP82 extends PHP {
   use
-    RewriteBlockLambdaExpressions, 
-    RewriteDynamicClassConstants, 
-    RewriteStaticVariableInitializations, 
-    ReadonlyClasses, 
+    RewriteBlockLambdaExpressions,
+    RewriteDynamicClassConstants,
+    RewriteStaticVariableInitializations,
+    ReadonlyClasses,
     OmitConstantTypes
   ;
 

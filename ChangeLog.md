@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.14.0 / 2023-07-15
+
+* Fixed error *Cannot access offset of type array on array* when using
+  reflection for non-constant parameter defaults
+  (@thekid)
 * Implemented feature #162: Arbitrary static variable initializers, see
   https://wiki.php.net/rfc/arbitrary_static_variable_initializers
   (@thekid)
