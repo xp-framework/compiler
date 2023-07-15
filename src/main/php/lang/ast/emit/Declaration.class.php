@@ -3,17 +3,13 @@
 use lang\ast\nodes\{EnumCase, Property};
 
 class Declaration extends Type {
-  private $type, $result;
+  private $type;
 
   static function __static() { }
 
-  /**
-   * @param  lang.ast.nodes.TypeDeclaration $type
-   * @param  lang.ast.Result $result
-   */
-  public function __construct($type, $result) {
+  /** @param  lang.ast.nodes.TypeDeclaration $type */
+  public function __construct($type) {
     $this->type= $type;
-    $this->result= $result;
   }
 
   /** @return string */
