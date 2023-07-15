@@ -109,4 +109,17 @@ class MethodOverridingTest extends EmittingTest {
       $this->verify('class %T { use '.$trait->literal().'; }')
     );
   }
+
+  #[Test]
+  public function private_methods_not_considered() {
+    $parent= $this->declare('class %T { private function fixture() { } }');
+
+    Assert::equals(
+      'T::fixture() has #[\Override] attribute, but no matching parent method exists',
+      $this->verify('class %T extends '.$parent->literal().' {
+        #[Override]
+        public function fixture() { }
+      }')
+    );
+  }
 }

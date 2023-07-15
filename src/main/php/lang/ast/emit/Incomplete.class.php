@@ -13,9 +13,10 @@ class Incomplete extends Type {
    * Checks whether a given method exists
    *
    * @param  string $named
+   * @param  ?int $select
    * @return bool
    */
-  public function providesMethod($named) {
+  public function providesMethod($named, $select= null) {
     return false;
   }
 

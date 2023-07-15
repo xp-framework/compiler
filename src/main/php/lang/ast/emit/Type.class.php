@@ -15,9 +15,10 @@ abstract class Type {
    * Checks whether a given method exists
    *
    * @param  string $named
+   * @param  ?int $select
    * @return bool
    */
-  public abstract function providesMethod($named);
+  public abstract function providesMethod($named, $select= null);
 
   /**
    * Checks `#[Override]`

@@ -3,6 +3,7 @@
 use Override;
 use lang\ast\Error;
 use lang\ast\nodes\{EnumCase, InterfaceDeclaration, TraitDeclaration, Property, Method};
+use lang\reflection\Modifiers;
 
 class Declaration extends Type {
   private $type, $codegen;
@@ -55,7 +56,7 @@ class Declaration extends Type {
     } else {
 
       // Check parent, then check all implemented interfaces
-      if ($this->type->parent && $this->codegen->lookup('parent')->providesMethod($method)) return;
+      if ($this->type->parent && $this->codegen->lookup('parent')->providesMethod($method, MODIFIER_PUBLIC)) return;
       foreach ($this->type->implements as $interface) {
         if ($this->codegen->lookup($interface->literal())->providesMethod($method)) return;
       }
@@ -76,10 +77,14 @@ class Declaration extends Type {
    * Checks whether a given method exists
    *
    * @param  string $named
+   * @param  ?int $select
    * @return bool
    */
-  public function providesMethod($named) {
-    return isset($this->type->body["{$named}()"]);
+  public function providesMethod($named, $select= null) {
+    if ($method= $this->type->body["{$named}()"] ?? null) {
+      return null === $select || (bool)((new Modifiers($method->modifiers))->bits() & $select);
+    }
+    return false;
   }
 
   /**
