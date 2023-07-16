@@ -567,8 +567,9 @@ abstract class PHP extends Emitter {
     $result->out->write('use '.implode(',', $use->types));
 
     // Verify Override
+    $self= $result->codegen->lookup('self');
     foreach ($use->types as $type) {
-      $result->codegen->lookup($type)->checkOverrides($result->codegen->lookup('self'));
+      $result->codegen->lookup($type)->checkOverrides($self);
     }
 
     if ($use->aliases) {
