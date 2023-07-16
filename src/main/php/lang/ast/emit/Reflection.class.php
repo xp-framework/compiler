@@ -35,7 +35,7 @@ class Reflection extends Type {
    */
   public function providesMethod($named, $select= null) {
     if ($this->reflect->hasMethod($named)) {
-      return null === $select || (bool)($this->reflect->getMethod($named)->getModifiers() & $select);
+      return null === $select || $this->reflect->getMethod($named)->getModifiers() & $select;
     }
     return false;
   }

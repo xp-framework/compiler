@@ -87,7 +87,7 @@ class Declaration extends Type {
    */
   public function providesMethod($named, $select= null) {
     if ($method= $this->type->body["{$named}()"] ?? null) {
-      return null === $select || (bool)((new Modifiers($method->modifiers))->bits() & $select);
+      return null === $select || (new Modifiers($method->modifiers))->bits() & $select;
     }
     return false;
   }
