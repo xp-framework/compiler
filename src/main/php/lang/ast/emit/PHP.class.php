@@ -17,7 +17,7 @@ use lang\ast\nodes\{
   Variable
 };
 use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpression};
-use lang\ast\{Emitter, Error, Node, Type, Result};
+use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
   const PROPERTY = 0;
