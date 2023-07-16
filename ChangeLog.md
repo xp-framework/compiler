@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.15.1 / 2023-07-16
+
 * Fixed parent constructors not being invoked when using non-constant
   property initialization.
   (@thekid)
