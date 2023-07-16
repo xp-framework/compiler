@@ -113,7 +113,8 @@ class CompileRunner {
       $file= $path->toString('/');
       $t->start();
       try {
-        $emit->write($lang->parse(new Tokens($source, $file))->stream(), $output->target((string)$path));
+        $parse= $lang->parse(new Tokens($source, $file));
+        $emit->write($parse->stream(), $output->target((string)$path), $parse->file);
 
         $t->stop();
         $quiet || Console::$err->writeLinef('> %s (%.3f seconds)', $file, $t->elapsedTime());

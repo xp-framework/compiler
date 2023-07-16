@@ -22,6 +22,18 @@ class Result implements Closeable {
   }
 
   /**
+   * Set filename this result originates from, defaulting to `(unknown)`.
+   *
+   * @param  ?string $file
+   * @return self
+   */
+  public function from($file) {
+    $this->codegen->source= $file ?? '(unknown)';
+    return $this;
+  }
+
+
+  /**
    * Initialize result. Guaranteed to be called *once* from constructor.
    * Without implementation here - overwrite in subclasses.
    *

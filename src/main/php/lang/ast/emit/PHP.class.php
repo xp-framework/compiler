@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use Override;
 use lang\ast\emit\Escaping;
 use lang\ast\nodes\{
   Annotation,
@@ -564,6 +565,13 @@ abstract class PHP extends Emitter {
 
   protected function emitUse($result, $use) {
     $result->out->write('use '.implode(',', $use->types));
+
+    // Verify Override
+    $self= $result->codegen->lookup('self');
+    foreach ($use->types as $type) {
+      $result->codegen->lookup($type)->checkOverrides($self);
+    }
+
     if ($use->aliases) {
       $result->out->write('{');
       foreach ($use->aliases as $reference => $alias) {
@@ -628,7 +636,14 @@ abstract class PHP extends Emitter {
     ];
 
     $method->comment && $this->emitOne($result, $method->comment);
-    $method->annotations && $this->emitOne($result, $method->annotations);
+    if ($method->annotations) {
+      $this->emitOne($result, $method->annotations);
+      $method->annotations->named(Override::class) && $result->codegen->lookup('self')->checkOverride(
+        $method->name,
+        $method->line
+      );
+    }
+
     $result->at($method->declared)->out->write(
       implode(' ', $method->modifiers).
       ' function '.

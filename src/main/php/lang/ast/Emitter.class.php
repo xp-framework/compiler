@@ -172,17 +172,20 @@ abstract class Emitter {
 
   /**
    * Emitter entry point, takes nodes and emits them to the given target.
-   * 
+   *
    * @param  iterable $nodes
    * @param  io.streams.OutputStream $target
+   * @param  ?string $source
    * @return io.streams.OutputStream
    * @throws lang.ast.Errors
    */
-  public function write($nodes, OutputStream $target) {
-    $result= $this->result($target);
+  public function write($nodes, OutputStream $target, $source= null) {
+    $result= $this->result($target)->from($source);
     try {
       $this->emitAll($result, $nodes);
       return $target;
+    } catch (Error $e) {
+      throw new Errors([$e], $source);
     } finally {
       $result->close();
     }
