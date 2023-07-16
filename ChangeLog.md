@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.15.0 / 2023-07-16
+
+* Merged PR #173: Check for `#[Override]` annotation, implementing this
+  PHP 8.3 RFC: https://wiki.php.net/rfc/marking_overriden_methods
+  (@thekid)
 * Merged PR #171: Refactor scope lookup from Result to CodeGen - @thekid
 
 ## 8.14.0 / 2023-07-15
