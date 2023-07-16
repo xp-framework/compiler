@@ -469,7 +469,14 @@ abstract class PHP extends Emitter {
     // Create constructor for property initializations to non-static scalars
     // which have not already been emitted inside constructor
     if ($context->init) {
-      $result->out->write('public function __construct() {');
+      $t= $result->temp();
+      $result->out->write("public function __construct(... {$t}) {");
+
+      // If existant, invoke parent constructor, passing all parameters as arguments
+      if (($parent= $result->codegen->lookup('parent')) && $parent->providesMethod('__construct')) {
+        $result->out->write("parent::__construct(... {$t});");
+      }
+
       $this->emitInitializations($result, $context->init);
       $result->out->write('}');
     }

@@ -216,4 +216,24 @@ class InitializeWithExpressionsTest extends EmittingTest {
     }');
     Assert::equals(1, $t->newInstance(new Handle(1))->run());
   }
+
+  #[Test]
+  public function invokes_parent_constructor() {
+    $t= $this->declare('class %T {
+      protected $invoked= false;
+
+      public function __construct($invoked) {
+        $this->invoked= $invoked;
+      }
+    }');
+
+    $r= $this->declare('use lang\ast\unittest\emit\Handle; class %T extends '.$t->literal().' {
+      private $h= new Handle(0);
+
+      public function run() {
+        return [$this->invoked, $this->h];
+      }
+    }');
+    Assert::equals([true, new Handle(0)], $r->newInstance(true)->run());
+  }
 }

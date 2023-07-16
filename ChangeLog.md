@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed parent constructors not being invoked when using non-constant
+  property initialization.
+  (@thekid)
+
 ## 8.15.0 / 2023-07-16
 
 * Merged PR #173: Check for `#[Override]` annotation, implementing this
