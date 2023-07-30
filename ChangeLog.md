@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Refactored code base to use the new reflection library instead of
+  the *Package* class from `lang.reflect`. See xp-framework/rfc#338
+  (@thekid)
+
 ## 8.15.1 / 2023-07-16
 
 * Fixed parent constructors not being invoked when using non-constant
