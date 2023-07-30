@@ -1,28 +1,13 @@
 <?php namespace xp\compiler;
 
-use lang\ClassLoader;
+use lang\Reflection;
 use lang\ast\{Language, Emitter};
+use lang\reflection\Package;
 use util\cmd\Console;
 
 /** @codeCoverageIgnore */
 class Usage {
   const RUNTIME= 'php';
-
-  /**
-   * Returns XPClass instances for all classes inside a given package
-   *
-   * @param  string $package
-   * @return iterable
-   */
-  private static function classesIn($package) {
-    $offset= -strlen(\xp::CLASS_FILE_EXT);
-    $cl= ClassLoader::getDefault();
-    foreach ($cl->packageContents($package) as $item) {
-      if (0 === substr_compare($item, \xp::CLASS_FILE_EXT, $offset)) {
-        yield $cl->loadClass($package.'.'.substr($item, 0, $offset));
-      }
-    }
-  }
 
   /** @return int */
   public static function main(array $args) {
@@ -32,26 +17,26 @@ class Usage {
       public $byLoader= [];
 
       public function add($t, $active= false) {
-        $this->byLoader[$t->getClassLoader()->toString()][$t->getName()]= $active;
+        $this->byLoader[$t->classLoader()->toString()][$t->name()]= $active;
       }
     };
 
     $emitter= Emitter::forRuntime(self::RUNTIME.':'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION);
-    foreach (self::classesIn('lang.ast.emit') as $class) {
-      if ($class->isSubclassOf(Emitter::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
-        $impl->add($class, $class->equals($emitter));
+    foreach ((new Package('lang.ast.emit'))->types() as $type) {
+      if ($type->is(Emitter::class) && !$type->modifiers()->isAbstract()) {
+        $impl->add($type, $type->class()->equals($emitter));
       }
     }
 
     $language= Language::named(strtoupper(self::RUNTIME));
-    foreach (self::classesIn('lang.ast.syntax') as $class) {
-      if ($class->isSubclassOf(Language::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
-        $impl->add($class, $class->isInstance($language));
+    foreach ((new Package('lang.ast.syntax'))->types() as $type) {
+      if ($type->is(Language::class) && !$type->modifiers()->isAbstract()) {
+        $impl->add($type, $type->isInstance($language));
       }
     }
 
     foreach ($language->extensions() as $extension) {
-      $impl->add(typeof($extension), 'true');
+      $impl->add(Reflection::type($extension), true);
     }
 
     // Show implementations sorted by class loader
