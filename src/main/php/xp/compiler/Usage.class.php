@@ -6,7 +6,7 @@ use util\cmd\Console;
 
 /** @codeCoverageIgnore */
 class Usage {
-  const RUNTIME = 'php';
+  const RUNTIME= 'php';
 
   /**
    * Returns XPClass instances for all classes inside a given package
@@ -17,7 +17,7 @@ class Usage {
   private static function classesIn($package) {
     $offset= -strlen(\xp::CLASS_FILE_EXT);
     $cl= ClassLoader::getDefault();
-    foreach (ClassLoader::getDefault()->packageContents($package) as $item) {
+    foreach ($cl->packageContents($package) as $item) {
       if (0 === substr_compare($item, \xp::CLASS_FILE_EXT, $offset)) {
         yield $cl->loadClass($package.'.'.substr($item, 0, $offset));
       }
