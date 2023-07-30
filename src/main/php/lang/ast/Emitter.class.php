@@ -2,7 +2,6 @@
 
 use io\streams\OutputStream;
 use lang\ast\{Node, Error, Errors};
-use lang\reflect\Package;
 use lang\{IllegalArgumentException, IllegalStateException, ClassLoader, XPClass};
 
 abstract class Emitter {
@@ -18,16 +17,16 @@ abstract class Emitter {
    */
   public static function forRuntime($runtime, $emitters= []) {
     sscanf($runtime, '%[^.:]%*[.:]%d.%d', $engine, $major, $minor);
-    $p= Package::forName('lang.ast.emit');
+    $cl= ClassLoader::getDefault();
 
     $engine= strtoupper($engine);
     do {
-      $impl= $engine.$major.$minor;
-      if ($p->providesClass($impl)) {
-        if (empty($emitters)) return $p->loadClass($impl);
+      $impl= "lang.ast.emit.{$engine}{$major}{$minor}";
+      if ($cl->providesClass($impl)) {
+        if (empty($emitters)) return $cl->loadClass($impl);
 
         // Extend loaded class, including all given emitters
-        $extended= ['kind' => 'class', 'extends' => [$p->loadClass($impl)], 'implements' => [], 'use' => []];
+        $extended= ['kind' => 'class', 'extends' => [$cl->loadClass($impl)], 'implements' => [], 'use' => []];
         foreach ($emitters as $class) {
           if ($class instanceof XPClass) {
             $impl.= '⋈'.strtr($class->getName(), ['.' => '·']);
@@ -37,7 +36,7 @@ abstract class Emitter {
             $extended['use'][]= XPClass::forName($class);
           }
         }
-        return ClassLoader::defineType($p->getName().'.'.$impl, $extended, '{}');
+        return ClassLoader::defineType($impl, $extended, '{}');
       }
     } while ($minor-- > 0);
 

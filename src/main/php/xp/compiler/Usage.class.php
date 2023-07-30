@@ -1,12 +1,28 @@
 <?php namespace xp\compiler;
 
+use lang\ClassLoader;
 use lang\ast\{Language, Emitter};
-use lang\reflect\Package;
 use util\cmd\Console;
 
 /** @codeCoverageIgnore */
 class Usage {
   const RUNTIME = 'php';
+
+  /**
+   * Returns XPClass instances for all classes inside a given package
+   *
+   * @param  string $package
+   * @return iterable
+   */
+  private static function classesIn($package) {
+    $offset= -strlen(\xp::CLASS_FILE_EXT);
+    $cl= ClassLoader::getDefault();
+    foreach (ClassLoader::getDefault()->packageContents($package) as $item) {
+      if (0 === substr_compare($item, \xp::CLASS_FILE_EXT, $offset)) {
+        yield $cl->loadClass($package.'.'.substr($item, 0, $offset));
+      }
+    }
+  }
 
   /** @return int */
   public static function main(array $args) {
@@ -21,14 +37,14 @@ class Usage {
     };
 
     $emitter= Emitter::forRuntime(self::RUNTIME.':'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION);
-    foreach (Package::forName('lang.ast.emit')->getClasses() as $class) {
+    foreach (self::classesIn('lang.ast.emit') as $class) {
       if ($class->isSubclassOf(Emitter::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
         $impl->add($class, $class->equals($emitter));
       }
     }
 
     $language= Language::named(strtoupper(self::RUNTIME));
-    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
+    foreach (self::classesIn('lang.ast.syntax') as $class) {
       if ($class->isSubclassOf(Language::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
         $impl->add($class, $class->isInstance($language));
       }
