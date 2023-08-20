@@ -36,13 +36,13 @@ class PHP81 extends PHP {
       IsValue::class        => function($t) { return $t->literal(); },
       IsNullable::class     => function($t) {
         if (null === ($l= $this->literal($t->element))) return null;
-        return $t->element instanceof IsUnion ? $l.'|null' : '?'.$l;
+        return $t->element instanceof IsUnion ? "{$l}|null" : "?{$l}";
       },
       IsIntersection::class => function($t) {
         $i= '';
         foreach ($t->components as $component) {
           if (null === ($l= $this->literal($component))) return null;
-          $i.= '&'.$l;
+          $i.= "&{$l}";
         }
         return substr($i, 1);
       },
@@ -52,7 +52,7 @@ class PHP81 extends PHP {
           if ('null' === $component->literal) {
             $u.= '|null';
           } else if (null !== ($l= $this->literal($component))) {
-            $u.= '|'.$l;
+            $u.= "|{$l}";
           } else {
             return null;  // One of the components didn't resolve
           }

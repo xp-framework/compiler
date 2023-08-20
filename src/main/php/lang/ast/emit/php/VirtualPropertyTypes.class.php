@@ -80,7 +80,7 @@ trait VirtualPropertyTypes {
 
     // Initialize via constructor
     if (isset($property->expression)) {
-      $scope->init['$this->'.$property->name]= $property->expression;
+      $scope->init["\$this->{$property->name}"]= $property->expression;
     }
 
     // Emit XP meta information for the reflection API

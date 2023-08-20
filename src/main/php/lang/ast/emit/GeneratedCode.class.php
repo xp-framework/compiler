@@ -56,7 +56,7 @@ class GeneratedCode extends Result {
    * @return string
    */
   public function temp() {
-    return '$'.$this->codegen->symbol();
+    return "\${$this->codegen->symbol()}";
   }
 
   /**

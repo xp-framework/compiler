@@ -137,7 +137,7 @@ class CompilingClassLoader implements IClassLoader {
    */
   public function loadUri($uri) {
     if (!$this->providesUri($uri)) {
-      throw new ClassNotFoundException('No such class at '.$uri);
+      throw new ClassNotFoundException("No such class at {$uri}");
     }
 
     $class= $this->loadClass($this->source[$uri]);
@@ -174,16 +174,16 @@ class CompilingClassLoader implements IClassLoader {
     $uri= strtr($class, '.', '/').self::EXTENSION;
     Compiled::$source[$uri]= $source;
 
-    \xp::$cl[$class]= nameof($this).'://'.$this->instanceId();
+    \xp::$cl[$class]= nameof($this)."://{$this->instanceId()}";
     \xp::$cll++;
     try {
-      include($this->version.'://'.$uri);
+      include("{$this->version}://{$uri}");
     } catch (ClassLoadingException $e) {
       unset(\xp::$cl[$class]); // @codeCoverageIgnore
       throw $e;                // @codeCoverageIgnore
     } catch (\Throwable $e) {
       unset(\xp::$cl[$class]);
-      throw new ClassFormatException('Compiler error: '.$e->getMessage(), $e);
+      throw new ClassFormatException("Compiler error: {$e->getMessage()}", $e);
     } finally {
       \xp::$cll--;
       unset(Compiled::$source[$uri]);
@@ -267,7 +267,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return string
    */
   public function toString() {
-    return 'CompilingCL<'.$this->version.'>';
+    return "CompilingCL<{$this->version}>";
   }
 
   /**
@@ -276,7 +276,7 @@ class CompilingClassLoader implements IClassLoader {
    * @return string
    */
   public function hashCode() {
-    return 'C'.$this->version;
+    return "C{$this->version}";
   }
 
   /**

@@ -24,7 +24,7 @@ trait XpMeta {
     foreach ($annotations as $name => $arguments) {
       $p= strrpos($name, '\\');
       $key= lcfirst(false === $p ? $name : substr($name, $p + 1));
-      $result->out->write("'".$key."' => ");
+      $result->out->write("'{$key}' => ");
       $name === $key || $lookup[$key]= $name;
 
       if (empty($arguments)) {
@@ -36,7 +36,7 @@ trait XpMeta {
       } else {
         $result->out->write('[');
         foreach ($arguments as $name => $argument) {
-          is_string($name) && $result->out->write("'".$name."' => ");
+          is_string($name) && $result->out->write("'{$name}' => ");
           $this->emitOne($result, $argument);
           $result->out->write(',');
         }
@@ -52,7 +52,7 @@ trait XpMeta {
     $lookup= $this->annotations($result, $annotations);
     $result->out->write('], DETAIL_TARGET_ANNO => [');
     foreach ($target as $name => $annotations) {
-      $result->out->write("'$".$name."' => [");
+      $result->out->write("'\${$name}' => [");
       foreach ($this->annotations($result, $annotations, $name) as $key => $value) {
         $lookup[$key]= $value;
       }
@@ -74,21 +74,21 @@ trait XpMeta {
     if (null === $type) {
       $result->out->write('\xp::$meta[strtr(self::class, "\\\\", ".")]= [');
     } else if ($type instanceof IsGeneric) {
-      $result->out->write('\xp::$meta[\''.$type->base->name().'\']= [');
+      $result->out->write("\\xp::\$meta['{$type->base->name()}']= [");
     } else {
-      $result->out->write('\xp::$meta[\''.$type->name().'\']= [');
+      $result->out->write("\\xp::\$meta['{$type->name()}']= [");
     }
     $result->out->write('"class" => [');
     $this->attributes($result, $annotations, []);
-    $result->out->write(', DETAIL_COMMENT => '.$this->comment($comment).'],');
+    $result->out->write(", DETAIL_COMMENT => {$this->comment($comment)}],");
 
     foreach ($result->codegen->scope[0]->meta as $type => $lookup) {
       $result->out->write($type.' => [');
       foreach ($lookup as $key => $meta) {
-        $result->out->write("'".$key."' => [");
+        $result->out->write("'{$key}' => [");
         $this->attributes($result, $meta[DETAIL_ANNOTATIONS], $meta[DETAIL_TARGET_ANNO]);
-        $result->out->write(', DETAIL_RETURNS => \''.$meta[DETAIL_RETURNS].'\'');
-        $result->out->write(', DETAIL_COMMENT => '.$this->comment($meta[DETAIL_COMMENT]));
+        $result->out->write(", DETAIL_RETURNS => '{$meta[DETAIL_RETURNS]}'");
+        $result->out->write(", DETAIL_COMMENT => {$this->comment($meta[DETAIL_COMMENT])}");
         $result->out->write(', DETAIL_ARGUMENTS => ['.($meta[DETAIL_ARGUMENTS]
           ? "'".implode("', '", $meta[DETAIL_ARGUMENTS])."']],"
           : ']],'

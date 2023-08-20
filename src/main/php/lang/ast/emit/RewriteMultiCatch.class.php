@@ -8,16 +8,16 @@
 trait RewriteMultiCatch {
  
   protected function emitCatch($result, $catch) {
-    $capture= $catch->variable ? '$'.$catch->variable : $result->temp();
+    $capture= $catch->variable ? "\${$catch->variable}" : $result->temp();
     if (empty($catch->types)) {
-      $result->out->write('catch(\\Throwable '.$capture.') {');
+      $result->out->write("catch(\\Throwable {$capture}) {");
     } else {
       $last= array_pop($catch->types);
       $label= $result->codegen->symbol();
       foreach ($catch->types as $type) {
-        $result->out->write('catch('.$type.' '.$capture.') { goto '.$label.'; }');
+        $result->out->write("catch({$type} {$capture}) { goto {$label}; }");
       }
-      $result->out->write('catch('.$last.' '.$capture.') { '.$label.':');
+      $result->out->write("catch({$last} {$capture}) { {$label}:");
     }
 
     $this->emitAll($result, $catch->body);

@@ -10,13 +10,13 @@ trait RewriteStaticVariableInitializations {
 
   protected function emitStatic($result, $static) {
     foreach ($static->initializations as $variable => $initial) {
-      $result->out->write('static $'.$variable);
+      $result->out->write("static \${$variable}");
       if ($initial) {
         if ($this->isConstant($result, $initial)) {
           $result->out->write('=');
           $this->emitOne($result, $initial);
         } else {
-          $result->out->write('= null; null === $'.$variable.' && $'.$variable.'= ');
+          $result->out->write("= null; null === \${$variable} && \${$variable}=");
           $this->emitOne($result, $initial);
         }
       }

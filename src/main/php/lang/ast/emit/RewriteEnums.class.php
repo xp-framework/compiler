@@ -8,17 +8,18 @@
 trait RewriteEnums {
 
   protected function emitEnumCase($result, $case) {
-    $result->out->write('public static $'.$case->name.';');
+    $result->out->write("public static \${$case->name};");
   }
 
   protected function emitEnum($result, $enum) {
     $context= $result->codegen->enter(new InType($enum));
-    $result->out->write('final class '.$enum->declaration().' implements \\'.($enum->base ? 'BackedEnum' : 'UnitEnum'));
+    $base= $enum->base ? 'BackedEnum' : 'UnitEnum';
+    $result->out->write("final class {$enum->declaration()} implements \\{$base}");
 
     if ($enum->implements) {
       $list= '';
       foreach ($enum->implements as $type) {
-        $list.= ', '.$type->literal();
+        $list.= ", {$type->literal()}";
       }
       $result->out->write($list);
     }
@@ -62,7 +63,7 @@ trait RewriteEnums {
     // Enum cases
     $result->out->write('public static function cases() { return [');
     foreach ($cases as $case) {
-      $result->out->write('self::$'.$case->name.', ');
+      $result->out->write("self::\${$case->name}, ");
     }
     $result->out->write(']; }');
 
@@ -70,18 +71,18 @@ trait RewriteEnums {
     $result->out->write('static function __init() {');
     if ($enum->base) {
       foreach ($cases as $case) {
-        $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'", ');
+        $result->out->write("self::\${$case->name}= new self('{$case->name}', ");
         $this->emitOne($result, $case->expression);
         $result->out->write(');');
       }
     } else {
       foreach ($cases as $case) {
-        $result->out->write('self::$'.$case->name.'= new self("'.$case->name.'");');
+        $result->out->write("self::\${$case->name}= new self('{$case->name}');");
       }
     }
     $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-    $result->out->write('}} '.$enum->name.'::__init();');
+    $result->out->write("}} {$enum->name}::__init();");
     $result->codegen->leave();
   }
 }

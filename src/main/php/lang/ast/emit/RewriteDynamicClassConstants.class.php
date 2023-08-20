@@ -11,7 +11,7 @@ trait RewriteDynamicClassConstants {
 
   protected function emitScope($result, $scope) {
     if ($scope->member instanceof Expression && -1 !== $scope->line) {
-      $result->out->write('constant('.$scope->type.'::class."::".');
+      $result->out->write("constant({$scope->type}::class.'::'.");
       $this->emitOne($result, $scope->member->inline);
       $result->out->write(')');
     } else {

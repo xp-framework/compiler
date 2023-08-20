@@ -102,7 +102,7 @@ class Declaration extends Type {
     if (!self::$ENUMS && 'enum' === $this->type->kind) {
       return ($this->type->body[$member] ?? null) instanceof EnumCase;
     } else if ('class' === $this->type->kind && $this->type->parent && '\\lang\\Enum' === $this->type->parent->literal()) {
-      return ($this->type->body['$'.$member] ?? null) instanceof Property;
+      return ($this->type->body["\${$member}"] ?? null) instanceof Property;
     }
     return false;
   }

@@ -199,12 +199,12 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitNamespace($result, $declaration) {
-    $result->out->write('namespace '.$declaration->name);
+    $result->out->write("namespace {$declaration->name}");
   }
 
   protected function emitImport($result, $import) {
     foreach ($import->names as $name => $alias) {
-      $result->out->write('use '.$import->type.' '.$name.($alias ? ' as '.$alias : '').';');
+      $result->out->write("use {$import->type} {$name}".($alias ? " as {$alias}" : '').';');
     }
   }
 
@@ -232,7 +232,7 @@ abstract class PHP extends Emitter {
 
   protected function emitStatic($result, $static) {
     foreach ($static->initializations as $variable => $initial) {
-      $result->out->write('static $'.$variable);
+      $result->out->write("static \${$variable}");
       if ($initial) {
         $result->out->write('=');
         $this->emitOne($result, $initial);
@@ -243,7 +243,7 @@ abstract class PHP extends Emitter {
 
   protected function emitVariable($result, $variable) {
     if ($variable->const) {
-      $result->out->write('$'.$variable->pointer);
+      $result->out->write("\${$variable->pointer}");
     } else {
       $result->out->write('$');
       $this->emitOne($result, $variable->pointer);
@@ -262,7 +262,7 @@ abstract class PHP extends Emitter {
     // Inline nullable checks using ternaries
     if ($cast->type instanceof IsNullable) {
       $t= $result->temp();
-      $result->out->write('null===('.$t.'=');
+      $result->out->write("null===({$t}=");
       $this->emitOne($result, $cast->expression);
       $result->out->write(')?null:');
 
@@ -274,12 +274,12 @@ abstract class PHP extends Emitter {
     }
 
     if (isset($native[$name])) {
-      $result->out->write('('.$name.')');
+      $result->out->write("({$name})");
       $this->emitOne($result, $expression);
     } else {
       $result->out->write('cast(');
       $this->emitOne($result, $expression);
-      $result->out->write(',\''.$name.'\')');
+      $result->out->write(",'{$name}')");
     }
   }
 
@@ -299,12 +299,12 @@ abstract class PHP extends Emitter {
   protected function emitParameter($result, $parameter) {
     $parameter->annotations && $this->emitOne($result, $parameter->annotations);
     if ($parameter->type && $t= $this->literal($parameter->type)) {
-      $result->out->write($t.' ');
+      $result->out->write("{$t} ");
     }
     if ($parameter->variadic) {
-      $result->out->write('... $'.$parameter->name);
+      $result->out->write("... \${$parameter->name}");
     } else {
-      $result->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
+      $result->out->write(($parameter->reference ? '&' : '')."\${$parameter->name}");
     }
     if ($parameter->default) {
       if ($this->isConstant($result, $parameter->default)) {
@@ -326,7 +326,7 @@ abstract class PHP extends Emitter {
     $result->out->write(')');
 
     if ($signature->returns && $t= $this->literal($signature->returns)) {
-      $result->out->write(':'.$t);
+      $result->out->write(":{$t}");
     }
   }
 
@@ -334,7 +334,8 @@ abstract class PHP extends Emitter {
     $result->stack[]= $result->locals;
     $result->locals= [];
 
-    $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
+    $r= $function->signature->byref ? '&' : '';
+    $result->out->write("function {$r}{$function->name}");
     $this->emitSignature($result, $function->signature);
 
     $result->out->write('{');
@@ -381,7 +382,7 @@ abstract class PHP extends Emitter {
     ];
 
     $case->annotations && $this->emitOne($result, $case->annotations);
-    $result->out->write('case '.$case->name);
+    $result->out->write("case {$case->name}");
     if ($case->expression) {
       $result->out->write('=');
       $this->emitOne($result, $case->expression);
@@ -394,13 +395,13 @@ abstract class PHP extends Emitter {
 
     $enum->comment && $this->emitOne($result, $enum->comment);
     $enum->annotations && $this->emitOne($result, $enum->annotations);
-    $result->at($enum->declared)->out->write('enum '.$enum->declaration());
-    $enum->base && $result->out->write(':'.$enum->base);
+    $result->at($enum->declared)->out->write("enum {$enum->declaration()}");
+    $enum->base && $result->out->write(":{$enum->base}");
 
     if ($enum->implements) {
       $list= '';
       foreach ($enum->implements as $type) {
-        $list.= ', '.$type->literal();
+        $list.= ", {$type->literal()}";
       }
       $result->out->write(' implements '.substr($list, 2));
     }
@@ -412,7 +413,7 @@ abstract class PHP extends Emitter {
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $enum->name, $enum->annotations, $enum->comment);
-    $result->out->write('}} '.$enum->declaration().'::__init();');
+    $result->out->write("}} {$enum->declaration()}::__init();");
 
     $result->codegen->leave();
   }
@@ -422,13 +423,13 @@ abstract class PHP extends Emitter {
 
     $class->comment && $this->emitOne($result, $class->comment);
     $class->annotations && $this->emitOne($result, $class->annotations);
-    $result->at($class->declared)->out->write(implode(' ', $class->modifiers).' class '.$class->declaration());
-    $class->parent && $result->out->write(' extends '.$class->parent->literal());
+    $result->at($class->declared)->out->write(implode(' ', $class->modifiers)." class {$class->declaration()}");
+    $class->parent && $result->out->write(" extends {$class->parent->literal()}");
 
     if ($class->implements) {
       $list= '';
       foreach ($class->implements as $type) {
-        $list.= ', '.$type->literal();
+        $list.= ", {$type->literal()}";
       }
       $result->out->write(' implements '.substr($list, 2));
     }
@@ -448,7 +449,7 @@ abstract class PHP extends Emitter {
 
       $result->out->write('public function __get($name) { switch ($name) {');
       foreach ($context->virtual as $name => $access) {
-        $result->out->write($name ? 'case "'.$name.'":' : 'default:');
+        $result->out->write($name ? "case '{$name}':" : 'default:');
         $this->emitOne($result, $access[0]);
         $result->out->write(';break;');
       }
@@ -459,7 +460,7 @@ abstract class PHP extends Emitter {
 
       $result->out->write('public function __set($name, $value) { switch ($name) {');
       foreach ($context->virtual as $name => $access) {
-        $result->out->write($name ? 'case "'.$name.'":' : 'default:');
+        $result->out->write($name ? "case '{$name}':" : 'default:');
         $this->emitOne($result, $access[1]);
         $result->out->write(';break;');
       }
@@ -484,7 +485,7 @@ abstract class PHP extends Emitter {
     $result->out->write('static function __init() {');
     $this->emitInitializations($result, $context->statics);
     $this->emitMeta($result, $class->name, $class->annotations, $class->comment);
-    $result->out->write('}} '.$class->declaration().'::__init();');
+    $result->out->write("}} {$class->declaration()}::__init();");
 
     $result->codegen->leave();
   }
@@ -499,7 +500,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitAnnotation($result, $annotation) {
-    $result->out->write('\\'.$annotation->name);
+    $result->out->write("\\{$annotation->name}");
     if (empty($annotation->arguments)) return;
 
     // Check whether arguments are constant
@@ -541,7 +542,7 @@ abstract class PHP extends Emitter {
 
     $interface->comment && $this->emitOne($result, $interface->comment);
     $interface->annotations && $this->emitOne($result, $interface->annotations);
-    $result->at($interface->declared)->out->write('interface '.$interface->declaration());
+    $result->at($interface->declared)->out->write("interface {$interface->declaration()}");
     $interface->parents && $result->out->write(' extends '.implode(', ', $interface->parents));
 
     $result->out->write('{');
@@ -559,7 +560,7 @@ abstract class PHP extends Emitter {
 
     $trait->comment && $this->emitOne($result, $trait->comment);
     $trait->annotations && $this->emitOne($result, $trait->annotations);
-    $result->at($trait->declared)->out->write('trait '.$trait->declaration());
+    $result->at($trait->declared)->out->write("trait {$trait->declaration()}");
     $result->out->write('{');
     foreach ($trait->body as $member) {
       $this->emitOne($result, $member);
@@ -601,7 +602,7 @@ abstract class PHP extends Emitter {
 
     $const->comment && $this->emitOne($result, $const->comment);
     $const->annotations && $this->emitOne($result, $const->annotations);
-    $result->at($const->declared)->out->write(implode(' ', $const->modifiers).' const '.$this->constantType($const->type).' '.$const->name.'=');
+    $result->at($const->declared)->out->write(implode(' ', $const->modifiers)." const {$this->constantType($const->type)} {$const->name}=");
     $this->emitOne($result, $const->expression);
     $result->out->write(';');
   }
@@ -617,15 +618,15 @@ abstract class PHP extends Emitter {
 
     $property->comment && $this->emitOne($result, $property->comment);
     $property->annotations && $this->emitOne($result, $property->annotations);
-    $result->at($property->declared)->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
+    $result->at($property->declared)->out->write(implode(' ', $property->modifiers)." {$this->propertyType($property->type)} \${$property->name}");
     if (isset($property->expression)) {
       if ($this->isConstant($result, $property->expression)) {
         $result->out->write('=');
         $this->emitOne($result, $property->expression);
       } else if (in_array('static', $property->modifiers)) {
-        $result->codegen->scope[0]->statics['self::$'.$property->name]= $property->expression;
+        $result->codegen->scope[0]->statics["self::\${$property->name}"]= $property->expression;
       } else {
-        $result->codegen->scope[0]->init['$this->'.$property->name]= $property->expression;
+        $result->codegen->scope[0]->init["\$this->{$property->name}"]= $property->expression;
       }
     }
     $result->out->write(';');
@@ -680,14 +681,15 @@ abstract class PHP extends Emitter {
 
       // Emit non-constant parameter defaults
       foreach ($init as $param) {
-        $result->out->write('$'.$param->name.' ?? $'.$param->name.'=');
+        $result->out->write("\${$param->name} ?? \${$param->name}=");
         $this->emitOne($result, $param->default);
         $result->out->write(';');
       }
 
       // Emit promoted parameters
       foreach ($promoted as $param) {
-        $result->out->write('$this->'.$param->name.($param->reference ? '=&$' : '=$').$param->name.';');
+        $r= $param->reference ? '&' : '';
+        $result->out->write("\$this->{$param->name}={$r}\${$param->name};");
       }
 
       // Emit initializations if inside constructor
@@ -716,12 +718,12 @@ abstract class PHP extends Emitter {
 
   protected function emitBinary($result, $binary) {
     $this->emitOne($result, $binary->left);
-    $result->out->write(' '.$binary->operator.' ');
+    $result->out->write(" {$binary->operator} ");
     $this->emitOne($result, $binary->right);
   }
 
   protected function emitPrefix($result, $unary) {
-    $result->out->write($unary->operator.' ');
+    $result->out->write("{$unary->operator} ");
     $this->emitOne($result, $unary->expression);
   }
 
@@ -751,7 +753,7 @@ abstract class PHP extends Emitter {
 
   protected function emitAssign($result, $target) {
     if ($target instanceof Variable && $target->const) {
-      $result->out->write('$'.$target->pointer);
+      $result->out->write("\${$target->pointer}");
       $result->locals[$target->pointer]= true;
     } else if ($target instanceof ArrayLiteral) {
       $result->out->write('list(');
@@ -843,11 +845,11 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitCatch($result, $catch) {
-    $capture= $catch->variable ? ' $'.$catch->variable : '';
+    $capture= $catch->variable ? " \${$catch->variable}" : '';
     if (empty($catch->types)) {
-      $result->out->write('catch(\\Throwable'.$capture.') {');
+      $result->out->write("catch(\\Throwable{$capture}) {");
     } else {
-      $result->out->write('catch('.implode('|', $catch->types).$capture.') {');
+      $result->out->write('catch('.implode('|', $catch->types)."{$capture}) {");
     }
     $this->emitAll($result, $catch->body);
     $result->out->write('}');
@@ -922,8 +924,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitDo($result, $do) {
-    $result->out->write('do');
-    $result->out->write('{');
+    $result->out->write('do {');
     $this->emitAll($result, $do->body);
     $result->out->write('} while (');
     $this->emitOne($result, $do->expression);
@@ -951,11 +952,11 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitLabel($result, $label) {
-    $result->out->write($label->name.':');
+    $result->out->write("{$label->name}:");
   }
 
   protected function emitGoto($result, $goto) {
-    $result->out->write('goto '.$goto->label);
+    $result->out->write("goto {$goto->label}");
   }
 
   protected function emitInstanceOf($result, $instanceof) {
@@ -969,14 +970,14 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $type);
     } else if ($type instanceof Node) {
       $t= $result->temp();
-      $result->out->write('('.$t.'= ');
+      $result->out->write("({$t}= ");
       $this->emitOne($result, $type);
       $result->out->write(')?');
       $this->emitOne($result, $instanceof->expression);
-      $result->out->write(' instanceof '.$t.':null');
+      $result->out->write(" instanceof {$t}:null");
     } else {
       $this->emitOne($result, $instanceof->expression);
-      $result->out->write(' instanceof '.$type);
+      $result->out->write(" instanceof {$type}");
     }
   }
 
@@ -984,7 +985,7 @@ abstract class PHP extends Emitter {
     $i= 0;
     foreach ($arguments as $name => $argument) {
       if ($i++) $result->out->write(',');
-      if (is_string($name)) $result->out->write($name.':');
+      if (is_string($name)) $result->out->write("{$name}:");
       $this->emitOne($result, $argument);
     }
   }
@@ -995,7 +996,7 @@ abstract class PHP extends Emitter {
       $this->emitOne($result, $new->type->expression);
       $result->out->write(')(');
     } else {
-      $result->out->write('new '.$new->type->literal().'(');
+      $result->out->write("new {$new->type->literal()}(");
     }
 
     $this->emitArguments($result, $new->arguments);
@@ -1012,15 +1013,15 @@ abstract class PHP extends Emitter {
     // Allow "extends self" to reference enclosing class (except if this
     // class is an anonymous class!)
     if ($enclosing && $new->definition->parent && 'self' === $new->definition->parent->name()) {
-      $result->out->write(' extends '.$enclosing->type->name->literal());
+      $result->out->write(" extends {$enclosing->type->name->literal()}");
     } else if ($new->definition->parent) {
-      $result->out->write(' extends '.$new->definition->parent->literal());
+      $result->out->write(" extends {$new->definition->parent->literal()}");
     }
 
     if ($new->definition->implements) {
       $list= '';
       foreach ($new->definition->implements as $type) {
-        $list.= ', '.$type->literal();
+        $list.= ", {$type->literal()}";
       }
       $result->out->write(' implements '.substr($list, 2));
     }
@@ -1056,7 +1057,7 @@ abstract class PHP extends Emitter {
     $this->emitOne($result, $callable->type);
     $callable->type->arguments= null;
 
-    $result->out->write("; }");
+    $result->out->write('; }');
   }
 
   protected function emitInvoke($result, $invoke) {
@@ -1074,7 +1075,7 @@ abstract class PHP extends Emitter {
       $result->out->write('::');
     } else if ($scope->type instanceof Node) {
       $t= $result->temp();
-      $result->out->write('(null==='.$t.'=');
+      $result->out->write("(null==={$t}=");
       $this->emitOne($result, $scope->type);
       $result->out->write(")?null:{$t}::");
     } else {
@@ -1088,7 +1089,7 @@ abstract class PHP extends Emitter {
       'class' !== $scope->member->expression &&
       $result->codegen->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
     ) {
-      $result->out->write('$'.$scope->member->expression);
+      $result->out->write("\${$scope->member->expression}");
     } else {
       $this->emitOne($result, $scope->member);
     }

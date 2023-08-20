@@ -40,7 +40,7 @@ abstract class Emitter {
       }
     } while ($minor-- > 0);
 
-    throw new IllegalArgumentException('XP Compiler does not support '.$runtime.' yet');
+    throw new IllegalArgumentException("XP Compiler does not support {$runtime} yet");
   }
 
   /**
@@ -113,7 +113,7 @@ abstract class Emitter {
    * @return void
    */
   protected function emitOperator($result, $operator) {
-    throw new IllegalStateException('Unexpected operator '.$operator->value.' at line '.$operator->line);
+    throw new IllegalStateException("Unexpected operator {$operator->value} at line {$operator->line}");
   }
 
   /**
@@ -145,11 +145,11 @@ abstract class Emitter {
         $r= $transformation($result->codegen, $node);
         if ($r instanceof Node) {
           if ($r->kind === $node->kind) continue;
-          $this->{'emit'.$r->kind}($result, $r);
+          $this->{"emit{$r->kind}"}($result, $r);
           return;
         } else if ($r) {
           foreach ($r as $n) {
-            $this->{'emit'.$n->kind}($result, $n);
+            $this->{"emit{$n->kind}"}($result, $n);
             $result->out->write(';');
           }
           return;
@@ -158,7 +158,7 @@ abstract class Emitter {
       // Fall through, use default
     }
 
-    $this->{'emit'.$node->kind}($result, $node);
+    $this->{"emit{$node->kind}"}($result, $node);
   }
 
   /**

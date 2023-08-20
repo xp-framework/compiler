@@ -41,9 +41,9 @@ trait ArrayUnpackUsingMerge {
             $result->out->write(',[');
           } else {
             $t= $result->temp();
-            $result->out->write('],('.$t.'=');
+            $result->out->write("],({$t}=");
             $this->emitOne($result, $pair[1]->expression);
-            $result->out->write(') instanceof \Traversable ? iterator_to_array('.$t.') : '.$t.',[');
+            $result->out->write(") instanceof \\Traversable ? iterator_to_array({$t}) : {$t},[");
           }
         } else {
           $this->emitOne($result, $pair[1]);

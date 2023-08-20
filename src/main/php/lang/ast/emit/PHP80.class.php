@@ -40,7 +40,7 @@ class PHP80 extends PHP {
       IsValue::class        => function($t) { return $t->literal(); },
       IsNullable::class     => function($t) {
         if (null === ($l= $this->literal($t->element))) return null;
-        return $t->element instanceof IsUnion ? $l.'|null' : '?'.$l;
+        return $t->element instanceof IsUnion ? "{$l}|null" : "?{$l}";
       },
       IsIntersection::class => function($t) { return null; },
       IsUnion::class        => function($t) {
@@ -49,7 +49,7 @@ class PHP80 extends PHP {
           if ('null' === $component->literal) {
             $u.= '|null';
           } else if (null !== ($l= $this->literal($component))) {
-            $u.= '|'.$l;
+            $u.= "|{$l}";
           } else {
             return null;  // One of the components didn't resolve
           }

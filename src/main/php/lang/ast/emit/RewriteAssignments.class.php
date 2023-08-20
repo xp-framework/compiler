@@ -20,7 +20,7 @@ trait RewriteAssignments {
 
   protected function rewriteDestructuring($result, $assignment) {
     $t= $result->temp();
-    $result->out->write('is_array('.$t.'=');
+    $result->out->write("is_array({$t}=");
 
     // Create reference to right-hand if possible
     $r= $assignment->expression;
@@ -63,7 +63,7 @@ trait RewriteAssignments {
       }
       $result->out->write(',');
     }
-    $result->out->write(']?'.$t.':null)');
+    $result->out->write("]?{$t}:null)");
   }
 
   protected function emitAssignment($result, $assignment) {

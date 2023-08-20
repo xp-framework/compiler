@@ -15,14 +15,14 @@ trait ArbitrayNewExpressions {
 
     // Emit supported `new $var`, rewrite unsupported `new ($expr)`
     if ($new->type->expression instanceof Variable && $new->type->expression->const) {
-      $result->out->write('new $'.$new->type->expression->pointer.'(');
+      $result->out->write("new \${$new->type->expression->pointer}(");
       $this->emitArguments($result, $new->arguments);
       $result->out->write(')');
     } else {
       $t= $result->temp();
-      $result->out->write('('.$t.'= ');
+      $result->out->write("({$t}= ");
       $this->emitOne($result, $new->type->expression);
-      $result->out->write(') ? new '.$t.'(');
+      $result->out->write(") ? new {$t}(");
       $this->emitArguments($result, $new->arguments);
       $result->out->write(') : null');
     }

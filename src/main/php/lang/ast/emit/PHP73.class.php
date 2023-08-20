@@ -38,7 +38,7 @@ class PHP73 extends PHP {
       IsMap::class          => function($t) { return 'array'; },
       IsFunction::class     => function($t) { return 'callable'; },
       IsValue::class        => function($t) { $l= $t->literal(); return 'static' === $l ? 'self' : $l; },
-      IsNullable::class     => function($t) { $l= $this->literal($t->element); return null === $l ? null : '?'.$l; },
+      IsNullable::class     => function($t) { $l= $this->literal($t->element); return null === $l ? null : "?{$l}"; },
       IsUnion::class        => function($t) { return null; },
       IsIntersection::class => function($t) { return null; },
       IsLiteral::class      => function($t) {

@@ -64,7 +64,7 @@ class PHP70 extends PHP {
 
   protected function emitCallable($result, $callable) {
     $t= $result->temp();
-    $result->out->write('(is_callable('.$t.'=');
+    $result->out->write("(is_callable({$t}=");
     if ($callable->expression instanceof Literal) {
 
       // Rewrite f() => "f"
@@ -111,7 +111,7 @@ class PHP70 extends PHP {
 
     // Emit equivalent of Closure::fromCallable() which doesn't exist until PHP 7.1
     $a= $result->temp();
-    $result->out->write(')?function(...'.$a.') use('.$t.') { return '.$t.'(...'.$a.'); }:');
+    $result->out->write(")?function(...{$a}) use({$t}) { return {$t}(...{$a}); }:");
     $result->out->write('(function() { throw new \Error("Given argument is not callable"); })())');
   }
 

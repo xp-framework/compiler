@@ -17,7 +17,7 @@ trait OmitConstModifiers {
       DETAIL_ARGUMENTS   => []
     ];
 
-    $result->out->write('const '.$const->name.'=');
+    $result->out->write("const {$const->name}=");
     $this->emitOne($result, $const->expression);
     $result->out->write(';');
   }

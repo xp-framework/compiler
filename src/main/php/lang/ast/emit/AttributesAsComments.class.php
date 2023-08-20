@@ -13,7 +13,7 @@
 trait AttributesAsComments {
 
   protected function emitAnnotation($result, $annotation) {
-    $result->out->write('\\'.$annotation->name);
+    $result->out->write("\\{$annotation->name}");
     if (empty($annotation->arguments)) return;
 
     // Check whether arguments are constant, enclose in `eval` array

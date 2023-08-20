@@ -26,7 +26,7 @@ trait ForeachDestructuringAsStatement {
 
     if ('array' === $foreach->value->kind) {
       $t= $result->temp();
-      $result->out->write('&'.$t.') {');
+      $result->out->write("&{$t}) {");
       $this->rewriteDestructuring($result, new Assignment($foreach->value, '=', new Variable(substr($t, 1))));
       $result->out->write(';');
       $this->emitAll($result, $foreach->body);

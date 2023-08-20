@@ -8,11 +8,11 @@
 trait NonCapturingCatchVariables {
 
   protected function emitCatch($result, $catch) {
-    $capture= $catch->variable ? '$'.$catch->variable : $result->temp();
+    $capture= $catch->variable ? "\${$catch->variable}" : $result->temp();
     if (empty($catch->types)) {
-      $result->out->write('catch(\\Throwable '.$capture.') {');
+      $result->out->write("catch(\\Throwable {$capture}) {");
     } else {
-      $result->out->write('catch('.implode('|', $catch->types).' '.$capture.') {');
+      $result->out->write('catch('.implode('|', $catch->types)." {$capture}) {");
     }
     $this->emitAll($result, $catch->body);
     $result->out->write('}');
