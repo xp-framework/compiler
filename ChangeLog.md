@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.16.0 / 2023-10-01
+
+* Merged PR #175_ Transform multiple nodes without creating statements
+  (@thekid)
 * Refactored code base to use the new reflection library instead of
   the *Package* class from `lang.reflect`. See xp-framework/rfc#338
   (@thekid)
