@@ -148,9 +148,9 @@ abstract class Emitter {
           $this->{'emit'.$r->kind}($result, $r);
           return;
         } else if ($r) {
-          foreach ($r as $n) {
+          foreach ($r as $s => $n) {
             $this->{'emit'.$n->kind}($result, $n);
-            $result->out->write(';');
+            null === $s || $result->out->write(';');
           }
           return;
         }
