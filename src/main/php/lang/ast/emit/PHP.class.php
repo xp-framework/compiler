@@ -129,7 +129,7 @@ abstract class PHP extends Emitter {
     }
     unset($capture['this']);
 
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= [];
     if ($signature) {
       $static ? $result->out->write('static function') : $result->out->write('function');
@@ -151,7 +151,7 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     $emit($result, $node);
     $result->out->write('}');
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   /**
@@ -331,7 +331,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitFunction($result, $function) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= [];
 
     $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
@@ -341,11 +341,11 @@ abstract class PHP extends Emitter {
     $this->emitAll($result, $function->body);
     $result->out->write('}');
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   protected function emitClosure($result, $closure) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= [];
 
     $closure->static ? $result->out->write('static function') : $result->out->write('function');
@@ -361,18 +361,18 @@ abstract class PHP extends Emitter {
     $this->emitAll($result, $closure->body);
     $result->out->write('}');
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   protected function emitLambda($result, $lambda) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
 
     $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
     $this->emitOne($result, $lambda->body);
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   protected function emitEnumCase($result, $case) {
@@ -636,7 +636,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitMethod($result, $method) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
@@ -708,7 +708,7 @@ abstract class PHP extends Emitter {
       $this->emitProperty($result, new Property(explode(' ', $param->promote), $param->name, $param->type));
     }
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
     $result->codegen->scope[0]->meta[self::METHOD][$method->name]= $meta;
   }
 
