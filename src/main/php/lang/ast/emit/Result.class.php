@@ -8,7 +8,6 @@ class Result implements Closeable {
   public $out;
   public $codegen;
   public $locals= [];
-  public $stack= [];
 
   /**
    * Starts a result stream.
