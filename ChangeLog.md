@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.17.0 / 2023-10-03
+
+* Merged PR #177: Remove Result::$stack. Use local variables for backing
+  up and restoring locals instead. Slight performance improvement.
+  (@thekid)
+* Fixed issue #176: Lambda parameters bleeding into locals - @thekid
+
 ## 8.16.0 / 2023-10-01
 
 * Merged PR #175: Transform multiple nodes without creating statements
