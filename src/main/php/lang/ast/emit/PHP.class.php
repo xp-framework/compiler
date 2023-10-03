@@ -365,10 +365,15 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitLambda($result, $lambda) {
+    $result->stack[]= $result->locals;
+    $result->locals= [];
+
     $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
     $this->emitOne($result, $lambda->body);
+
+    $result->locals= array_pop($result->stack);
   }
 
   protected function emitEnumCase($result, $case) {

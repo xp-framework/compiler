@@ -225,4 +225,22 @@ class LambdasTest extends EmittingTest {
       }
     }');
   }
+
+  #[Test]
+  public function issue_176() {
+    $r= $this->run('class %T {
+      public function run(iterable $records) {
+        $nonNull= fn($record) => null !== $record;
+        $process= fn($records, $filter) => {
+          foreach ($records as $record) {
+            if ($filter($record)) yield $record;
+          }
+        };
+
+        return $process($records, $nonNull);
+      }
+    }', [1, null, 2]);
+
+    Assert::equals([1, 2], iterator_to_array($r));
+  }
 }
