@@ -2,6 +2,7 @@
 
 use test\{Assert, Test, Values};
 
+/** @see https://github.com/xp-framework/ast/pull/49 */
 class LineNumbersTest extends EmittingTest {
 
   #[Test]
