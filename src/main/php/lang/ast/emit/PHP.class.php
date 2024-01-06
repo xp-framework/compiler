@@ -317,13 +317,20 @@ abstract class PHP extends Emitter {
     $result->locals[$parameter->name]= true;
   }
 
-  protected function emitSignature($result, $signature) {
+  protected function emitSignature($result, $signature, $use= null) {
     $result->out->write('(');
     foreach ($signature->parameters as $i => $parameter) {
       if ($i++) $result->out->write(',');
       $this->emitParameter($result, $parameter);
     }
     $result->out->write(')');
+
+    if ($use) {
+      $result->out->write(' use('.implode(',', $use).') ');
+      foreach ($use as $variable) {
+        $result->locals[substr($variable, 1)]= true;
+      }
+    }
 
     if ($signature->returns && $t= $this->literal($signature->returns)) {
       $result->out->write(':'.$t);
@@ -349,14 +356,8 @@ abstract class PHP extends Emitter {
     $result->locals= [];
 
     $closure->static ? $result->out->write('static function') : $result->out->write('function');
-    $this->emitSignature($result, $closure->signature);
+    $this->emitSignature($result, $closure->signature, $closure->use);
 
-    if ($closure->use) {
-      $result->out->write(' use('.implode(',', $closure->use).') ');
-      foreach ($closure->use as $variable) {
-        $result->locals[substr($variable, 1)]= true;
-      }
-    }
     $result->out->write('{');
     $this->emitAll($result, $closure->body);
     $result->out->write('}');

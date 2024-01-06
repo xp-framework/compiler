@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed emitting captures and return types for closures - @thekid
+
 ## 8.17.0 / 2023-10-03
 
 * Merged PR #177: Remove Result::$stack. Use local variables for backing
