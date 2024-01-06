@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.17.1 / 2024-01-06
+
 * Fixed emitting captures and return types for closures - @thekid
 
 ## 8.17.0 / 2023-10-03
