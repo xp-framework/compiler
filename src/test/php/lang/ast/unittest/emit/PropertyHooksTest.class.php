@@ -55,7 +55,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function set_expression() {
     $r= $this->run('class %T {
-      public $test { set => $field= ucfirst($value); }
+      public $test { set => $this->test= ucfirst($value); }
 
       public function run() {
         $this->test= "test";
@@ -69,7 +69,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function set_block() {
     $r= $this->run('class %T {
-      public $test { set($value) { $field= ucfirst($value); } }
+      public $test { set($value) { $this->test= ucfirst($value); } }
 
       public function run() {
         $this->test= "test";
@@ -89,23 +89,6 @@ class PropertyHooksTest extends EmittingTest {
         $this->test= "test";
       }
     }');
-  }
-
-  #[Test]
-  public function get_and_set_using_field() {
-    $r= $this->run('class %T {
-      public $test {
-        get => $field;
-        set => $field= ucfirst($value);
-      }
-
-      public function run() {
-        $this->test= "test";
-        return $this->test;
-      }
-    }');
-
-    Assert::equals('Test', $r);
   }
 
   #[Test]
@@ -129,7 +112,7 @@ class PropertyHooksTest extends EmittingTest {
   public function implicit_set() {
     $r= $this->run('class %T {
       public $test {
-        get => ucfirst($field);
+        get => ucfirst($this->test);
       }
 
       public function run() {
@@ -145,7 +128,7 @@ class PropertyHooksTest extends EmittingTest {
   public function typed_set() {
     $r= $this->run('use util\\Bytes; class %T {
       public string $test {
-        set(string|Bytes $arg) => $field= ucfirst($arg);
+        set(string|Bytes $arg) => $this->test= ucfirst($arg);
       }
 
       public function run() {
@@ -161,7 +144,7 @@ class PropertyHooksTest extends EmittingTest {
   public function typed_mismatch() {
     $this->run('class %T {
       public string $test {
-        set(int $times) => $field= $times." times";
+        set(int $times) => $this->test= $times." times";
       }
 
       public function run() {
@@ -174,7 +157,7 @@ class PropertyHooksTest extends EmittingTest {
   public function initial_value() {
     $r= $this->run('class %T {
       public $test= "test" {
-        get => ucfirst($field);
+        get => ucfirst($this->test);
       }
 
       public function run() {
@@ -219,8 +202,8 @@ class PropertyHooksTest extends EmittingTest {
   public function reflection() {
     $t= $this->declare('class %T {
       public string $test {
-        get => $field;
-        set => $field= ucfirst($value);
+        get => $this->test;
+        set => $this->test= ucfirst($value);
       }
     }');
 
@@ -260,7 +243,7 @@ class PropertyHooksTest extends EmittingTest {
       public $test {
         set(string $name) {
           if (strlen($name) > 10) throw new IllegalArgumentException("Too long");
-          $field= $name;
+          $this->test= $name;
         }
       }
 

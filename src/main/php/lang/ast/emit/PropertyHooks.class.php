@@ -29,12 +29,12 @@ trait PropertyHooks {
     // Magic constant referencing property name
     if ($node instanceof Literal && '__PROPERTY__' === $node->expression) return $literal;
 
-    // Special variable $field, $this->propertyName syntax
-    if ($node instanceof Variable && 'field' === $node->pointer || (
+    // Rewrite $this->propertyName to virtual property
+    if (
       $node instanceof InstanceExpression &&
       $node->expression instanceof Variable && 'this' === $node->expression->pointer &&
       $node->member instanceof Literal && $name === $node->member->expression
-    )) return $virtual;
+    ) return $virtual;
 
     // <T>::$field::hook() => <T>::__<hook>_<field>()
     if (
