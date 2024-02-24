@@ -3,6 +3,43 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.17.1 / 2024-01-06
+
+* Fixed emitting captures and return types for closures - @thekid
+
+## 8.17.0 / 2023-10-03
+
+* Merged PR #177: Remove Result::$stack. Use local variables for backing
+  up and restoring locals instead. Slight performance improvement.
+  (@thekid)
+* Fixed issue #176: Lambda parameters bleeding into locals - @thekid
+
+## 8.16.0 / 2023-10-01
+
+* Merged PR #175: Transform multiple nodes without creating statements
+  (@thekid)
+* Refactored code base to use the new reflection library instead of
+  the *Package* class from `lang.reflect`. See xp-framework/rfc#338
+  (@thekid)
+
+## 8.15.1 / 2023-07-16
+
+* Fixed parent constructors not being invoked when using non-constant
+  property initialization.
+  (@thekid)
+
+## 8.15.0 / 2023-07-16
+
+* Merged PR #173: Check for `#[Override]` annotation, implementing this
+  PHP 8.3 RFC: https://wiki.php.net/rfc/marking_overriden_methods
+  (@thekid)
+* Merged PR #171: Refactor scope lookup from Result to CodeGen - @thekid
+
+## 8.14.0 / 2023-07-15
+
+* Fixed error *Cannot access offset of type array on array* when using
+  reflection for non-constant parameter defaults
+  (@thekid)
 * Implemented feature #162: Arbitrary static variable initializers, see
   https://wiki.php.net/rfc/arbitrary_static_variable_initializers
   (@thekid)

@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\IllegalArgumentException;
+use lang\{IllegalArgumentException, Reflection};
 use test\{Assert, Test, Values};
 
 /**
@@ -41,14 +41,12 @@ class InitializeWithExpressionsTest extends EmittingTest {
 
   #[Test, Values(from: 'expressions')]
   public function reflective_access_to_property($declaration, $expected) {
-    Assert::equals($expected, $this->run(strtr('use lang\ast\unittest\emit\{FileInput, Handle}; class %T {
+    $t= $this->declare(strtr('use lang\ast\unittest\emit\{FileInput, Handle}; class %T {
       const INITIAL= "initial";
-      private $h= %D;
+      public $h= %D;
+    }', ['%D' => $declaration]));
 
-      public function run() {
-        return typeof($this)->getField("h")->get($this);
-      }
-    }', ['%D' => $declaration])));
+    Assert::equals($expected, $t->property('h')->get($t->newInstance()));
   }
 
   #[Test, Values(['fn($arg) => $arg->redirect(1)', 'function($arg) { return $arg->redirect(1); }'])]
@@ -151,12 +149,12 @@ class InitializeWithExpressionsTest extends EmittingTest {
 
   #[Test]
   public function parameter_default_reflective_access() {
-    $r= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+    $t= $this->declare('use lang\ast\unittest\emit\Handle; class %T {
       public function run($h= new Handle(0)) {
-        return typeof($this)->getMethod("run")->getParameter(0)->getDefaultValue();
+        // NOOP
       }
     }');
-    Assert::equals(new Handle(0), $r);
+    Assert::equals(new Handle(0), $t->method('run')->parameter(0)->default());
   }
 
   #[Test]
@@ -217,5 +215,25 @@ class InitializeWithExpressionsTest extends EmittingTest {
       }
     }');
     Assert::equals(1, $t->newInstance(new Handle(1))->run());
+  }
+
+  #[Test]
+  public function invokes_parent_constructor() {
+    $t= $this->declare('class %T {
+      protected $invoked= false;
+
+      public function __construct($invoked) {
+        $this->invoked= $invoked;
+      }
+    }');
+
+    $r= $this->declare('use lang\ast\unittest\emit\Handle; class %T extends '.$t->literal().' {
+      private $h= new Handle(0);
+
+      public function run() {
+        return [$this->invoked, $this->h];
+      }
+    }');
+    Assert::equals([true, new Handle(0)], $r->newInstance(true)->run());
   }
 }

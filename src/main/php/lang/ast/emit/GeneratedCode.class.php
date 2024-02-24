@@ -62,28 +62,11 @@ class GeneratedCode extends Result {
   /**
    * Looks up a given type 
    *
+   * @deprecated Use `CodeGen::lookup()` instead!
    * @param  string $type
    * @return lang.ast.emit.Type
    */
   public function lookup($type) {
-    $enclosing= $this->codegen->scope[0] ?? null;
-
-    if ('self' === $type || 'static' === $type) {
-      return new Declaration($enclosing->type, $this);
-    } else if ('parent' === $type) {
-      return $enclosing->type->parent ? $this->lookup($enclosing->type->parent->literal()) : null;
-    }
-
-    foreach ($this->codegen->scope as $scope) {
-      if ($scope->type->name && $type === $scope->type->name->literal()) {
-        return new Declaration($scope->type, $this);
-      }
-    }
-
-    if (class_exists($type) || interface_exists($type) || trait_exists($type) || enum_exists($type)) {
-      return new Reflection($type);
-    } else {
-      return new Incomplete($type);
-    }
+    return $this->codegen->lookup($type);
   }
 }

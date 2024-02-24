@@ -2,7 +2,6 @@
 
 use lang\ast\emit\Reflection;
 use lang\ast\emit\php\XpMeta;
-use lang\reflect\Package;
 use lang\{
   ClassFormatException,
   ClassLoader,

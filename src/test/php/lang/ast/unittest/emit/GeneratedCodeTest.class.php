@@ -49,7 +49,7 @@ class GeneratedCodeTest {
     $r= new GeneratedCode(new MemoryOutputStream());
     $context= $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
 
-    Assert::equals(new Declaration($context->type, $r), $r->lookup('self'));
+    Assert::equals(new Declaration($context->type, $r->codegen), $r->lookup('self'));
   }
 
   #[Test]
@@ -73,7 +73,7 @@ class GeneratedCodeTest {
     $r= new GeneratedCode(new MemoryOutputStream());
     $context= $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
 
-    Assert::equals(new Declaration($context->type, $r), $r->lookup('\\T'));
+    Assert::equals(new Declaration($context->type, $r->codegen), $r->lookup('\\T'));
   }
 
   #[Test]

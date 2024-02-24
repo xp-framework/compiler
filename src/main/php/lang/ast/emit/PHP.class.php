@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use Override;
 use lang\ast\emit\Escaping;
 use lang\ast\nodes\{
   Annotation,
@@ -70,7 +71,7 @@ abstract class PHP extends Emitter {
       return (
         $node->member instanceof Literal &&
         is_string($node->type) &&
-        !$result->lookup($node->type)->rewriteEnumCase($node->member->expression)
+        !$result->codegen->lookup($node->type)->rewriteEnumCase($node->member->expression)
       );
     } else if ($node instanceof BinaryExpression) {
       return $this->isConstant($result, $node->left) && $this->isConstant($result, $node->right);
@@ -128,7 +129,7 @@ abstract class PHP extends Emitter {
     }
     unset($capture['this']);
 
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= [];
     if ($signature) {
       $static ? $result->out->write('static function') : $result->out->write('function');
@@ -150,7 +151,7 @@ abstract class PHP extends Emitter {
     $result->out->write('{');
     $emit($result, $node);
     $result->out->write('}');
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   /**
@@ -316,7 +317,7 @@ abstract class PHP extends Emitter {
     $result->locals[$parameter->name]= true;
   }
 
-  protected function emitSignature($result, $signature) {
+  protected function emitSignature($result, $signature, $use= null) {
     $result->out->write('(');
     foreach ($signature->parameters as $i => $parameter) {
       if ($i++) $result->out->write(',');
@@ -324,13 +325,20 @@ abstract class PHP extends Emitter {
     }
     $result->out->write(')');
 
+    if ($use) {
+      $result->out->write(' use('.implode(',', $use).') ');
+      foreach ($use as $variable) {
+        $result->locals[substr($variable, 1)]= true;
+      }
+    }
+
     if ($signature->returns && $t= $this->literal($signature->returns)) {
       $result->out->write(':'.$t);
     }
   }
 
   protected function emitFunction($result, $function) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= [];
 
     $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
@@ -340,34 +348,32 @@ abstract class PHP extends Emitter {
     $this->emitAll($result, $function->body);
     $result->out->write('}');
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   protected function emitClosure($result, $closure) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= [];
 
     $closure->static ? $result->out->write('static function') : $result->out->write('function');
-    $this->emitSignature($result, $closure->signature);
+    $this->emitSignature($result, $closure->signature, $closure->use);
 
-    if ($closure->use) {
-      $result->out->write(' use('.implode(',', $closure->use).') ');
-      foreach ($closure->use as $variable) {
-        $result->locals[substr($variable, 1)]= true;
-      }
-    }
     $result->out->write('{');
     $this->emitAll($result, $closure->body);
     $result->out->write('}');
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
   }
 
   protected function emitLambda($result, $lambda) {
+    $locals= $result->locals;
+
     $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
     $this->emitOne($result, $lambda->body);
+
+    $result->locals= $locals;
   }
 
   protected function emitEnumCase($result, $case) {
@@ -468,7 +474,14 @@ abstract class PHP extends Emitter {
     // Create constructor for property initializations to non-static scalars
     // which have not already been emitted inside constructor
     if ($context->init) {
-      $result->out->write('public function __construct() {');
+      $t= $result->temp();
+      $result->out->write("public function __construct(... {$t}) {");
+
+      // If existant, invoke parent constructor, passing all parameters as arguments
+      if (($parent= $result->codegen->lookup('parent')) && $parent->providesMethod('__construct')) {
+        $result->out->write("parent::__construct(... {$t});");
+      }
+
       $this->emitInitializations($result, $context->init);
       $result->out->write('}');
     }
@@ -564,6 +577,13 @@ abstract class PHP extends Emitter {
 
   protected function emitUse($result, $use) {
     $result->out->write('use '.implode(',', $use->types));
+
+    // Verify Override
+    $self= $result->codegen->lookup('self');
+    foreach ($use->types as $type) {
+      $result->codegen->lookup($type)->checkOverrides($self);
+    }
+
     if ($use->aliases) {
       $result->out->write('{');
       foreach ($use->aliases as $reference => $alias) {
@@ -617,7 +637,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitMethod($result, $method) {
-    $result->stack[]= $result->locals;
+    $locals= $result->locals;
     $result->locals= ['this' => true];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
@@ -628,7 +648,14 @@ abstract class PHP extends Emitter {
     ];
 
     $method->comment && $this->emitOne($result, $method->comment);
-    $method->annotations && $this->emitOne($result, $method->annotations);
+    if ($method->annotations) {
+      $this->emitOne($result, $method->annotations);
+      $method->annotations->named(Override::class) && $result->codegen->lookup('self')->checkOverride(
+        $method->name,
+        $method->line
+      );
+    }
+
     $result->at($method->declared)->out->write(
       implode(' ', $method->modifiers).
       ' function '.
@@ -640,9 +667,9 @@ abstract class PHP extends Emitter {
     foreach ($method->signature->parameters as $param) {
       if (isset($param->promote)) $promoted[]= $param;
 
-      // Create a parameter annotation named `default` for non-constant parameter defaults
+      // Create a parameter annotation named `Default` for non-constant parameter defaults
       if (isset($param->default) && !$this->isConstant($result, $param->default)) {
-        $param->annotate(new Annotation('default', [$param->default]));
+        $param->annotate(new Annotation('Default', [$param->default]));
         $init[]= $param;
       }
 
@@ -658,7 +685,7 @@ abstract class PHP extends Emitter {
 
       // Emit non-constant parameter defaults
       foreach ($init as $param) {
-        $result->out->write('null === $'.$param->name.' && $'.$param->name.'=');
+        $result->out->write('$'.$param->name.' ?? $'.$param->name.'=');
         $this->emitOne($result, $param->default);
         $result->out->write(';');
       }
@@ -682,7 +709,7 @@ abstract class PHP extends Emitter {
       $this->emitProperty($result, new Property(explode(' ', $param->promote), $param->name, $param->type));
     }
 
-    $result->locals= array_pop($result->stack);
+    $result->locals= $locals;
     $result->codegen->scope[0]->meta[self::METHOD][$method->name]= $meta;
   }
 
@@ -1064,7 +1091,7 @@ abstract class PHP extends Emitter {
       $scope->member instanceof Literal &&
       is_string($scope->type) &&
       'class' !== $scope->member->expression &&
-      $result->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
+      $result->codegen->lookup($scope->type)->rewriteEnumCase($scope->member->expression)
     ) {
       $result->out->write('$'.$scope->member->expression);
     } else {

@@ -1,12 +1,13 @@
 <?php namespace xp\compiler;
 
+use lang\Reflection;
 use lang\ast\{Language, Emitter};
-use lang\reflect\Package;
+use lang\reflection\Package;
 use util\cmd\Console;
 
 /** @codeCoverageIgnore */
 class Usage {
-  const RUNTIME = 'php';
+  const RUNTIME= 'php';
 
   /** @return int */
   public static function main(array $args) {
@@ -16,26 +17,26 @@ class Usage {
       public $byLoader= [];
 
       public function add($t, $active= false) {
-        $this->byLoader[$t->getClassLoader()->toString()][$t->getName()]= $active;
+        $this->byLoader[$t->classLoader()->toString()][$t->name()]= $active;
       }
     };
 
     $emitter= Emitter::forRuntime(self::RUNTIME.':'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION);
-    foreach (Package::forName('lang.ast.emit')->getClasses() as $class) {
-      if ($class->isSubclassOf(Emitter::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
-        $impl->add($class, $class->equals($emitter));
+    foreach ((new Package('lang.ast.emit'))->types() as $type) {
+      if ($type->is(Emitter::class) && !$type->modifiers()->isAbstract()) {
+        $impl->add($type, $type->class()->equals($emitter));
       }
     }
 
     $language= Language::named(strtoupper(self::RUNTIME));
-    foreach (Package::forName('lang.ast.syntax')->getClasses() as $class) {
-      if ($class->isSubclassOf(Language::class) && !(MODIFIER_ABSTRACT & $class->getModifiers())) {
-        $impl->add($class, $class->isInstance($language));
+    foreach ((new Package('lang.ast.syntax'))->types() as $type) {
+      if ($type->is(Language::class) && !$type->modifiers()->isAbstract()) {
+        $impl->add($type, $type->isInstance($language));
       }
     }
 
     foreach ($language->extensions() as $extension) {
-      $impl->add(typeof($extension), 'true');
+      $impl->add(Reflection::type($extension), true);
     }
 
     // Show implementations sorted by class loader

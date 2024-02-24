@@ -8,7 +8,6 @@ class Result implements Closeable {
   public $out;
   public $codegen;
   public $locals= [];
-  public $stack= [];
 
   /**
    * Starts a result stream.
@@ -20,6 +19,18 @@ class Result implements Closeable {
     $this->codegen= new CodeGen();
     $this->initialize();
   }
+
+  /**
+   * Set filename this result originates from, defaulting to `(unknown)`.
+   *
+   * @param  ?string $file
+   * @return self
+   */
+  public function from($file) {
+    $this->codegen->source= $file ?? '(unknown)';
+    return $this;
+  }
+
 
   /**
    * Initialize result. Guaranteed to be called *once* from constructor.

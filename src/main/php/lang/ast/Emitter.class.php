@@ -2,7 +2,6 @@
 
 use io\streams\OutputStream;
 use lang\ast\{Node, Error, Errors};
-use lang\reflect\Package;
 use lang\{IllegalArgumentException, IllegalStateException, ClassLoader, XPClass};
 
 abstract class Emitter {
@@ -18,16 +17,16 @@ abstract class Emitter {
    */
   public static function forRuntime($runtime, $emitters= []) {
     sscanf($runtime, '%[^.:]%*[.:]%d.%d', $engine, $major, $minor);
-    $p= Package::forName('lang.ast.emit');
+    $cl= ClassLoader::getDefault();
 
     $engine= strtoupper($engine);
     do {
-      $impl= $engine.$major.$minor;
-      if ($p->providesClass($impl)) {
-        if (empty($emitters)) return $p->loadClass($impl);
+      $impl= "lang.ast.emit.{$engine}{$major}{$minor}";
+      if ($cl->providesClass($impl)) {
+        if (empty($emitters)) return $cl->loadClass($impl);
 
         // Extend loaded class, including all given emitters
-        $extended= ['kind' => 'class', 'extends' => [$p->loadClass($impl)], 'implements' => [], 'use' => []];
+        $extended= ['kind' => 'class', 'extends' => [$cl->loadClass($impl)], 'implements' => [], 'use' => []];
         foreach ($emitters as $class) {
           if ($class instanceof XPClass) {
             $impl.= '⋈'.strtr($class->getName(), ['.' => '·']);
@@ -37,7 +36,7 @@ abstract class Emitter {
             $extended['use'][]= XPClass::forName($class);
           }
         }
-        return ClassLoader::defineType($p->getName().'.'.$impl, $extended, '{}');
+        return ClassLoader::defineType($impl, $extended, '{}');
       }
     } while ($minor-- > 0);
 
@@ -149,9 +148,9 @@ abstract class Emitter {
           $this->{'emit'.$r->kind}($result, $r);
           return;
         } else if ($r) {
-          foreach ($r as $n) {
+          foreach ($r as $s => $n) {
             $this->{'emit'.$n->kind}($result, $n);
-            $result->out->write(';');
+            null === $s || $result->out->write(';');
           }
           return;
         }
@@ -172,17 +171,20 @@ abstract class Emitter {
 
   /**
    * Emitter entry point, takes nodes and emits them to the given target.
-   * 
+   *
    * @param  iterable $nodes
    * @param  io.streams.OutputStream $target
+   * @param  ?string $source
    * @return io.streams.OutputStream
    * @throws lang.ast.Errors
    */
-  public function write($nodes, OutputStream $target) {
-    $result= $this->result($target);
+  public function write($nodes, OutputStream $target, $source= null) {
+    $result= $this->result($target)->from($source);
     try {
       $this->emitAll($result, $nodes);
       return $target;
+    } catch (Error $e) {
+      throw new Errors([$e], $source);
     } finally {
       $result->close();
     }

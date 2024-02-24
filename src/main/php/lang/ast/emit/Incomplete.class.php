@@ -10,6 +10,40 @@ class Incomplete extends Type {
   public function name() { return $this->name; }
 
   /**
+   * Checks whether a given method exists
+   *
+   * @param  string $named
+   * @param  ?int $select
+   * @return bool
+   */
+  public function providesMethod($named, $select= null) {
+    return false;
+  }
+
+  /**
+   * Checks `#[Override]`
+   *
+   * @param  lang.ast.emit.Type $type
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public function checkOverrides($type) {
+    // NOOP
+  }
+
+  /**
+   * Checks `#[Override]` for a given method
+   *
+   * @param  string $method
+   * @param  int $line
+   * @return void
+   * @throws lang.ast.Error
+   */
+  public function checkOverride($method, $line) {
+    // NOOP
+  }
+
+  /**
    * Returns whether a given member is an enum case
    *
    * @param  string $member
