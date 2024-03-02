@@ -236,6 +236,16 @@ class MembersTest extends EmittingTest {
     Assert::equals(['Test'], $r);
   }
 
+  #[Test]
+  public function magic_class_constant() {
+    $t= $this->type('class %T {
+      public function run() {
+        return self::class;
+      }
+    }');
+    Assert::equals($t->literal(), $t->newInstance()->run());
+  }
+
   #[Test, Values(['variable', 'invocation', 'array'])]
   public function class_on_objects($via) {
     $t= $this->declare('class %T {
