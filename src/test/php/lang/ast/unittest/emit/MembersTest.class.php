@@ -412,4 +412,17 @@ class MembersTest extends EmittingTest {
     ');
     Assert::equals(new ArrayType($t->class()), $t->method('run')->returns()->type());
   }
+
+  #[Test, Values(['namespace', 'class', 'new', 'use', 'interface', 'trait', 'enum'])]
+  public function keyword_used_as_method_name($keyword) {
+    $r= $this->run('class %T {
+      private static function '.$keyword.'() { return "Test"; }
+
+      public function run() {
+        return self::'.$keyword.'();
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
 }
