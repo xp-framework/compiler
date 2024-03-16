@@ -55,7 +55,7 @@ trait ReadonlyProperties {
 
     // Create virtual property implementing the readonly semantics
     $scope->virtual[$property->name]= [
-      new Code(sprintf($check.'return $this->__virtual["%1$s"][0] ?? null;', $property->name)),
+      new Code(sprintf($check.'return $this->__virtual["%1$s"][0];', $property->name)),
       new Code(sprintf(
         ($check ?: '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;').
         'if (isset($this->__virtual["%1$s"])) throw new \\Error("Cannot modify readonly property ".__CLASS__."::{$name}");'.
