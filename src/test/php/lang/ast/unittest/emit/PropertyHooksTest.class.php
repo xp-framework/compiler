@@ -69,7 +69,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function set_block() {
     $r= $this->run('class %T {
-      public $test { set($value) { $this->test= ucfirst($value); } }
+      public $test { set { $this->test= ucfirst($value); } }
 
       public function run() {
         $this->test= "test";
