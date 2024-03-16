@@ -83,7 +83,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test, Expect(IllegalArgumentException::class)]
   public function set_raising_exception() {
     $this->run('use lang\\IllegalArgumentException; class %T {
-      public $test { set($value) { throw new IllegalArgumentException("Cannot set"); } }
+      public $test { set { throw new IllegalArgumentException("Cannot set"); } }
 
       public function run() {
         $this->test= "test";
