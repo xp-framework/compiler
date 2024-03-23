@@ -62,7 +62,7 @@ abstract class EmittingTest {
    */
   protected function emit($code) {
     $name= 'E'.(self::$id++);
-    $tree= $this->language->parse(new Tokens(str_replace('<T>', $name, $code), static::class))->tree();
+    $tree= $this->language->parse(new Tokens(str_replace('%T', $name, $code), static::class))->tree();
 
     $out= new MemoryOutputStream();
     $this->emitter->emitAll(new GeneratedCode($out, ''), $tree->children());
@@ -91,8 +91,6 @@ abstract class EmittingTest {
     $name= 'T'.(self::$id++);
     if (strstr($code, '%T')) {
       $declaration= str_replace('%T', $name, $code);
-    } else if (strstr($code, '<T>')) {
-      $declaration= str_replace('<T>', $name, $code);  // deprecated
     } else {
       $declaration= $code.' class '.$name.' { }';
     }
