@@ -2,7 +2,7 @@
 
 use lang\{Runnable, Reflection};
 use test\{Assert, Test};
-use util\AbstractDeferredInvokationHandler;
+use util\Binford;
 
 /**
  * Anonymous class support
@@ -28,14 +28,15 @@ class AnonymousClassTest extends EmittingTest {
   public function extending_base_class() {
     $r= $this->run('class %T {
       public function run() {
-        return new class() extends \\util\\AbstractDeferredInvokationHandler {
-          public function initialize() {
-            // TBI
+        return new class() extends \\util\\Binford {
+          public function more(int $factor): self {
+            $this->poweredBy*= $factor;
+            return $this;
           }
         };
       }
     }');
-    Assert::instance(AbstractDeferredInvokationHandler::class, $r);
+    Assert::instance(Binford::class, $r);
   }
 
   #[Test]
