@@ -5,6 +5,8 @@ XP Compiler ChangeLog
 
 ## 9.0.0 / ????-??-??
 
+* Merged PR #179: XP 12 compatibility, dropping PHP 7.0 - 7.3 support!
+  (@thekid)
 * Removed deprecated *lookup()* from `lang.ast.emit.GeneratedCode`
   (@thekid)
 
