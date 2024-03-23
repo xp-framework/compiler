@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 8.17.2 / 2024-03-23
+
+* Fixed *implicitely nullable type* warnings for parameters with non-
+  constant expressions (e.g. `$param= new Handle(0)`) in PHP 8.4, see
+  https://wiki.php.net/rfc/deprecate-implicitly-nullable-types
+  (@thekid)
+
 ## 8.17.1 / 2024-01-06
 
 * Fixed emitting captures and return types for closures - @thekid
