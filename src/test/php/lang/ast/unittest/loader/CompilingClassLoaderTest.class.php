@@ -68,9 +68,10 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function load_class() {
-    Assert::equals('Tests', $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
-      return $loader->loadClass($types['Tests'])->getSimpleName();
-    }));
+    Assert::equals('Tests', $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types) => $loader->loadClass($types['Tests'])->getSimpleName()
+    ));
   }
 
   #[Test]
@@ -91,9 +92,10 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function package_contents() {
-    $contents= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
-      return $loader->packageContents(strstr($types['Tests'], '.', true));
-    });
+    $contents= $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types) => $loader->packageContents(strstr($types['Tests'], '.', true))
+    );
     Assert::equals(['Tests'.\xp::CLASS_FILE_EXT], $contents);
   }
 
@@ -106,8 +108,8 @@ class CompilingClassLoaderTest {
       'Feature' => '<?php namespace %s; trait Feature { }'
     ];
 
-    $c= $this->compile($source, function($loader, $types) { return $loader->loadClass($types['Child']); });
-    $n= function($c) { return $c->getSimpleName(); };
+    $c= $this->compile($source, fn($loader, $types) => $loader->loadClass($types['Child']));
+    $n= fn($class) => $class->getSimpleName();
     Assert::equals(
       ['Child', 'Base', ['Impl'], ['Feature']],
       [$n($c), $n($c->getParentClass()), array_map($n, $c->getInterfaces()), array_map($n, $c->getTraits())]
@@ -116,33 +118,31 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function load_class_bytes() {
-    $code= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
-      return $loader->loadClassBytes($types['Tests']);
-    });
+    $code= $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types) => $loader->loadClassBytes($types['Tests'])
+    );
     Assert::matches('/<\?php .+ class Tests/', $code);
   }
 
   #[Test]
   public function load_uri() {
-    $class= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types, $temp) {
-      return $loader->loadUri($temp->path.strtr($types['Tests'], '.', DIRECTORY_SEPARATOR).CompilingClassLoader::EXTENSION);
-    });
+    $class= $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types, $temp) => $loader->loadUri($temp->path.strtr($types['Tests'], '.', DIRECTORY_SEPARATOR).CompilingClassLoader::EXTENSION)
+    );
     Assert::equals('Tests', $class->getSimpleName());
   }
 
   #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Expected "type name", have .+/')]
   public function load_class_with_syntax_errors() {
-    $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) {
-      return $loader->loadClass($types['Errors']);
-    });
+    $this->compile(['Errors' => "<?php\nclass"], fn($loader, $types) => $loader->loadClass($types['Errors']));
   }
 
   #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Class .+ not found/')]
   public function load_class_with_non_existant_parent() {
     $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
-    $this->compile(['Orphan' => $code], function($loader, $types) {
-      return $loader->loadClass($types['Orphan']);
-    });
+    $this->compile(['Orphan' => $code], fn($loader, $types) => $loader->loadClass($types['Orphan']));
   }
 
   #[Test]
@@ -152,7 +152,7 @@ class CompilingClassLoaderTest {
         trigger_error("Test");
       }
     }'];
-    $t= $this->compile($source, function($loader, $types) { return $loader->loadClass($types['Triggers']); });
+    $t= $this->compile($source, fn($loader, $types) => $loader->loadClass($types['Triggers']));
 
     $t->newInstance()->trigger();
     Assert::notEquals(false, strpos(
