@@ -17,54 +17,11 @@ class TypeLiteralsTest {
   }
 
   /**
-   * PHP 7.0 - the base case
+   * PHP 7.4 is the same as PHP 7.2
    *
    * @return iterable
    */
-  private function php70() {
-    yield from $this->base();
-    yield [new IsLiteral('object'), null];
-    yield [new IsLiteral('void'), null];
-    yield [new IsLiteral('never'), null];
-    yield [new IsLiteral('iterable'), null];
-    yield [new IsLiteral('mixed'), null];
-    yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), 'bool'];
-    yield [new IsLiteral('true'), 'bool'];
-    yield [new IsNullable(new IsLiteral('string')), null];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
-    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
-  }
-
-  /**
-   * PHP 7.1 added `void` and `iterable` as well as support for nullable types
-   *
-   * @return iterable
-   */
-  private function php71() {
-    yield from $this->base();
-    yield [new IsLiteral('object'), null];
-    yield [new IsLiteral('void'), 'void'];
-    yield [new IsLiteral('never'), 'void'];
-    yield [new IsLiteral('iterable'), 'iterable'];
-    yield [new IsLiteral('mixed'), null];
-    yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), 'bool'];
-    yield [new IsLiteral('true'), 'bool'];
-    yield [new IsNullable(new IsLiteral('string')), '?string'];
-    yield [new IsNullable(new IsLiteral('object')), null];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
-    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
-  }
-
-  /**
-   * PHP 7.2 added `object`
-   *
-   * @return iterable
-   */
-  private function php72() {
+  private function php74() {
     yield from $this->base();
     yield [new IsLiteral('object'), 'object'];
     yield [new IsLiteral('void'), 'void'];
@@ -79,15 +36,6 @@ class TypeLiteralsTest {
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
-  }
-
-  /**
-   * PHP 7.4 is the same as PHP 7.2
-   *
-   * @return iterable
-   */
-  private function php74() {
-    yield from $this->php72();
   }
 
   /**
@@ -154,21 +102,6 @@ class TypeLiteralsTest {
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|false'];
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
-  }
-
-  #[Test, Values(from: 'php70')]
-  public function php70_literals($type, $literal) {
-    Assert::equals($literal, (new PHP70())->literal($type));
-  }
-
-  #[Test, Values(from: 'php71')]
-  public function php71_literals($type, $literal) {
-    Assert::equals($literal, (new PHP71())->literal($type));
-  }
-
-  #[Test, Values(from: 'php72')]
-  public function php72_literals($type, $literal) {
-    Assert::equals($literal, (new PHP72())->literal($type));
   }
 
   #[Test, Values(from: 'php74')]

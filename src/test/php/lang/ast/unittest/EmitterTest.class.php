@@ -34,7 +34,7 @@ class EmitterTest {
 
   #[Test]
   public function transform() {
-    $function= function($class) { return $class; };
+    $function= fn($class) => $class;
 
     $fixture= $this->newEmitter();
     $fixture->transform('class', $function);
@@ -43,7 +43,7 @@ class EmitterTest {
 
   #[Test]
   public function remove() {
-    $first= function($codegen, $class) { return $class; };
+    $first= fn($codegen, $class) => $class;
     $second= function($codegen, $class) { $class->annotations['author']= 'Test'; return $class; };
 
     $fixture= $this->newEmitter();
@@ -55,7 +55,7 @@ class EmitterTest {
 
   #[Test]
   public function remove_unsets_empty_kind() {
-    $function= function($codegen, $class) { return $class; };
+    $function= fn($codegen, $class) => $class;
 
     $fixture= $this->newEmitter();
     $transformation= $fixture->transform('class', $function);
@@ -108,7 +108,7 @@ class EmitterTest {
   #[Test]
   public function transform_to_null() {
     $fixture= $this->newEmitter();
-    $fixture->transform('variable', function($codegen, $var) { return null; });
+    $fixture->transform('variable', fn($codegen, $var) => null);
     $out= $fixture->write([new Variable('a')], new MemoryOutputStream());
 
     Assert::equals('<?php $a;', $out->bytes());

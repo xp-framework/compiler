@@ -4,7 +4,7 @@ XP Compiler
 [![Build status on GitHub](https://github.com/xp-framework/compiler/workflows/Tests/badge.svg)](https://github.com/xp-framework/compiler/actions)
 [![XP Framework Module](https://raw.githubusercontent.com/xp-framework/web/master/static/xp-framework-badge.png)](https://github.com/xp-framework/core)
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
-[![Requires PHP 7.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_0plus.svg)](http://php.net/)
+[![Requires PHP 7.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_4plus.svg)](http://php.net/)
 [![Supports PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
 [![Latest Stable Version](https://poser.pugx.org/xp-framework/compiler/version.png)](https://packagist.org/packages/xp-framework/compiler)
 
@@ -16,7 +16,7 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack language, PHP 8.3, PHP 8.2, 8.1, 8.0, PHP 7.4, PHP 7.3, PHP 7.2, PHP 7.1 and PHP 7.0 features but runs on anything >= PHP 7.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
@@ -87,9 +87,6 @@ $ xp compile
 Usage: xp compile <in> [<out>]
 
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
-lang.ast.emit.PHP70
-lang.ast.emit.PHP71
-lang.ast.emit.PHP72
 lang.ast.emit.PHP74
 lang.ast.emit.PHP80
 lang.ast.emit.PHP81
