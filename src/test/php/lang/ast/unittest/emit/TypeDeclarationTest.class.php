@@ -2,7 +2,6 @@
 
 use lang\reflection\Kind;
 use lang\{XPClass, Type};
-use test\verify\Runtime;
 use test\{Assert, Test, Values};
 
 class TypeDeclarationTest extends EmittingTest {
@@ -69,7 +68,7 @@ class TypeDeclarationTest extends EmittingTest {
     );
   }
 
-  #[Test, Values(['public', 'private', 'protected']), Runtime(php: '>=7.1.0')]
+  #[Test, Values(['public', 'private', 'protected'])]
   public function constant($modifiers) {
     $c= $this->declare('class %T { '.$modifiers.' const test = 1; }')->constant('test');
     Assert::equals(

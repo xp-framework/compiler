@@ -3,7 +3,6 @@
 use io\{File, Files, Folder};
 use lang\ast\CompilingClassLoader;
 use lang\{ClassFormatException, ClassLoader, ClassNotFoundException, ElementNotFoundException, Environment};
-use test\verify\Runtime;
 use test\{Action, Assert, Expect, Test, Values};
 
 class CompilingClassLoaderTest {
@@ -138,7 +137,7 @@ class CompilingClassLoaderTest {
     });
   }
 
-  #[Test, Runtime(php: '>=7.3'), Expect(class: ClassFormatException::class, message: '/Compiler error: Class .+ not found/')]
+  #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Class .+ not found/')]
   public function load_class_with_non_existant_parent() {
     $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
     $this->compile(['Orphan' => $code], function($loader, $types) {
