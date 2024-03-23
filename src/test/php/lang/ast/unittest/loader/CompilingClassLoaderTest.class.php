@@ -58,12 +58,12 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function string_representation() {
-    Assert::equals('CompilingCL<PHP70+lang.ast.emit.php.XpMeta>', CompilingClassLoader::instanceFor('php:7.0.0')->toString());
+    Assert::equals('CompilingCL<PHP80+lang.ast.emit.php.XpMeta>', CompilingClassLoader::instanceFor('php:8.0.0')->toString());
   }
 
   #[Test]
   public function hashcode() {
-    Assert::equals('CPHP70+lang.ast.emit.php.XpMeta', CompilingClassLoader::instanceFor('php:7.0.0')->hashCode());
+    Assert::equals('CPHP80+lang.ast.emit.php.XpMeta', CompilingClassLoader::instanceFor('php:8.0.0')->hashCode());
   }
 
   #[Test]
