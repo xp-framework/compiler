@@ -1,9 +1,7 @@
 <?php namespace lang\ast\unittest;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\emit\{Declaration, Escaping, Reflection, Result};
-use lang\ast\nodes\ClassDeclaration;
-use lang\{ClassNotFoundException, Value};
+use lang\ast\emit\{Result, Escaping};
 use test\{Assert, Expect, Test};
 
 class ResultTest {

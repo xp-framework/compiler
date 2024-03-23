@@ -1,9 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use io\streams\MemoryOutputStream;
-use lang\ast\emit\{Declaration, Escaping, GeneratedCode, InType, Reflection, Incomplete};
-use lang\ast\nodes\ClassDeclaration;
-use lang\ast\types\IsValue;
+use lang\ast\emit\GeneratedCode;
 use lang\{ClassNotFoundException, Value};
 use test\{Assert, Expect, Test, Values};
 
@@ -42,51 +40,6 @@ class GeneratedCodeTest {
     $r->close();
 
     Assert::equals('<?php ?>', $out->bytes());
-  }
-
-  #[Test]
-  public function lookup_self() {
-    $r= new GeneratedCode(new MemoryOutputStream());
-    $context= $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
-
-    Assert::equals(new Declaration($context->type, $r->codegen), $r->lookup('self'));
-  }
-
-  #[Test]
-  public function lookup_parent() {
-    $r= new GeneratedCode(new MemoryOutputStream());
-    $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), new IsValue('\\lang\\Value'), [], [], null, null, 1)));
-
-    Assert::equals(new Reflection(Value::class), $r->lookup('parent'));
-  }
-
-  #[Test]
-  public function lookup_parent_without_parent() {
-    $r= new GeneratedCode(new MemoryOutputStream());
-    $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
-
-    Assert::null($r->lookup('parent'));
-  }
-
-  #[Test]
-  public function lookup_named() {
-    $r= new GeneratedCode(new MemoryOutputStream());
-    $context= $r->codegen->enter(new InType(new ClassDeclaration([], new IsValue('\\T'), null, [], [], null, null, 1)));
-
-    Assert::equals(new Declaration($context->type, $r->codegen), $r->lookup('\\T'));
-  }
-
-  #[Test]
-  public function lookup_value_interface() {
-    $r= new GeneratedCode(new MemoryOutputStream());
-
-    Assert::equals(new Reflection(Value::class), $r->lookup('\\lang\\Value'));
-  }
-
-  #[Test]
-  public function lookup_non_existant() {
-    $r= new GeneratedCode(new MemoryOutputStream());
-    Assert::instance(Incomplete::class, $r->lookup('\\NotFound'));
   }
 
   #[Test]

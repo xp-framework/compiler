@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.0.0 / ????-??-??
+
+* Removed deprecated *lookup()* from `lang.ast.emit.GeneratedCode`
+  (@thekid)
+
 ## 8.17.2 / 2024-03-23
 
 * Fixed *implicitely nullable type* warnings for parameters with non-
