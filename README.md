@@ -87,9 +87,6 @@ $ xp compile
 Usage: xp compile <in> [<out>]
 
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
-lang.ast.emit.PHP70
-lang.ast.emit.PHP71
-lang.ast.emit.PHP72
 lang.ast.emit.PHP74
 lang.ast.emit.PHP80
 lang.ast.emit.PHP81
