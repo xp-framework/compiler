@@ -35,7 +35,7 @@ class CompilingClassLoaderTest {
    * @return var
    */
   private function compile($source, $callback) {
-    list($folder, $names)= $this->tempFolder($source);
+    [$folder, $names]= $this->tempFolder($source);
 
     $cl= ClassLoader::registerPath($folder->path);
     try {
@@ -204,7 +204,7 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function ignores_autoload_and_xp_entry() {
-    list($folder, $names)= $this->tempFolder([
+    [$folder, $names]= $this->tempFolder([
       '__xp'     => '<?php ...',
       'autoload' => '<?php ...',
       'Fixture'  => '<?php class Fixture { }',
