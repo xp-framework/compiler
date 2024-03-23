@@ -20,9 +20,9 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpressio
 use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
-  const PROPERTY = 0;
-  const METHOD   = 1;
-  const CONSTANT = 2;
+  const PROPERTY= 0;
+  const METHOD  = 1;
+  const CONSTANT= 2;
 
   protected $literals= [];
 
@@ -770,7 +770,7 @@ abstract class PHP extends Emitter {
       $result->out->write('$'.$target->pointer);
       $result->locals[$target->pointer]= true;
     } else if ($target instanceof ArrayLiteral) {
-      $result->out->write('list(');
+      $result->out->write('[');
       foreach ($target->values as $pair) {
         if ($pair[0]) {
           $this->emitOne($result, $pair[0]);
@@ -781,7 +781,7 @@ abstract class PHP extends Emitter {
         }
         $result->out->write(',');
       }
-      $result->out->write(')');
+      $result->out->write(']');
     } else {
       $this->emitOne($result, $target);
     }
