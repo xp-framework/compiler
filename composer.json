@@ -6,13 +6,13 @@
   "description" : "XP Compiler",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "^11.6 | ^10.16",
-    "xp-framework/reflection": "^2.13",
-    "xp-framework/ast": "^10.1",
-    "php" : ">=7.0.0"
+    "xp-framework/core": "^12.0 | ^11.6 | ^10.16",
+    "xp-framework/reflection": "^3.0 | ^2.13",
+    "xp-framework/ast": "^11.0 | ^10.1",
+    "php" : ">=7.4.0"
   },
   "require-dev" : {
-    "xp-framework/test": "^1.5"
+    "xp-framework/test": "^2.0 | ^1.5"
   },
   "bin": ["bin/xp.xp-framework.compiler.compile", "bin/xp.xp-framework.compiler.ast"],
   "autoload" : {
