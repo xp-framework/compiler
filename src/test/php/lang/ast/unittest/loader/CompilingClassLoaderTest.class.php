@@ -51,7 +51,7 @@ class CompilingClassLoaderTest {
     CompilingClassLoader::instanceFor(self::$runtime);
   }
 
-  #[Test, Values(['7.0.0', '7.0.1', '7.1.0', '7.2.0', '7.3.0', '7.4.0', '7.4.12', '8.0.0'])]
+  #[Test, Values(['7.4.0', '7.4.12', '8.0.0', '8.1.0', '8.2.0', '8.3.0', '8.4.0'])]
   public function supports_php($version) {
     CompilingClassLoader::instanceFor('php:'.$version);
   }
