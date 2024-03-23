@@ -12,9 +12,9 @@ class TypeDeclarationTest extends EmittingTest {
     Assert::equals(
       ['constants' => [], 'properties' => [], 'methods' => []],
       [
-        'constants'  => iterator_to_array($t->constants()),
-        'properties' => iterator_to_array($t->properties()),
-        'methods'    => iterator_to_array($t->methods())
+        'constants'  => [...$t->constants()],
+        'properties' => [...$t->properties()],
+        'methods'    => [...$t->methods()],
       ]
     );
   }
