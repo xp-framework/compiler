@@ -17,6 +17,19 @@ class OperatorTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
+  #[Test, Values([['|=', 0x0003], ['&=', 0x0002], ['^=', 0x0001]])]
+  public function assignment_and_bitwise($op, $expected) {
+    $r= $this->run('class %T {
+      public function run() {
+        $a= 0x0003;
+        $a'.$op.' 0x0002;
+        return $a;
+      }
+    }');
+
+    Assert::equals($expected, $r);
+  }
+
   #[Test]
   public function destructuring() {
     $r= $this->run('class %T {
