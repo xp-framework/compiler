@@ -4,7 +4,7 @@ use test\{Assert, Test, Values};
 
 class OperatorTest extends EmittingTest {
 
-  #[Test, Values([['+=', 3], ['-=', -1], ['*=', 2], ['/=', 0.5]])]
+  #[Test, Values([['+=', 3], ['-=', -1], ['*=', 2], ['/=', 0.5], ['**=', 1]])]
   public function assignment_and_math($op, $expected) {
     $r= $this->run('class %T {
       public function run() {
@@ -17,7 +17,7 @@ class OperatorTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
-  #[Test, Values([['|=', 0x0003], ['&=', 0x0002], ['^=', 0x0001]])]
+  #[Test, Values([['|=', 0x0003], ['&=', 0x0002], ['^=', 0x0001], ['>>=', 0x0000], ['<<=', 0x000C]])]
   public function assignment_and_bitwise($op, $expected) {
     $r= $this->run('class %T {
       public function run() {
@@ -28,6 +28,46 @@ class OperatorTest extends EmittingTest {
     }');
 
     Assert::equals($expected, $r);
+  }
+
+  #[Test]
+  public function concatenation() {
+    $r= $this->run('class %T {
+      public function run() {
+        $a= "A..";
+        $a.= "B";
+        return $a;
+      }
+    }');
+
+    Assert::equals('A..B', $r);
+  }
+
+  #[Test, Values([['$a++', 2, 1], ['++$a', 2, 2], ['$a--', 0, 1], ['--$a', 0, 0]])]
+  public function inc_dec($op, $a, $b) {
+    $r= $this->run('class %T {
+      public function run() {
+        $a= 1;
+        $b= '.$op.';
+        return [$a, $b];
+      }
+    }');
+
+    Assert::equals([$a, $b], $r);
+  }
+
+  #[Test]
+  public function references() {
+    $r= $this->run('class %T {
+      public function run() {
+        $a= 3;
+        $ptr= &$a;
+        $a++;
+        return $ptr;
+      }
+    }');
+
+    Assert::equals(4, $r);
   }
 
   #[Test]
