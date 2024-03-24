@@ -4,7 +4,7 @@ use test\{Assert, Test, Values};
 
 class OperatorTest extends EmittingTest {
 
-  #[Test, Values([['+=', 3], ['-=', -1], ['*=', 2], ['/=', 0.5], ['**=', 1]])]
+  #[Test, Values([['+=', 3], ['-=', -1], ['*=', 2], ['/=', 0.5], ['**=', 1], ['%=', 1]])]
   public function assignment_and_math($op, $expected) {
     $r= $this->run('class %T {
       public function run() {
