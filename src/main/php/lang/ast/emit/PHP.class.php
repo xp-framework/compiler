@@ -7,6 +7,8 @@ use lang\ast\nodes\{
   ArrayLiteral,
   BinaryExpression,
   Block,
+  CallableExpression,
+  CallableNewExpression,
   Comment,
   Expression,
   InstanceExpression,
@@ -1127,6 +1129,44 @@ abstract class PHP extends Emitter {
     $this->emitOne($result, $instance->expression);
     $result->out->write('?->');
     $this->emitOne($result, $instance->member);
+  }
+
+  protected function emitPipeTarget($result, $pipe, $argument) {
+
+    // $expr |> new T(...) => new T($expr)
+    if ($pipe->target instanceof CallableNewExpression) {
+      $pipe->target->type->arguments= [$argument];
+      $this->emitOne($result, $pipe->target->type);
+      $pipe->target->type->arguments= null;
+      return;
+    }
+
+    // $expr |> strtoupper(...) => strtoupper($expr)
+    // $expr |> fn($x) => $x * 2 => (fn($x) => $x * 2)($expr)
+    if ($pipe->target instanceof CallableExpression) {
+      $this->emitOne($result, $pipe->target->expression);
+    } else {
+      $result->out->write('(');
+      $this->emitOne($result, $pipe->target);
+      $result->out->write(')');
+    }
+
+    $result->out->write('(');
+    $this->emitOne($result, $argument);
+    $result->out->write(')');
+  }
+
+  protected function emitPipe($result, $pipe) {
+    $this->emitPipeTarget($result, $pipe, $pipe->expression);
+  }
+
+  protected function emitNullsafePipe($result, $pipe) {
+    $t= $result->temp();
+    $result->out->write('null===('.$t.'=');
+    $this->emitOne($result, $pipe->expression);
+    $result->out->write(')?null:');
+
+    $this->emitPipeTarget($result, $pipe, new Variable(substr($t, 1)));
   }
 
   protected function emitUnpack($result, $unpack) {
