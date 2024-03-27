@@ -1,7 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\IllegalStateException;
-use test\{Assert, Expect, Test, Values};
+use test\{Assert, Test, Values};
 
 class PipelinesTest extends EmittingTest {
 
