@@ -61,8 +61,19 @@ class PipelinesTest extends EmittingTest {
     Assert::equals('TEST', $r);
   }
 
-  #[Test, Values([[null, null], ['test', 'TEST'], [' test ', 'TEST']])]
+  #[Test, Values([[['test'], 'TEST'], [[], null]])]
   public function nullsafe_pipe($input, $expected) {
+    $r= $this->run('class %T {
+      public function run($arg) {
+        return array_shift($arg) ?|> strtoupper(...);
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[Test, Values([[null, null], ['test', 'TEST'], [' test ', 'TEST']])]
+  public function nullsafe_chain($input, $expected) {
     $r= $this->run('class %T {
       public function run($arg) {
         return $arg ?|> trim(...) ?|> strtoupper(...);
