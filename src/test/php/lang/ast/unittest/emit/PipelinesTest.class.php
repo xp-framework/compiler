@@ -16,6 +16,53 @@ class PipelinesTest extends EmittingTest {
   }
 
   #[Test]
+  public function pipe_to_variable() {
+    $r= $this->run('class %T {
+      public function run() {
+        $f= strtoupper(...);
+        return "test" |> $f;
+      }
+    }');
+
+    Assert::equals('TEST', $r);
+  }
+
+  #[Test]
+  public function pipe_to_callable_string() {
+    $r= $this->run('class %T {
+      public function run() {
+        return "test" |> "strtoupper";
+      }
+    }');
+
+    Assert::equals('TEST', $r);
+  }
+
+  #[Test]
+  public function pipe_to_callable_array() {
+    $r= $this->run('class %T {
+      public function toUpper($x) { return strtoupper($x); }
+
+      public function run() {
+        return "test" |> [$this, "toUpper"];
+      }
+    }');
+
+    Assert::equals('TEST', $r);
+  }
+
+  #[Test]
+  public function pipe_to_callable_without_all_args() {
+    $r= $this->run('class %T {
+      public function run() {
+        return "A&B" |> htmlspecialchars(...);
+      }
+    }');
+
+    Assert::equals('A&amp;B', $r);
+  }
+
+  #[Test]
   public function pipe_to_callable_new() {
     $r= $this->run('class %T {
       public function run() {
