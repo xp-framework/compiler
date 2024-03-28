@@ -2,7 +2,7 @@
 
 use io\{File, Files, Folder};
 use lang\ast\CompilingClassLoader;
-use lang\{ClassFormatException, ClassLoader, ClassNotFoundException, ElementNotFoundException, Environment};
+use lang\{ClassFormatException, ClassLoader, ClassNotFoundException, ElementNotFoundException, Environment, Reflection};
 use test\{Action, Assert, Expect, Test, Values};
 
 class CompilingClassLoaderTest {
@@ -108,11 +108,11 @@ class CompilingClassLoaderTest {
       'Feature' => '<?php namespace %s; trait Feature { }'
     ];
 
-    $c= $this->compile($source, fn($loader, $types) => $loader->loadClass($types['Child']));
-    $n= fn($class) => $class->getSimpleName();
+    $t= Reflection::type($this->compile($source, fn($loader, $types) => $loader->loadClass($types['Child'])));
+    $n= fn($class) => $class->declaredName();
     Assert::equals(
       ['Child', 'Base', ['Impl'], ['Feature']],
-      [$n($c), $n($c->getParentClass()), array_map($n, $c->getInterfaces()), array_map($n, $c->getTraits())]
+      [$n($t), $n($t->parent()), array_map($n, $t->interfaces()), array_map($n, $t->traits())]
     );
   }
 
