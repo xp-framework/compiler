@@ -142,7 +142,7 @@ trait PropertyHooks {
           $method,
           new Signature($hook->parameter ? [$hook->parameter] : [new Parameter('value', null)], null),
           null === $hook->expression ? null : [$this->rewriteHook(
-            $hook->expression,
+            $hook->expression instanceof Block ? $hook->expression : new Assignment($virtual, '=', $hook->expression),
             $property->name,
             $virtual,
             $literal

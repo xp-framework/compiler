@@ -55,7 +55,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function set_expression() {
     $r= $this->run('class %T {
-      public $test { set => $this->test= ucfirst($value); }
+      public $test { set => ucfirst($value); }
 
       public function run() {
         $this->test= "test";
@@ -69,7 +69,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test]
   public function set_block() {
     $r= $this->run('class %T {
-      public $test { set($value) { $this->test= ucfirst($value); } }
+      public $test { set { $this->test= ucfirst($value); } }
 
       public function run() {
         $this->test= "test";
@@ -83,7 +83,7 @@ class PropertyHooksTest extends EmittingTest {
   #[Test, Expect(IllegalArgumentException::class)]
   public function set_raising_exception() {
     $this->run('use lang\\IllegalArgumentException; class %T {
-      public $test { set($value) { throw new IllegalArgumentException("Cannot set"); } }
+      public $test { set { throw new IllegalArgumentException("Cannot set"); } }
 
       public function run() {
         $this->test= "test";
@@ -96,7 +96,7 @@ class PropertyHooksTest extends EmittingTest {
     $r= $this->run('class %T {
       public $test {
         get => $this->test;
-        set => $this->test= ucfirst($value);
+        set => ucfirst($value);
       }
 
       public function run() {
@@ -128,7 +128,7 @@ class PropertyHooksTest extends EmittingTest {
   public function typed_set() {
     $r= $this->run('use util\\Bytes; class %T {
       public string $test {
-        set(string|Bytes $arg) => $this->test= ucfirst($arg);
+        set(string|Bytes $arg) => ucfirst($arg);
       }
 
       public function run() {
@@ -144,7 +144,7 @@ class PropertyHooksTest extends EmittingTest {
   public function typed_mismatch() {
     $this->run('class %T {
       public string $test {
-        set(int $times) => $this->test= $times." times";
+        set(int $times) => $times." times";
       }
 
       public function run() {
@@ -203,7 +203,7 @@ class PropertyHooksTest extends EmittingTest {
     $t= $this->declare('class %T {
       public string $test {
         get => $this->test;
-        set => $this->test= ucfirst($value);
+        set => ucfirst($value);
       }
     }');
 
