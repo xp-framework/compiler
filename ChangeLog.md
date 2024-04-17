@@ -3,6 +3,20 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.0.0 / 2024-03-23
+
+* Merged PR #179: XP 12 compatibility, dropping PHP 7.0 - 7.3 support!
+  (@thekid)
+* Removed deprecated *lookup()* from `lang.ast.emit.GeneratedCode`
+  (@thekid)
+
+## 8.17.2 / 2024-03-23
+
+* Fixed *implicitely nullable type* warnings for parameters with non-
+  constant expressions (e.g. `$param= new Handle(0)`) in PHP 8.4, see
+  https://wiki.php.net/rfc/deprecate-implicitly-nullable-types
+  (@thekid)
+
 ## 8.17.1 / 2024-01-06
 
 * Fixed emitting captures and return types for closures - @thekid

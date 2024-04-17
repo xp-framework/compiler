@@ -50,7 +50,7 @@ class ParameterTest extends EmittingTest {
 
   #[Test]
   public function value_type_with_null() {
-    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('Value $param= null')->constraint()->type());
+    Assert::equals($this->nullable(new XPClass(Value::class)), $this->param('?Value $param= null')->constraint()->type());
   }
 
   #[Test]
@@ -65,7 +65,7 @@ class ParameterTest extends EmittingTest {
 
   #[Test]
   public function string_typed_with_null() {
-    Assert::equals($this->nullable(Primitive::$STRING), $this->param('string $param= null')->constraint()->type());
+    Assert::equals($this->nullable(Primitive::$STRING), $this->param('?string $param= null')->constraint()->type());
   }
 
   #[Test]

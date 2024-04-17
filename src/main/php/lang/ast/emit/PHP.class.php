@@ -20,9 +20,9 @@ use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpressio
 use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
-  const PROPERTY = 0;
-  const METHOD   = 1;
-  const CONSTANT = 2;
+  const PROPERTY= 0;
+  const METHOD  = 1;
+  const CONSTANT= 2;
 
   protected $literals= [];
 
@@ -297,24 +297,35 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
+    $result->locals[$parameter->name]= true;
     $parameter->annotations && $this->emitOne($result, $parameter->annotations);
-    if ($parameter->type && $t= $this->literal($parameter->type)) {
-      $result->out->write($t.' ');
+
+    // If we have a non-constant default and a type, emit a nullable type hint
+    // to prevent "implicitely nullable type" warnings being raised. See here:
+    // https://wiki.php.net/rfc/deprecate-implicitly-nullable-types
+    $type= $parameter->type;
+    if ($parameter->default) {
+      $const= $this->isConstant($result, $parameter->default);
+      if ($type && !$const && !$type instanceof IsNullable) {
+        $type= new IsNullable($parameter->type);
+      }
     }
+    if ($type && $t= $this->literal($type)) $result->out->write($t.' ');
+
     if ($parameter->variadic) {
       $result->out->write('... $'.$parameter->name);
     } else {
       $result->out->write(($parameter->reference ? '&' : '').'$'.$parameter->name);
     }
+
     if ($parameter->default) {
-      if ($this->isConstant($result, $parameter->default)) {
+      if ($const) {
         $result->out->write('=');
         $this->emitOne($result, $parameter->default);
       } else {
         $result->out->write('=null');
       }
     }
-    $result->locals[$parameter->name]= true;
   }
 
   protected function emitSignature($result, $signature, $use= null) {
@@ -759,7 +770,7 @@ abstract class PHP extends Emitter {
       $result->out->write('$'.$target->pointer);
       $result->locals[$target->pointer]= true;
     } else if ($target instanceof ArrayLiteral) {
-      $result->out->write('list(');
+      $result->out->write('[');
       foreach ($target->values as $pair) {
         if ($pair[0]) {
           $this->emitOne($result, $pair[0]);
@@ -770,7 +781,7 @@ abstract class PHP extends Emitter {
         }
         $result->out->write(',');
       }
-      $result->out->write(')');
+      $result->out->write(']');
     } else {
       $this->emitOne($result, $target);
     }

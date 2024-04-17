@@ -58,15 +58,4 @@ class GeneratedCode extends Result {
   public function temp() {
     return '$'.$this->codegen->symbol();
   }
-
-  /**
-   * Looks up a given type 
-   *
-   * @deprecated Use `CodeGen::lookup()` instead!
-   * @param  string $type
-   * @return lang.ast.emit.Type
-   */
-  public function lookup($type) {
-    return $this->codegen->lookup($type);
-  }
 }

@@ -93,7 +93,7 @@ class ArgumentPromotionTest extends EmittingTest {
   #[Test]
   public function can_be_mixed_with_normal_arguments() {
     $t= $this->declare('class %T {
-      public function __construct(public string $name, string $initial= null) {
+      public function __construct(public string $name, ?string $initial= null) {
         if (null !== $initial) $this->name.= " ".$initial.".";
       }
     }');

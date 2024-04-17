@@ -2,6 +2,7 @@
 
 use lang\ast\emit\{Reflection, Declaration, Incomplete};
 
+/** @test lang.ast.unittest.CodeGenTest */
 class CodeGen {
   private $id= 0;
   public $scope= [];

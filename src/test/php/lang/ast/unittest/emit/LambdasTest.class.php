@@ -241,7 +241,7 @@ class LambdasTest extends EmittingTest {
       }
     }', [1, null, 2]);
 
-    Assert::equals([1, 2], iterator_to_array($r));
+    Assert::equals([1, 2], [...$r]);
   }
 
   #[Test]

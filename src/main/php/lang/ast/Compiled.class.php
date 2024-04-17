@@ -39,7 +39,7 @@ class Compiled implements OutputStream {
    * @param  string $opened
    */
   public function stream_open($path, $mode, $options, &$opened) {
-    list($version, $file)= explode('://', $path);
+    [$version, $file]= explode('://', $path);
     $stream= self::$source[$file][1]->getResourceAsStream($file);
     self::parse(self::$source[$file][0], $stream->in(), $version, $this, $file);
     $opened= $stream->getURI();

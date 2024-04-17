@@ -2,8 +2,7 @@
 
 use io\{File, Files, Folder};
 use lang\ast\CompilingClassLoader;
-use lang\{ClassFormatException, ClassLoader, ClassNotFoundException, ElementNotFoundException, Environment};
-use test\verify\Runtime;
+use lang\{ClassFormatException, ClassLoader, ClassNotFoundException, ElementNotFoundException, Environment, Reflection};
 use test\{Action, Assert, Expect, Test, Values};
 
 class CompilingClassLoaderTest {
@@ -36,7 +35,7 @@ class CompilingClassLoaderTest {
    * @return var
    */
   private function compile($source, $callback) {
-    list($folder, $names)= $this->tempFolder($source);
+    [$folder, $names]= $this->tempFolder($source);
 
     $cl= ClassLoader::registerPath($folder->path);
     try {
@@ -52,26 +51,27 @@ class CompilingClassLoaderTest {
     CompilingClassLoader::instanceFor(self::$runtime);
   }
 
-  #[Test, Values(['7.0.0', '7.0.1', '7.1.0', '7.2.0', '7.3.0', '7.4.0', '7.4.12', '8.0.0'])]
+  #[Test, Values(['7.4.0', '7.4.12', '8.0.0', '8.1.0', '8.2.0', '8.3.0', '8.4.0'])]
   public function supports_php($version) {
     CompilingClassLoader::instanceFor('php:'.$version);
   }
 
   #[Test]
   public function string_representation() {
-    Assert::equals('CompilingCL<PHP70+lang.ast.emit.php.XpMeta>', CompilingClassLoader::instanceFor('php:7.0.0')->toString());
+    Assert::equals('CompilingCL<PHP80+lang.ast.emit.php.XpMeta>', CompilingClassLoader::instanceFor('php:8.0.0')->toString());
   }
 
   #[Test]
   public function hashcode() {
-    Assert::equals('CPHP70+lang.ast.emit.php.XpMeta', CompilingClassLoader::instanceFor('php:7.0.0')->hashCode());
+    Assert::equals('CPHP80+lang.ast.emit.php.XpMeta', CompilingClassLoader::instanceFor('php:8.0.0')->hashCode());
   }
 
   #[Test]
   public function load_class() {
-    Assert::equals('Tests', $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
-      return $loader->loadClass($types['Tests'])->getSimpleName();
-    }));
+    Assert::equals('Tests', $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types) => $loader->loadClass($types['Tests'])->getSimpleName()
+    ));
   }
 
   #[Test]
@@ -92,9 +92,10 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function package_contents() {
-    $contents= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
-      return $loader->packageContents(strstr($types['Tests'], '.', true));
-    });
+    $contents= $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types) => $loader->packageContents(strstr($types['Tests'], '.', true))
+    );
     Assert::equals(['Tests'.\xp::CLASS_FILE_EXT], $contents);
   }
 
@@ -107,43 +108,41 @@ class CompilingClassLoaderTest {
       'Feature' => '<?php namespace %s; trait Feature { }'
     ];
 
-    $c= $this->compile($source, function($loader, $types) { return $loader->loadClass($types['Child']); });
-    $n= function($c) { return $c->getSimpleName(); };
+    $t= Reflection::type($this->compile($source, fn($loader, $types) => $loader->loadClass($types['Child'])));
+    $n= fn($class) => $class->declaredName();
     Assert::equals(
       ['Child', 'Base', ['Impl'], ['Feature']],
-      [$n($c), $n($c->getParentClass()), array_map($n, $c->getInterfaces()), array_map($n, $c->getTraits())]
+      [$n($t), $n($t->parent()), array_map($n, $t->interfaces()), array_map($n, $t->traits())]
     );
   }
 
   #[Test]
   public function load_class_bytes() {
-    $code= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types) {
-      return $loader->loadClassBytes($types['Tests']);
-    });
+    $code= $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types) => $loader->loadClassBytes($types['Tests'])
+    );
     Assert::matches('/<\?php .+ class Tests/', $code);
   }
 
   #[Test]
   public function load_uri() {
-    $class= $this->compile(['Tests' => '<?php namespace %s; class Tests { }'], function($loader, $types, $temp) {
-      return $loader->loadUri($temp->path.strtr($types['Tests'], '.', DIRECTORY_SEPARATOR).CompilingClassLoader::EXTENSION);
-    });
+    $class= $this->compile(
+      ['Tests' => '<?php namespace %s; class Tests { }'],
+      fn($loader, $types, $temp) => $loader->loadUri($temp->path.strtr($types['Tests'], '.', DIRECTORY_SEPARATOR).CompilingClassLoader::EXTENSION)
+    );
     Assert::equals('Tests', $class->getSimpleName());
   }
 
   #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Expected "type name", have .+/')]
   public function load_class_with_syntax_errors() {
-    $this->compile(['Errors' => "<?php\nclass"], function($loader, $types) {
-      return $loader->loadClass($types['Errors']);
-    });
+    $this->compile(['Errors' => "<?php\nclass"], fn($loader, $types) => $loader->loadClass($types['Errors']));
   }
 
-  #[Test, Runtime(php: '>=7.3'), Expect(class: ClassFormatException::class, message: '/Compiler error: Class .+ not found/')]
+  #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Class .+ not found/')]
   public function load_class_with_non_existant_parent() {
     $code= "<?php namespace %s;\nclass Orphan extends NotFound { }";
-    $this->compile(['Orphan' => $code], function($loader, $types) {
-      return $loader->loadClass($types['Orphan']);
-    });
+    $this->compile(['Orphan' => $code], fn($loader, $types) => $loader->loadClass($types['Orphan']));
   }
 
   #[Test]
@@ -153,7 +152,7 @@ class CompilingClassLoaderTest {
         trigger_error("Test");
       }
     }'];
-    $t= $this->compile($source, function($loader, $types) { return $loader->loadClass($types['Triggers']); });
+    $t= $this->compile($source, fn($loader, $types) => $loader->loadClass($types['Triggers']));
 
     $t->newInstance()->trigger();
     Assert::notEquals(false, strpos(
@@ -205,7 +204,7 @@ class CompilingClassLoaderTest {
 
   #[Test]
   public function ignores_autoload_and_xp_entry() {
-    list($folder, $names)= $this->tempFolder([
+    [$folder, $names]= $this->tempFolder([
       '__xp'     => '<?php ...',
       'autoload' => '<?php ...',
       'Fixture'  => '<?php class Fixture { }',

@@ -236,6 +236,16 @@ class MembersTest extends EmittingTest {
     Assert::equals(['Test'], $r);
   }
 
+  #[Test]
+  public function magic_class_constant() {
+    $t= $this->type('class %T {
+      public function run() {
+        return self::class;
+      }
+    }');
+    Assert::equals($t->literal(), $t->newInstance()->run());
+  }
+
   #[Test, Values(['variable', 'invocation', 'array'])]
   public function class_on_objects($via) {
     $t= $this->declare('class %T {
@@ -401,5 +411,18 @@ class MembersTest extends EmittingTest {
       class %T { public function run(): array<self> { return [$this]; } }
     ');
     Assert::equals(new ArrayType($t->class()), $t->method('run')->returns()->type());
+  }
+
+  #[Test, Values(['namespace', 'class', 'new', 'use', 'interface', 'trait', 'enum'])]
+  public function keyword_used_as_method_name($keyword) {
+    $r= $this->run('class %T {
+      private static function '.$keyword.'() { return "Test"; }
+
+      public function run() {
+        return self::'.$keyword.'();
+      }
+    }');
+
+    Assert::equals('Test', $r);
   }
 }
