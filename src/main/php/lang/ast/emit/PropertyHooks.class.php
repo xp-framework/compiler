@@ -1,5 +1,6 @@
 <?php namespace lang\ast\emit;
 
+use ReflectionProperty;
 use lang\ast\Code;
 use lang\ast\nodes\{
   Assignment,
@@ -81,7 +82,7 @@ trait PropertyHooks {
     return new Block($nodes);
   }
 
-  protected function emitProperty($result, $property) {
+  protected function emitEmulatedHooks($result, $property) {
     static $lookup= [
       'public'    => MODIFIER_PUBLIC,
       'protected' => MODIFIER_PROTECTED,
@@ -92,20 +93,19 @@ trait PropertyHooks {
       'readonly'  => 0x0080, // XP 10.13: MODIFIER_READONLY
     ];
 
-    if (empty($property->hooks)) return parent::emitProperty($result, $property);
-
     // Emit XP meta information for the reflection API
     $scope= $result->codegen->scope[0];
     $modifiers= 0;
     foreach ($property->modifiers as $name) {
       $modifiers|= $lookup[$name];
     }
+
     $scope->meta[self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
       DETAIL_ANNOTATIONS => $property->annotations,
       DETAIL_COMMENT     => $property->comment,
       DETAIL_TARGET_ANNO => [],
-      DETAIL_ARGUMENTS   => [$modifiers]
+      DETAIL_ARGUMENTS   => ['interface' === $scope->type->kind ? $modifiers | MODIFIER_ABSTRACT : $modifiers]
     ];
 
     $literal= new Literal("'{$property->name}'");
@@ -166,6 +166,65 @@ trait PropertyHooks {
     ];
     if (isset($property->expression)) {
       $scope->init[sprintf('$this->__virtual["%s"]', $property->name)]= $property->expression;
+    }
+  }
+
+  protected function emitNativeHooks($result, $property) {
+    $result->codegen->scope[0]->meta[self::PROPERTY][$property->name]= [
+      DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
+      DETAIL_ANNOTATIONS => $property->annotations,
+      DETAIL_COMMENT     => $property->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => []
+    ];
+
+    $property->comment && $this->emitOne($result, $property->comment);
+    $property->annotations && $this->emitOne($result, $property->annotations);
+    $result->at($property->declared)->out->write(implode(' ', $property->modifiers).' '.$this->propertyType($property->type).' $'.$property->name);
+    if (isset($property->expression)) {
+      if ($this->isConstant($result, $property->expression)) {
+        $result->out->write('=');
+        $this->emitOne($result, $property->expression);
+      } else if (in_array('static', $property->modifiers)) {
+        $result->codegen->scope[0]->statics['self::$'.$property->name]= $property->expression;
+      } else {
+        $result->codegen->scope[0]->init['$this->'.$property->name]= $property->expression;
+      }
+    }
+
+    // TODO move this to lang.ast.emit.PHP once https://github.com/php/php-src/pull/13455 is merged
+    $result->out->write('{');
+    foreach ($property->hooks as $type => $hook) {
+      $hook->byref && $result->out->write('&');
+      $result->out->write($type);
+      if ($hook->parameter) {
+        $result->out->write('(');
+        $this->emitOne($result, $hook->parameter);
+        $result->out->write(')');
+      }
+
+      if (null === $hook->expression) {
+        $result->out->write(';');
+      } else if ($hook->expression instanceof Block) {
+        $this->emitOne($result, $hook->expression);
+      } else {
+        $result->out->write('=>');
+        $this->emitOne($result, $hook->expression);
+        $result->out->write(';');
+      }
+    }
+    $result->out->write('}');
+  }
+
+  protected function emitProperty($result, $property) {
+    static $hooks= null;
+
+    if (empty($property->hooks)) {
+      parent::emitProperty($result, $property);
+    } else if ($hooks ?? $hooks= method_exists(ReflectionProperty::class, 'getHooks')) {
+      $this->emitNativeHooks($result, $property);
+    } else {
+      $this->emitEmulatedHooks($result, $property);
     }
   }
 }
