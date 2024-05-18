@@ -11,6 +11,7 @@ use lang\ast\nodes\{
   Expression,
   InstanceExpression,
   Literal,
+  NewExpression,
   Property,
   ScopeExpression,
   UnpackExpression,
@@ -1084,15 +1085,14 @@ abstract class PHP extends Emitter {
 
   protected function emitScope($result, $scope) {
 
-    // $x::<expr> vs. e.g. invoke()::<expr> vs. T::<expr>
-    if ($scope->type instanceof Variable) {
+    // new T()::<expr> vs. e.g. $x::<expr> vs. T::<expr>
+    if ($scope->type instanceof NewExpression) {
+      $result->out->write('(');
+      $this->emitOne($result, $scope->type);
+      $result->out->write(')::');
+    } else if ($scope->type instanceof Node) {
       $this->emitOne($result, $scope->type);
       $result->out->write('::');
-    } else if ($scope->type instanceof Node) {
-      $t= $result->temp();
-      $result->out->write('(null==='.$t.'=');
-      $this->emitOne($result, $scope->type);
-      $result->out->write(")?null:{$t}::");
     } else {
       $result->out->write("{$scope->type}::");
     }
@@ -1111,7 +1111,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitInstance($result, $instance) {
-    if ('new' === $instance->expression->kind) {
+    if ($instance->expression instanceof NewExpression) {
       $result->out->write('(');
       $this->emitOne($result, $instance->expression);
       $result->out->write(')->');
