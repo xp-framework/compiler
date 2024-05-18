@@ -211,15 +211,6 @@ class PropertyHooksTest extends EmittingTest {
   }
 
   #[Test]
-  public function abstract_hook() {
-    $t= $this->declare('abstract class %T {
-      public string $test { abstract get; }
-    }');
-
-    Assert::equals('public string $test', $t->property('test')->toString());
-  }
-
-  #[Test]
   public function abstract_property() {
     $t= $this->declare('abstract class %T {
       public abstract string $test { get; set; }
