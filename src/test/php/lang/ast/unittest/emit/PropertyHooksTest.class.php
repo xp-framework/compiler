@@ -140,15 +140,15 @@ class PropertyHooksTest extends EmittingTest {
     Assert::equals('Test', $r);
   }
 
-  #[Test, Expect(class: Error::class, message: '/Argument .+ type int(eger)?, string given/')]
+  #[Test, Expect(class: Error::class, message: '/Argument .+ type string, array given/')]
   public function typed_mismatch() {
     $this->run('class %T {
       public string $test {
-        set(int $times) => $times." times";
+        set(string $times) => $times." times";
       }
 
       public function run() {
-        $this->test= "no";
+        $this->test= [];
       }
     }');
   }
@@ -225,14 +225,14 @@ class PropertyHooksTest extends EmittingTest {
       public string $test { get; }
     }');
 
-    Assert::equals('public string $test', $t->property('test')->toString());
+    Assert::equals('public abstract string $test', $t->property('test')->toString());
   }
 
   #[Test]
   public function line_number_in_thrown_expression() {
     $r= $this->run('use lang\\IllegalArgumentException; class %T {
       public $test {
-        set(string $name) {
+        set($name) {
           if (strlen($name) > 10) throw new IllegalArgumentException("Too long");
           $this->test= $name;
         }
