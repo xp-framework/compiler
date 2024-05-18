@@ -220,6 +220,27 @@ class PropertyHooksTest extends EmittingTest {
   }
 
   #[Test]
+  public function reflective_get() {
+    $t= $this->declare('class %T {
+      public string $test { get => "Test"; }
+    }');
+
+    $instance= $t->newInstance();
+    Assert::equals('Test', $t->property('test')->get($instance));
+  }
+
+  #[Test]
+  public function reflective_set() {
+    $t= $this->declare('class %T {
+      public string $test { set => ucfirst($value); }
+    }');
+
+    $instance= $t->newInstance();
+    $t->property('test')->set($instance, 'test');
+    Assert::equals('Test', $instance->test);
+  }
+
+  #[Test]
   public function interface_hook() {
     $t= $this->declare('interface %T {
       public string $test { get; }
