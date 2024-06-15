@@ -3,6 +3,14 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.1.0 / 2024-06-15
+
+* Merged PR #166: Implement property hooks via virtual properties, see
+  https://wiki.php.net/rfc/property-hooks. Includes support for native
+  implementation, which is yet to be merged (php/php-src#13455). Thus,
+  this still might be a moving target in some regards!
+  (@thekid)
+
 ## 9.0.0 / 2024-03-23
 
 * Merged PR #179: XP 12 compatibility, dropping PHP 7.0 - 7.3 support!
