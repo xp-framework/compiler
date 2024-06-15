@@ -8,7 +8,7 @@
   "require" : {
     "xp-framework/core": "^12.0 | ^11.6 | ^10.16",
     "xp-framework/reflection": "^3.0 | ^2.13",
-    "xp-framework/ast": "dev-feature/property-hooks as 11.1.0",
+    "xp-framework/ast": "^11.1",
     "php" : ">=7.4.0"
   },
   "require-dev" : {
