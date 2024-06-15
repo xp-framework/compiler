@@ -24,7 +24,8 @@ class PHP81 extends PHP {
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,
     ReadonlyClasses,
-    OmitConstantTypes
+    OmitConstantTypes,
+    PropertyHooks
   ;
 
   /** Sets up type => literal mappings */
