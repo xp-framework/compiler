@@ -16,24 +16,25 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack language, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.4, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
 
 use lang\Reflection;
+use util\Date;
 use util\cmd\Console;
 
 #[Author('Timm Friebe')]
 #[Permissions(0o777)]
 class HelloWorld {
-  public const string GREETING = 'Hello';
+  private const string GREETING= 'Hello';
 
   public static function main(array<string> $args): void {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
     $author= Reflection::type(self::class)->annotation(Author::class)->argument(0);
 
-    Console::writeLine($greet($args[0] ?? 'World', from: $author));
+    Console::writeLine(new Date()->toString(), ': ', $greet($args[0] ?? 'World', from: $author));
   }
 }
 ```
