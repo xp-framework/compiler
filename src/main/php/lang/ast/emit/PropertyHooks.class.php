@@ -78,8 +78,7 @@ trait PropertyHooks {
       return new Block($nodes);
     }
 
-    array_unshift($nodes, new Code($check));
-    return new Block($nodes);
+    return new Block([new Code($check), ...$nodes]);
   }
 
   protected function emitEmulatedHooks($result, $property) {
