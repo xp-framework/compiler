@@ -18,7 +18,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
     Assert::equals('Test', $t->newInstance()->fixture);
   }
 
-  #[Test, Expect(class: Error::class, message: '/Cannot access private property T.+::fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot modify private\(set\) property T.+::\$fixture/')]
   public function writing_private() {
     $t= $this->declare('class %T {
       public private(set) $fixture= "Test";
@@ -26,7 +26,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
     $t->newInstance()->fixture= 'Changed';
   }
 
-  #[Test, Expect(class: Error::class, message: '/Cannot access protected property T.+::fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot modify protected\(set\) property T.+::\$fixture/')]
   public function writing_protected() {
     $t= $this->declare('class %T {
       public protected(set) $fixture= "Test";
