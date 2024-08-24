@@ -19,9 +19,17 @@ class AsymmetricVisibilityTest extends EmittingTest {
   }
 
   #[Test, Expect(class: Error::class, message: '/Cannot access private property T.+::fixture/')]
-  public function writing() {
+  public function writing_private() {
     $t= $this->declare('class %T {
       public private(set) $fixture= "Test";
+    }');
+    $t->newInstance()->fixture= 'Changed';
+  }
+
+  #[Test, Expect(class: Error::class, message: '/Cannot access protected property T.+::fixture/')]
+  public function writing_protected() {
+    $t= $this->declare('class %T {
+      public protected(set) $fixture= "Test";
     }');
     $t->newInstance()->fixture= 'Changed';
   }
