@@ -28,6 +28,22 @@ class AsymmetricVisibilityTest extends EmittingTest {
         return $this;
       }
     }');
+
+    Assert::throws(Error::class, fn() => $t->newInstance()->fixture= 'Changed');
+    Assert::equals('Changed', $t->newInstance()->rename('Changed')->fixture);
+  }
+
+  #[Test]
+  public function writing_from_inherited_scope() {
+    $parent= $this->declare('class %T { public protected(set) $fixture= "Test"; }');
+    $t= $this->declare('class %T extends '.$parent->literal().' {
+      public function rename($name) {
+        $this->fixture= $name;
+        return $this;
+      }
+    }');
+
+    Assert::throws(Error::class, fn() => $t->newInstance()->fixture= 'Changed');
     Assert::equals('Changed', $t->newInstance()->rename('Changed')->fixture);
   }
 
