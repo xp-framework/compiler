@@ -10,6 +10,12 @@ use lang\ast\nodes\{
   Variable
 };
 
+/**
+ * Asymmetric Visibility
+ *
+ * @see  https://wiki.php.net/rfc/asymmetric-visibility-v2
+ * @test lang.ast.unittest.emit.AsymmetricVisibilityTest
+ */
 trait AsymmetricVisibility {
   use VisibilityChecks;
 
