@@ -81,4 +81,18 @@ class AsymmetricVisibilityTest extends EmittingTest {
     }');
     Assert::equals('Test', $t->newInstance('Test')->fixture);
   }
+
+  #[Test, Expect(class: Error::class, message: '/Cannot modify readonly property .+fixture/')]
+  public function readonly() {
+    $t= $this->declare('class %T {
+
+      // public-read, protected-write, write-once property
+      public protected(set) readonly string $fixture= "Test";
+
+      public function rename() {
+        $this->fixture= "Changed"; // Will always error
+      }
+    }');
+    $t->newInstance()->rename();
+  }
 }

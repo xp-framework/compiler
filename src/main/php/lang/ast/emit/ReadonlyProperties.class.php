@@ -66,8 +66,8 @@ trait ReadonlyProperties {
       $check ? new Block([$check, new ReturnStatement($virtual)]) : new ReturnStatement($virtual),
       new Block([
         $check ?? new Code('$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'),
+        $this->initonce($property->name),
         new Code(sprintf(
-          'if (isset($this->__virtual["%1$s"])) throw new \\Error("Cannot modify readonly property ".__CLASS__."::{$name}");'.
           'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
           'throw new \\Error("Cannot initialize readonly property ".__CLASS__."::{$name} from ".($scope ? "scope {$scope}": "global scope"));'.
           '$this->__virtual["%1$s"]= [$value];',

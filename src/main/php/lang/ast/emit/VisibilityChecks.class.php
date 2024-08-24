@@ -4,6 +4,10 @@ use lang\ast\Code;
 
 trait VisibilityChecks {
 
+  private function initonce($name) {
+    return new Code('if (isset($this->__virtual["'.$name.'"])) throw new \\Error("Cannot modify readonly property ".__CLASS__."::\$'.$name.'");');
+  }
+
   private function private($name, $access) {
     return new Code(
       '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
