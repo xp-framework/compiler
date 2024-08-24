@@ -1,7 +1,6 @@
 <?php namespace lang\ast\emit;
 
 use ReflectionProperty;
-use lang\ast\Code;
 use lang\ast\nodes\{
   Assignment,
   Block,
@@ -24,6 +23,7 @@ use lang\ast\nodes\{
  * @test lang.ast.unittest.emit.PropertyHooksTest
  */
 trait PropertyHooks {
+  use VisibilityChecks;
 
   protected function rewriteHook($node, $name, $virtual, $literal) {
 
@@ -61,24 +61,14 @@ trait PropertyHooks {
 
   protected function withScopeCheck($modifiers, $nodes) {
     if ($modifiers & MODIFIER_PRIVATE) {
-      $check= (
-        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
-        'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot access private property ".__CLASS__."::".$name);'
-      );
+      return new Block([$this->private('$name', 'access private'), ...$nodes]);
     } else if ($modifiers & MODIFIER_PROTECTED) {
-      $check= (
-        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
-        'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot access protected property ".__CLASS__."::".$name);'
-      );
+      return new Block([$this->protected('$name', 'access protected'), ...$nodes]);
     } else if (1 === sizeof($nodes)) {
       return $nodes[0];
     } else {
       return new Block($nodes);
     }
-
-    return new Block([new Code($check), ...$nodes]);
   }
 
   protected function emitEmulatedHooks($result, $property) {

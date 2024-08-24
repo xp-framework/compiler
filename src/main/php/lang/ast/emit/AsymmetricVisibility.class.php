@@ -1,6 +1,5 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\Code;
 use lang\ast\nodes\{
   Assignment,
   Block,
@@ -12,20 +11,13 @@ use lang\ast\nodes\{
 };
 
 trait AsymmetricVisibility {
+  use VisibilityChecks;
 
   protected function emitProperty($result, $property) {
     if (in_array('private(set)', $property->modifiers)) {
-      $check= [new Code(
-        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
-        'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot modify private(set) property ".__CLASS__."::\$".$name." from ".($scope ? "scope ".$scope : "global scope"));'
-      )];
+      $check= [$this->private($property->name, 'modify private(set)')];
     } else if (in_array('protected(set)', $property->modifiers)) {
-      $check= [new Code(
-        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
-        'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot modify protected(set) property ".__CLASS__."::\$".$name." from ".($scope ? "scope ".$scope : "global scope"));'
-      )];
+      $check= [$this->protected($property->name, 'modify protected(set)')];
     } else {
       $check= [];
     }
