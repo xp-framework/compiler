@@ -14,9 +14,6 @@ use lang\ast\nodes\{
 trait AsymmetricVisibility {
 
   protected function emitProperty($result, $property) {
-    $literal= new Literal("'{$property->name}'");
-    $virtual= new InstanceExpression(new Variable('this'), new OffsetExpression(new Literal('__virtual'), $literal));
-
     if (in_array('private(set)', $property->modifiers)) {
       $check= [new Code(
         '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
@@ -32,6 +29,11 @@ trait AsymmetricVisibility {
     } else {
       $check= [];
     }
+
+    $virtual= new InstanceExpression(new Variable('this'), new OffsetExpression(
+      new Literal('__virtual'),
+      new Literal("'{$property->name}'"))
+    );
 
     $scope= $result->codegen->scope[0];
     $scope->virtual[$property->name]= [
