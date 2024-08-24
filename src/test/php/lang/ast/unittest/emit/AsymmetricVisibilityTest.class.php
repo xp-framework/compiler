@@ -19,7 +19,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   }
 
   #[Test]
-  public function writing() {
+  public function writing_from_self_scope() {
     $t= $this->declare('class %T {
       public private(set) $fixture= "Test";
 
@@ -29,6 +29,17 @@ class AsymmetricVisibilityTest extends EmittingTest {
       }
     }');
     Assert::equals('Changed', $t->newInstance()->rename('Changed')->fixture);
+  }
+
+  #[Test]
+  public function writing_explicitely_public_set() {
+    $t= $this->declare('class %T {
+      public public(set) $fixture= "Test";
+    }');
+
+    $instance= $t->newInstance();
+    $instance->fixture= 'Changed';
+    Assert::equals('Changed', $instance->fixture);
   }
 
   #[Test, Expect(class: Error::class, message: '/Cannot modify private\(set\) property T.+::\$fixture/')]
