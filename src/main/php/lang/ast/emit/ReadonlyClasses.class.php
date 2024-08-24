@@ -21,7 +21,13 @@ trait ReadonlyClasses {
           $member->modifiers[]= 'readonly';
         } else if ($member->is('method')) {
           foreach ($member->signature->parameters as $param) {
-            $param->promote && $param->promote.= ' readonly';
+            if (null === $param->promote) {
+              // NOOP
+            } else if (is_array($param->promote)) {
+              $param->promote[]= 'readonly';
+            } else if (is_string($param->promote)) {
+              $param->promote.= ' readonly';
+            }
           }
         }
       }

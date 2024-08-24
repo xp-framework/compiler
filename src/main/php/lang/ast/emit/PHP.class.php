@@ -718,7 +718,11 @@ abstract class PHP extends Emitter {
     }
 
     foreach ($promoted as $param) {
-      $this->emitProperty($result, new Property(explode(' ', $param->promote), $param->name, $param->type));
+      $this->emitProperty($result, new Property(
+        is_array($param->promote) ? $param->promote : explode(' ', $param->promote),
+        $param->name,
+        $param->type
+      ));
     }
 
     $result->locals= $locals;
