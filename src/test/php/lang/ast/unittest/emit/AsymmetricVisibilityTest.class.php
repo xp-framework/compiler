@@ -46,4 +46,12 @@ class AsymmetricVisibilityTest extends EmittingTest {
     }');
     $t->newInstance()->fixture= 'Changed';
   }
+
+  #[Test]
+  public function promoted_constructor_parameter() {
+    $t= $this->declare('class %T {
+      public function __construct(public private(set) $fixture) { }
+    }');
+    Assert::equals('Test', $t->newInstance('Test')->fixture);
+  }
 }
