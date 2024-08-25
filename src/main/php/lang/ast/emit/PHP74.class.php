@@ -28,6 +28,8 @@ class PHP74 extends PHP {
     RewriteThrowableExpressions
   ;
 
+  public $targetVersion= 70400;
+
   /** Sets up type => literal mappings */
   public function __construct() {
     $this->literals= [

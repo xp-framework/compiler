@@ -10,15 +10,17 @@ trait RewriteProperties {
   }
 
   protected function emitProperty($result, $property) {
-    static $asymmetric= null;
     if ($property->hooks) {
       return $this->emitPropertyHooks($result, $property);
     } else if (
-      !($asymmetric ?? $asymmetric= method_exists(ReflectionProperty::class, 'isPrivateSet')) &&
+      $this->targetVersion < 80400 &&
       array_intersect($property->modifiers, ['private(set)', 'protected(set)', 'public(set)'])
     ) {
       return $this->emitAsymmetricVisibility($result, $property);
-    } else if (PHP_VERSION_ID <= 80100 && in_array('readonly', $property->modifiers)) {
+    } else if (
+      $this->targetVersion < 80100 &&
+      in_array('readonly', $property->modifiers)
+    ) {
       return $this->emitReadonlyProperties($result, $property);
     }
     parent::emitProperty($result, $property);

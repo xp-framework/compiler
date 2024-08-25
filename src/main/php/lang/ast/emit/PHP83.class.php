@@ -20,6 +20,8 @@ use lang\ast\types\{
 class PHP83 extends PHP {
   use RewriteBlockLambdaExpressions, RewriteProperties, ReadonlyClasses;
 
+  public $targetVersion= 80300;
+
   /** Sets up type => literal mappings */
   public function __construct() {
     $this->literals= [

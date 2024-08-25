@@ -31,6 +31,8 @@ class PHP80 extends PHP {
     RewriteStaticVariableInitializations
   ;
 
+  public $targetVersion= 80000;
+
   /** Sets up type => literal mappings */
   public function __construct() {
     $this->literals= [

@@ -28,6 +28,8 @@ class PHP82 extends PHP {
     OmitConstantTypes
   ;
 
+  public $targetVersion= 80200;
+
   /** Sets up type => literal mappings */
   public function __construct() {
     $this->literals= [
