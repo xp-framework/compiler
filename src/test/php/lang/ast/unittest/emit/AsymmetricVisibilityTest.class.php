@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
-use test\{Assert, Expect, Test};
+use test\{Assert, Expect, Test, Values};
 
 /**
  * Asymmetric visibility tests
@@ -94,5 +94,17 @@ class AsymmetricVisibilityTest extends EmittingTest {
       }
     }');
     $t->newInstance()->rename();
+  }
+
+  #[Test, Values(['private', 'protected', 'public'])]
+  public function reflection($modifier) {
+    $t= $this->declare('class %T {
+      public '.$modifier.'(set) string $fixture= "Test";
+    }');
+
+    Assert::equals(
+      'public '.$modifier.'(set) string $fixture',
+      $t->property('fixture')->toString()
+    );
   }
 }

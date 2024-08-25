@@ -20,10 +20,37 @@ trait AsymmetricVisibility {
   use VisibilityChecks;
 
   protected function emitProperty($result, $property) {
+    static $lookup= [
+      'public'         => MODIFIER_PUBLIC,
+      'protected'      => MODIFIER_PROTECTED,
+      'private'        => MODIFIER_PRIVATE,
+      'static'         => MODIFIER_STATIC,
+      'final'          => MODIFIER_FINAL,
+      'abstract'       => MODIFIER_ABSTRACT,
+      'readonly'       => MODIFIER_READONLY,
+      'private(set)'   => 0x0400,
+      'protected(set)' => 0x0800,
+      'public(set)'    => 0x1000,
+    ];
+
+    // Emit XP meta information for the reflection API
+    $scope= $result->codegen->scope[0];
+    $modifiers= 0;
+    foreach ($property->modifiers as $name) {
+      $modifiers|= $lookup[$name];
+    }
+    $scope->meta[self::PROPERTY][$property->name]= [
+      DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
+      DETAIL_ANNOTATIONS => $property->annotations,
+      DETAIL_COMMENT     => $property->comment,
+      DETAIL_TARGET_ANNO => [],
+      DETAIL_ARGUMENTS   => [$modifiers]
+    ];
+
     $checks= [];
-    if (in_array('private(set)', $property->modifiers)) {
+    if ($modifiers & 0x0400) {
       $checks[]= $this->private($property->name, 'modify private(set)');
-    } else if (in_array('protected(set)', $property->modifiers)) {
+    } else if ($modifiers & 0x0800) {
       $checks[]= $this->protected($property->name, 'modify protected(set)');
     }
 
@@ -36,8 +63,6 @@ trait AsymmetricVisibility {
       new Literal('__virtual'),
       new Literal("'{$property->name}'"))
     );
-
-    $scope= $result->codegen->scope[0];
     $scope->virtual[$property->name]= [
       new ReturnStatement($virtual),
       new Block([...$checks, new Assignment($virtual, '=', new Variable('value'))]),

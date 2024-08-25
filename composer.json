@@ -7,7 +7,7 @@
   "keywords": ["module", "xp"],
   "require" : {
     "xp-framework/core": "^12.0 | ^11.6 | ^10.16",
-    "xp-framework/reflection": "^3.0 | ^2.13",
+    "xp-framework/reflection": "dev-feature/asymmetric-visibility as 3.2.0",
     "xp-framework/ast": "dev-feature/asymmetric-visibility as 11.3.0",
     "php" : ">=7.4.0"
   },
