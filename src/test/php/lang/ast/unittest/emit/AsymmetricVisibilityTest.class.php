@@ -13,7 +13,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   #[Test]
   public function reading() {
     $t= $this->declare('class %T {
-      public private(set) $fixture= "Test";
+      public private(set) string $fixture= "Test";
     }');
     Assert::equals('Test', $t->newInstance()->fixture);
   }
@@ -21,7 +21,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   #[Test]
   public function writing_from_self_scope() {
     $t= $this->declare('class %T {
-      public private(set) $fixture= "Test";
+      public private(set) string $fixture= "Test";
 
       public function rename($name) {
         $this->fixture= $name;
@@ -35,7 +35,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
 
   #[Test]
   public function writing_from_inherited_scope() {
-    $parent= $this->declare('class %T { public protected(set) $fixture= "Test"; }');
+    $parent= $this->declare('class %T { public protected(set) string $fixture= "Test"; }');
     $t= $this->declare('class %T extends '.$parent->literal().' {
       public function rename($name) {
         $this->fixture= $name;
@@ -50,7 +50,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   #[Test]
   public function writing_explicitely_public_set() {
     $t= $this->declare('class %T {
-      public public(set) $fixture= "Test";
+      public public(set) string $fixture= "Test";
     }');
 
     $instance= $t->newInstance();
@@ -61,7 +61,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   #[Test, Expect(class: Error::class, message: '/Cannot modify private\(set\) property T.+::\$fixture/')]
   public function writing_private() {
     $t= $this->declare('class %T {
-      public private(set) $fixture= "Test";
+      public private(set) string $fixture= "Test";
     }');
     $t->newInstance()->fixture= 'Changed';
   }
@@ -69,7 +69,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   #[Test, Expect(class: Error::class, message: '/Cannot modify protected\(set\) property T.+::\$fixture/')]
   public function writing_protected() {
     $t= $this->declare('class %T {
-      public protected(set) $fixture= "Test";
+      public protected(set) string $fixture= "Test";
     }');
     $t->newInstance()->fixture= 'Changed';
   }
@@ -77,7 +77,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
   #[Test]
   public function promoted_constructor_parameter() {
     $t= $this->declare('class %T {
-      public function __construct(public private(set) $fixture) { }
+      public function __construct(public private(set) string $fixture) { }
     }');
     Assert::equals('Test', $t->newInstance('Test')->fixture);
   }
@@ -87,7 +87,11 @@ class AsymmetricVisibilityTest extends EmittingTest {
     $t= $this->declare('class %T {
 
       // public-read, protected-write, write-once property
-      public protected(set) readonly string $fixture= "Test";
+      public protected(set) readonly string $fixture;
+
+      public function __construct() {
+        $this->fixture= "Test";
+      }
 
       public function rename() {
         $this->fixture= "Changed"; // Will always error
