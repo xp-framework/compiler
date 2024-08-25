@@ -28,9 +28,9 @@ trait AsymmetricVisibility {
       'final'          => MODIFIER_FINAL,
       'abstract'       => MODIFIER_ABSTRACT,
       'readonly'       => MODIFIER_READONLY,
-      'private(set)'   => 0x0400,
+      'public(set)'    => 0x0400,
       'protected(set)' => 0x0800,
-      'public(set)'    => 0x1000,
+      'private(set)'   => 0x1000,
     ];
 
     // Emit XP meta information for the reflection API
@@ -48,7 +48,7 @@ trait AsymmetricVisibility {
     ];
 
     $checks= [];
-    if ($modifiers & 0x0400) {
+    if ($modifiers & 0x1000) {
       $checks[]= $this->private($property->name, 'modify private(set)');
     } else if ($modifiers & 0x0800) {
       $checks[]= $this->protected($property->name, 'modify protected(set)');
