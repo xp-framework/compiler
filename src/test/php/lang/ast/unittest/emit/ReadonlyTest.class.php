@@ -27,7 +27,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly int $fixture',
+      'public readonly protected(set) int $fixture',
       $t->property('fixture')->toString()
     );
   }
@@ -39,7 +39,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly int $fixture',
+      'public readonly protected(set) int $fixture',
       $t->property('fixture')->toString()
     );
   }
@@ -51,7 +51,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly string $fixture',
+      'public readonly protected(set) string $fixture',
       $t->property('fixture')->toString()
     );
     Assert::equals('Test', $t->newInstance('Test')->fixture);
@@ -64,7 +64,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly string $fixture',
+      'public readonly protected(set) string $fixture',
       $t->property('fixture')->toString()
     );
     Assert::equals('Test', $t->newInstance('Test')->fixture);
