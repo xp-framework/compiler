@@ -107,4 +107,16 @@ class AsymmetricVisibilityTest extends EmittingTest {
       $t->property('fixture')->toString()
     );
   }
+
+  #[Test, Values(['private', 'protected', 'public'])]
+  public function same_modifier_for_get_and_set($modifier) {
+    $t= $this->declare('class %T {
+      '.$modifier.' '.$modifier.'(set) string $fixture= "Test";
+    }');
+
+    Assert::equals(
+      $modifier.' string $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
 }
