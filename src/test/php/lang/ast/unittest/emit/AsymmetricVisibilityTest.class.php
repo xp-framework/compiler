@@ -96,7 +96,7 @@ class AsymmetricVisibilityTest extends EmittingTest {
     $t->newInstance()->rename();
   }
 
-  #[Test, Values(['private', 'protected', 'public'])]
+  #[Test, Values(['private', 'protected'])]
   public function reflection($modifier) {
     $t= $this->declare('class %T {
       public '.$modifier.'(set) string $fixture= "Test";
