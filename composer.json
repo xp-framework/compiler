@@ -8,7 +8,7 @@
   "require" : {
     "xp-framework/core": "^12.0 | ^11.6 | ^10.16",
     "xp-framework/reflection": "^3.2",
-    "xp-framework/ast": "dev-feature/asymmetric-visibility as 11.3.0",
+    "xp-framework/ast": "^11.3",
     "php" : ">=7.4.0"
   },
   "require-dev" : {
