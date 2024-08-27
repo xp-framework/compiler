@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.2.0 / 2024-08-27
+
+* Merged PR #183: Add emitting support for asymmetric visibility. See
+  https://wiki.php.net/rfc/asymmetric-visibility-v2, targeted for PHP 8.4
+  (@thekid)
+
 ## 9.1.1 / 2024-08-27
 
 * Forward compatibility with newer `xp-framework/ast` releases - @thekid
