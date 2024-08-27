@@ -91,8 +91,9 @@ Usage: xp compile <in> [<out>]
 lang.ast.emit.PHP74
 lang.ast.emit.PHP80
 lang.ast.emit.PHP81
-lang.ast.emit.PHP82 [*]
-lang.ast.emit.PHP83
+lang.ast.emit.PHP82
+lang.ast.emit.PHP83 [*]
+lang.ast.emit.PHP84
 lang.ast.syntax.php.Using [*]
 
 @FileSystemCL<./vendor/xp-lang/php-is-operator/src/main/php>
