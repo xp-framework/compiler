@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.1.1 / 2024-08-27
+
+* Forward compatibility with newer `xp-framework/ast` releases - @thekid
+
 ## 9.1.0 / 2024-06-15
 
 * Merged PR #166: Implement property hooks via virtual properties, see
