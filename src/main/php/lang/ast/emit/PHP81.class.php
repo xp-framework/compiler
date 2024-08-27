@@ -23,10 +23,12 @@ class PHP81 extends PHP {
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,
+    RewriteProperties,
     ReadonlyClasses,
-    OmitConstantTypes,
-    PropertyHooks
+    OmitConstantTypes
   ;
+
+  public $targetVersion= 80100;
 
   /** Sets up type => literal mappings */
   public function __construct() {

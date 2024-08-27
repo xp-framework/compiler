@@ -151,7 +151,7 @@ class ReadonlyTest extends EmittingTest {
     Assert::equals('Test', $i->fixture);
   }
 
-  #[Test, Expect(class: Error::class, message: '/Cannot initialize readonly property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot (initialize readonly|modify protected\(set\)) property .+fixture/')]
   public function cannot_initialize_from_outside() {
     $t= $this->declare('class %T {
       public readonly string $fixture;
