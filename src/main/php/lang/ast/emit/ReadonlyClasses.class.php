@@ -33,9 +33,11 @@ trait ReadonlyClasses {
       }
 
       // Prevent dynamic members
-      $throw= new Code('throw new \\Error("Cannot create dynamic property ".__CLASS__."::".$name);');
       $context= $result->codegen->enter(new InType($class));
-      $context->virtual[null]= [$throw, $throw];
+      $context->virtual[null]= [
+        new Code(''),
+        new Code('throw new \\Error("Cannot create dynamic property ".__CLASS__."::".$name);')
+      ];
     }
 
     return parent::emitClass($result, $class);
