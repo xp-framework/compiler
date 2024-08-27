@@ -18,7 +18,7 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_83
  */
 class PHP83 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteProperties, ReadonlyClasses;
+  use RewriteBlockLambdaExpressions, RewriteProperties;
 
   public $targetVersion= 80300;
 

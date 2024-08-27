@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed emitter to use native readonly classes in PHP 8.3, fixing an
+  inconsistency with accessing undefined properties
+  (@thekid)
+
 ## 9.2.0 / 2024-08-27
 
 * Merged PR #183: Add emitting support for asymmetric visibility. See
