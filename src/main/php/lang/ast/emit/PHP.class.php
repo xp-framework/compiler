@@ -645,7 +645,32 @@ abstract class PHP extends Emitter {
         $result->codegen->scope[0]->init['$this->'.$property->name]= $property->expression;
       }
     }
-    $result->out->write(';');
+
+    if ($property->hooks) {
+      $result->out->write('{');
+      foreach ($property->hooks as $type => $hook) {
+        $hook->byref && $result->out->write('&');
+        $result->out->write($type);
+        if ($hook->parameter) {
+          $result->out->write('(');
+          $this->emitOne($result, $hook->parameter);
+          $result->out->write(')');
+        }
+
+        if (null === $hook->expression) {
+          $result->out->write(';');
+        } else if ($hook->expression instanceof Block) {
+          $this->emitOne($result, $hook->expression);
+        } else {
+          $result->out->write('=>');
+          $this->emitOne($result, $hook->expression);
+          $result->out->write(';');
+        }
+      }
+      $result->out->write('}');
+    } else {
+      $result->out->write(';');
+    }
   }
 
   protected function emitMethod($result, $method) {
