@@ -28,9 +28,9 @@ trait AsymmetricVisibility {
       'final'          => MODIFIER_FINAL,
       'abstract'       => MODIFIER_ABSTRACT,
       'readonly'       => MODIFIER_READONLY,
-      'public(set)'    => 0x0400,
-      'protected(set)' => 0x0800,
-      'private(set)'   => 0x1000,
+      'public(set)'    => 0x1000000,
+      'protected(set)' => 0x0000800,
+      'private(set)'   => 0x0001000,
     ];
 
     $scope= $result->codegen->scope[0];
@@ -41,15 +41,15 @@ trait AsymmetricVisibility {
 
     // Declare checks for private(set) and protected(set), folding declarations
     // like `[visibility] [visibility](set)` to just the visibility itself.
-    if ($modifiers & 0x0400) {
+    if ($modifiers & 0x1000000) {
       $checks= [];
-      $modifiers&= ~0x0400;
-    } else if ($modifiers & 0x0800) {
+      $modifiers&= ~0x1000000;
+    } else if ($modifiers & 0x0000800) {
       $checks= [$this->protected($property->name, 'modify protected(set)')];
-      $modifiers & MODIFIER_PROTECTED && $modifiers&= ~0x0800;
-    } else if ($modifiers & 0x1000) {
+      $modifiers & MODIFIER_PROTECTED && $modifiers&= ~0x0000800;
+    } else if ($modifiers & 0x0001000) {
       $checks= [$this->private($property->name, 'modify private(set)')];
-      $modifiers & MODIFIER_PRIVATE && $modifiers&= ~0x1000;
+      $modifiers & MODIFIER_PRIVATE && $modifiers&= ~0x0001000;
     }
 
     // Emit XP meta information for the reflection API
