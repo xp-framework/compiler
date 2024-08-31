@@ -6,7 +6,7 @@ XP Compiler ChangeLog
 * Added PHP 8.4 emitter which natively emits property hooks and asymmetric
   visibility syntax
   (@thekid)
-* Changed emitter to use native readonly classes in PHP 8.3, fixing an
+* Changed emitter to use native readonly classes in PHP 8.2, fixing an
   inconsistency with accessing undefined properties
   (@thekid)
 

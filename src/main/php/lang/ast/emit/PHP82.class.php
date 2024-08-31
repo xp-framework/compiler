@@ -24,7 +24,6 @@ class PHP82 extends PHP {
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,
     RewriteProperties,
-    ReadonlyClasses,
     OmitConstantTypes
   ;
 

@@ -22,4 +22,12 @@ class PHP82Test extends EmittingTest {
   public function callable_instance_method_syntax() {
     Assert::equals('$this->method(...);', $this->emit('$this->method(...);'));
   }
+
+  #[Test]
+  public function readonly_classes() {
+    Assert::matches(
+      '/readonly class [A-Z0-9]+{/',
+      $this->emit('readonly class %T { }')
+    );
+  }
 }
