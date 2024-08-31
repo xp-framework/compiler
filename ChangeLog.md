@@ -3,9 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Added PHP 8.4 emitter which feature-checks for both property hooks
-  and asymmetric visibility RFCs, deciding whether to natively emit or
-  use virtual properties
+* Added PHP 8.4 emitter which natively emits property hooks and asymmetric
+  visibility syntax
   (@thekid)
 * Changed emitter to use native readonly classes in PHP 8.3, fixing an
   inconsistency with accessing undefined properties
