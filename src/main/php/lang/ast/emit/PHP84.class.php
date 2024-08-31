@@ -1,6 +1,5 @@
 <?php namespace lang\ast\emit;
 
-use ReflectionProperty;
 use lang\ast\types\{
   IsArray,
   IsFunction,
@@ -20,10 +19,6 @@ use lang\ast\types\{
  */
 class PHP84 extends PHP {
   use RewriteBlockLambdaExpressions;
-  use PropertyHooks, AsymmetricVisibility {
-    PropertyHooks::emitProperty as emitPropertyHooks;
-    AsymmetricVisibility::emitProperty as emitAsymmetricVisibility;
-  }
 
   public $targetVersion= 80400;
 
@@ -57,26 +52,5 @@ class PHP84 extends PHP {
       IsLiteral::class      => function($t) { return $t->literal(); },
       IsGeneric::class      => function($t) { return null; }
     ];
-  }
-
-  protected function emitProperty($result, $property) {
-    static $asymmetric= null;
-    static $hooks= null;
-
-    // TODO Remove once https://github.com/php/php-src/pull/15063 and
-    // https://github.com/php/php-src/pull/13455 are merged
-    if (
-      !($asymmetric ?? $asymmetric= method_exists(ReflectionProperty::class, 'isPrivateSet')) &&
-      array_intersect($property->modifiers, ['private(set)', 'protected(set)', 'public(set)'])
-    ) {
-      return $this->emitAsymmetricVisibility($result, $property);
-    } else if (
-      !($hooks ?? $hooks= method_exists(ReflectionProperty::class, 'getHooks')) &&
-      $property->hooks
-    ) {
-      return $this->emitPropertyHooks($result, $property);
-    }
-
-    parent::emitProperty($result, $property);
   }
 }
