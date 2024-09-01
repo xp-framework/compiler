@@ -123,4 +123,22 @@ class AsymmetricVisibilityTest extends EmittingTest {
       $t->property('fixture')->toString()
     );
   }
+
+  #[Test]
+  public function interaction_with_hooks() {
+    $t= $this->declare('class %T {
+      public private(set) string $fixture {
+        get => $this->fixture;
+        set => strtolower($value);
+      }
+
+      public function rename($name) {
+        $this->fixture= $name;
+        return $this;
+      }
+    }');
+
+    Assert::throws(Error::class, fn() => $t->newInstance()->fixture= 'Changed');
+    Assert::equals('changed', $t->newInstance()->rename('Changed')->fixture);
+  }
 }

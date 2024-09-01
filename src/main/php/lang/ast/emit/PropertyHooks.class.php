@@ -72,13 +72,16 @@ trait PropertyHooks {
 
   protected function emitProperty($result, $property) {
     static $lookup= [
-      'public'    => MODIFIER_PUBLIC,
-      'protected' => MODIFIER_PROTECTED,
-      'private'   => MODIFIER_PRIVATE,
-      'static'    => MODIFIER_STATIC,
-      'final'     => MODIFIER_FINAL,
-      'abstract'  => MODIFIER_ABSTRACT,
-      'readonly'  => MODIFIER_READONLY,
+      'public'         => MODIFIER_PUBLIC,
+      'protected'      => MODIFIER_PROTECTED,
+      'private'        => MODIFIER_PRIVATE,
+      'static'         => MODIFIER_STATIC,
+      'final'          => MODIFIER_FINAL,
+      'abstract'       => MODIFIER_ABSTRACT,
+      'readonly'       => MODIFIER_READONLY,
+      'public(set)'    => 0x1000000,
+      'protected(set)' => 0x0000800,
+      'private(set)'   => 0x0001000,
     ];
 
     // Emit XP meta information for the reflection API
@@ -86,6 +89,22 @@ trait PropertyHooks {
     $modifiers= 0;
     foreach ($property->modifiers as $name) {
       $modifiers|= $lookup[$name];
+    }
+
+    // Derive modifiers for private(set) and protected(set), folding declarations
+    // like `[visibility] [visibility](set)` to just the visibility itself.
+    if ($modifiers & 0x1000000) {
+      $check= null;
+      $modifiers&= ~0x1000000;
+      $write= MODIFIER_PUBLIC;
+    } else if ($modifiers & 0x0000800) {
+      $modifiers & MODIFIER_PROTECTED && $modifiers&= ~0x0000800;
+      $write= MODIFIER_PROTECTED;
+    } else if ($modifiers & 0x0001000) {
+      $modifiers & MODIFIER_PRIVATE && $modifiers&= ~0x0001000;
+      $write= MODIFIER_PRIVATE;
+    } else {
+      $write= $modifiers;
     }
 
     $scope->meta[self::PROPERTY][$property->name]= [
@@ -137,7 +156,7 @@ trait PropertyHooks {
           )],
           null // $hook->annotations
         ));
-        $set= $this->withScopeCheck($modifiers, [new InvokeExpression(
+        $set= $this->withScopeCheck($write, [new InvokeExpression(
           new InstanceExpression(new Variable('this'), new Literal($method)),
           [new Variable('value')]
         )]);

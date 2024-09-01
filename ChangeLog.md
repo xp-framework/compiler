@@ -5,6 +5,8 @@ XP Compiler ChangeLog
 
 ## 9.3.0 / 2024-08-31
 
+* Fixed checks for property hooks emulation with asymmetric visibility
+  (@thekid)
 * Added PHP 8.4 emitter which natively emits property hooks and asymmetric
   visibility syntax. This is integration-tested with PHP 8.4.0 Beta 4.
   See https://github.com/php/php-src/blob/php-8.4.0beta4/NEWS
