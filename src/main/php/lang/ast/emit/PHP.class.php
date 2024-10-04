@@ -125,7 +125,7 @@ abstract class PHP extends Emitter {
     $capture= [];
     foreach ($result->codegen->search($node, 'variable') as $var) {
       if (isset($result->locals[$var->pointer])) {
-        $capture[$var->pointer]= true;
+        $capture[$var->pointer]??= ($result->locals[$var->pointer] ? '&$' : '$').$var->pointer;
       }
     }
     unset($capture['this']);
@@ -143,9 +143,9 @@ abstract class PHP extends Emitter {
     }
 
     if ($capture) {
-      $result->out->write('use($'.implode(', $', array_keys($capture)).')');
-      foreach ($capture as $name => $_) {
-        $result->locals[$name]= true;
+      $result->out->write('use('.implode(', ', $capture).')');
+      foreach ($capture as $name => $variable) {
+        $result->locals[$name]= '&' === $variable[0];
       }
     }
 
@@ -298,7 +298,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
-    $result->locals[$parameter->name]= true;
+    $result->locals[$parameter->name]= $parameter->reference;
     $parameter->annotations && $this->emitOne($result, $parameter->annotations);
 
     // If we have a non-constant default and a type, emit a nullable type hint
@@ -340,7 +340,7 @@ abstract class PHP extends Emitter {
     if ($use) {
       $result->out->write(' use('.implode(',', $use).') ');
       foreach ($use as $variable) {
-        $result->locals[substr($variable, 1)]= true;
+        $result->locals[ltrim($variable, '&$')]= '&' === $variable[0];
       }
     }
 
@@ -675,7 +675,7 @@ abstract class PHP extends Emitter {
 
   protected function emitMethod($result, $method) {
     $locals= $result->locals;
-    $result->locals= ['this' => true];
+    $result->locals= ['this' => false];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => $method->annotations,
@@ -798,7 +798,7 @@ abstract class PHP extends Emitter {
   protected function emitAssign($result, $target) {
     if ($target instanceof Variable && $target->const) {
       $result->out->write('$'.$target->pointer);
-      $result->locals[$target->pointer]= true;
+      $result->locals[$target->pointer]= false;
     } else if ($target instanceof ArrayLiteral) {
       $result->out->write('[');
       foreach ($target->values as $pair) {

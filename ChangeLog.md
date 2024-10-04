@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed enclosing scopes when using references - @thekid
+
 ## 9.3.0 / 2024-08-31
 
 * Fixed checks for property hooks emulation with asymmetric visibility

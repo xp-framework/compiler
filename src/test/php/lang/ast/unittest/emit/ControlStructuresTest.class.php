@@ -211,4 +211,24 @@ class ControlStructuresTest extends EmittingTest {
 
     Assert::equals('one item', $r(1));
   }
+
+  #[Test]
+  public function match_block_inside_function_using_ref() {
+    $r= $this->run('class %T {
+      public function run() {
+        $test= "Original";
+        (function() use(&$test) {
+          match (true) {
+            true => {
+              $test= "Changed";
+              return true;
+            }
+          };
+        })();
+        return $test;
+      }
+    }');
+
+    Assert::equals('Changed', $r);
+  }
 }
