@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed `private(set)` not being implicitely marked as *final*, see
+  https://wiki.php.net/rfc/asymmetric-visibility-v2#inheritance
+  (@thekid)
 * Fixed enclosing scopes when using references - @thekid
 
 ## 9.3.0 / 2024-08-31
