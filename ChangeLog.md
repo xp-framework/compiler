@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.3.1 / 2024-10-05
+
 * Fixed `private(set)` not being implicitely marked as *final*, see
   https://wiki.php.net/rfc/asymmetric-visibility-v2#inheritance
   (@thekid)
