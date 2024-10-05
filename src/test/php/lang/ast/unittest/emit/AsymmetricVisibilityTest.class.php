@@ -112,19 +112,19 @@ class AsymmetricVisibilityTest extends EmittingTest {
     );
   }
 
-  #[Test]
-  public function private_set_implicitely_final_in_reflection() {
+  #[Test, Values(['protected', 'public'])]
+  public function private_set_implicitely_final_in_reflection($modifier) {
     $t= $this->declare('class %T {
-      public private(set) string $fixture= "Test";
+      '.$modifier.' private(set) string $fixture= "Test";
     }');
 
     Assert::equals(
-      'public final private(set) string $fixture',
+      $modifier.' final private(set) string $fixture',
       $t->property('fixture')->toString()
     );
   }
 
-  #[Test, Values(['protected', 'public'])]
+  #[Test, Values(['private', 'protected', 'public'])]
   public function same_modifier_for_get_and_set($modifier) {
     $t= $this->declare('class %T {
       '.$modifier.' '.$modifier.'(set) string $fixture= "Test";
@@ -132,18 +132,6 @@ class AsymmetricVisibilityTest extends EmittingTest {
 
     Assert::equals(
       $modifier.' string $fixture',
-      $t->property('fixture')->toString()
-    );
-  }
-
-  #[Test]
-  public function private_modifier_for_get_and_set() {
-    $t= $this->declare('class %T {
-      private private(set) string $fixture= "Test";
-    }');
-
-    Assert::equals(
-      'private final string $fixture',
       $t->property('fixture')->toString()
     );
   }

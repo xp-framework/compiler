@@ -49,8 +49,7 @@ trait AsymmetricVisibility {
       $modifiers & MODIFIER_PROTECTED && $modifiers&= ~0x0000800;
     } else if ($modifiers & 0x0001000) {
       $checks= [$this->private($property->name, 'modify private(set)')];
-      $modifiers & MODIFIER_PRIVATE && $modifiers&= ~0x0001000;
-      $modifiers|= MODIFIER_FINAL;
+      $modifiers & MODIFIER_PRIVATE ? $modifiers&= ~0x0001000 : $modifiers|= MODIFIER_FINAL;
     }
 
     // Emit XP meta information for the reflection API
