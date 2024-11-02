@@ -3,6 +3,15 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.3.2 / 2024-11-02
+
+* Fixed empty match expressions and match expressions with default
+  case only in PHP 7
+  (@thekid)
+* Added tests verifying closures are supported in constant expressions
+  https://wiki.php.net/rfc/closures_in_const_expr
+  (@thekid)
+
 ## 9.3.1 / 2024-10-05
 
 * Fixed `private(set)` not being implicitely marked as *final*, see
