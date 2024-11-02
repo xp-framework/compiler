@@ -75,6 +75,12 @@ abstract class AnnotationSupport extends EmittingTest {
   }
 
   #[Test]
+  public function first_class_callable_value() {
+    $verify= $this->annotations($this->declare('#[Verify(strtoupper(...))]'))['Verify'];
+    Assert::equals('TEST', $verify[0]('test'));
+  }
+
+  #[Test]
   public function arrow_function_value() {
     $verify= $this->annotations($this->declare('#[Verify(fn($arg) => $arg)]'))['Verify'];
     Assert::equals('test', $verify[0]('test'));
