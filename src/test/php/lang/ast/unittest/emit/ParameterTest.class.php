@@ -136,6 +136,12 @@ class ParameterTest extends EmittingTest {
   }
 
   #[Test]
+  public function first_class_callable_as_default() {
+    $function= $this->param('$op= strlen(...)')->default();
+    Assert::equals(4, $function('Test'));
+  }
+
+  #[Test]
   public function trailing_comma_allowed() {
     $p= $this->declare('class %T { public function fixture($param, ) { } }')
       ->method('fixture')
