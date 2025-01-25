@@ -6,6 +6,7 @@ use test\{Assert, Expect, Test, Values};
 /**
  * Tests for first-class callable syntax
  *
+ * @see   https://wiki.php.net/rfc/fcc_in_const_expr
  * @see   https://wiki.php.net/rfc/first_class_callable_syntax#proposal
  */
 class CallableSyntaxTest extends EmittingTest {
@@ -181,5 +182,17 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
     Assert::equals($this, $f($this)->value);
+  }
+
+  #[Test]
+  public function inside_annotation() {
+    $f= $this->run('use lang\Reflection; class %T {
+
+      #[Attr(strrev(...))]
+      public function run() {
+        return Reflection::of($this)->method("run")->annotation(Attr::class)->argument(0);
+      }
+    }');
+    Assert::equals('cba', $f('abc'));
   }
 }
