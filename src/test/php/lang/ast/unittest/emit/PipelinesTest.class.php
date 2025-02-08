@@ -2,6 +2,7 @@
 
 use test\{Assert, Test, Values};
 
+/** @see https://wiki.php.net/rfc/pipe-operator-v3 */
 class PipelinesTest extends EmittingTest {
 
   #[Test]
@@ -128,5 +129,20 @@ class PipelinesTest extends EmittingTest {
     }', $input);
 
     Assert::equals($expected, $r);
+  }
+
+  #[Test]
+  public function rfc_example() {
+    $r= $this->run('class %T {
+      public function run() {
+        return "Hello World"
+          |> "htmlentities"
+          |> str_split(...)
+          |> fn($x) => array_map(strtoupper(...), $x)
+          |> fn($x) => array_filter($x, fn($v) => $v != "O")
+        ;
+      }
+    }');
+    Assert::equals(['H', 'E', 'L', 'L', ' ', 'W', 'R', 'L', 'D'], array_values($r));
   }
 }
