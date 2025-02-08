@@ -132,6 +132,17 @@ class PipelinesTest extends EmittingTest {
   }
 
   #[Test]
+  public function precedence() {
+    $r= $this->run('class %T {
+      public function run() {
+        return "te"."st" |> strtoupper(...);
+      }
+    }');
+
+    Assert::equals('TEST', $r);
+  }
+
+  #[Test]
   public function rfc_example() {
     $r= $this->run('class %T {
       public function run() {
