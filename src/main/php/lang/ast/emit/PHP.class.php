@@ -13,6 +13,7 @@ use lang\ast\nodes\{
   Expression,
   InstanceExpression,
   Literal,
+  NewExpression,
   Property,
   ScopeExpression,
   UnpackExpression,
@@ -126,7 +127,7 @@ abstract class PHP extends Emitter {
     $capture= [];
     foreach ($result->codegen->search($node, 'variable') as $var) {
       if (isset($result->locals[$var->pointer])) {
-        $capture[$var->pointer]= true;
+        $capture[$var->pointer]??= ($result->locals[$var->pointer] ? '&$' : '$').$var->pointer;
       }
     }
     unset($capture['this']);
@@ -144,9 +145,9 @@ abstract class PHP extends Emitter {
     }
 
     if ($capture) {
-      $result->out->write('use($'.implode(', $', array_keys($capture)).')');
-      foreach ($capture as $name => $_) {
-        $result->locals[$name]= true;
+      $result->out->write('use('.implode(', ', $capture).')');
+      foreach ($capture as $name => $variable) {
+        $result->locals[$name]= '&' === $variable[0];
       }
     }
 
@@ -299,7 +300,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
-    $result->locals[$parameter->name]= true;
+    $result->locals[$parameter->name]= $parameter->reference;
     $parameter->annotations && $this->emitOne($result, $parameter->annotations);
 
     // If we have a non-constant default and a type, emit a nullable type hint
@@ -341,7 +342,7 @@ abstract class PHP extends Emitter {
     if ($use) {
       $result->out->write(' use('.implode(',', $use).') ');
       foreach ($use as $variable) {
-        $result->locals[substr($variable, 1)]= true;
+        $result->locals[ltrim($variable, '&$')]= '&' === $variable[0];
       }
     }
 
@@ -464,7 +465,7 @@ abstract class PHP extends Emitter {
       }
       $result->out->write('];');
 
-      $result->out->write('public function __get($name) { switch ($name) {');
+      $result->out->write('public function &__get($name) { switch ($name) {');
       foreach ($context->virtual as $name => $access) {
         $result->out->write($name ? 'case "'.$name.'":' : 'default:');
         $this->emitOne($result, $access[0]);
@@ -646,12 +647,37 @@ abstract class PHP extends Emitter {
         $result->codegen->scope[0]->init['$this->'.$property->name]= $property->expression;
       }
     }
-    $result->out->write(';');
+
+    if ($property->hooks) {
+      $result->out->write('{');
+      foreach ($property->hooks as $type => $hook) {
+        $hook->byref && $result->out->write('&');
+        $result->out->write($type);
+        if ($hook->parameter) {
+          $result->out->write('(');
+          $this->emitOne($result, $hook->parameter);
+          $result->out->write(')');
+        }
+
+        if (null === $hook->expression) {
+          $result->out->write(';');
+        } else if ($hook->expression instanceof Block) {
+          $this->emitOne($result, $hook->expression);
+        } else {
+          $result->out->write('=>');
+          $this->emitOne($result, $hook->expression);
+          $result->out->write(';');
+        }
+      }
+      $result->out->write('}');
+    } else {
+      $result->out->write(';');
+    }
   }
 
   protected function emitMethod($result, $method) {
     $locals= $result->locals;
-    $result->locals= ['this' => true];
+    $result->locals= ['this' => false];
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => $method->annotations,
@@ -719,7 +745,11 @@ abstract class PHP extends Emitter {
     }
 
     foreach ($promoted as $param) {
-      $this->emitProperty($result, new Property(explode(' ', $param->promote), $param->name, $param->type));
+      $this->emitProperty($result, new Property(
+        is_array($param->promote) ? $param->promote : explode(' ', $param->promote),
+        $param->name,
+        $param->type
+      ));
     }
 
     $result->locals= $locals;
@@ -770,7 +800,7 @@ abstract class PHP extends Emitter {
   protected function emitAssign($result, $target) {
     if ($target instanceof Variable && $target->const) {
       $result->out->write('$'.$target->pointer);
-      $result->locals[$target->pointer]= true;
+      $result->locals[$target->pointer]= false;
     } else if ($target instanceof ArrayLiteral) {
       $result->out->write('[');
       foreach ($target->values as $pair) {
@@ -1086,15 +1116,14 @@ abstract class PHP extends Emitter {
 
   protected function emitScope($result, $scope) {
 
-    // $x::<expr> vs. e.g. invoke()::<expr> vs. T::<expr>
-    if ($scope->type instanceof Variable) {
+    // new T()::<expr> vs. e.g. $x::<expr> vs. T::<expr>
+    if ($scope->type instanceof NewExpression) {
+      $result->out->write('(');
+      $this->emitOne($result, $scope->type);
+      $result->out->write(')::');
+    } else if ($scope->type instanceof Node) {
       $this->emitOne($result, $scope->type);
       $result->out->write('::');
-    } else if ($scope->type instanceof Node) {
-      $t= $result->temp();
-      $result->out->write('(null==='.$t.'=');
-      $this->emitOne($result, $scope->type);
-      $result->out->write(")?null:{$t}::");
     } else {
       $result->out->write("{$scope->type}::");
     }
@@ -1113,7 +1142,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitInstance($result, $instance) {
-    if ('new' === $instance->expression->kind) {
+    if ($instance->expression instanceof NewExpression) {
       $result->out->write('(');
       $this->emitOne($result, $instance->expression);
       $result->out->write(')->');

@@ -6,7 +6,7 @@ XP Compiler
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
 [![Requires PHP 7.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_4plus.svg)](http://php.net/)
 [![Supports PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
-[![Latest Stable Version](https://poser.pugx.org/xp-framework/compiler/version.png)](https://packagist.org/packages/xp-framework/compiler)
+[![Latest Stable Version](https://poser.pugx.org/xp-framework/compiler/version.svg)](https://packagist.org/packages/xp-framework/compiler)
 
 Compiles future PHP to today's PHP.
 
@@ -16,24 +16,25 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack language, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.4, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
 
 use lang\Reflection;
+use util\Date;
 use util\cmd\Console;
 
 #[Author('Timm Friebe')]
 #[Permissions(0o777)]
 class HelloWorld {
-  public const string GREETING = 'Hello';
+  private const string GREETING= 'Hello';
 
   public static function main(array<string> $args): void {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
     $author= Reflection::type(self::class)->annotation(Author::class)->argument(0);
 
-    Console::writeLine($greet($args[0] ?? 'World', from: $author));
+    Console::writeLine(new Date()->toString(), ': ', $greet($args[0] ?? 'World', from: $author));
   }
 }
 ```
@@ -90,8 +91,9 @@ Usage: xp compile <in> [<out>]
 lang.ast.emit.PHP74
 lang.ast.emit.PHP80
 lang.ast.emit.PHP81
-lang.ast.emit.PHP82 [*]
-lang.ast.emit.PHP83
+lang.ast.emit.PHP82
+lang.ast.emit.PHP83 [*]
+lang.ast.emit.PHP84
 lang.ast.syntax.php.Using [*]
 
 @FileSystemCL<./vendor/xp-lang/php-is-operator/src/main/php>

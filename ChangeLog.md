@@ -3,6 +3,52 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.3.2 / 2024-11-02
+
+* Fixed empty match expressions and match expressions with default
+  case only in PHP 7
+  (@thekid)
+* Added tests verifying closures are supported in constant expressions
+  https://wiki.php.net/rfc/closures_in_const_expr
+  (@thekid)
+
+## 9.3.1 / 2024-10-05
+
+* Fixed `private(set)` not being implicitely marked as *final*, see
+  https://wiki.php.net/rfc/asymmetric-visibility-v2#inheritance
+  (@thekid)
+* Fixed enclosing scopes when using references - @thekid
+
+## 9.3.0 / 2024-08-31
+
+* Fixed checks for property hooks emulation with asymmetric visibility
+  (@thekid)
+* Added PHP 8.4 emitter which natively emits property hooks and asymmetric
+  visibility syntax. This is integration-tested with PHP 8.4.0 Beta 4.
+  See https://github.com/php/php-src/blob/php-8.4.0beta4/NEWS
+  (@thekid)
+* Changed emitter to use native readonly classes in PHP 8.2, fixing an
+  inconsistency with accessing undefined properties
+  (@thekid)
+
+## 9.2.0 / 2024-08-27
+
+* Merged PR #183: Add emitting support for asymmetric visibility. See
+  https://wiki.php.net/rfc/asymmetric-visibility-v2, targeted for PHP 8.4
+  (@thekid)
+
+## 9.1.1 / 2024-08-27
+
+* Forward compatibility with newer `xp-framework/ast` releases - @thekid
+
+## 9.1.0 / 2024-06-15
+
+* Merged PR #166: Implement property hooks via virtual properties, see
+  https://wiki.php.net/rfc/property-hooks. Includes support for native
+  implementation, which is yet to be merged (php/php-src#13455). Thus,
+  this still might be a moving target in some regards!
+  (@thekid)
+
 ## 9.0.0 / 2024-03-23
 
 * Merged PR #179: XP 12 compatibility, dropping PHP 7.0 - 7.3 support!

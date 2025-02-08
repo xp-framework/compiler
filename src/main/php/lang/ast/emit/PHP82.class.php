@@ -23,9 +23,11 @@ class PHP82 extends PHP {
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,
-    ReadonlyClasses,
+    RewriteProperties,
     OmitConstantTypes
   ;
+
+  public $targetVersion= 80200;
 
   /** Sets up type => literal mappings */
   public function __construct() {

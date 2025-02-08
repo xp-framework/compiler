@@ -27,7 +27,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly int $fixture',
+      'public readonly protected(set) int $fixture',
       $t->property('fixture')->toString()
     );
   }
@@ -39,7 +39,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly int $fixture',
+      'public readonly protected(set) int $fixture',
       $t->property('fixture')->toString()
     );
   }
@@ -51,7 +51,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly string $fixture',
+      'public readonly protected(set) string $fixture',
       $t->property('fixture')->toString()
     );
     Assert::equals('Test', $t->newInstance('Test')->fixture);
@@ -64,7 +64,7 @@ class ReadonlyTest extends EmittingTest {
     }');
 
     Assert::equals(
-      'public readonly string $fixture',
+      'public readonly protected(set) string $fixture',
       $t->property('fixture')->toString()
     );
     Assert::equals('Test', $t->newInstance('Test')->fixture);
@@ -151,7 +151,7 @@ class ReadonlyTest extends EmittingTest {
     Assert::equals('Test', $i->fixture);
   }
 
-  #[Test, Expect(class: Error::class, message: '/Cannot initialize readonly property .+fixture/')]
+  #[Test, Expect(class: Error::class, message: '/Cannot (initialize readonly|modify protected\(set\) readonly) property .+fixture/')]
   public function cannot_initialize_from_outside() {
     $t= $this->declare('class %T {
       public readonly string $fixture;
@@ -174,10 +174,11 @@ class ReadonlyTest extends EmittingTest {
     }');
   }
 
-  #[Test, Expect(class: Error::class, message: '/Cannot create dynamic property .+fixture/')]
-  public function cannot_read_dynamic_members_from_readonly_classes() {
+  #[Test]
+  public function reading_dynamic_members_from_readonly_classes_causes_warning() {
     $t= $this->declare('readonly class %T { }');
-    $t->newInstance()->fixture;
+    Assert::null($t->newInstance()->fixture);
+    \xp::gc();
   }
 
   #[Test, Expect(class: Error::class, message: '/Cannot create dynamic property .+fixture/')]

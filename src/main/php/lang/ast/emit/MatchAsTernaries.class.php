@@ -30,9 +30,12 @@ trait MatchAsTernaries {
       }
     }
 
+    // Match without cases => create something that will never match
+    $b || $result->out->write('===NAN?:');
+
     // Emit IIFE for raising an error until we have throw expressions
     if (null === $match->default) {
-      $result->out->write('function() use('.$t.') { throw new \\Error("Unhandled match value of type ".gettype('.$t.')); })(');
+      $result->out->write('(function() use('.$t.') { throw new \\Error("Unhandled match value of type ".gettype('.$t.')); })()');
     } else {
       $this->emitAsExpression($result, $match->default);
     }

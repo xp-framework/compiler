@@ -3,6 +3,7 @@
 use lang\{ArrayType, MapType, Primitive, Type, Value, XPClass};
 use test\verify\Runtime;
 use test\{Action, Assert, Test, Values};
+use util\Binford;
 
 class ParameterTest extends EmittingTest {
   use AnnotationsOf, NullableSupport;
@@ -14,7 +15,7 @@ class ParameterTest extends EmittingTest {
    * @return lang.reflection.Parameter
    */
   private function param($declaration) {
-    return $this->declare('use lang\Value; class %T { public function fixture('.$declaration.') { } }')
+    return $this->declare('use lang\Value; use util\Binford; class %T { public function fixture('.$declaration.') { } }')
       ->method('fixture')
       ->parameter(0)
     ;
@@ -120,6 +121,24 @@ class ParameterTest extends EmittingTest {
   #[Test]
   public function optional_parameters_default_value() {
     Assert::equals(true, $this->param('$param= true')->default());
+  }
+
+  #[Test]
+  public function new_as_default() {
+    $power= $this->param('$power= new Binford(6100)')->default();
+    Assert::equals(new Binford(6100), $power);
+  }
+
+  #[Test]
+  public function closure_as_default() {
+    $function= $this->param('$op= fn($in) => $in * 2')->default();
+    Assert::equals(2, $function(1));
+  }
+
+  #[Test]
+  public function first_class_callable_as_default() {
+    $function= $this->param('$op= strlen(...)')->default();
+    Assert::equals(4, $function('Test'));
   }
 
   #[Test]

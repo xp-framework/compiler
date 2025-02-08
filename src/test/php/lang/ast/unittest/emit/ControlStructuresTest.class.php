@@ -86,6 +86,19 @@ class ControlStructuresTest extends EmittingTest {
     Assert::equals($expected, $r);
   }
 
+  #[Test]
+  public function match_with_default_only() {
+    $r= $this->run('class %T {
+      public function run() {
+        return match (true) {
+          default => "Test",
+        };
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
   #[Test, Values([[200, 'OK'], [302, 'Redirect'], [404, 'Error #404']])]
   public function match_with_multiple_cases($input, $expected) {
     $r= $this->run('class %T {
@@ -155,6 +168,17 @@ class ControlStructuresTest extends EmittingTest {
   }
 
   #[Test, Expect(class: Throwable::class, message: '/Unhandled match (value of type .+|case .+)/')]
+  public function empty_match() {
+    $r= $this->run('class %T {
+      public function run() {
+        return match (true) { };
+      }
+    }');
+
+    Assert::equals('Test', $r);
+  }
+
+  #[Test, Expect(class: Throwable::class, message: '/Unhandled match (value of type .+|case .+)/')]
   public function unhandled_match() {
     $this->run('class %T {
       public function run($arg) {
@@ -210,5 +234,25 @@ class ControlStructuresTest extends EmittingTest {
     }');
 
     Assert::equals('one item', $r(1));
+  }
+
+  #[Test]
+  public function match_block_inside_function_using_ref() {
+    $r= $this->run('class %T {
+      public function run() {
+        $test= "Original";
+        (function() use(&$test) {
+          match (true) {
+            true => {
+              $test= "Changed";
+              return true;
+            }
+          };
+        })();
+        return $test;
+      }
+    }');
+
+    Assert::equals('Changed', $r);
   }
 }

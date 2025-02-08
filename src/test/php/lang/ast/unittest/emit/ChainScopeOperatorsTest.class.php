@@ -1,16 +1,16 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ast\emit\{PHP, RewriteClassOnObjects};
+use lang\ast\emit\{PHP, ChainScopeOperators};
 use lang\ast\nodes\{ClassDeclaration, Literal, ScopeExpression, Variable};
 use lang\ast\types\IsValue;
 use test\{Assert, Test};
 
-class RewriteClassOnObjectsTest extends EmitterTraitTest {
+class ChainScopeOperatorsTest extends EmitterTraitTest {
 
   /** @return lang.ast.Emitter */
   protected function fixture() {
     return new class() extends PHP {
-      use RewriteClassOnObjects;
+      use ChainScopeOperators;
     };
   }
 

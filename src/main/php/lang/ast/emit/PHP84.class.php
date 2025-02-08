@@ -13,14 +13,14 @@ use lang\ast\types\{
 };
 
 /**
- * PHP 8.3 syntax
+ * PHP 8.4 syntax
  *
- * @see  https://wiki.php.net/rfc#php_83
+ * @see  https://wiki.php.net/rfc#php_84
  */
-class PHP83 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteProperties;
+class PHP84 extends PHP {
+  use RewriteBlockLambdaExpressions;
 
-  public $targetVersion= 80300;
+  public $targetVersion= 80400;
 
   /** Sets up type => literal mappings */
   public function __construct() {

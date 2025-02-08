@@ -13,20 +13,22 @@ class PHP74 extends PHP {
     ArrayUnpackUsingMerge,
     AttributesAsComments,
     CallablesAsClosures,
+    ChainScopeOperators,
     MatchAsTernaries,
     NonCapturingCatchVariables,
     NullsafeAsTernaries,
     OmitArgumentNames,
     OmitConstantTypes,
     ReadonlyClasses,
-    ReadonlyProperties,
     RewriteBlockLambdaExpressions,
-    RewriteClassOnObjects,
     RewriteEnums,
     RewriteExplicitOctals,
+    RewriteProperties,
     RewriteStaticVariableInitializations,
     RewriteThrowableExpressions
   ;
+
+  public $targetVersion= 70400;
 
   /** Sets up type => literal mappings */
   public function __construct() {

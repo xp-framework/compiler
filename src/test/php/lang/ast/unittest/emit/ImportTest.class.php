@@ -34,6 +34,17 @@ class ImportTest extends EmittingTest {
   }
 
   #[Test]
+  public function import_type_as_alias_in_group() {
+    Assert::equals(Date::class, $this->run('
+      use util\{Objects, Date as D};
+
+      class %T {
+        public function run() { return D::class; }
+      }'
+    ));
+  }
+
+  #[Test]
   public function import_const() {
     Assert::equals('imported', $this->run('
       use const lang\ast\unittest\emit\FIXTURE;

@@ -7,7 +7,7 @@ class NamespacesTest extends EmittingTest {
 
   #[Test]
   public function without_namespace() {
-    Assert::null($this->declare('class %T { }')->package());
+    Assert::false(strpos($this->declare('class %T { }')->name(), '.'));
   }
 
   #[Test]

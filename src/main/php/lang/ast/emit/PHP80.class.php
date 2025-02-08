@@ -23,13 +23,15 @@ class PHP80 extends PHP {
     CallablesAsClosures,
     OmitConstantTypes,
     ReadonlyClasses,
-    ReadonlyProperties,
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteEnums,
     RewriteExplicitOctals,
+    RewriteProperties,
     RewriteStaticVariableInitializations
   ;
+
+  public $targetVersion= 80000;
 
   /** Sets up type => literal mappings */
   public function __construct() {

@@ -1,5 +1,15 @@
 <?php namespace lang\ast\emit;
 
+use lang\ast\nodes\{
+  Assignment,
+  Block,
+  InstanceExpression,
+  InvokeExpression,
+  Literal,
+  OffsetExpression,
+  ReturnStatement,
+  Variable
+};
 use lang\ast\{Code, Error, Errors};
 
 /**
@@ -9,6 +19,7 @@ use lang\ast\{Code, Error, Errors};
  * @see  https://wiki.php.net/rfc/readonly_properties_v2
  */
 trait ReadonlyProperties {
+  use VisibilityChecks;
 
   protected function emitProperty($result, $property) {
     static $lookup= [
@@ -37,33 +48,33 @@ trait ReadonlyProperties {
     ];
 
     // Add visibility check for accessing private and protected properties
-    if (in_array('private', $property->modifiers)) {
-      $check= (
-        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
-        'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot access private property ".__CLASS__."::\\$%1$s");'
-      );
-    } else if (in_array('protected', $property->modifiers)) {
-      $check= (
-        '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'.
-        'if (__CLASS__ !== $scope && !is_subclass_of($scope, __CLASS__) && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot access protected property ".__CLASS__."::\\$%1$s");'
-      );
+    if ($modifiers & MODIFIER_PRIVATE) {
+      $check= $this->private($property->name, 'access private');
+    } else if ($modifiers & MODIFIER_PROTECTED) {
+      $check= $this->protected($property->name, 'access protected');
     } else {
-      $check= '';
+      $check= null;
     }
+
+    $virtual= new InstanceExpression(new Variable('this'), new OffsetExpression(
+      new Literal('__virtual'),
+      new Literal("'{$property->name}'"))
+    );
 
     // Create virtual property implementing the readonly semantics
     $scope->virtual[$property->name]= [
-      new Code(sprintf($check.'return $this->__virtual["%1$s"][0] ?? null;', $property->name)),
-      new Code(sprintf(
-        ($check ?: '$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;').
-        'if (isset($this->__virtual["%1$s"])) throw new \\Error("Cannot modify readonly property ".__CLASS__."::{$name}");'.
-        'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
-        'throw new \\Error("Cannot initialize readonly property ".__CLASS__."::{$name} from ".($scope ? "scope {$scope}": "global scope"));'.
-        '$this->__virtual["%1$s"]= [$value];',
-        $property->name
-      )),
+      $check ? new Block([$check, new ReturnStatement($virtual)]) : new ReturnStatement($virtual),
+      new Block([
+        $check ?? new Code('$scope= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["class"] ?? null;'),
+        $this->initonce($property->name),
+        new Code(sprintf(
+          'if (__CLASS__ !== $scope && \\lang\\VirtualProperty::class !== $scope)'.
+          'throw new \\Error("Cannot initialize readonly property ".__CLASS__."::{$name} from ".($scope ? "scope {$scope}": "global scope"));'.
+          '$this->__virtual["%1$s"]= [$value];',
+          $property->name
+        )),
+        new Assignment($virtual, '=', new Variable('value'))
+      ]),
     ];
   }
 }
