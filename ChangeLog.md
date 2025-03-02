@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.3.3 / 2025-03-02
+
+* Fixed callable new syntax when using a variable or expression, e.g.
+  `new $class(...)`. See also https://github.com/php/php-src/issues/12336
+  (@thekid)
+
 ## 9.3.2 / 2024-11-02
 
 * Fixed empty match expressions and match expressions with default
