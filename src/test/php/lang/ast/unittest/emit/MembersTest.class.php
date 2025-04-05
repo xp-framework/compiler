@@ -425,4 +425,13 @@ class MembersTest extends EmittingTest {
 
     Assert::equals('Test', $r);
   }
+
+  #[Test]
+  public function final_property() {
+    $t= $this->declare('class %T {
+      public final string $fixture= "Test";
+    }');
+
+    Assert::equals(MODIFIER_PUBLIC | MODIFIER_FINAL, $t->property('fixture')->modifiers()->bits());
+  }
 }
