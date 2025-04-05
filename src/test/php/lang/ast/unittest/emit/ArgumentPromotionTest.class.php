@@ -10,6 +10,7 @@ use test\{Assert, Expect, Test};
  * @see  https://github.com/xp-framework/rfc/issues/240
  * @see  https://docs.hhvm.com/hack/other-features/constructor-parameter-promotion
  * @see  https://wiki.php.net/rfc/constructor_promotion (PHP 8.0)
+ * @see  https://wiki.php.net/rfc/final_prompotion
  * @see  https://wiki.php.net/rfc/automatic_property_initialization (Declined)
  */
 class ArgumentPromotionTest extends EmittingTest {
@@ -141,5 +142,14 @@ class ArgumentPromotionTest extends EmittingTest {
       public function __construct(private array $list) { }
     }');
     Assert::equals('Test', $t->newInstance(['Test'])->first);
+  }
+
+  #[Test]
+  public function promoted_final() {
+    $t= $this->declare('class %T {
+      public function __construct(public final string $name) { }
+    }');
+
+    Assert::equals(MODIFIER_PUBLIC | MODIFIER_FINAL, $t->property('name')->modifiers()->bits());
   }
 }
