@@ -18,8 +18,9 @@ trait FinalProperties {
       $modifiers|= $lookup[$name];
     }
 
+    // Emit without final modifier, store `final` in xp::$meta
     $property->modifiers= array_diff($property->modifiers, ['final']);
     parent::emitProperty($result, $property);
-    $result->codegen->scope[0]->meta[self::PROPERTY][$property->name][DETAIL_ARGUMENTS]= [$modifiers];
+    $result->codegen->scope[0]->meta[self::PROPERTY][$property->name][DETAIL_ARGUMENTS]= [MODIFIER_FINAL];
   }
 }
