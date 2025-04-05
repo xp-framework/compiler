@@ -22,23 +22,10 @@ trait ReadonlyProperties {
   use VisibilityChecks;
 
   protected function emitProperty($result, $property) {
-    static $lookup= [
-      'public'    => MODIFIER_PUBLIC,
-      'protected' => MODIFIER_PROTECTED,
-      'private'   => MODIFIER_PRIVATE,
-      'static'    => MODIFIER_STATIC,
-      'final'     => MODIFIER_FINAL,
-      'abstract'  => MODIFIER_ABSTRACT,
-      'readonly'  => 0x0080, // XP 10.13: MODIFIER_READONLY
-    ];
-
     if (!in_array('readonly', $property->modifiers)) return parent::emitProperty($result, $property);
 
     $scope= $result->codegen->scope[0];
-    $modifiers= 0;
-    foreach ($property->modifiers as $name) {
-      $modifiers|= $lookup[$name];
-    }
+    $modifiers= Modifiers::bits($property->modifiers);
     $scope->meta[self::PROPERTY][$property->name]= [
       DETAIL_RETURNS     => $property->type ? $property->type->name() : 'var',
       DETAIL_ANNOTATIONS => $property->annotations,

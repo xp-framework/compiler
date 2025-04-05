@@ -71,25 +71,8 @@ trait PropertyHooks {
   }
 
   protected function emitProperty($result, $property) {
-    static $lookup= [
-      'public'         => MODIFIER_PUBLIC,
-      'protected'      => MODIFIER_PROTECTED,
-      'private'        => MODIFIER_PRIVATE,
-      'static'         => MODIFIER_STATIC,
-      'final'          => MODIFIER_FINAL,
-      'abstract'       => MODIFIER_ABSTRACT,
-      'readonly'       => MODIFIER_READONLY,
-      'public(set)'    => 0x1000000,
-      'protected(set)' => 0x0000800,
-      'private(set)'   => 0x0001000,
-    ];
-
-    // Emit XP meta information for the reflection API
     $scope= $result->codegen->scope[0];
-    $modifiers= 0;
-    foreach ($property->modifiers as $name) {
-      $modifiers|= $lookup[$name];
-    }
+    $modifiers= Modifiers::bits($property->modifiers);
 
     // Derive modifiers for private(set) and protected(set), folding declarations
     // like `[visibility] [visibility](set)` to just the visibility itself.
