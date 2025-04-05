@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.4.0 / 2025-04-05
+
 * Merged PR #184: Add support for final properties added in PHP 8.4, see
   https://wiki.php.net/rfc/property-hooks; including parameter promotion,
   see https://wiki.php.net/rfc/final_promotion
