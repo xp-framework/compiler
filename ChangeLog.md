@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #184: Add support for final properties added in PHP 8.4, see
+  https://wiki.php.net/rfc/property-hooks; including parameter promotion,
+  see https://wiki.php.net/rfc/final_promotion
+  (@thekid)
+
 ## 9.3.3 / 2025-03-02
 
 * Fixed callable new syntax when using a variable or expression, e.g.

@@ -22,8 +22,6 @@ trait ReadonlyProperties {
   use VisibilityChecks;
 
   protected function emitProperty($result, $property) {
-    if (!in_array('readonly', $property->modifiers)) return parent::emitProperty($result, $property);
-
     $scope= $result->codegen->scope[0];
     $modifiers= Modifiers::bits($property->modifiers);
     $scope->meta[self::PROPERTY][$property->name]= [
