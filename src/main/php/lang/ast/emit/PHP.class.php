@@ -1082,6 +1082,19 @@ abstract class PHP extends Emitter {
     $result->codegen->leave();
   }
 
+  protected function emitClone($result, $clone) {
+    $result->out->write('clone ');
+    if (empty($clone->with)) {
+      $this->emitOne($result, $clone->expression);
+    } else {
+      $result->out->write('(');
+      $this->emitOne($result, $clone->expression);
+      $result->out->write(',');
+      $this->emitArguments($result, $clone->with);
+      $result->out->write(')');
+    }
+  }
+
   protected function emitCallable($result, $callable) {
 
     // Disambiguate the following:

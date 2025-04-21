@@ -9,7 +9,12 @@ class CloningTest extends EmittingTest {
   #[Before]
   public function fixture() {
     $this->fixture= new class() {
-      public $id= 1;
+      private $id= 1;
+      private $name= 'Test';
+
+      public function toString() {
+        return "<id: {$this->id}, name: {$this->name}>";
+      }
 
       public function with($id) {
         $this->id= $id;
@@ -50,8 +55,26 @@ class CloningTest extends EmittingTest {
       public function run($in) {
         return clone $in;
       }
-    }', $this->fixture->with(id: 1));
+    }', $this->fixture->with(1));
 
-    Assert::equals([1, 2], [$this->fixture->id, $clone->id]);
+    Assert::equals(
+      ['<id: 1, name: Test>', '<id: 2, name: Test>'],
+      [$this->fixture->toString(), $clone->toString()]
+    );
+  }
+
+  #[Test]
+  public function clone_with() {
+    $clone= $this->run('class %T {
+      private $id= 6100;
+      public function run($in) {
+        return clone($in, id: $this->id, name: "Changed");
+      }
+    }', $this->fixture->with(1));
+
+    Assert::equals(
+      ['<id: 1, name: Test>', '<id: 6100, name: Changed>'],
+      [$this->fixture->toString(), $clone->toString()]
+    );
   }
 }
