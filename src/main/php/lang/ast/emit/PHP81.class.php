@@ -21,6 +21,7 @@ use lang\ast\types\{
 class PHP81 extends PHP {
   use
     RewriteBlockLambdaExpressions,
+    RewriteCloneWith,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,
     RewriteProperties,
