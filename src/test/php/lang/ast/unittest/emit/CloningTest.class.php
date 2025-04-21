@@ -50,7 +50,7 @@ class CloningTest extends EmittingTest {
       public function run($in) {
         return clone $in;
       }
-    }', $this->fixture->with(id: 1));
+    }', $this->fixture->with(1));
 
     Assert::equals([1, 2], [$this->fixture->id, $clone->id]);
   }
