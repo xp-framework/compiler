@@ -21,6 +21,7 @@ class PHP80 extends PHP {
   use
     ArrayUnpackUsingMerge,
     CallablesAsClosures,
+    EmulatePipelines,
     OmitConstantTypes,
     ReadonlyClasses,
     RewriteBlockLambdaExpressions,
