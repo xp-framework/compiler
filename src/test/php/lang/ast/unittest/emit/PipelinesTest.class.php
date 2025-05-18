@@ -155,7 +155,7 @@ class PipelinesTest extends EmittingTest {
   public function concat_precedence() {
     $r= $this->run('class %T {
       public function run() {
-        return "te"."st" |> strtoupper(...);
+        return "te" . "st" |> strtoupper(...);
       }
     }');
 
@@ -187,8 +187,31 @@ class PipelinesTest extends EmittingTest {
   #[Test, Values([[0, 'even'], [1, 'odd'], [2, 'even']])]
   public function ternary_precedence($arg, $expected) {
     $r= $this->run('class %T {
+
+      private function odd($n) { return $n % 2; }
+
       public function run($arg) {
-        return $arg |> fn($i) => $i % 2 ? "odd" : "even";
+        return $arg |> $this->odd(...) ? "odd" : "even";
+      }
+    }', $arg);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[Test, Values([[0, '(empty)'], [1, 'one element'], [2, '2 elements']])]
+  public function short_ternary_precedence($arg, $expected) {
+    $r= $this->run('class %T {
+
+      private function number($n) {
+        return match ($n) {
+          0 => null,
+          1 => "one element",
+          default => "{$n} elements"
+        };
+      }
+
+      public function run($arg) {
+        return $arg |> $this->number(...) ?: "(empty)";
       }
     }', $arg);
 
