@@ -3,6 +3,19 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.4.0 / 2025-04-05
+
+* Merged PR #184: Add support for final properties added in PHP 8.4, see
+  https://wiki.php.net/rfc/property-hooks; including parameter promotion,
+  see https://wiki.php.net/rfc/final_promotion
+  (@thekid)
+
+## 9.3.3 / 2025-03-02
+
+* Fixed callable new syntax when using a variable or expression, e.g.
+  `new $class(...)`. See also https://github.com/php/php-src/issues/12336
+  (@thekid)
+
 ## 9.3.2 / 2024-11-02
 
 * Fixed empty match expressions and match expressions with default

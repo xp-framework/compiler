@@ -3,8 +3,9 @@
 use ReflectionProperty;
 
 trait RewriteProperties {
-  use PropertyHooks, ReadonlyProperties, AsymmetricVisibility {
+  use PropertyHooks, FinalProperties, ReadonlyProperties, AsymmetricVisibility {
     PropertyHooks::emitProperty as emitPropertyHooks;
+    FinalProperties::emitProperty as emitFinalProperties;
     ReadonlyProperties::emitProperty as emitReadonlyProperties;
     AsymmetricVisibility::emitProperty as emitAsymmetricVisibility;
   }
@@ -17,6 +18,11 @@ trait RewriteProperties {
       array_intersect($property->modifiers, ['private(set)', 'protected(set)', 'public(set)'])
     ) {
       return $this->emitAsymmetricVisibility($result, $property);
+    } else if (
+      $this->targetVersion < 80400 &&
+      in_array('final', $property->modifiers)
+    ) {
+      return $this->emitFinalProperties($result, $property);
     } else if (
       $this->targetVersion < 80100 &&
       in_array('readonly', $property->modifiers)

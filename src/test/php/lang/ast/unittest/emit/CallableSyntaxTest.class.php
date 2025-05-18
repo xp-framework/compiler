@@ -172,6 +172,28 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
+  public function variable_instantiation() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $class= Handle::class;
+        return array_map(new $class(...), [0, 1, 2]);
+      }
+    }');
+    Assert::equals([new Handle(0), new Handle(1), new Handle(2)], $r);
+  }
+
+  #[Test]
+  public function expression_instantiation() {
+    $r= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $version= "";
+        return array_map(new (Handle::class.$version)(...), [0, 1, 2]);
+      }
+    }');
+    Assert::equals([new Handle(0), new Handle(1), new Handle(2)], $r);
+  }
+
+  #[Test]
   public function anonymous_instantiation() {
     $f= $this->run('class %T {
       public function run() {

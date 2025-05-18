@@ -1098,13 +1098,11 @@ abstract class PHP extends Emitter {
 
   protected function emitCallableNew($result, $callable) {
     $t= $result->temp();
-    $result->out->write("function(...{$t}) { return ");
+    $result->out->write("fn(...{$t}) => ");
 
     $callable->type->arguments= [new UnpackExpression(new Variable(substr($t, 1)), $callable->line)];
     $this->emitOne($result, $callable->type);
     $callable->type->arguments= null;
-
-    $result->out->write("; }");
   }
 
   protected function emitInvoke($result, $invoke) {
