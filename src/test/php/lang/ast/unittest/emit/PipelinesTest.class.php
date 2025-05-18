@@ -110,10 +110,19 @@ class PipelinesTest extends EmittingTest {
   }
 
   #[Test, Expect(Error::class)]
-  public function pipe_to_missing() {
+  public function missing_function() {
     $this->run('class %T {
       public function run() {
         return "test" |> "__missing";
+      }
+    }');
+  }
+
+  #[Test, Expect(Error::class)]
+  public function missing_argument() {
+    $this->run('class %T {
+      public function run() {
+        return 5 |> fn($a, $b) => $a * $b;
       }
     }');
   }
