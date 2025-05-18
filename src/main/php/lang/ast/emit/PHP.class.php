@@ -7,8 +7,6 @@ use lang\ast\nodes\{
   ArrayLiteral,
   BinaryExpression,
   Block,
-  CallableExpression,
-  CallableNewExpression,
   Comment,
   Expression,
   InstanceExpression,

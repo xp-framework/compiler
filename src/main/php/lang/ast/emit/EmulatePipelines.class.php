@@ -3,9 +3,10 @@
 use lang\ast\nodes\{CallableExpression, CallableNewExpression, Variable};
 
 /**
- * Emulates pipelines
+ * Emulates pipelines / the pipe operator, including a null-safe version.
  *
- * @see  https://wiki.php.net/rfc/pipe-operator-v3#precedence
+ * @see  https://wiki.php.net/rfc/pipe-operator-v3
+ * @see  https://externals.io/message/107661#107670
  * @test lang.ast.unittest.emit.PipelinesTest
  */
 trait EmulatePipelines {
