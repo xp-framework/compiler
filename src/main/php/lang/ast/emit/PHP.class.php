@@ -1158,42 +1158,40 @@ abstract class PHP extends Emitter {
     $this->emitOne($result, $instance->member);
   }
 
-  protected function emitPipeTarget($result, $pipe, $argument) {
-
-    // $expr |> new T(...) => new T($expr)
-    if ($pipe->target instanceof CallableNewExpression) {
-      $pipe->target->type->arguments= [$argument];
-      $this->emitOne($result, $pipe->target->type);
-      $pipe->target->type->arguments= null;
-      return;
-    }
-
-    // $expr |> strtoupper(...) => strtoupper($expr)
-    // $expr |> fn($x) => $x * 2 => (fn($x) => $x * 2)($expr)
-    if ($pipe->target instanceof CallableExpression) {
-      $this->emitOne($result, $pipe->target->expression);
+  protected function emitPipeTarget($result, $target, $arg) {
+    if ($target instanceof CallableNewExpression) {
+      $target->type->arguments= [new Variable(substr($arg, 1))];
+      $this->emitOne($result, $target->type);
+      $target->type->arguments= null;
+    } else if ($target instanceof CallableExpression) {
+      $this->emitOne($result, $target->expression);
+      $result->out->write('('.$arg.')');
     } else {
       $result->out->write('(');
-      $this->emitOne($result, $pipe->target);
-      $result->out->write(')');
+      $this->emitOne($result, $target);
+      $result->out->write(')('.$arg.')');
     }
-
-    $result->out->write('(');
-    $this->emitOne($result, $argument);
-    $result->out->write(')');
   }
 
   protected function emitPipe($result, $pipe) {
-    $this->emitPipeTarget($result, $pipe, $pipe->expression);
+
+    // $expr |> strtoupper(...) => [$arg= $expr, strtoupper($arg)][1]
+    $t= $result->temp();
+    $result->out->write('['.$t.'=');
+    $this->emitOne($result, $pipe->expression);
+    $result->out->write(',');
+    $this->emitPipeTarget($result, $pipe->target, $t);
+    $result->out->write('][1]');
   }
 
   protected function emitNullsafePipe($result, $pipe) {
+
+    // $expr ?|> strtoupper(...) => null === ($arg= $expr) ? null : strtoupper($arg)
     $t= $result->temp();
     $result->out->write('null===('.$t.'=');
     $this->emitOne($result, $pipe->expression);
     $result->out->write(')?null:');
-
-    $this->emitPipeTarget($result, $pipe, new Variable(substr($t, 1)));
+    $this->emitPipeTarget($result, $pipe->target, $t);
   }
 
   protected function emitUnpack($result, $unpack) {
