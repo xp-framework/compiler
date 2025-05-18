@@ -20,6 +20,7 @@ use lang\ast\types\{
  */
 class PHP82 extends PHP {
   use
+    EmulatePipelines,
     RewriteBlockLambdaExpressions,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,

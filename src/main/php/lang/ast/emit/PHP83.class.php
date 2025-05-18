@@ -15,10 +15,11 @@ use lang\ast\types\{
 /**
  * PHP 8.3 syntax
  *
+ * @test lang.ast.unittest.emit.PHP83Test
  * @see  https://wiki.php.net/rfc#php_83
  */
 class PHP83 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteProperties;
+  use EmulatePipelines, RewriteBlockLambdaExpressions, RewriteProperties;
 
   public $targetVersion= 80300;
 

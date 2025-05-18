@@ -14,6 +14,7 @@ class PHP74 extends PHP {
     AttributesAsComments,
     CallablesAsClosures,
     ChainScopeOperators,
+    EmulatePipelines,
     MatchAsTernaries,
     NonCapturingCatchVariables,
     NullsafeAsTernaries,
