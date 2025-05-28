@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.5.0 / 2025-05-28
+
 * Merged PR #181: Add support for pipelines with `|>` and `?|>`, see
   https://wiki.php.net/rfc/pipe-operator-v3 and issue #180
   (@thekid)
