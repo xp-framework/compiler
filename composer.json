@@ -8,7 +8,7 @@
   "require" : {
     "xp-framework/core": "^12.0 | ^11.6 | ^10.16",
     "xp-framework/reflection": "^3.2 | ^2.15",
-    "xp-framework/ast": "dev-feature/pipelines as 11.6.0",
+    "xp-framework/ast": "^11.6",
     "php" : ">=7.4.0"
   },
   "require-dev" : {
