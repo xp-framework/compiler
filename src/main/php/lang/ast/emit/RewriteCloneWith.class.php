@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{Signature, Parameter};
+use lang\ast\nodes\{Signature, Parameter, UnpackExpression};
 
 /** @see https://wiki.php.net/rfc/clone_with_v2 */
 trait RewriteCloneWith {
@@ -20,6 +20,11 @@ trait RewriteCloneWith {
     } else if (isset($clone->arguments['object'])) {
       $result->out->write('clone ');
       $this->emitOne($result, $expr);
+    } else if ($expr instanceof UnpackExpression) {
+      $result->out->write('(function($u) { $c= clone $u["object"] ?? $u[0];');
+      $result->out->write('foreach ($u["withProperties"] ?? $u[1] ?? [] as $p=>$v) { $c->$p= $v; } return $c;})(');
+      $this->emitOne($result, $expr->expression);
+      $result->out->write(')');
     } else {
       return parent::emitClone($result, $clone);
     }

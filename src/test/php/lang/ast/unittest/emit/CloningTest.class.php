@@ -87,6 +87,18 @@ class CloningTest extends EmittingTest {
   }
 
   #[Test]
+  public function clone_unpack() {
+    $clone= $this->run('class %T {
+      public function run($in) {
+        $args= ["object" => $in];
+        return clone(...$args);
+      }
+    }', $this->fixture);
+
+    Assert::true($clone instanceof $this->fixture && $this->fixture !== $clone);
+  }
+
+  #[Test]
   public function clone_with_named_argument() {
     $clone= $this->run('class %T {
       public function run($in) {
