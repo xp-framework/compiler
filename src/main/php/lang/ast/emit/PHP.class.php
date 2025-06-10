@@ -1169,6 +1169,22 @@ abstract class PHP extends Emitter {
     $this->emitOne($result, $instance->member);
   }
 
+  protected function emitPipe($result, $pipe) {
+    $this->emitOne($result, $pipe->expression);
+    $result->out->write('|>');
+    $this->emitOne($result, $pipe->target);
+  }
+
+  protected function emitNullsafePipe($result, $pipe) {
+
+    // $expr ?|> strtoupper(...) => null === ($t= $expr) ? null : $t |> strtoupper(...)
+    $t= $result->temp();
+    $result->out->write('null===('.$t.'=');
+    $this->emitOne($result, $pipe->expression);
+    $result->out->write(')?null:'.$t.'|>');
+    $this->emitOne($result, $pipe->target);
+  }
+
   protected function emitUnpack($result, $unpack) {
     $result->out->write('...');
     $this->emitOne($result, $unpack->expression);

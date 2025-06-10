@@ -15,10 +15,11 @@ use lang\ast\types\{
 /**
  * PHP 8.4 syntax
  *
+ * @test lang.ast.unittest.emit.PHP84Test
  * @see  https://wiki.php.net/rfc#php_84
  */
 class PHP84 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteCloneWith;
+  use EmulatePipelines, RewriteCloneWith, RewriteBlockLambdaExpressions;
 
   public $targetVersion= 80400;
 
