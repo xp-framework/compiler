@@ -99,6 +99,21 @@ class CloningTest extends EmittingTest {
     );
   }
 
+  #[Test, Values(['protected', 'private'])]
+  public function clone_with_can_access($modifiers) {
+    $clone= $this->run('class %T {
+      '.$modifiers.' $id= 1;
+
+      public function id() { return $this->id; }
+
+      public function run() {
+        return clone($this, ["id" => 6100]);
+      }
+    }');
+
+    Assert::equals(6100, $clone->id());
+  }
+
   #[Test, Ignore('Could be done with reflection but with significant performance cost')]
   public function clone_with_respects_visibility() {
     $base= $this->type('class %T { private $id= 1; }');
