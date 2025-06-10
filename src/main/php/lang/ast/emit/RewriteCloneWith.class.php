@@ -12,7 +12,7 @@ trait RewriteCloneWith {
     // Wrap clone with, e.g. clone($x, ['id' => 6100]), inside an IIFE which
     /// iterates over the property-value pairs, assigning them to the clone.
     if ($with) {
-      $result->out->write('(function($c, $a) { foreach ($a as $p=>$v) { $c->$p= $v; } return $c;})(clone ');
+      $result->out->write('(function($c, array $a) { foreach ($a as $p=>$v) { $c->$p= $v; } return $c;})(clone ');
       $this->emitOne($result, $expr);
       $result->out->write(',');
       $this->emitOne($result, $with);

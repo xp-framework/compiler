@@ -1,7 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
-use test\{Assert, Before, Ignore, Test, Values};
+use test\{Assert, Before, Expect, Ignore, Test, Values};
 
 /** @see https://www.php.net/manual/en/language.oop5.cloning.php */
 class CloningTest extends EmittingTest {
@@ -123,5 +123,23 @@ class CloningTest extends EmittingTest {
         clone($this, ["id" => 6100]); // Tries to set private member from base
       }
     }'));
+  }
+
+  #[Test, Expect(Error::class)]
+  public function clone_null_object() {
+    $this->run('class %T {
+      public function run() {
+        return clone(null);
+      }
+    }');
+  }
+
+  #[Test, Expect(Error::class)]
+  public function clone_with_null_properties() {
+    $this->run('class %T {
+      public function run() {
+        return clone($this, null);
+      }
+    }');
   }
 }
