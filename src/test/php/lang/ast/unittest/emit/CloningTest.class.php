@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
+use test\verify\Runtime;
 use test\{Assert, Before, Expect, Ignore, Test, Values};
 
 /** @see https://www.php.net/manual/en/language.oop5.cloning.php */
@@ -123,6 +124,18 @@ class CloningTest extends EmittingTest {
         clone($this, ["id" => 6100]); // Tries to set private member from base
       }
     }'));
+  }
+
+  #[Test, Values(['clone(...)', '"clone"', '$func']), Runtime(php: '>=8.5.0')]
+  public function clone_callable($expression) {
+    $clone= $this->run('class %T {
+      public function run($in) {
+        $func= "clone";
+        return array_map('.$expression.', [$in])[0];
+      }
+    }', $this->fixture);
+
+    Assert::true($clone instanceof $this->fixture && $this->fixture !== $clone);
   }
 
   #[Test, Expect(Error::class)]
