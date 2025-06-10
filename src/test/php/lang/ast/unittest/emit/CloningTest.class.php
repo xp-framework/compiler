@@ -126,8 +126,19 @@ class CloningTest extends EmittingTest {
     }'));
   }
 
-  #[Test, Values(['clone(...)', '"clone"', '$func']), Runtime(php: '>=8.5.0')]
-  public function clone_callable($expression) {
+  #[Test]
+  public function clone_callable() {
+    $clone= $this->run('class %T {
+      public function run($in) {
+        return array_map(clone(...), [$in])[0];
+      }
+    }', $this->fixture);
+
+    Assert::true($clone instanceof $this->fixture && $this->fixture !== $clone);
+  }
+
+  #[Test, Values(['"clone"', '$func']), Runtime(php: '>=8.5.0')]
+  public function clone_callable_reference($expression) {
     $clone= $this->run('class %T {
       public function run($in) {
         $func= "clone";
