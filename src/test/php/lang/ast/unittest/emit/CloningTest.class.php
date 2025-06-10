@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
-use test\{Assert, Before, Test, Values};
+use lang\Error;
+use test\{Assert, Before, Ignore, Test, Values};
 
 /** @see https://www.php.net/manual/en/language.oop5.cloning.php */
 class CloningTest extends EmittingTest {
@@ -17,8 +18,8 @@ class CloningTest extends EmittingTest {
   #[Before]
   public function fixture() {
     $this->fixture= new class() {
-      private $id= 1;
-      private $name= 'Test';
+      public $id= 1;
+      public $name= 'Test';
 
       public function toString() {
         return "<id: {$this->id}, name: {$this->name}>";
@@ -96,5 +97,16 @@ class CloningTest extends EmittingTest {
       ['<id: 1, name: Test>', '<id: 2, name: Test>'],
       [$this->fixture->toString(), $clone->toString()]
     );
+  }
+
+  #[Test, Ignore('Could be done with reflection but with significant performance cost')]
+  public function clone_with_respects_visibility() {
+    $base= $this->type('class %T { private $id= 1; }');
+
+    Assert::throws(Error::class, fn() => $this->run('class %T extends '.$base.' {
+      public function run() {
+        clone($this, ["id" => 6100]); // Tries to set private member from base
+      }
+    }'));
   }
 }

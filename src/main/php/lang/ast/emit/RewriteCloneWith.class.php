@@ -9,20 +9,14 @@ trait RewriteCloneWith {
     $expr= $clone->arguments['object'] ?? $clone->arguments[0] ?? null;
     $with= $clone->arguments['withProperties'] ?? $clone->arguments[1] ?? null;
 
-    // Wrap clone with, e.g. clone($x, ['id' => 6100]), inside an IIFE as follows:
-    // `function($args) { $this->id= $args['id']; return $this; }`, then bind
-    // this closure to the cloned instance before invoking it with the named
-    // arguments so we can access non-public members.
+    // Wrap clone with, e.g. clone($x, ['id' => 6100]), inside an IIFE which
+    /// iterates over the property-value pairs, assigning them to the clone.
     if ($with) {
-      $c= $result->temp();
-      $a= $result->temp();
-
-      $result->out->write('['.$c.'=clone ');
+      $result->out->write('(function($c, $a) { foreach ($a as $p=>$v) { $c->$p= $v; } return $c;})(clone ');
       $this->emitOne($result, $expr);
-      $result->out->write(','.$a.'=');
+      $result->out->write(',');
       $this->emitOne($result, $with);
-      $result->out->write(']?(function($a) { foreach ($a as $p=>$v) { $this->$p= $v; }return $this;})');
-      $result->out->write('->bindTo('.$c.','.$c.')('.$a.'):null');
+      $result->out->write(')');
     } else if (isset($clone->arguments['object'])) {
       $result->out->write('clone ');
       $this->emitOne($result, $expr);
