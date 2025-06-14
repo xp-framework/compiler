@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #187: Add PHP 8.5 emitter - @thekid
+
 ## 9.5.0 / 2025-05-28
 
 * Merged PR #181: Add support for pipelines with `|>` and `?|>`, see
