@@ -48,8 +48,12 @@ trait CallablesAsClosures {
   }
 
   protected function emitCallable($result, $callable) {
-    $result->out->write('\Closure::fromCallable(');
-    $this->emitQuoted($result, $callable->expression);
-    $result->out->write(')');
+    if ($callable->expression instanceof Literal && 'clone' === $callable->expression->expression) {
+      $result->out->write('fn($o) => clone $o');
+    } else {
+      $result->out->write('\Closure::fromCallable(');
+      $this->emitQuoted($result, $callable->expression);
+      $result->out->write(')');
+    }
   }
 }
