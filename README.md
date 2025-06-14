@@ -94,6 +94,7 @@ lang.ast.emit.PHP81
 lang.ast.emit.PHP82
 lang.ast.emit.PHP83 [*]
 lang.ast.emit.PHP84
+lang.ast.emit.PHP85
 lang.ast.syntax.php.Using [*]
 
 @FileSystemCL<./vendor/xp-lang/php-is-operator/src/main/php>
