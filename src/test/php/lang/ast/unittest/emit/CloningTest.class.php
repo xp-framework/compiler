@@ -90,12 +90,33 @@ class CloningTest extends EmittingTest {
   public function clone_unpack() {
     $clone= $this->run('class %T {
       public function run($in) {
-        $args= ["object" => $in];
-        return clone(...$args);
+        return clone(...["object" => $in]);
       }
     }', $this->fixture);
 
-    Assert::true($clone instanceof $this->fixture && $this->fixture !== $clone);
+    Assert::equals('<id: 2, name: Test>', $clone->toString());
+  }
+
+  #[Test]
+  public function clone_unpack_with_properties() {
+    $clone= $this->run('class %T {
+      public function run($in) {
+        return clone(...["object" => $in, "withProperties" => ["name" => "Changed"]]);
+      }
+    }', $this->fixture);
+
+    Assert::equals('<id: 2, name: Changed>', $clone->toString());
+  }
+
+  #[Test]
+  public function clone_unpack_only_properties() {
+    $clone= $this->run('class %T {
+      public function run($in) {
+        return clone($in, ...["withProperties" => ["name" => "Changed"]]);
+      }
+    }', $this->fixture);
+
+    Assert::equals('<id: 2, name: Changed>', $clone->toString());
   }
 
   #[Test]
