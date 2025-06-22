@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.6.0 / 2025-05-22
+
 * Merged PR #185: Implement "clone with", emitting emulating code for
   the expression, callable reference and calls with unpacking; see
   https://wiki.php.net/rfc/clone_with_v2
