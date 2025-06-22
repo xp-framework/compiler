@@ -25,6 +25,7 @@ class PHP80 extends PHP {
     OmitConstantTypes,
     ReadonlyClasses,
     RewriteBlockLambdaExpressions,
+    RewriteCloneWith,
     RewriteDynamicClassConstants,
     RewriteEnums,
     RewriteExplicitOctals,

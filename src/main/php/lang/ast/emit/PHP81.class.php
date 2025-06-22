@@ -22,6 +22,8 @@ class PHP81 extends PHP {
   use
     EmulatePipelines,
     RewriteBlockLambdaExpressions,
+    RewriteCallableClone,
+    RewriteCloneWith,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,
     RewriteProperties,
