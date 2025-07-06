@@ -153,7 +153,7 @@ abstract class AnnotationSupport extends EmittingTest {
   }
 
   #[Test]
-  public function multiple_class_annotations() {
+  public function separated_class_annotations() {
     Assert::equals(
       ['Resource' => ['/'], 'Authenticated' => []],
       $this->annotations($this->declare('#[Resource("/"), Authenticated]'))
@@ -161,8 +161,25 @@ abstract class AnnotationSupport extends EmittingTest {
   }
 
   #[Test]
-  public function multiple_member_annotations() {
+  public function multiple_class_annotations() {
+    Assert::equals(
+      ['Resource' => ['/'], 'Authenticated' => []],
+      $this->annotations($this->declare('#[Resource("/")] #[Authenticated]'))
+    );
+  }
+
+  #[Test]
+  public function separated_member_annotations() {
     $t= $this->declare('class %T { #[Test, Values([1, 2, 3])] public function fixture() { } }');
+    Assert::equals(
+      ['Test' => [], 'Values' => [[1, 2, 3]]],
+      $this->annotations($t->method('fixture'))
+    );
+  }
+
+  #[Test]
+  public function multiple_member_annotations() {
+    $t= $this->declare('class %T { #[Test] #[Values([1, 2, 3])] public function fixture() { } }');
     Assert::equals(
       ['Test' => [], 'Values' => [[1, 2, 3]]],
       $this->annotations($t->method('fixture'))
