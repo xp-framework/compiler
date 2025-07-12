@@ -279,7 +279,7 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(1, $count);
   }
 
-  #[Test, Runtime(php: '>=8.5.0')]
+  #[Test]
   public function partial_function_application_order() {
     [$result, $invokations]= $this->run('class %T {
       private $invokations= [];
