@@ -303,4 +303,16 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals('tested', $result);
     Assert::equals(['arg', 'run', 'concat'], $invokations);
   }
+
+  #[Test]
+  public function partial_function_application_inside_annotation() {
+    $f= $this->run('use lang\Reflection; class %T {
+
+      #[Attr(strrev(?))]
+      public function run() {
+        return Reflection::of($this)->method("run")->annotation(Attr::class)->argument(0);
+      }
+    }');
+    Assert::equals('cba', $f('abc'));
+  }
 }
