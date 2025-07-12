@@ -160,10 +160,20 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
-  public function instantiation() {
+  public function instantiation_variadic() {
     $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
       public function run() {
         return new Handle(...);
+      }
+    }');
+    Assert::equals(new Handle(1), $f(1));
+  }
+
+  #[Test]
+  public function instantiation_argument() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        return new Handle(?);
       }
     }');
     Assert::equals(new Handle(1), $f(1));
