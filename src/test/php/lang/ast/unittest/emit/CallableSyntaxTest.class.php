@@ -1,6 +1,7 @@
 <?php namespace lang\ast\unittest\emit;
 
 use lang\Error;
+use test\verify\Runtime;
 use test\{Assert, Expect, Test, Values};
 
 /**
@@ -263,5 +264,18 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
     Assert::equals(['ONE', 'TWO'], $f(['One', 'Two']));
+  }
+
+  #[Test, Runtime(php: '>=8.5.0')]
+  public function partial_function_application_variadic_optional_by_ref() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", ...);
+      }
+    }');
+
+    $count= 0;
+    Assert::equals('ok', $f('ok', 'test', $count));
+    Assert::equals(1, $count);
   }
 }
