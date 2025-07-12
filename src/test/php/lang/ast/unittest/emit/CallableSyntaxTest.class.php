@@ -1,5 +1,6 @@
 <?php namespace lang\ast\unittest\emit;
 
+use Closure;
 use lang\Error;
 use test\verify\Runtime;
 use test\{Assert, Expect, Test, Values};
@@ -23,33 +24,33 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(4, $this->run($code)('Test'));
   }
 
-  #[Test]
-  public function native_function_variadic() {
+  #[Test, Values(['strlen(...)', 'strlen(?)'])]
+  public function returns_closure($notation) {
+    Assert::instance(Closure::class, $this->run('class %T {
+      public function run() { return '.$notation.'; }
+    }'));
+  }
+
+  #[Test, Values(['strlen(...)', 'strlen(?)'])]
+  public function native_function($notation) {
     $this->verify('class %T {
-      public function run() { return strlen(...); }
+      public function run() { return '.$notation.'; }
     }');
   }
 
-  #[Test]
-  public function native_function_argument() {
-    $this->verify('class %T {
-      public function run() { return strlen(?); }
-    }');
-  }
-
-  #[Test]
-  public function instance_method() {
+  #[Test, Values(['$this->length(...)', '$this->length(?)'])]
+  public function instance_method($notation) {
     $this->verify('class %T {
       public function length($arg) { return strlen($arg); }
-      public function run() { return $this->length(...); }
+      public function run() { return '.$notation.'; }
     }');
   }
 
-  #[Test]
-  public function class_method() {
+  #[Test, Values(['self::length(...)', 'self::length(?)'])]
+  public function class_method($notation) {
     $this->verify('class %T {
       public static function length($arg) { return strlen($arg); }
-      public function run() { return self::length(...); }
+      public function run() { return '.$notation.'; }
     }');
   }
 
@@ -159,21 +160,11 @@ class CallableSyntaxTest extends EmittingTest {
     }');
   }
 
-  #[Test]
-  public function instantiation_variadic() {
+  #[Test, Values(['new Handle(...)', 'new Handle(?)'])]
+  public function instantiation($notation) {
     $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
       public function run() {
         return new Handle(...);
-      }
-    }');
-    Assert::equals(new Handle(1), $f(1));
-  }
-
-  #[Test]
-  public function instantiation_argument() {
-    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
-      public function run() {
-        return new Handle(?);
       }
     }');
     Assert::equals(new Handle(1), $f(1));
