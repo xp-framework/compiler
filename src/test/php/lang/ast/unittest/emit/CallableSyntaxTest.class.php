@@ -323,6 +323,15 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(['hi world'], $r);
   }
 
+  #[Test, Expect(class: Error::class, message: '/Too few arguments/')]
+  public function partial_function_application_returned_by_pipe() {
+    $this->run('class %T {
+      public function run() {
+        "hi" |> str_replace("hello", ?, ?);
+      }
+    }');
+  }
+
   #[Test]
   public function partial_function_application_pass_named() {
     $f= $this->run('class %T {
