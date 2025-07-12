@@ -257,6 +257,24 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
+  public function partial_function_application_static_method() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      private static function for($impl, $stream) {
+        return match ($stream) {
+          STDIN => new $impl(0),
+          STDOUT => new $impl(1),
+          STDERR => new $impl(2),
+        };
+      }
+
+      public function run() {
+        return self::for(Handle::class, ?);
+      }
+    }');
+    Assert::equals(new Handle(2), $f(STDERR));
+  }
+
+  #[Test]
   public function partial_function_application_variadic() {
     $f= $this->run('class %T {
       public function run() {
