@@ -276,19 +276,6 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(['ONE', 'TWO'], $f(['One', 'Two']));
   }
 
-  #[Test, Runtime(php: '>=8.5.0')]
-  public function partial_function_application_variadic_optional_by_ref() {
-    $f= $this->run('class %T {
-      public function run() {
-        return str_replace("test", ...);
-      }
-    }');
-
-    $count= 0;
-    Assert::equals('ok', $f('ok', 'test', $count));
-    Assert::equals(1, $count);
-  }
-
   #[Test]
   public function partial_function_application_order() {
     [$result, $invokations]= $this->run('class %T {
@@ -359,12 +346,37 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test, Runtime(php: '>=8.5.0')]
+  public function partial_function_application_variadic_optional_by_ref() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", "ok", ...);
+      }
+    }');
+
+    $count= 0;
+    Assert::equals('ok.', $f('test.', $count));
+    Assert::equals(1, $count);
+  }
+
+  #[Test, Runtime(php: '>=8.5.0')]
   public function partial_function_application_with_named() {
     $r= $this->run('class %T {
 
       public function run() {
         $f= str_replace("test", "ok", ?);
         return $f(subject: "test.");
+      }
+    }');
+    Assert::equals('ok.', $r);
+  }
+
+  #[Test, Runtime(php: '>=8.5.0')]
+  public function partial_function_application_variadic_before_named() {
+    $r= $this->run('class %T {
+
+      public function run() {
+        $f= str_replace("test", ..., subject: ?);
+        return $f("ok", "test.");
       }
     }');
     Assert::equals('ok.', $r);
