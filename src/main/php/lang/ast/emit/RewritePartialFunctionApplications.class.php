@@ -34,20 +34,20 @@ trait RewritePartialFunctionApplications {
     if ([Placeholder::$VARIADIC] !== $callable->arguments) {
       $sig= '';
       $pass= $init= [];
-      foreach ($callable->arguments as $argument) {
+      foreach ($callable->arguments as $name => $argument) {
         if (Placeholder::$VARIADIC === $argument) {
           $t= $result->temp();
           $sig.= ',...'.$t;
-          $pass[]= new UnpackExpression(new Variable(substr($t, 1)));
+          $pass[$name]= new UnpackExpression(new Variable(substr($t, 1)));
         } else if (Placeholder::$ARGUMENT === $argument) {
           $t= $result->temp();
           $sig.= ','.$t;
-          $pass[]= new Variable(substr($t, 1));
+          $pass[$name]= new Variable(substr($t, 1));
         } else if ($this->isConstant($result, $argument)) {
-          $pass[]= $argument;
+          $pass[$name]= $argument;
         } else {
           $t= $result->temp();
-          $pass[]= new Variable(substr($t, 1));
+          $pass[$name]= new Variable(substr($t, 1));
           $init[$t]= $argument;
         }
       }

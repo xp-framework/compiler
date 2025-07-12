@@ -335,4 +335,38 @@ class CallableSyntaxTest extends EmittingTest {
     }');
     Assert::equals(['hi world'], $r);
   }
+
+  #[Test]
+  public function partial_function_application_pass_named() {
+    $f= $this->run('class %T {
+
+      public function run() {
+        return str_replace(search: "test", replace: "ok", subject: ?);
+      }
+    }');
+    Assert::equals('ok.', $f('test.'));
+  }
+
+  #[Test, Runtime(php: '>=8.0.0')]
+  public function partial_function_application_named_arguments_out_of_order() {
+    $f= $this->run('class %T {
+
+      public function run() {
+        return str_replace(subject: ?, replace: "ok", search: "test");
+      }
+    }');
+    Assert::equals('ok.', $f('test.'));
+  }
+
+  #[Test, Runtime(php: '>=8.5.0')]
+  public function partial_function_application_with_named() {
+    $r= $this->run('class %T {
+
+      public function run() {
+        $f= str_replace("test", "ok", ?);
+        return $f(subject: "test.");
+      }
+    }');
+    Assert::equals('ok.', $r);
+  }
 }
