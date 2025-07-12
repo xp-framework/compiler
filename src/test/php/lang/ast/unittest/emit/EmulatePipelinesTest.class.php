@@ -64,6 +64,14 @@ class EmulatePipelinesTest extends EmittingTest {
   }
 
   #[Test]
+  public function to_partial_constructor_application() {
+    Assert::equals(
+      'new \\util\\Date("2025-07-12",$timezone);',
+      $this->emit('"2025-07-12" |> new \\util\\Date(?, $timezone);')
+    );
+  }
+
+  #[Test]
   public function chained() {
     Assert::equals(
       '[$_0=strtoupper("hi"),trim($_0,"{}")][1];',
