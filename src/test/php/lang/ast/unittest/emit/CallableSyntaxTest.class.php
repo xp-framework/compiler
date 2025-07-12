@@ -315,4 +315,14 @@ class CallableSyntaxTest extends EmittingTest {
     }');
     Assert::equals('cba', $f('abc'));
   }
+
+  #[Test]
+  public function partial_function_application_with_pipe() {
+    $r= $this->run('class %T {
+      public function run() {
+        return ["hello world"] |> array_map(str_replace("hello", "hi", ?), ?);
+      }
+    }');
+    Assert::equals(['hi world'], $r);
+  }
 }
