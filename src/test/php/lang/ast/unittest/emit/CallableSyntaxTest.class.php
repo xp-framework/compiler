@@ -361,6 +361,39 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals('ok.', $f('test.'));
   }
 
+  #[Test]
+  public function partial_function_application_invoke_interceptor() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $add= new class() {
+          public function __invoke(int $a, int $b) {
+            return $a + $b;
+          }
+        };
+        return $add(1, ?);
+      }
+    }');
+    Assert::equals(3, $f(2));
+  }
+
+  #[Test]
+  public function partial_function_application_call_interceptor() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $calc= new class() {
+          public function __call($name, $args) {
+            return match ($name) {
+              "add" => array_sum($args),
+              // TBI
+            };
+          }
+        };
+        return $calc->add(1, ...);
+      }
+    }');
+    Assert::equals(6, $f(2, 3));
+  }
+
   #[Test, Runtime(php: '>=8.0.0')]
   public function partial_function_application_named_arguments_out_of_order() {
     $f= $this->run('class %T {
