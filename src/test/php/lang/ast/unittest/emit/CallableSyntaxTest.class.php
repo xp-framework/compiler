@@ -278,4 +278,29 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals('ok', $f('ok', 'test', $count));
     Assert::equals(1, $count);
   }
+
+  #[Test, Runtime(php: '>=8.5.0')]
+  public function partial_function_application_order() {
+    [$result, $invokations]= $this->run('class %T {
+      private $invokations= [];
+
+      private function concat(... $args) {
+        $this->invokations[]= __FUNCTION__;
+        return implode("", $args);
+      }
+
+      private function arg() {
+        $this->invokations[]= __FUNCTION__;
+        return "ed";
+      }
+
+      public function run() {
+        $f= $this->concat(?, $this->arg());
+        $this->invokations[]= __FUNCTION__;
+        return [$f("test"), $this->invokations];
+      }
+    }');
+    Assert::equals('tested', $result);
+    Assert::equals(['arg', 'run', 'concat'], $invokations);
+  }
 }

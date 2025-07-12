@@ -3,7 +3,15 @@
 use lang\ast\nodes\{Placeholder, Variable, UnpackExpression};
 
 /**
- * Rewrites partial function application
+ * Rewrites partial function application as follows:
+ * 
+ * ```php
+ * // Input:
+ * $f= str_replace('test', 'ok', ?);
+ * 
+ * // Ouput:
+ * $f= fn($arg) => str_replace('test', 'ok', $arg);
+ * ```
  *
  * @see  https://wiki.php.net/rfc/partial_function_application_v2
  */
