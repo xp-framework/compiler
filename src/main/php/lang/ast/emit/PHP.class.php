@@ -12,7 +12,6 @@ use lang\ast\nodes\{
   InstanceExpression,
   Literal,
   NewExpression,
-  Placeholder,
   Property,
   ScopeExpression,
   UnpackExpression,
