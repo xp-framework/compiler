@@ -11,11 +11,15 @@ use lang\ast\nodes\{Placeholder, Variable, UnpackExpression};
  * 
  * // Output:
  * $f= fn($arg) => str_replace('test', 'ok', $arg);
+ * ```
  *
+ * Keeps evaluation order consistent with native implementation:
+ *
+ * ```php
  * // Input:
  * $f= str_replace('test', result(), ?);
  *
- * // Ouput:
+ * // Output:
  * $f= [
  *   $temp= result(),
  *   fn($arg) => str_replace('test', $temp, $arg)
