@@ -22,7 +22,7 @@ class PHP81 extends PHP {
   use
     EmulatePipelines,
     RewriteBlockLambdaExpressions,
-    RewriteCallableClone,
+    RewriteCallables,
     RewriteCloneWith,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,

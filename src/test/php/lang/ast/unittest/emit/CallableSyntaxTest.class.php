@@ -23,9 +23,16 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
-  public function native_function() {
+  public function native_function_variadic() {
     $this->verify('class %T {
       public function run() { return strlen(...); }
+    }');
+  }
+
+  #[Test]
+  public function native_function_argument() {
+    $this->verify('class %T {
+      public function run() { return strlen(?); }
     }');
   }
 
@@ -216,5 +223,45 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
     Assert::equals('cba', $f('abc'));
+  }
+
+  #[Test]
+  public function partial_function_application() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", "ok", ?);
+      }
+    }');
+    Assert::equals('ok', $f('test'));
+  }
+
+  #[Test]
+  public function partial_function_application_multiple_arguments() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", ?, ?);
+      }
+    }');
+    Assert::equals('ok', $f('ok', 'test'));
+  }
+
+  #[Test]
+  public function partial_function_application_variadic() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", ...);
+      }
+    }');
+    Assert::equals('ok', $f('ok', 'test'));
+  }
+
+  #[Test]
+  public function partial_function_application_callable_syntax_mixed() {
+    $f= $this->run('class %T {
+      public function run() {
+        return array_map(strtoupper(...), ?);
+      }
+    }');
+    Assert::equals(['ONE', 'TWO'], $f(['One', 'Two']));
   }
 }
