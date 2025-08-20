@@ -2,7 +2,7 @@
 
 use lang\Error;
 use test\verify\Runtime;
-use test\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Ignore, Test, Values};
 
 /** @see https://wiki.php.net/rfc/pipe-operator-v3 */
 class PipelinesTest extends EmittingTest {
@@ -345,5 +345,20 @@ class PipelinesTest extends EmittingTest {
     }');
 
     Assert::equals([2, 3, 4], $r);
+  }
+
+  #[Test, Ignore('See https://externals.io/message/128473')]
+  public function pipe_precedence_challenges() {
+    $r= $this->run('class %T {
+      public function run() {
+        ob_start();
+
+        42 |> fn($x) => $x < 42 |> fn($x) => var_dump($x);
+
+        return ob_get_clean();
+      }
+    }');
+
+    Assert::equals("bool(false)\n", $r);
   }
 }
