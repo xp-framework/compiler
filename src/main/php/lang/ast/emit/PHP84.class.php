@@ -19,7 +19,12 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_84
  */
 class PHP84 extends PHP {
-  use EmulatePipelines, RewriteCallableClone, RewriteCloneWith, RewriteBlockLambdaExpressions;
+  use
+    EmulatePipelines,
+    RewriteCallables,
+    RewriteCloneWith,
+    RewriteBlockLambdaExpressions
+  ;
 
   public $targetVersion= 80400;
 

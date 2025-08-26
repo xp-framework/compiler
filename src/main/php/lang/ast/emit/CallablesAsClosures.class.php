@@ -1,24 +1,27 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Node;
-use lang\ast\nodes\{Expression, InstanceExpression, ScopeExpression, Literal};
+use lang\ast\nodes\{Expression, InstanceExpression, ScopeExpression, Literal, Placeholder};
 
 /**
  * Rewrites callable expressions to `Callable::fromClosure()`
  *
  * @see  https://www.php.net/manual/de/closure.fromcallable.php
+ * @see  https://wiki.php.net/rfc/clone_with_v2
  * @see  https://wiki.php.net/rfc/first_class_callable_syntax
+ * @see  https://wiki.php.net/rfc/partial_function_application_v2
  */
 trait CallablesAsClosures {
+  use RewritePartialFunctionApplications { emitCallable as emitPartial; }
 
   private function emitQuoted($result, $node) {
     if ($node instanceof Literal) {
 
-      // Rewrite f() => "f"
+      // Rewrite f(...) => "f"
       $result->out->write('"'.trim($node, '"\'').'"');
     } else if ($node instanceof InstanceExpression) {
 
-      // Rewrite $this->f => [$this, "f"]
+      // Rewrite $this->f(...) => [$this, "f"]
       $result->out->write('[');
       $this->emitOne($result, $node->expression);
       $result->out->write(',');
@@ -26,7 +29,7 @@ trait CallablesAsClosures {
       $result->out->write(']');
     } else if ($node instanceof ScopeExpression) {
 
-      // Rewrite T::f => [T::class, "f"]
+      // Rewrite T::f(...) => [T::class, "f"]
       $result->out->write('[');
       if ($node->type instanceof Node) {
         $this->emitOne($result, $node->type);
@@ -38,7 +41,7 @@ trait CallablesAsClosures {
       $result->out->write(']');
     } else if ($node instanceof Expression) {
 
-      // Rewrite T::{<f>} => [T::class, <f>]
+      // Rewrite T::{<f>}(...) => [T::class, <f>]
       $this->emitOne($result, $node->inline);
     } else {
 
@@ -50,6 +53,8 @@ trait CallablesAsClosures {
   protected function emitCallable($result, $callable) {
     if ($callable->expression instanceof Literal && 'clone' === $callable->expression->expression) {
       $result->out->write('fn($o) => clone $o');
+    } else if ([Placeholder::$VARIADIC] !== $callable->arguments) {
+      $this->emitPartial($result, $callable);
     } else {
       $result->out->write('\Closure::fromCallable(');
       $this->emitQuoted($result, $callable->expression);
