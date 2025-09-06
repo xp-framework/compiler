@@ -3,6 +3,8 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.7.0 / 2025-09-06
+
 * Changed PHP 8.5 emitter to emit *clone with* expressions natively now
   that the RFC has been implemented
   (@thekid)
