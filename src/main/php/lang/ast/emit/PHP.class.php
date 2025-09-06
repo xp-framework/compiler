@@ -7,6 +7,7 @@ use lang\ast\nodes\{
   ArrayLiteral,
   BinaryExpression,
   Block,
+  CallableNewExpression,
   Comment,
   Expression,
   InstanceExpression,
@@ -1165,7 +1166,15 @@ abstract class PHP extends Emitter {
   protected function emitPipe($result, $pipe) {
     $this->emitOne($result, $pipe->expression);
     $result->out->write('|>');
-    $this->emitOne($result, $pipe->target);
+
+    // `fn() => ...` on the right-hand side of pipe operator must be parenthesized
+    if ($pipe->target instanceof CallableNewExpression) {
+      $result->out->write('(');
+      $this->emitOne($result, $pipe->target);
+      $result->out->write(')');
+    } else {
+      $this->emitOne($result, $pipe->target);
+    }
   }
 
   protected function emitNullsafePipe($result, $pipe) {

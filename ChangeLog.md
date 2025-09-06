@@ -3,6 +3,10 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed the error *Arrow functions on the right hand side of |> must be
+  parenthesized* - see https://externals.io/message/128473#128554
+  (@thekid)
+
 ## 9.6.0 / 2025-05-22
 
 * Merged PR #185: Implement "clone with", emitting emulating code for
