@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed PHP 8.5 emitter to emit *clone with* expressions natively now
+  that the RFC has been implemented
+  (@thekid)
 * Fixed the warning *Using null as an array offset is deprecated, use an
   empty string instead* in PHP 8.5+
   (@thekid)

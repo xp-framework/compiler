@@ -23,4 +23,12 @@ class PHP85Test extends EmittingTest {
       $this->emit('"test" ?|> strtoupper(...);')
     );
   }
+
+  #[Test]
+  public function clone_with() {
+    Assert::equals(
+      'clone($this,["name"=>strtoupper($this->name),]);',
+      $this->emit('clone($this, ["name" => strtoupper($this->name)]);')
+    );
+  }
 }
