@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed the warning *Using null as an array offset is deprecated, use an
+  empty string instead* in PHP 8.5+
+  (@thekid)
 * Fixed the error *Arrow functions on the right hand side of |> must be
   parenthesized* - see https://externals.io/message/128473#128554
   (@thekid)
