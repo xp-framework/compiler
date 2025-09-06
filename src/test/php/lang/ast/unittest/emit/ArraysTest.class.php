@@ -199,6 +199,8 @@ class ArraysTest extends EmittingTest {
       }
     }', $value);
 
+    // Yields "E_WARNING: Cannot use string as array" in PHP 8.5
+    \xp::gc();
     Assert::equals([null, null, $value], $r);
   }
 
