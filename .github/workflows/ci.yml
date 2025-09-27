@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['8.5']
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
         os: [ubuntu-latest, windows-latest]
 
     steps:
@@ -54,7 +54,4 @@ jobs:
         echo "vendor/autoload.php" > composer.pth
 
     - name: Run test suite
-      run: >
-        php -v ; 
-        php -m ;
-        for i in pipe_to_callable pipe_to_variable pipe_to_callable_string pipe_to_callable_array pipe_to_callable_without_all_args pipe_to_callable_new pipe_to_callable_anonymous_new pipe_to_closure pipe_to_throw missing_function missing_argument pipe_chain nullsafe_pipe nullsafe_chain concat_precedence addition_precedence comparison_precedence ternary_precedence short_ternary_precedence coalesce_precedence rfc_example rejects_by_reference_functions accepts_prefer_by_reference_functions execution_order interrupted_by_exception generators pipe_precedence_challenges ; do sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::$i --output=code ; done
+      run: sh xp-run xp.test.Runner -r Dots src/test/php
