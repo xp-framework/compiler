@@ -53,4 +53,5 @@ jobs:
         echo "vendor/autoload.php" > composer.pth
 
     - name: Run test suite
-      run: sh xp-run xp.test.Runner -r Dots src/test/php
+      run: >
+        for f in $(find src/test/php/ -name '*Test.class.php') ; do sh xp-run xp.test.Runner -r Dots $f ; done
