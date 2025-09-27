@@ -53,4 +53,33 @@ jobs:
         echo "vendor/autoload.php" > composer.pth
 
     - name: Run test suite
-      run: sh xp-run xp.test.Runner src/test/php/lang/ast/unittest/emit/PipelinesTest.class.php --output=code
+      run: >
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable_new --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_variable --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable_string --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable_array --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable_without_all_args --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable_new --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_callable_anonymous_new --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_closure --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_to_throw --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::missing_function --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::missing_argument --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_chain --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::nullsafe_pipe($input, $expecte --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::nullsafe_chain($input, $expecte --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::concat_precedence --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::addition_precedence --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::comparison_precedence --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::ternary_precedence($arg, $expecte --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::short_ternary_precedence($arg, $expecte --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::coalesce_precedence($arg, $expecte --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::rfc_example --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::rejects_by_reference_functions --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::accepts_prefer_by_reference_functions --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::execution_order --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::interrupted_by_exception --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::generators --output=code ;
+        sh xp-run xp.test.Runner lang.ast.unittest.emit.PipelinesTest::pipe_precedence_challenges --output=code ;
+        echo "OK"
