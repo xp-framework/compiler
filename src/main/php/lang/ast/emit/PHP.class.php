@@ -1105,6 +1105,7 @@ abstract class PHP extends Emitter {
     $t= $result->temp();
     $result->out->write("fn(...{$t}) => ");
 
+    // See https://externals.io/message/129329
     $callable->type->arguments= [new UnpackExpression(new Variable(substr($t, 1)), $callable->line)];
     $this->emitOne($result, $callable->type);
     $callable->type->arguments= null;

@@ -6,6 +6,7 @@ use test\{Assert, Expect, Test, Values};
 /**
  * Tests for first-class callable syntax
  *
+ * @see   https://externals.io/message/129329
  * @see   https://wiki.php.net/rfc/fcc_in_const_expr
  * @see   https://wiki.php.net/rfc/first_class_callable_syntax#proposal
  */
