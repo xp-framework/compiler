@@ -3,6 +3,9 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added PHP 8.6, changed PHP 8.5 to no longer allow failures in CI
+  (@thekid)
+
 ## 9.7.0 / 2025-09-06
 
 * Changed PHP 8.5 emitter to emit *clone with* expressions natively now
