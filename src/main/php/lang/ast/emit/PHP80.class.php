@@ -24,6 +24,7 @@ class PHP80 extends PHP {
     EmulatePipelines,
     OmitConstantTypes,
     ReadonlyClasses,
+    RemoveVoidCasts,
     RewriteBlockLambdaExpressions,
     RewriteCloneWith,
     RewriteDynamicClassConstants,

@@ -21,6 +21,7 @@ class PHP74 extends PHP {
     OmitArgumentNames,
     OmitConstantTypes,
     ReadonlyClasses,
+    RemoveVoidCasts,
     RewriteBlockLambdaExpressions,
     RewriteCloneWith,
     RewriteEnums,

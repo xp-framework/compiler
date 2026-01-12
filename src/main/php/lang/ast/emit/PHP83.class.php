@@ -19,7 +19,14 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_83
  */
 class PHP83 extends PHP {
-  use EmulatePipelines, RewriteCallableClone, RewriteCloneWith, RewriteBlockLambdaExpressions, RewriteProperties;
+  use
+    EmulatePipelines,
+    RemoveVoidCasts,
+    RewriteCallableClone,
+    RewriteCloneWith,
+    RewriteBlockLambdaExpressions,
+    RewriteProperties
+  ;
 
   public $targetVersion= 80300;
 

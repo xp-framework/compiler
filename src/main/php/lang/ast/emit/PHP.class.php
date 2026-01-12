@@ -259,7 +259,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitCast($result, $cast) {
-    static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true];
+    static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true, 'void' => true];
 
     // Inline nullable checks using ternaries
     if ($cast->type instanceof IsNullable) {
