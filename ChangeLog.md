@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.8.0 / 2026-01-12
+
+* Merged PR #189: Support `(void)`-casts, defined in `#[NoDiscard]`
+  RFC https://wiki.php.net/rfc/marking_return_value_as_important
+  (@thekid)
 * Added PHP 8.6, changed PHP 8.5 to no longer allow failures in CI
   (@thekid)
 
