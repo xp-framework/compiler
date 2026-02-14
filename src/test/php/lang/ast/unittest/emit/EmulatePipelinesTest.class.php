@@ -56,7 +56,15 @@ class EmulatePipelinesTest extends EmittingTest {
   }
 
   #[Test]
-  public function to_partial_function_application() {
+  public function to_partial_function_application_first() {
+    Assert::equals(
+      '\Console::writeLine("hi");',
+      $this->emit('"hi" |> Console::writeLine(?);')
+    );
+  }
+
+  #[Test]
+  public function to_partial_function_application_last() {
     Assert::equals(
       'str_replace("hi","hello","hi");',
       $this->emit('"hi" |> str_replace("hi", "hello", ?);')

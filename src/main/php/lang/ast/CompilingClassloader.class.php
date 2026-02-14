@@ -2,6 +2,7 @@
 
 use lang\ast\emit\Reflection;
 use lang\ast\emit\php\XpMeta;
+use lang\ast\nodes\Placeholder;
 use lang\{
   ClassFormatException,
   ClassLoader,
@@ -23,6 +24,7 @@ class CompilingClassLoader implements IClassLoader {
   static function __static() {
 
     // See https://github.com/xp-framework/compiler/issues/122
+    Placeholder::__static();
     Reflection::__static();
   }
 
