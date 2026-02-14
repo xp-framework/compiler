@@ -2,7 +2,7 @@
 
 use lang\Error;
 use test\verify\Runtime;
-use test\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Ignore, Test, Values};
 
 /** @see https://wiki.php.net/rfc/pipe-operator-v3 */
 class PipelinesTest extends EmittingTest {
@@ -93,7 +93,7 @@ class PipelinesTest extends EmittingTest {
   public function pipe_to_closure() {
     $r= $this->run('class %T {
       public function run() {
-        return "test" |> fn($x) => $x.": OK";
+        return "test" |> (fn($x) => $x.": OK");
       }
     }');
 
@@ -122,7 +122,7 @@ class PipelinesTest extends EmittingTest {
   public function missing_argument() {
     $this->run('class %T {
       public function run() {
-        return 5 |> fn($a, $b) => $a * $b;
+        return 5 |> (fn($a, $b) => $a * $b);
       }
     }');
   }
@@ -175,7 +175,7 @@ class PipelinesTest extends EmittingTest {
   public function addition_precedence() {
     $r= $this->run('class %T {
       public function run() {
-        return 5 + 2 |> fn($i) => $i * 2;
+        return 5 + 2 |> (fn($i) => $i * 2);
       }
     }');
 
@@ -186,7 +186,7 @@ class PipelinesTest extends EmittingTest {
   public function comparison_precedence() {
     $r= $this->run('class %T {
       public function run() {
-        return 5 |> fn($i) => $i * 2 === 10;
+        return 5 |> (fn($i) => $i * 2 === 10);
       }
     }');
 
@@ -249,8 +249,8 @@ class PipelinesTest extends EmittingTest {
         return "Hello World"
           |> "htmlentities"
           |> str_split(...)
-          |> fn($x) => array_map(strtoupper(...), $x)
-          |> fn($x) => array_filter($x, fn($v) => $v != "O")
+          |> (fn($x) => array_map(strtoupper(...), $x))
+          |> (fn($x) => array_filter($x, fn($v) => $v != "O"))
         ;
       }
     }');
@@ -345,5 +345,20 @@ class PipelinesTest extends EmittingTest {
     }');
 
     Assert::equals([2, 3, 4], $r);
+  }
+
+  #[Test]
+  public function pipe_precedence_challenges() {
+    $r= $this->run('class %T {
+      public function run() {
+        ob_start();
+
+        42 |> (fn($x) => $x < 42) |> (fn($x) => var_dump($x));
+
+        return ob_get_clean();
+      }
+    }');
+
+    Assert::equals("bool(false)\n", $r);
   }
 }

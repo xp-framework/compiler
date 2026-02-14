@@ -161,4 +161,16 @@ class CastingTest extends EmittingTest {
       $value
     ));
   }
+
+  #[Test, Values(['null', '$this', 'strlen("Test")'])]
+  public function void_cast($expr) {
+    Assert::true($this->run(
+      'class %T {
+        public function run() {
+          (void)'.$expr.';
+          return true;
+        }
+      }'
+    ));
+  }
 }

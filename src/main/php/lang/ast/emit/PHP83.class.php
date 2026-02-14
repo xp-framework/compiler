@@ -21,6 +21,7 @@ use lang\ast\types\{
 class PHP83 extends PHP {
   use 
     EmulatePipelines,
+    RemoveVoidCasts,
     RewriteCallables,
     RewriteCloneWith,
     RewriteBlockLambdaExpressions,

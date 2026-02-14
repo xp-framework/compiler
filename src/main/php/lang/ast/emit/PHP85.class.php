@@ -19,7 +19,7 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_85
  */
 class PHP85 extends PHP {
-  use RewriteBlockLambdaExpressions, RewriteCallables, RewriteCloneWith; // TODO: Remove once PR is merged!
+  use RewriteBlockLambdaExpressions, RewriteCallables;
 
   public $targetVersion= 80500;
 

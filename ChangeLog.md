@@ -3,6 +3,26 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.8.0 / 2026-01-12
+
+* Merged PR #189: Support `(void)`-casts, defined in `#[NoDiscard]`
+  RFC https://wiki.php.net/rfc/marking_return_value_as_important
+  (@thekid)
+* Added PHP 8.6, changed PHP 8.5 to no longer allow failures in CI
+  (@thekid)
+
+## 9.7.0 / 2025-09-06
+
+* Changed PHP 8.5 emitter to emit *clone with* expressions natively now
+  that the RFC has been implemented
+  (@thekid)
+* Fixed the warning *Using null as an array offset is deprecated, use an
+  empty string instead* in PHP 8.5+
+  (@thekid)
+* Fixed the error *Arrow functions on the right hand side of |> must be
+  parenthesized* - see https://externals.io/message/128473#128554
+  (@thekid)
+
 ## 9.6.0 / 2025-05-22
 
 * Merged PR #185: Implement "clone with", emitting emulating code for

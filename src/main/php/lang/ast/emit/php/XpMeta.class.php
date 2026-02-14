@@ -32,7 +32,7 @@ trait XpMeta {
       } else if (1 === sizeof($arguments) && isset($arguments[0])) {
         $this->emitOne($result, $arguments[0]);
         $result->out->write(',');
-        $lookup[$name][$resolve]= 1; // Resolve ambiguity
+        $lookup[$name][$resolve ?? '']= 1; // Resolve ambiguity
       } else {
         $result->out->write('[');
         foreach ($arguments as $name => $argument) {

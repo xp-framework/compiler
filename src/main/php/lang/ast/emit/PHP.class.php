@@ -7,6 +7,7 @@ use lang\ast\nodes\{
   ArrayLiteral,
   BinaryExpression,
   Block,
+  CallableNewExpression,
   Comment,
   Expression,
   InstanceExpression,
@@ -258,7 +259,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitCast($result, $cast) {
-    static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true];
+    static $native= ['string' => true, 'int' => true, 'float' => true, 'bool' => true, 'array' => true, 'object' => true, 'void' => true];
 
     // Inline nullable checks using ternaries
     if ($cast->type instanceof IsNullable) {
@@ -1104,6 +1105,7 @@ abstract class PHP extends Emitter {
     $t= $result->temp();
     $result->out->write("fn(...{$t}) => ");
 
+    // See https://externals.io/message/129329
     $callable->type->arguments= [new UnpackExpression(new Variable(substr($t, 1)), $callable->line)];
     $this->emitOne($result, $callable->type);
     $callable->type->arguments= null;
@@ -1165,7 +1167,15 @@ abstract class PHP extends Emitter {
   protected function emitPipe($result, $pipe) {
     $this->emitOne($result, $pipe->expression);
     $result->out->write('|>');
-    $this->emitOne($result, $pipe->target);
+
+    // `fn() => ...` on the right-hand side of pipe operator must be parenthesized
+    if ($pipe->target instanceof CallableNewExpression) {
+      $result->out->write('(');
+      $this->emitOne($result, $pipe->target);
+      $result->out->write(')');
+    } else {
+      $this->emitOne($result, $pipe->target);
+    }
   }
 
   protected function emitNullsafePipe($result, $pipe) {
