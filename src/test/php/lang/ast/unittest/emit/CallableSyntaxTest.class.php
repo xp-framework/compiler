@@ -397,7 +397,7 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals('ok.', $f('test.'));
   }
 
-  #[Test, Runtime(php: '>=8.5.0')]
+  #[Test, Runtime(php: '>=8.6.0')]
   public function partial_function_application_variadic_optional_by_ref() {
     $f= $this->run('class %T {
       public function run() {
@@ -410,7 +410,7 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(1, $count);
   }
 
-  #[Test, Runtime(php: '>=8.5.0')]
+  #[Test, Runtime(php: '>=8.6.0')]
   public function partial_function_application_with_named() {
     $r= $this->run('class %T {
 
@@ -422,7 +422,7 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals('ok.', $r);
   }
 
-  #[Test, Runtime(php: '>=8.5.0')]
+  #[Test, Runtime(php: '>=8.6.0')]
   public function partial_function_application_variadic_before_named() {
     $r= $this->run('class %T {
 
