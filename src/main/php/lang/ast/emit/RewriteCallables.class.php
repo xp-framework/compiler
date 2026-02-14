@@ -13,7 +13,7 @@ trait RewriteCallables {
 
   protected function emitCallable($result, $callable) {
     if ($callable->expression instanceof Literal && 'clone' === $callable->expression->expression) {
-      $result->out->write('fn($o) => clone $o');
+      $result->out->write('(fn($o) => clone $o)');
     } else {
       $this->emitPartial($result, $callable);
     }

@@ -229,6 +229,18 @@ class CallableSyntaxTest extends EmittingTest {
   }
 
   #[Test]
+  public function clone() {
+    $handles= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $a= new Handle(0);
+        return [$a, $a |> clone(...)];
+      }
+    }');
+    $handles[1]->redirect(4);
+    Assert::notEquals($handles[0], $handles[1]);
+  }
+
+  #[Test]
   public function partial_function_application() {
     $f= $this->run('class %T {
       public function run() {
