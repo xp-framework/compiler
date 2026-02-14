@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.9.0 / 2026-02-14
+
+* Merged PR #188: Implement partial function application as described
+  in https://wiki.php.net/rfc/partial_function_application_v2
+  (@thekid)
+
 ## 9.8.0 / 2026-01-12
 
 * Merged PR #189: Support `(void)`-casts, defined in `#[NoDiscard]`
