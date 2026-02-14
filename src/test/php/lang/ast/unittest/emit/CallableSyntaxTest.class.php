@@ -1,6 +1,8 @@
 <?php namespace lang\ast\unittest\emit;
 
+use Closure;
 use lang\Error;
+use test\verify\Runtime;
 use test\{Assert, Expect, Test, Values};
 
 /**
@@ -23,26 +25,33 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(4, $this->run($code)('Test'));
   }
 
-  #[Test]
-  public function native_function() {
+  #[Test, Values(['strlen(...)', 'strlen(?)'])]
+  public function returns_closure($notation) {
+    Assert::instance(Closure::class, $this->run('class %T {
+      public function run() { return '.$notation.'; }
+    }'));
+  }
+
+  #[Test, Values(['strlen(...)', 'strlen(?)'])]
+  public function native_function($notation) {
     $this->verify('class %T {
-      public function run() { return strlen(...); }
+      public function run() { return '.$notation.'; }
     }');
   }
 
-  #[Test]
-  public function instance_method() {
+  #[Test, Values(['$this->length(...)', '$this->length(?)'])]
+  public function instance_method($notation) {
     $this->verify('class %T {
       public function length($arg) { return strlen($arg); }
-      public function run() { return $this->length(...); }
+      public function run() { return '.$notation.'; }
     }');
   }
 
-  #[Test]
-  public function class_method() {
+  #[Test, Values(['self::length(...)', 'self::length(?)'])]
+  public function class_method($notation) {
     $this->verify('class %T {
       public static function length($arg) { return strlen($arg); }
-      public function run() { return self::length(...); }
+      public function run() { return '.$notation.'; }
     }');
   }
 
@@ -152,8 +161,8 @@ class CallableSyntaxTest extends EmittingTest {
     }');
   }
 
-  #[Test]
-  public function instantiation() {
+  #[Test, Values(['new Handle(...)', 'new Handle(?)'])]
+  public function instantiation($notation) {
     $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
       public function run() {
         return new Handle(...);
@@ -217,5 +226,223 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
     Assert::equals('cba', $f('abc'));
+  }
+
+  #[Test]
+  public function clone() {
+    $handles= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $a= new Handle(0);
+        return [$a, $a |> clone(...)];
+      }
+    }');
+    $handles[1]->redirect(4);
+    Assert::notEquals($handles[0], $handles[1]);
+  }
+
+  #[Test]
+  public function partial_function_application() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", "ok", ?);
+      }
+    }');
+    Assert::equals('ok', $f('test'));
+  }
+
+  #[Test]
+  public function partial_function_application_multiple_arguments() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", ?, ?);
+      }
+    }');
+    Assert::equals('ok', $f('ok', 'test'));
+  }
+
+  #[Test]
+  public function partial_function_application_static_method() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      private static function for($impl, $stream) {
+        return match ($stream) {
+          STDIN => new $impl(0),
+          STDOUT => new $impl(1),
+          STDERR => new $impl(2),
+        };
+      }
+
+      public function run() {
+        return self::for(Handle::class, ?);
+      }
+    }');
+    Assert::equals(new Handle(2), $f(STDERR));
+  }
+
+  #[Test]
+  public function partial_function_application_variadic() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", ...);
+      }
+    }');
+    Assert::equals('ok', $f('ok', 'test'));
+  }
+
+  #[Test]
+  public function partial_function_application_callable_syntax_mixed() {
+    $f= $this->run('class %T {
+      public function run() {
+        return array_map(strtoupper(...), ?);
+      }
+    }');
+    Assert::equals(['ONE', 'TWO'], $f(['One', 'Two']));
+  }
+
+  #[Test]
+  public function partial_function_application_order() {
+    [$result, $invokations]= $this->run('class %T {
+      private $invokations= [];
+
+      private function concat(... $args) {
+        $this->invokations[]= __FUNCTION__;
+        return implode("", $args);
+      }
+
+      private function arg() {
+        $this->invokations[]= __FUNCTION__;
+        return "ed";
+      }
+
+      public function run() {
+        $f= $this->concat(?, $this->arg());
+        $this->invokations[]= __FUNCTION__;
+        return [$f("test"), $this->invokations];
+      }
+    }');
+    Assert::equals('tested', $result);
+    Assert::equals(['arg', 'run', 'concat'], $invokations);
+  }
+
+  #[Test]
+  public function partial_function_application_inside_annotation() {
+    $f= $this->run('use lang\Reflection; class %T {
+
+      #[Attr(strrev(?))]
+      public function run() {
+        return Reflection::of($this)->method("run")->annotation(Attr::class)->argument(0);
+      }
+    }');
+    Assert::equals('cba', $f('abc'));
+  }
+
+  #[Test]
+  public function partial_function_application_with_pipe() {
+    $r= $this->run('class %T {
+      public function run() {
+        return ["hello world"] |> array_map(str_replace("hello", "hi", ?), ?);
+      }
+    }');
+    Assert::equals(['hi world'], $r);
+  }
+
+  #[Test, Expect(class: Error::class, message: '/Too few arguments/')]
+  public function partial_function_application_returned_by_pipe() {
+    $this->run('class %T {
+      public function run() {
+        "hi" |> str_replace("hello", ?, ?);
+      }
+    }');
+  }
+
+  #[Test]
+  public function partial_function_application_pass_named() {
+    $f= $this->run('class %T {
+
+      public function run() {
+        return str_replace(search: "test", replace: "ok", subject: ?);
+      }
+    }');
+    Assert::equals('ok.', $f('test.'));
+  }
+
+  #[Test]
+  public function partial_function_application_invoke_interceptor() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $add= new class() {
+          public function __invoke(int $a, int $b) {
+            return $a + $b;
+          }
+        };
+        return $add(1, ?);
+      }
+    }');
+    Assert::equals(3, $f(2));
+  }
+
+  #[Test]
+  public function partial_function_application_call_interceptor() {
+    $f= $this->run('use lang\ast\unittest\emit\Handle; class %T {
+      public function run() {
+        $calc= new class() {
+          public function __call($name, $args) {
+            return match ($name) {
+              "add" => array_sum($args),
+              // TBI
+            };
+          }
+        };
+        return $calc->add(1, ...);
+      }
+    }');
+    Assert::equals(6, $f(2, 3));
+  }
+
+  #[Test, Runtime(php: '>=8.0.0')]
+  public function partial_function_application_named_arguments_out_of_order() {
+    $f= $this->run('class %T {
+
+      public function run() {
+        return str_replace(subject: ?, replace: "ok", search: "test");
+      }
+    }');
+    Assert::equals('ok.', $f('test.'));
+  }
+
+  #[Test, Runtime(php: '>=8.6.0')]
+  public function partial_function_application_variadic_optional_by_ref() {
+    $f= $this->run('class %T {
+      public function run() {
+        return str_replace("test", "ok", ...);
+      }
+    }');
+
+    $count= 0;
+    Assert::equals('ok.', $f('test.', $count));
+    Assert::equals(1, $count);
+  }
+
+  #[Test, Runtime(php: '>=8.6.0')]
+  public function partial_function_application_with_named() {
+    $r= $this->run('class %T {
+
+      public function run() {
+        $f= str_replace("test", "ok", ?);
+        return $f(subject: "test.");
+      }
+    }');
+    Assert::equals('ok.', $r);
+  }
+
+  #[Test, Runtime(php: '>=8.6.0')]
+  public function partial_function_application_variadic_before_named() {
+    $r= $this->run('class %T {
+
+      public function run() {
+        $f= str_replace("test", ..., subject: ?);
+        return $f("ok", "test.");
+      }
+    }');
+    Assert::equals('ok.', $r);
   }
 }

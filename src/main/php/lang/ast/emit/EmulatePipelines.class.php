@@ -1,6 +1,6 @@
 <?php namespace lang\ast\emit;
 
-use lang\ast\nodes\{CallableExpression, CallableNewExpression, Literal, Variable};
+use lang\ast\nodes\{CallableExpression, CallableNewExpression, Literal, Placeholder, Variable};
 
 /**
  * Emulates pipelines / the pipe operator, including a null-safe version.
@@ -14,9 +14,13 @@ use lang\ast\nodes\{CallableExpression, CallableNewExpression, Literal, Variable
  * $in |> 'strlen';
  * strlen($in);
  *
- * // Optimize for first-class callables:
+ * // Optimize for first-class callables with single placeholder argument:
  * $in |> strlen(...);
  * strlen($in);
+ *
+ * // Optimize for partial functions with single placeholder argument:
+ * $in |> str_replace('test', 'ok', ?);
+ * strlen('test', 'ok', $in);
  * ```
  *
  * @see  https://wiki.php.net/rfc/pipe-operator-v3
@@ -26,15 +30,29 @@ use lang\ast\nodes\{CallableExpression, CallableNewExpression, Literal, Variable
  */
 trait EmulatePipelines {
 
+  private function passSingle($arguments, $arg) {
+    $placeholder= -1;
+    foreach ($arguments as $n => $argument) {
+      if ($argument instanceof Placeholder) {
+        if ($placeholder > -1) return null;
+        $placeholder= $n;
+      }
+    }
+
+    $r= $arguments;
+    $r[$placeholder]= $arg;
+    return $r;
+  }
+
   protected function emitPipeTarget($result, $target, $arg) {
-    if ($target instanceof CallableNewExpression) {
-      $target->type->arguments= [$arg];
+    if ($target instanceof CallableNewExpression && ($pass= $this->passSingle($target->arguments, $arg))) {
+      $target->type->arguments= $pass;
       $this->emitOne($result, $target->type);
       $target->type->arguments= null;
-    } else if ($target instanceof CallableExpression) {
+    } else if ($target instanceof CallableExpression && ($pass= $this->passSingle($target->arguments, $arg))) {
       $this->emitOne($result, $target->expression);
       $result->out->write('(');
-      $this->emitOne($result, $arg);
+      $this->emitArguments($result, $pass);
       $result->out->write(')');
     } else if ($target instanceof Literal) {
       $result->out->write(trim($target->expression, '"\''));

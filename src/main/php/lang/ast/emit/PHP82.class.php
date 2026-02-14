@@ -23,7 +23,7 @@ class PHP82 extends PHP {
     EmulatePipelines,
     RemoveVoidCasts,
     RewriteBlockLambdaExpressions,
-    RewriteCallableClone,
+    RewriteCallables,
     RewriteCloneWith,
     RewriteDynamicClassConstants,
     RewriteStaticVariableInitializations,

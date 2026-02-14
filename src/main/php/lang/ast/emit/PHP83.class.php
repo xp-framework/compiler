@@ -19,10 +19,10 @@ use lang\ast\types\{
  * @see  https://wiki.php.net/rfc#php_83
  */
 class PHP83 extends PHP {
-  use
+  use 
     EmulatePipelines,
     RemoveVoidCasts,
-    RewriteCallableClone,
+    RewriteCallables,
     RewriteCloneWith,
     RewriteBlockLambdaExpressions,
     RewriteProperties
