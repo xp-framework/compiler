@@ -60,6 +60,8 @@ trait RewritePartialFunctionApplications {
           $this->emitOne($result, $argument);
           $result->out->write(',');
         }
+      } else {
+        $result->out->write('(');
       }
 
       // Emit closure invoking the callable expression
@@ -68,7 +70,12 @@ trait RewritePartialFunctionApplications {
       $result->out->write('(');
       $this->emitArguments($result, $pass);
       $result->out->write(')');
-      $init && $result->out->write(']['.sizeof($init).']');
+
+      if ($init) {
+        $result->out->write(']['.sizeof($init).']');
+      } else {
+        $result->out->write(')');
+      }
     } else {
       parent::emitCallable($result, $callable);
     }
