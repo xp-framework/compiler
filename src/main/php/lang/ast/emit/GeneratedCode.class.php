@@ -2,7 +2,6 @@
 
 class GeneratedCode extends Result {
   private $prolog, $epilog;
-  public $line= 1;
 
   /**
    * Starts a result stream, including an optional prolog and epilog
@@ -34,20 +33,6 @@ class GeneratedCode extends Result {
    */
   protected function finalize() {
     '' === $this->epilog || $this->out->write($this->epilog);
-  }
-
-  /**
-   * Forwards output line to given line number
-   *
-   * @param  int $line
-   * @return self
-   */
-  public function at($line) {
-    if ($line > $this->line) {
-      $this->out->write(str_repeat("\n", $line - $this->line));
-      $this->line= $line;
-    }
-    return $this;
   }
 
   /**

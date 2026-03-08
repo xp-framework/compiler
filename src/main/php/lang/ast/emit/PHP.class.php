@@ -32,7 +32,7 @@ abstract class PHP extends Emitter {
    * Creates result
    *
    * @param  io.streams.OutputStream $target
-   * @return lang.ast.Result
+   * @return lang.ast.emit.Result
    */
   protected function result($target) {
     return new GeneratedCode($target, '<?php ');
@@ -57,7 +57,7 @@ abstract class PHP extends Emitter {
    * - Binary expression where left- and right hand side are literals
    *
    * @see    https://wiki.php.net/rfc/const_scalar_exprs
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  lang.ast.Node $node
    * @return bool
    */
@@ -116,11 +116,11 @@ abstract class PHP extends Emitter {
   /**
    * Enclose a node inside a closure
    *
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  lang.ast.Node $node
    * @param  ?lang.ast.nodes.Signature $signature
    * @param  bool $static
-   * @param  function(lang.ast.Result, lang.ast.Node): void $emit
+   * @param  function(lang.ast.emit.Result, lang.ast.Node): void $emit
    */
   protected function enclose($result, $node, $signature, $static, $emit) {
     $capture= [];
@@ -159,7 +159,7 @@ abstract class PHP extends Emitter {
   /**
    * Emits local initializations
    *
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  [:lang.ast.Node] $init
    * @return void
    */
@@ -175,7 +175,7 @@ abstract class PHP extends Emitter {
    * Convert blocks to IIFEs to allow a list of statements where PHP syntactically
    * doesn't, e.g. `fn`-style lambdas or match expressions.
    *
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  lang.ast.Node $expression
    * @return void
    */
@@ -1207,16 +1207,5 @@ abstract class PHP extends Emitter {
   protected function emitFrom($result, $from) {
     $result->out->write('yield from ');
     $this->emitOne($result, $from->iterable);
-  }
-
-  /**
-   * Emit single nodes
-   *
-   * @param  lang.ast.Result $result
-   * @param  lang.ast.Node $node
-   * @return void
-   */
-  public function emitOne($result, $node) {
-    parent::emitOne($result->at($node->line), $node);
   }
 }

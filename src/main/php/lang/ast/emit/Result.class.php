@@ -7,6 +7,7 @@ use lang\ast\CodeGen;
 class Result implements Closeable {
   public $out;
   public $codegen;
+  public $line= 1;
   public $locals= [];
 
   /**
@@ -31,6 +32,19 @@ class Result implements Closeable {
     return $this;
   }
 
+  /**
+   * Forwards output line to given line number
+   *
+   * @param  int $line
+   * @return self
+   */
+  public function at($line) {
+    if ($line > $this->line) {
+      $this->out->write(str_repeat("\n", $line - $this->line));
+      $this->line= $line;
+    }
+    return $this;
+  }
 
   /**
    * Initialize result. Guaranteed to be called *once* from constructor.

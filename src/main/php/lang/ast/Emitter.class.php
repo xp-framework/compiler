@@ -108,7 +108,7 @@ abstract class Emitter {
   /**
    * Standalone operators
    *
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  lang.ast.Token $operator
    * @return void
    */
@@ -119,7 +119,7 @@ abstract class Emitter {
   /**
    * Emit nodes seperated as statements
    *
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  iterable $nodes
    * @return void
    */
@@ -133,23 +133,21 @@ abstract class Emitter {
   /**
    * Emit single nodes
    *
-   * @param  lang.ast.Result $result
+   * @param  lang.ast.emit.Result $result
    * @param  lang.ast.Node $node
    * @return void
    */
   public function emitOne($result, $node) {
-
-    // Check for transformations
-    if (isset($this->transformations[$node->kind])) {
-      foreach ($this->transformations[$node->kind] as $transformation) {
+    if ($transformations= $this->transformations[$node->kind] ?? null) {
+      foreach ($transformations as $transformation) {
         $r= $transformation($result->codegen, $node);
         if ($r instanceof Node) {
           if ($r->kind === $node->kind) continue;
-          $this->{'emit'.$r->kind}($result, $r);
+          $this->{'emit'.$r->kind}($result->at($r->line), $r);
           return;
         } else if ($r) {
           foreach ($r as $s => $n) {
-            $this->{'emit'.$n->kind}($result, $n);
+            $this->{'emit'.$n->kind}($result->at($n->line), $n);
             null === $s || $result->out->write(';');
           }
           return;
@@ -158,14 +156,14 @@ abstract class Emitter {
       // Fall through, use default
     }
 
-    $this->{'emit'.$node->kind}($result, $node);
+    $this->{'emit'.$node->kind}($result->at($node->line), $node);
   }
 
   /**
    * Creates result
    *
    * @param  io.streams.OutputStream $target
-   * @return lang.ast.Result
+   * @return lang.ast.emit.Result
    */
   protected abstract function result($target);
 
