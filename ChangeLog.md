@@ -3,6 +3,12 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.10.0 / 2026-04-23
+
+* Merged PR #190: Implement logical AND and OR assignment operators `&&=`
+  and `||=`, see #133
+  (@thekid)
+
 ## 9.9.0 / 2026-02-14
 
 * Merged PR #188: Implement partial function application as described
