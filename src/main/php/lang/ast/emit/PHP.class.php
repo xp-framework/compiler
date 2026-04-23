@@ -820,7 +820,15 @@ abstract class PHP extends Emitter {
 
   protected function emitAssignment($result, $assignment) {
     $this->emitAssign($result, $assignment->variable);
-    $result->out->write($assignment->operator);
+
+    if ('||=' === $assignment->operator || '&&=' === $assignment->operator) {
+      $result->out->write(substr($assignment->operator, 0, 2));
+      $this->emitAssign($result, $assignment->variable);
+      $result->out->write('=');
+    } else {
+      $result->out->write($assignment->operator);
+    }
+
     $this->emitOne($result, $assignment->expression);
   }
 
