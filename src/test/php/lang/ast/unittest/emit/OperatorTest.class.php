@@ -118,4 +118,48 @@ class OperatorTest extends EmittingTest {
 
     Assert::equals($expected, $r[0]);
   }
+
+  #[Test, Values([[null, 'default'], ['test', 'test']])]
+  public function logical_or_assign($input, $expected) {
+    $r= $this->run('class %T {
+      public function run($a) {
+        $a||= "default";
+        return $a;
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[Test, Values([[null, null], ['test', 'changed']])]
+  public function logical_and_assign($input, $expected) {
+    $r= $this->run('class %T {
+      public function run($a) {
+        $a&&= "changed";
+        return $a;
+      }
+    }', $input);
+
+    Assert::equals($expected, $r);
+  }
+
+  #[Test, Values(['||=', '&&='])]
+  public function assignment_lhs_evaluated_only_once($op) {
+    $r= $this->run('class %T {
+      private $evaluated= 0;
+      private $a= null;
+
+      private function test() {
+        $this->evaluated++;
+        return $this;
+      }
+
+      public function run() {
+        $this->test()->a '.$op.' "default";
+        return $this->evaluated;
+      }
+    }');
+
+    Assert::equals(1, $r);
+  }
 }
