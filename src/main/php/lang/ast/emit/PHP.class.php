@@ -825,10 +825,17 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitLogicalAssignment($result, $assignment) {
-    $this->emitOne($result, $assignment->variable);
-    $result->out->write(substr($assignment->operator, 0, 2));
-    $this->emitOne($result, $assignment->variable);
-    $result->out->write('=');
+    if ($assignment->variable instanceof Variable) {
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write(substr($assignment->operator, 0, 2));
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write('=');
+    } else {
+      $t= $result->temp();
+      $result->out->write('('.$t.'= &');
+      $this->emitOne($result, $assignment->variable);
+      $result->out->write(')'.substr($assignment->operator, 0, 2).$t.'=');
+    }
     $this->emitOne($result, $assignment->expression);
   }
 

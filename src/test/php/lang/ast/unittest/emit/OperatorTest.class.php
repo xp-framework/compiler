@@ -142,4 +142,24 @@ class OperatorTest extends EmittingTest {
 
     Assert::equals($expected, $r);
   }
+
+  #[Test, Values(['??=', '||=', '&&='])]
+  public function assignment_lhs_evaluated_only_once($op) {
+    $r= $this->run('class %T {
+      private $evaluated= 0;
+      private $a= null;
+
+      private function test() {
+        $this->evaluated++;
+        return $this;
+      }
+
+      public function run() {
+        $this->test()->a '.$op.' "default";
+        return $this->evaluated;
+      }
+    }');
+
+    Assert::equals(1, $r);
+  }
 }
