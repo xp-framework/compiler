@@ -11,6 +11,7 @@ use test\{Assert, Expect, Test, Values};
  * @see   https://externals.io/message/129329
  * @see   https://wiki.php.net/rfc/fcc_in_const_expr
  * @see   https://wiki.php.net/rfc/first_class_callable_syntax#proposal
+ * @see   https://wiki.php.net/rfc/partial_function_application_optional_placeholder
  */
 class CallableSyntaxTest extends EmittingTest {
 
@@ -444,5 +445,28 @@ class CallableSyntaxTest extends EmittingTest {
       }
     }');
     Assert::equals('ok.', $r);
+  }
+
+  #[Test]
+  public function partial_function_application_omit_optional() {
+    $f= $this->run('class %T {
+
+      public function censor($in, $mask= "*", $prefix= 3) {
+        return substr($in, 0, $prefix).str_repeat($mask, strlen($in) - $prefix);
+      }
+
+      public function run() {
+        return $this->censor("testing", ?, ...);
+      }
+    }');
+
+    // Mask in returned PFA is not optional!
+    Assert::throws(Error::class, fn() => $f());
+
+    // Supply reqired argument
+    Assert::equals('tes####', $f('#'));
+
+    // Supply required and optional argument
+    Assert::equals('te#####', $f('#', 2));
   }
 }
