@@ -357,15 +357,15 @@ abstract class PHP extends Emitter {
     $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
     $this->emitSignature($result, $function->signature);
 
-    $result->out->write('{');
     if ($function->body instanceof Block) {
+      $result->out->write('{');
       $this->emitAll($result, $function->body->statements);
+      $result->out->write('}');
     } else {
-      $result->out->write('return ');
+      $result->out->write('{ return ');
       $this->emitOne($result, $function->body);
-      $result->out->write(';');
+      $result->out->write('; }');
     }
-    $result->out->write('}');
 
     $result->locals= $locals;
   }
@@ -377,15 +377,15 @@ abstract class PHP extends Emitter {
     $closure->static ? $result->out->write('static function') : $result->out->write('function');
     $this->emitSignature($result, $closure->signature, $closure->use);
 
-    $result->out->write('{');
     if ($closure->body instanceof Block) {
+      $result->out->write('{');
       $this->emitAll($result, $closure->body->statements);
+      $result->out->write('}');
     } else {
-      $result->out->write('return ');
+      $result->out->write('{ return ');
       $this->emitOne($result, $closure->body);
-      $result->out->write(';');
+      $result->out->write('; }');
     }
-    $result->out->write('}');
 
     $result->locals= $locals;
   }
@@ -754,12 +754,12 @@ abstract class PHP extends Emitter {
 
       if ($method->body instanceof Block) {
         $this->emitAll($result, $method->body->statements);
+        $result->out->write('}');
       } else {
         $result->out->write('return ');
         $this->emitOne($result, $method->body);
-        $result->out->write(';');
+        $result->out->write('; }');
       }
-      $result->out->write('}');
     }
 
     foreach ($promoted as $param) {
