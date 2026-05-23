@@ -350,16 +350,6 @@ abstract class PHP extends Emitter {
     }
   }
 
-  protected function emitFunctionScope($result, $scope) {
-    if ($scope instanceof Block) {
-      $this->emitAll($result, $scope->statements);
-    } else {
-      $result->out->write('return ');
-      $this->emitOne($result, $scope);
-      $result->out->write(';');
-    }
-  }
-
   protected function emitFunction($result, $function) {
     $locals= $result->locals;
     $result->locals= [];
@@ -368,7 +358,13 @@ abstract class PHP extends Emitter {
     $this->emitSignature($result, $function->signature);
 
     $result->out->write('{');
-    $this->emitFunctionScope($result, $function->body);
+    if ($function->body instanceof Block) {
+      $this->emitAll($result, $function->body->statements);
+    } else {
+      $result->out->write('return ');
+      $this->emitOne($result, $function->body);
+      $result->out->write(';');
+    }
     $result->out->write('}');
 
     $result->locals= $locals;
@@ -382,7 +378,13 @@ abstract class PHP extends Emitter {
     $this->emitSignature($result, $closure->signature, $closure->use);
 
     $result->out->write('{');
-    $this->emitFunctionScope($result, $closure->body);
+    if ($closure->body instanceof Block) {
+      $this->emitAll($result, $closure->body->statements);
+    } else {
+      $result->out->write('return ');
+      $this->emitOne($result, $closure->body);
+      $result->out->write(';');
+    }
     $result->out->write('}');
 
     $result->locals= $locals;
@@ -750,7 +752,13 @@ abstract class PHP extends Emitter {
         $result->codegen->scope[0]->init= [];
       }
 
-      $this->emitFunctionScope($result, $method->body);
+      if ($method->body instanceof Block) {
+        $this->emitAll($result, $method->body->statements);
+      } else {
+        $result->out->write('return ');
+        $this->emitOne($result, $method->body);
+        $result->out->write(';');
+      }
       $result->out->write('}');
     }
 
