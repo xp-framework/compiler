@@ -193,7 +193,7 @@ class LambdasTest extends EmittingTest {
   public function with_block() {
     $r= $this->run('class %T {
       public function run() {
-        return fn() => {
+        return fn() {
           $a= 1;
           return $a + 1;
         };
@@ -208,7 +208,7 @@ class LambdasTest extends EmittingTest {
     $r= $this->run('class %T {
       public function run() {
         $a= 1;
-        return fn() => {
+        return fn() {
           return $a + 1;
         };
       }
@@ -231,7 +231,7 @@ class LambdasTest extends EmittingTest {
     $r= $this->run('class %T {
       public function run(iterable $records) {
         $nonNull= fn($record) => null !== $record;
-        $process= fn($records, $filter) => {
+        $process= fn($records, $filter) {
           foreach ($records as $record) {
             if ($filter($record)) yield $record;
           }

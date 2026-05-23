@@ -357,9 +357,15 @@ abstract class PHP extends Emitter {
     $result->out->write('function '.($function->signature->byref ? '&' : '').$function->name);
     $this->emitSignature($result, $function->signature);
 
-    $result->out->write('{');
-    $this->emitAll($result, $function->body);
-    $result->out->write('}');
+    if ($function->body instanceof Block) {
+      $result->out->write('{');
+      $this->emitAll($result, $function->body->statements);
+      $result->out->write('}');
+    } else {
+      $result->out->write('{ return ');
+      $this->emitOne($result, $function->body);
+      $result->out->write('; }');
+    }
 
     $result->locals= $locals;
   }
@@ -371,9 +377,15 @@ abstract class PHP extends Emitter {
     $closure->static ? $result->out->write('static function') : $result->out->write('function');
     $this->emitSignature($result, $closure->signature, $closure->use);
 
-    $result->out->write('{');
-    $this->emitAll($result, $closure->body);
-    $result->out->write('}');
+    if ($closure->body instanceof Block) {
+      $result->out->write('{');
+      $this->emitAll($result, $closure->body->statements);
+      $result->out->write('}');
+    } else {
+      $result->out->write('{ return ');
+      $this->emitOne($result, $closure->body);
+      $result->out->write('; }');
+    }
 
     $result->locals= $locals;
   }
@@ -384,6 +396,7 @@ abstract class PHP extends Emitter {
     $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
+
     $this->emitOne($result, $lambda->body);
 
     $result->locals= $locals;
@@ -719,7 +732,7 @@ abstract class PHP extends Emitter {
     if (null === $method->body) {
       $result->out->write(';');
     } else {
-      $result->out->write(' {');
+      $result->out->write('{');
 
       // Emit non-constant parameter defaults
       foreach ($init as $param) {
@@ -739,8 +752,14 @@ abstract class PHP extends Emitter {
         $result->codegen->scope[0]->init= [];
       }
 
-      $this->emitAll($result, $method->body);
-      $result->out->write('}');
+      if ($method->body instanceof Block) {
+        $this->emitAll($result, $method->body->statements);
+        $result->out->write('}');
+      } else {
+        $result->out->write('return ');
+        $this->emitOne($result, $method->body);
+        $result->out->write('; }');
+      }
     }
 
     foreach ($promoted as $param) {
