@@ -353,12 +353,10 @@ abstract class PHP extends Emitter {
   protected function emitFunctionScope($result, $scope) {
     if ($scope instanceof Block) {
       $this->emitAll($result, $scope->statements);
-    } else if ($scope instanceof Node) {
+    } else {
       $result->out->write('return ');
       $this->emitOne($result, $scope);
       $result->out->write(';');
-    } else {
-      $this->emitAll($result, $scope); // BC
     }
   }
 
