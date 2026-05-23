@@ -3,6 +3,14 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.11.0 / 2026-04-23
+
+* Merged PR #61: Refactor function scopes: Capturing and returning.
+  - `fn` captures variables from the surrounding scope
+  - `function` does not
+  - `=> ...` is short for `{ return ... }`
+  (@thekid)
+
 ## 9.10.0 / 2026-04-23
 
 * Merged PR #190: Implement logical AND and OR assignment operators `&&=`
