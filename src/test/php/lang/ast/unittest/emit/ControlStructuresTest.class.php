@@ -121,11 +121,11 @@ class ControlStructuresTest extends EmittingTest {
         $value= "Test";
         return match ($type) {
           "PING" => "+PONG",
-          "MSG"  => {
+          "MSG" {
             $reply= "Re: ".$value;
             return "+OK $reply";
           },
-          default => {
+          default {
             return "-ERR Unknown ".$type;
           }
         };
@@ -243,7 +243,7 @@ class ControlStructuresTest extends EmittingTest {
         $test= "Original";
         (function() use(&$test) {
           match (true) {
-            true => {
+            true {
               $test= "Changed";
               return true;
             }

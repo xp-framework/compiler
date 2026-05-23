@@ -350,6 +350,18 @@ abstract class PHP extends Emitter {
     }
   }
 
+  protected function emitFunctionScope($result, $scope) {
+    if ($scope instanceof Block) {
+      $this->emitAll($result, $scope->statements);
+    } else if ($scope instanceof Node) {
+      $result->out->write('return ');
+      $this->emitOne($result, $scope);
+      $result->out->write(';');
+    } else {
+      $this->emitAll($result, $scope); // BC
+    }
+  }
+
   protected function emitFunction($result, $function) {
     $locals= $result->locals;
     $result->locals= [];
@@ -358,7 +370,7 @@ abstract class PHP extends Emitter {
     $this->emitSignature($result, $function->signature);
 
     $result->out->write('{');
-    $this->emitAll($result, $function->body);
+    $this->emitFunctionScope($result, $function->body);
     $result->out->write('}');
 
     $result->locals= $locals;
@@ -372,7 +384,7 @@ abstract class PHP extends Emitter {
     $this->emitSignature($result, $closure->signature, $closure->use);
 
     $result->out->write('{');
-    $this->emitAll($result, $closure->body);
+    $this->emitFunctionScope($result, $closure->body);
     $result->out->write('}');
 
     $result->locals= $locals;
@@ -384,6 +396,7 @@ abstract class PHP extends Emitter {
     $lambda->static ? $result->out->write('static fn') : $result->out->write('fn');
     $this->emitSignature($result, $lambda->signature);
     $result->out->write('=>');
+
     $this->emitOne($result, $lambda->body);
 
     $result->locals= $locals;
@@ -719,7 +732,7 @@ abstract class PHP extends Emitter {
     if (null === $method->body) {
       $result->out->write(';');
     } else {
-      $result->out->write(' {');
+      $result->out->write('{');
 
       // Emit non-constant parameter defaults
       foreach ($init as $param) {
@@ -739,7 +752,7 @@ abstract class PHP extends Emitter {
         $result->codegen->scope[0]->init= [];
       }
 
-      $this->emitAll($result, $method->body);
+      $this->emitFunctionScope($result, $method->body);
       $result->out->write('}');
     }
 

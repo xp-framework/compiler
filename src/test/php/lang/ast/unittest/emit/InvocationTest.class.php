@@ -78,30 +78,43 @@ class InvocationTest extends EmittingTest {
     ));
   }
 
-  #[Test]
-  public function closure() {
+  #[Test, Values(['function() { return "closure"; }', 'function() => "closure"'])]
+  public function closure($expr) {
     Assert::equals('closure', $this->run(
       'class %T {
 
         public function run() {
-          $f= function() { return "closure"; };
+          $f= '.$expr.';
           return $f();
         }
       }'
     ));
   }
 
-  #[Test]
-  public function global_function() {
-    Assert::equals('function', $this->run(
-      'function fixture() { return "function"; }
-      class %T {
+  #[Test, Values(['fn() { return "lambda"; }', 'fn() => "lambda"'])]
+  public function lambda($expr) {
+    Assert::equals('lambda', $this->run(
+      'class %T {
 
         public function run() {
-          return fixture();
+          $f= '.$expr.';
+          return $f();
         }
       }'
     ));
+  }
+
+  #[Test, Values(['function t%1$s() { return "function"; }', 'function t%1$s() => "function";'])]
+  public function global_function($decl) {
+    Assert::equals('function', $this->run(sprintf(
+      $decl.' class %%T {
+
+        public function run() {
+          return t%1$s();
+        }
+      }',
+      uniqid()
+    )));
   }
 
   #[Test]
