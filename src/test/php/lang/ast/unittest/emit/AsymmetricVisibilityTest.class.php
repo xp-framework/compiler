@@ -153,4 +153,17 @@ class AsymmetricVisibilityTest extends EmittingTest {
     Assert::throws(Error::class, fn() => $t->newInstance()->fixture= 'Changed');
     Assert::equals('changed', $t->newInstance()->rename('Changed')->fixture);
   }
+
+  #[Test]
+  public function equality() {
+    $t= $this->declare('class %T {
+      public private(set) string $name;
+
+      public function __construct($name) { $this->name= $name; }
+    }');
+
+    $a= $t->newInstance('Test');
+    $b= $t->newInstance('Test');
+    Assert::equals($a, $b);
+  }
 }
