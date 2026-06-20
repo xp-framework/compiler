@@ -13,6 +13,7 @@ abstract class EmittingTest {
   private static $id= 0;
   private $cl, $language, $emitter, $output;
   private $transformations= [];
+  private $extensions= [];
 
   /**
    * Constructor
@@ -52,6 +53,18 @@ abstract class EmittingTest {
    */
   protected function transform($type, $function) {
     $this->transformations[]= $this->emitter->transform($type, $function);
+  }
+
+  /**
+   * Register an extension.
+   *
+   * @param  string $type
+   * @param  [:var] $impl
+   * @return void
+   */
+  protected function extension($type, $impl) {
+    $this->emitter->extensions[$type]= $impl;
+    $this->extensions[]= $type;
   }
 
   /**
@@ -130,6 +143,10 @@ abstract class EmittingTest {
   public function tearDown() {
     foreach ($this->transformations as $transformation) {
       $this->emitter->remove($transformation);
+    }
+
+    foreach ($this->extensions as $type) {
+      unset($this->emitter->extensions[$type]);
     }
   }
 }
