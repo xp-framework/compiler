@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest\cli;
 
-use io\{File, Folder, IOException};
+use io\{File, Folder};
 use lang\Environment;
 use lang\archive\ArchiveClassLoader;
 use test\{After, Assert, Before, Test};
@@ -22,11 +22,9 @@ class ToArchiveTest {
   #[After]
   public function cleanup() {
     $this->archive->isOpen() && $this->archive->close();
-    try {
-      $this->folder->unlink();
-    } catch (IOException $ignored) {
-      // XP xar support holds on to file handles
-    }
+    $this->archive->unlink();
+
+    $this->folder->unlink();
   }
 
   #[Test]
