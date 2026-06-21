@@ -43,4 +43,9 @@ class ToArchive extends Output {
   public function close() {
     $this->archive->create();
   }
+
+  /** Ensure the archive is closed in any case */
+  public function __destruct() {
+    $this->archive->isOpen() && $this->archive->close();
+  }
 }
