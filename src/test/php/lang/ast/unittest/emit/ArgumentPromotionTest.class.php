@@ -2,6 +2,7 @@
 
 use lang\Primitive;
 use lang\ast\Errors;
+use lang\reflection\InvocationFailed;
 use test\{Assert, Expect, Test};
 
 /**
@@ -151,5 +152,24 @@ class ArgumentPromotionTest extends EmittingTest {
     }');
 
     Assert::equals(MODIFIER_PUBLIC | MODIFIER_FINAL, $t->property('name')->modifiers()->bits());
+  }
+
+  #[Test]
+  public function promoted_property_hook() {
+    $c= $this->declare('class %T {
+      public function __construct(
+        public private(set) float $celsius= 100 {
+          set {
+            if ($value < -273.15) {
+              throw new \\lang\\IllegalArgumentException($value." is below absolute zero");
+            }
+            $this->celsius= $value;
+          }
+        }
+      ) { }
+    }');
+
+    Assert::equals(0.0, $c->newInstance(0.0)->celsius);
+    Assert::throws(InvocationFailed::class, fn() => $c->newInstance(-300.0));
   }
 }
