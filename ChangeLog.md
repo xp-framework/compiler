@@ -6,7 +6,7 @@ XP Compiler ChangeLog
 ## 9.12.0 / 2026-07-05
 
 * Made compatible with `xp-framework/ast` version 13.0.0 - adding support
-  for parsing promoted parameters with property hook blocks
+  for promoted parameters with property hooks. See xp-framework/ast#64
   (@thekid)
 
 ## 9.11.0 / 2026-04-23
