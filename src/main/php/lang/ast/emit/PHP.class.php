@@ -763,8 +763,8 @@ abstract class PHP extends Emitter {
     }
 
     foreach ($promoted as $param) {
-      $this->emitProperty($result, new Property(
-        is_array($param->promote) ? $param->promote : explode(' ', $param->promote),
+      $this->emitProperty($result, $param->promote instanceof Property ? $param->promote : new Property(
+        $param->promote,
         $param->name,
         $param->type
       ));
