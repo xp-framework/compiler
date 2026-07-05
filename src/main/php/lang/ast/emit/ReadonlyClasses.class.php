@@ -1,6 +1,7 @@
 <?php namespace lang\ast\emit;
 
 use lang\ast\Code;
+use lang\ast\nodes\Property;
 
 /**
  * Implements readonly properties by removing the `readonly` modifier from
@@ -23,10 +24,10 @@ trait ReadonlyClasses {
           foreach ($member->signature->parameters as $param) {
             if (null === $param->promote) {
               // NOOP
-            } else if (is_array($param->promote)) {
+            } else if ($param->promote instanceof Property) {
+              $param->promote->modifiers[]= 'readonly';
+            } else {
               $param->promote[]= 'readonly';
-            } else if (is_string($param->promote)) {
-              $param->promote.= ' readonly';
             }
           }
         }
