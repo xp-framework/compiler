@@ -6,15 +6,10 @@ use lang\ast\nodes\{EnumCase, InterfaceDeclaration, TraitDeclaration, Property, 
 use lang\reflection\Modifiers;
 
 class Declaration extends Type {
-  private $type, $codegen;
 
   static function __static() { }
 
-  /** @param  lang.ast.nodes.TypeDeclaration $type */
-  public function __construct($type, $codegen) {
-    $this->type= $type;
-    $this->codegen= $codegen;
-  }
+  public function __construct(private $type, private $codegen) { }
 
   /** @return string */
   public function name() { return ltrim($this->type->name, '\\'); }
