@@ -15,7 +15,7 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack language, PHP 8.6, PHP 8.5, PHP 8.4, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.6, PHP 8.5, PHP 8.4, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 8.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
@@ -61,11 +61,11 @@ $ xp compile -o dist.xar src/main/php/
 # Compile src/main/php, do not write output
 $ xp compile -n src/main/php/
 
-# Target PHP 7.4 (default target is current PHP version)
-$ xp compile -t php:7.4 HelloWorld.php HelloWorld.class.php
+# Target PHP 8.0 (default target is current PHP version)
+$ xp compile -t php:8.0 HelloWorld.php HelloWorld.class.php
 
 # Emit XP meta information (includes lang.ast.emit.php.XpMeta):
-$ xp compile -t php:7.4 -a php:xp-meta -o dist src/main/php
+$ xp compile -t php:8.0 -a php:xp-meta -o dist src/main/php
 ```
 
 The -o and -n options accept multiple input sources following them.
@@ -74,7 +74,7 @@ The -q option suppresses all diagnostic output except for errors.
 Features supported
 ------------------
 
-XP Compiler supports features such as annotations, arrow functions, enums, property type-hints, the null-safe instance operator as well as all PHP 7 and PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
+XP Compiler supports features such as annotations, arrow functions, enums, property type-hints, the null-safe instance operator as well as all PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
 
 ### More features
 
@@ -88,7 +88,6 @@ $ xp compile
 Usage: xp compile <in> [<out>]
 
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
-lang.ast.emit.PHP74
 lang.ast.emit.PHP80
 lang.ast.emit.PHP81
 lang.ast.emit.PHP82
