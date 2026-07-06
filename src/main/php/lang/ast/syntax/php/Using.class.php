@@ -23,8 +23,8 @@ use lang\ast\syntax\Extension;
  * }
  * ```
  *
- * @see  https://github.com/xp-framework/compiler/pull/33
- * @test xp://lang.ast.unittest.emit.UsingTest
+ * @see   https://github.com/xp-framework/compiler/pull/33
+ * @test  lang.ast.unittest.emit.UsingTest
  */
 class Using implements Extension {
 
