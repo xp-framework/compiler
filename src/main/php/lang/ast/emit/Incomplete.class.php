@@ -1,10 +1,9 @@
 <?php namespace lang\ast\emit;
 
 class Incomplete extends Type {
-  private $name;
 
-  /** @param string $name */
-  public function __construct($name) { $this->name= $name; }
+  /** Creates a new incomplete type */
+  public function __construct(private string $name) { }
 
   /** @return string */
   public function name() { return $this->name; }
