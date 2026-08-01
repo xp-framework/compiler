@@ -70,7 +70,7 @@ class CompilingClassLoaderTest {
   public function load_class() {
     Assert::equals('Tests', $this->compile(
       ['Tests' => '<?php namespace %s; class Tests { }'],
-      fn($loader, $types) => $loader->loadClass($types['Tests'])->getSimpleName()
+      fn($loader, $types) => $loader->loadClass($types['Tests'])->reflect()->getShortName()
     ));
   }
 
@@ -131,7 +131,7 @@ class CompilingClassLoaderTest {
       ['Tests' => '<?php namespace %s; class Tests { }'],
       fn($loader, $types, $temp) => $loader->loadUri($temp->path.strtr($types['Tests'], '.', DIRECTORY_SEPARATOR).CompilingClassLoader::EXTENSION)
     );
-    Assert::equals('Tests', $class->getSimpleName());
+    Assert::equals('Tests', $class->reflect()->getShortName());
   }
 
   #[Test, Expect(class: ClassFormatException::class, message: '/Compiler error: Expected "type name", have .+/')]

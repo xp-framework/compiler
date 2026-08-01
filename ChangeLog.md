@@ -3,6 +3,11 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.12.1 / 2026-08-01
+
+* Added forward-compatible refactoring for xp-framework/core#367
+  (@thekid)
+
 ## 9.12.0 / 2026-07-05
 
 * Made compatible with `xp-framework/ast` version 13.0.0 - adding support
