@@ -3,6 +3,14 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.13.0 / 2026-08-02
+
+* Merged PR #196: Add PHP 8.6 emitter following the availability of
+  PHP 8.6 alpha 3, see https://www.php.net/archive/2026.php#2026-07-30-3
+  (@thekid)
+* Merged PR #195: Emit PHP 8 attributes alongside XP meta information
+  (@thekid)
+
 ## 9.12.1 / 2026-08-01
 
 * Added forward-compatible refactoring for xp-framework/core#367
