@@ -2,6 +2,7 @@
 
 use ReflectionClass;
 use lang\ast\emit\php\XpMeta;
+use test\verify\Runtime;
 use test\{Assert, Test, Values};
 
 /**
@@ -23,7 +24,7 @@ class AnnotationsTest extends AnnotationSupport {
     yield ['#[Test(value: "a")]', ['Test' => ['value' => 'a']]];
   }
 
-  #[Test, Values(from: 'declarations')]
+  #[Test, Runtime(php: '>=8.0.0-dev'), Values(from: 'declarations')]
   public function also_emits_php_attributes($declaration, $expected) {
     $type= $this->declare($declaration);
     $declared= [];
