@@ -1,6 +1,9 @@
 <?php namespace lang\ast\unittest\emit;
 
+use ReflectionClass;
 use lang\ast\emit\php\XpMeta;
+use test\verify\Runtime;
+use test\{Assert, Test, Values};
 
 /**
  * Annotations via XP Meta information
@@ -13,4 +16,22 @@ class AnnotationsTest extends AnnotationSupport {
   /** @return string[] */
   protected function emitters() { return [XpMeta::class]; }
 
+  /** @return iterable */
+  private function declarations() {
+    yield ['#[Test]', ['Test' => []]];
+    yield ['#[Test("a")]', ['Test' => ['a']]];
+    yield ['#[Test(1, 2, 3)]', ['Test' => [1, 2, 3]]];
+    yield ['#[Test(value: "a")]', ['Test' => ['value' => 'a']]];
+  }
+
+  #[Test, Runtime(php: '>=8.0.0-dev'), Values(from: 'declarations')]
+  public function also_emits_php_attributes($declaration, $expected) {
+    $type= $this->declare($declaration);
+    $declared= [];
+    foreach ((new ReflectionClass($type->literal()))->getAttributes() as $attribute) {
+      $declared[$attribute->getName()]= $attribute->getArguments();
+    }
+
+    Assert::equals($expected, $declared);
+  }
 }

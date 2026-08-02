@@ -102,12 +102,4 @@ trait XpMeta {
   protected function emitComment($result, $comment) {
     // Omit from generated code
   }
-
-  protected function emitAnnotation($result, $annotation) {
-    // Omit from generated code
-  }
-
-  protected function emitAnnotations($result, $annotations) {
-    // Omit from generated code
-  }
 }
