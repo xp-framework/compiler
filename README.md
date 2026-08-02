@@ -36,7 +36,7 @@ class HelloWorld {
 
     Console::writeLine(new Date()->toString(), ': ');
     $hello= $greet(?, from: $author);
-    $hello($args[0] ?? 'World') |> Console::writeLine(?);
+    $hello($args[0] ?? 'World') |> Console::writeLine(...);
   }
 }
 ```
@@ -95,8 +95,8 @@ lang.ast.emit.PHP80
 lang.ast.emit.PHP81
 lang.ast.emit.PHP82
 lang.ast.emit.PHP83
-lang.ast.emit.PHP84 [*]
-lang.ast.emit.PHP85
+lang.ast.emit.PHP84
+lang.ast.emit.PHP85 [*]
 lang.ast.emit.PHP86
 lang.ast.syntax.php.Using [*]
 
