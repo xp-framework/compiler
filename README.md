@@ -4,8 +4,7 @@ XP Compiler
 [![Build status on GitHub](https://github.com/xp-framework/compiler/workflows/Tests/badge.svg)](https://github.com/xp-framework/compiler/actions)
 [![XP Framework Module](https://raw.githubusercontent.com/xp-framework/web/master/static/xp-framework-badge.png)](https://github.com/xp-framework/core)
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
-[![Requires PHP 7.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_4plus.svg)](http://php.net/)
-[![Supports PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
+[![Requires PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
 [![Latest Stable Version](https://poser.pugx.org/xp-framework/compiler/version.svg)](https://packagist.org/packages/xp-framework/compiler)
 
 Compiles future PHP to today's PHP.
@@ -16,7 +15,7 @@ After adding the compiler to your project via `composer require xp-framework/com
 
 Example
 -------
-The following code uses Hack language, PHP 8.6, PHP 8.5, PHP 8.4, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 7.4. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
+The following code uses Hack language, PHP 8.6, PHP 8.5, PHP 8.4, PHP 8.3, PHP 8.2, 8.1 and 8.0 features but runs on anything >= PHP 8.0. Builtin features from newer PHP versions are translated to work with the currently executing runtime if necessary.
 
 ```php
 <?php // In a file "HelloWorld.php"
@@ -62,11 +61,11 @@ $ xp compile -o dist.xar src/main/php/
 # Compile src/main/php, do not write output
 $ xp compile -n src/main/php/
 
-# Target PHP 7.4 (default target is current PHP version)
-$ xp compile -t php:7.4 HelloWorld.php HelloWorld.class.php
+# Target PHP 8.0 (default target is current PHP version)
+$ xp compile -t php:8.0 HelloWorld.php HelloWorld.class.php
 
 # Emit XP meta information (includes lang.ast.emit.php.XpMeta):
-$ xp compile -t php:7.4 -a php:xp-meta -o dist src/main/php
+$ xp compile -t php:8.0 -a php:xp-meta -o dist src/main/php
 ```
 
 The -o and -n options accept multiple input sources following them.
@@ -75,7 +74,7 @@ The -q option suppresses all diagnostic output except for errors.
 Features supported
 ------------------
 
-XP Compiler supports features such as annotations, arrow functions, enums, property type-hints, the null-safe instance operator as well as all PHP 7 and PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
+XP Compiler supports features such as annotations, arrow functions, enums, property type-hints, the null-safe instance operator as well as all PHP 8 syntax additions. A complete list including examples can be found [in our Wiki](https://github.com/xp-framework/compiler/wiki).
 
 ### More features
 
@@ -89,7 +88,6 @@ $ xp compile
 Usage: xp compile <in> [<out>]
 
 @FileSystemCL<./vendor/xp-framework/compiler/src/main/php>
-lang.ast.emit.PHP74
 lang.ast.emit.PHP80
 lang.ast.emit.PHP81
 lang.ast.emit.PHP82
