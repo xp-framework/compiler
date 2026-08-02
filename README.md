@@ -34,7 +34,7 @@ class HelloWorld {
     $greet= fn($to, $from) => self::GREETING.' '.$to.' from '.$from;
     $author= Reflection::type(self::class)->annotation(Author::class)->argument(0);
 
-    Console::writeLine(new Date()->toString(), ': ');
+    Console::write(new Date()->toString(), ': ');
     $hello= $greet(?, from: $author);
     $hello($args[0] ?? 'World') |> Console::writeLine(...);
   }
