@@ -19,7 +19,7 @@ use lang\ast\nodes\{
   UnpackExpression,
   Variable
 };
-use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpression};
+use lang\ast\types\{IsUnion, IsFunction, IsArray, IsMap, IsNullable, IsExpression, IsLiteral};
 use lang\ast\{Emitter, Node, Type, Result};
 
 abstract class PHP extends Emitter {
@@ -28,6 +28,7 @@ abstract class PHP extends Emitter {
   const CONSTANT= 2;
 
   protected $literals= [];
+  public $extensions= [];
 
   /**
    * Creates result
@@ -115,6 +116,24 @@ abstract class PHP extends Emitter {
   }
 
   /**
+   * Returns type for a given node
+   *
+   * @param  lang.ast.emit.Result $result
+   * @param  lang.ast.Node $node
+   * @return ?lang.ast.Type
+   */
+  protected function typeOf($result, $node) {
+    if ($node instanceof Variable) {
+      $local= $result->locals[$node->pointer] ?? null;
+      return $local ? $local->type : null;
+    } else if ($node instanceof Literal) {
+      if ('"' === $node->expression[0] || "'" === $node->expression[0]) return new IsLiteral('string');
+    }
+
+    return null; // TBI
+  }
+
+  /**
    * Enclose a node inside a closure
    *
    * @param  lang.ast.emit.Result $result
@@ -127,7 +146,7 @@ abstract class PHP extends Emitter {
     $capture= [];
     foreach ($result->codegen->search($node, 'variable') as $var) {
       if (isset($result->locals[$var->pointer])) {
-        $capture[$var->pointer]??= ($result->locals[$var->pointer] ? '&$' : '$').$var->pointer;
+        $capture[$var->pointer]??= ($result->locals[$var->pointer]->byRef ? '&$' : '$').$var->pointer;
       }
     }
     unset($capture['this']);
@@ -147,7 +166,7 @@ abstract class PHP extends Emitter {
     if ($capture) {
       $result->out->write('use('.implode(', ', $capture).')');
       foreach ($capture as $name => $variable) {
-        $result->locals[$name]= '&' === $variable[0];
+        $result->locals[$name]= $locals[$name];
       }
     }
 
@@ -300,7 +319,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitParameter($result, $parameter) {
-    $result->locals[$parameter->name]= $parameter->reference;
+    $result->locals[$parameter->name]= new Local($parameter->type, $parameter->reference);
     $parameter->annotations && $this->emitOne($result, $parameter->annotations);
 
     // If we have a non-constant default and a type, emit a nullable type hint
@@ -342,7 +361,7 @@ abstract class PHP extends Emitter {
     if ($use) {
       $result->out->write(' use('.implode(',', $use).') ');
       foreach ($use as $variable) {
-        $result->locals[ltrim($variable, '&$')]= '&' === $variable[0];
+        $result->locals[ltrim($variable, '&$')]= new Local(null, '&' === $variable[0]);
       }
     }
 
@@ -690,7 +709,7 @@ abstract class PHP extends Emitter {
 
   protected function emitMethod($result, $method) {
     $locals= $result->locals;
-    $result->locals= ['this' => false];
+    $result->locals= ['this' => new Local(null, false)]; // FIXME: Type
     $meta= [
       DETAIL_RETURNS     => $method->signature->returns ? $method->signature->returns->name() : 'var',
       DETAIL_ANNOTATIONS => $method->annotations,
@@ -816,10 +835,10 @@ abstract class PHP extends Emitter {
     }
   }
 
-  protected function emitAssign($result, $target) {
+  protected function emitAssign($result, $target, $type= null) {
     if ($target instanceof Variable && $target->const) {
       $result->out->write('$'.$target->pointer);
-      $result->locals[$target->pointer]= false;
+      $result->locals[$target->pointer]= new Local($type, false);
     } else if ($target instanceof ArrayLiteral) {
       $result->out->write('[');
       foreach ($target->values as $pair) {
@@ -839,7 +858,7 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitAssignment($result, $assignment) {
-    $this->emitAssign($result, $assignment->variable);
+    $this->emitAssign($result, $assignment->variable, $this->typeOf($result, $assignment->expression));
     $result->out->write($assignment->operator);
     $this->emitOne($result, $assignment->expression);
   }
@@ -1159,10 +1178,18 @@ abstract class PHP extends Emitter {
   }
 
   protected function emitInvoke($result, $invoke) {
-    $this->emitOne($result, $invoke->expression);
-    $result->out->write('(');
-    $this->emitArguments($result, $invoke->arguments);
-    $result->out->write(')');
+    if (
+      ($invoke->expression instanceof InstanceExpression) &&
+      ($type= $this->typeOf($result, $invoke->expression->expression)) &&
+      ($extension= $this->extensions[$type->literal()][$invoke->expression->member->expression] ?? null)
+    ) {
+      $this->emitOne($result, $extension($invoke->expression->expression, $invoke->arguments));
+    } else {
+      $this->emitOne($result, $invoke->expression);
+      $result->out->write('(');
+      $this->emitArguments($result, $invoke->arguments);
+      $result->out->write(')');
+    }
   }
 
   protected function emitScope($result, $scope) {
