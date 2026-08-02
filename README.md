@@ -35,7 +35,8 @@ class HelloWorld {
     $author= Reflection::type(self::class)->annotation(Author::class)->argument(0);
 
     Console::writeLine(new Date()->toString(), ': ');
-    $greet($args[0] ?? 'World', from: $author) |> Console::writeLine(?);
+    $hello= $greet(?, from: $author);
+    $hello($args[0] ?? 'World') |> Console::writeLine(?);
   }
 }
 ```
