@@ -15,7 +15,7 @@ use lang\ast\types\{
 /**
  * PHP 8.6 syntax
  *
- * @test lang.ast.unittest.emit.PHP85Test
+ * @test lang.ast.unittest.emit.PHP86Test
  * @see  https://wiki.php.net/rfc#php_86
  */
 class PHP86 extends PHP {
