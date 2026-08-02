@@ -28,7 +28,7 @@ class AnnotationsTest extends AnnotationSupport {
     $type= $this->declare($declaration);
     $declared= [];
     foreach ((new ReflectionClass($type->literal()))->getAttributes() as $attribute) {
-      $declared[$attribute->name]= $attribute->getArguments();
+      $declared[$attribute->getName()]= $attribute->getArguments();
     }
 
     Assert::equals($expected, $declared);

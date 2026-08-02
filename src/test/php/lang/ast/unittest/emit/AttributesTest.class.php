@@ -1,7 +1,5 @@
 <?php namespace lang\ast\unittest\emit;
 
-use lang\ast\emit\php\XpMeta;
-
 /**
  * Annotations via PHP 8 attributes
  *
