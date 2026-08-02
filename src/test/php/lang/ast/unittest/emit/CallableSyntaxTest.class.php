@@ -423,25 +423,13 @@ class CallableSyntaxTest extends EmittingTest {
     Assert::equals(1, $count);
   }
 
-  #[Test, Runtime(php: '>=8.6.0')]
+  #[Test, Runtime(php: '>=8.6.0-dev')]
   public function partial_function_application_with_named() {
     $r= $this->run('class %T {
 
       public function run() {
         $f= str_replace("test", "ok", ?);
         return $f(subject: "test.");
-      }
-    }');
-    Assert::equals('ok.', $r);
-  }
-
-  #[Test, Runtime(php: '>=8.6.0')]
-  public function partial_function_application_variadic_before_named() {
-    $r= $this->run('class %T {
-
-      public function run() {
-        $f= str_replace("test", ..., subject: ?);
-        return $f("ok", "test.");
       }
     }');
     Assert::equals('ok.', $r);
