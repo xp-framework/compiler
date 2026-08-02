@@ -13,6 +13,7 @@ use lang\ast\nodes\{
   InstanceExpression,
   Literal,
   NewExpression,
+  Placeholder,
   Property,
   ScopeExpression,
   UnpackExpression,
@@ -1123,6 +1124,16 @@ abstract class PHP extends Emitter {
     $result->out->write(')');
   }
 
+  protected function emitPlaceholder($result, $placeholder) {
+    if (Placeholder::$VARIADIC === $placeholder) {
+      $result->out->write('...');
+    } else if (Placeholder::$ARGUMENT === $placeholder) {
+      $result->out->write('?');
+    } else {
+      $this->raise('Unsupportet placeholder '.$placeholder->kind());
+    }
+  }
+
   protected function emitCallable($result, $callable) {
 
     // Disambiguate the following:
@@ -1132,7 +1143,9 @@ abstract class PHP extends Emitter {
     $callable->expression->line= -1;
 
     $this->emitOne($result, $callable->expression);
-    $result->out->write('(...)');
+    $result->out->write('(');
+    $this->emitArguments($result, $callable->arguments);
+    $result->out->write(')');
   }
 
   protected function emitCallableNew($result, $callable) {
