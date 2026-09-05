@@ -7,7 +7,6 @@ use lang\ast\nodes\{
   ArrayLiteral,
   BinaryExpression,
   Block,
-  CallableNewExpression,
   Comment,
   Expression,
   InstanceExpression,
@@ -1150,12 +1149,14 @@ abstract class PHP extends Emitter {
 
   protected function emitCallableNew($result, $callable) {
     $t= $result->temp();
-    $result->out->write("fn(...{$t}) => ");
+    $result->out->write("(fn(...{$t}) => ");
 
     // See https://externals.io/message/129329
     $callable->type->arguments= [new UnpackExpression(new Variable(substr($t, 1)), $callable->line)];
     $this->emitOne($result, $callable->type);
     $callable->type->arguments= null;
+
+    $result->out->write(')');
   }
 
   protected function emitInvoke($result, $invoke) {
@@ -1214,15 +1215,7 @@ abstract class PHP extends Emitter {
   protected function emitPipe($result, $pipe) {
     $this->emitOne($result, $pipe->expression);
     $result->out->write('|>');
-
-    // `fn() => ...` on the right-hand side of pipe operator must be parenthesized
-    if ($pipe->target instanceof CallableNewExpression) {
-      $result->out->write('(');
-      $this->emitOne($result, $pipe->target);
-      $result->out->write(')');
-    } else {
-      $this->emitOne($result, $pipe->target);
-    }
+    $this->emitOne($result, $pipe->target);
   }
 
   protected function emitNullsafePipe($result, $pipe) {

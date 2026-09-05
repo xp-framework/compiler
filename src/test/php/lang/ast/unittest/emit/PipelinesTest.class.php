@@ -361,4 +361,15 @@ class PipelinesTest extends EmittingTest {
 
     Assert::equals("bool(false)\n", $r);
   }
+
+  #[Test, Values([null, '2026-09-05'])]
+  public function nullable_pipe_to_callable_new($value) {
+    $r= $this->run('class %T {
+      public function run($value) {
+        return $value ?|> new \util\Date(...);
+      }
+    }', $value);
+
+    Assert::equals($value, $r ? $r->toString('Y-m-d') : null);
+  }
 }
