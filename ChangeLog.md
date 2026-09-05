@@ -3,6 +3,13 @@ XP Compiler ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 9.13.1 / 2026-09-06
+
+* Merged PR #197: Always parenthesize callable new expressions like
+  `new T(...)`, fixing *Arrow functions on the right hand side of `|>`
+  must be parenthesized*.
+  (@thekid)
+
 ## 9.13.0 / 2026-08-02
 
 * Merged PR #196: Add PHP 8.6 emitter following the availability of
