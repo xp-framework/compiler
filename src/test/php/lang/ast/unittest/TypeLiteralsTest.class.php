@@ -1,6 +1,6 @@
 <?php namespace lang\ast\unittest;
 
-use lang\ast\emit\{PHP70, PHP71, PHP72, PHP74, PHP80, PHP81, PHP82};
+use lang\ast\emit\{PHP80, PHP81, PHP82};
 use lang\ast\types\{IsArray, IsFunction, IsGeneric, IsIntersection, IsLiteral, IsMap, IsNullable, IsUnion, IsValue};
 use test\{Assert, Test, Values};
 
@@ -14,28 +14,6 @@ class TypeLiteralsTest {
     yield [new IsFunction([], new IsLiteral('int')), 'callable'];
     yield [new IsArray(new IsLiteral('int')), 'array'];
     yield [new IsMap(new IsLiteral('string'), new IsLiteral('int')), 'array'];
-  }
-
-  /**
-   * PHP 7.4 is the same as PHP 7.2
-   *
-   * @return iterable
-   */
-  private function php74() {
-    yield from $this->base();
-    yield [new IsLiteral('object'), 'object'];
-    yield [new IsLiteral('void'), 'void'];
-    yield [new IsLiteral('never'), 'void'];
-    yield [new IsLiteral('iterable'), 'iterable'];
-    yield [new IsLiteral('mixed'), null];
-    yield [new IsLiteral('null'), null];
-    yield [new IsLiteral('false'), 'bool'];
-    yield [new IsLiteral('true'), 'bool'];
-    yield [new IsNullable(new IsLiteral('string')), '?string'];
-    yield [new IsNullable(new IsLiteral('object')), '?object'];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), null];
-    yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), null];
-    yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), null];
   }
 
   /**
@@ -102,11 +80,6 @@ class TypeLiteralsTest {
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('int')]), 'string|int'];
     yield [new IsUnion([new IsLiteral('string'), new IsLiteral('false')]), 'string|false'];
     yield [new IsIntersection([new IsValue('Test'), new IsValue('Iterator')]), 'Test&Iterator'];
-  }
-
-  #[Test, Values(from: 'php74')]
-  public function php74_literals($type, $literal) {
-    Assert::equals($literal, (new PHP74())->literal($type));
   }
 
   #[Test, Values(from: 'php80')]

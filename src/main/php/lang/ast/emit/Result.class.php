@@ -5,7 +5,6 @@ use lang\Closeable;
 use lang\ast\CodeGen;
 
 class Result implements Closeable {
-  public $out;
   public $codegen;
   public $line= 1;
   public $locals= [];
@@ -15,7 +14,7 @@ class Result implements Closeable {
    *
    * @param io.streams.OutputStream $out
    */
-  public function __construct(OutputStream $out) {
+  public function __construct(public OutputStream $out) {
     $this->out= $out;
     $this->codegen= new CodeGen();
     $this->initialize();

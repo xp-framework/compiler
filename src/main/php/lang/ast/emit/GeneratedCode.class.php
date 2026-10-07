@@ -1,18 +1,15 @@
 <?php namespace lang\ast\emit;
 
 class GeneratedCode extends Result {
-  private $prolog, $epilog;
 
   /**
    * Starts a result stream, including an optional prolog and epilog
    *
-   * @param io.streams.OutputStream $out
-   * @param string $prolog
-   * @param string $epilog
+   * @param  io.streams.OutputStream $out
+   * @param  string $prolog
+   * @param  string $epilog
    */
-  public function __construct($out, $prolog= '', $epilog= '') {
-    $this->prolog= $prolog;
-    $this->epilog= $epilog;
+  public function __construct($out, private $prolog= '', private $epilog= '') {
     parent::__construct($out);
   }
 

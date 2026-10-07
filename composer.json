@@ -9,7 +9,7 @@
     "xp-framework/core": "^12.0 | ^11.6 | ^10.16",
     "xp-framework/reflection": "^3.2 | ^2.15",
     "xp-framework/ast": "^13.0 | ^12.2",
-    "php" : ">=7.4.0"
+    "php" : ">=8.0.0"
   },
   "require-dev" : {
     "xp-framework/test": "^2.0 | ^1.5"
