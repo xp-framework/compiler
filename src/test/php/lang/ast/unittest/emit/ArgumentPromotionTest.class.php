@@ -156,7 +156,7 @@ class ArgumentPromotionTest extends EmittingTest {
 
   #[Test]
   public function promoted_property_hook() {
-    $c= $this->declare('class %T {
+    $t= $this->declare('class %T {
       public function __construct(
         public private(set) float $celsius= 100 {
           set {
@@ -169,7 +169,98 @@ class ArgumentPromotionTest extends EmittingTest {
       ) { }
     }');
 
-    Assert::equals(0.0, $c->newInstance(0.0)->celsius);
-    Assert::throws(InvocationFailed::class, fn() => $c->newInstance(-300.0));
+    Assert::equals(0.0, $t->newInstance(0.0)->celsius);
+    Assert::throws(InvocationFailed::class, fn() => $t->newInstance(-300.0));
+  }
+
+  #[Test]
+  public function primary_constructors() {
+    $t= $this->declare('class %T(public int $x, public int $y) {
+      public function coordinates() {
+        return [$this->x, $this->y];
+      }
+    }');
+
+    Assert::equals([14, 12], $t->newInstance(14, 12)->coordinates());
+  }
+
+  #[Test]
+  public function primary_constructor_with_parent() {
+    $b= $this->declare('class %T {
+      public $invoked= 0;
+      public function __construct($invoked= 1) { $this->invoked+= $invoked; }
+    }');
+    $i= $this->declare('class %T(public string $name) extends '.$b->literal().' { }')->newInstance('admin');
+
+    Assert::equals(0, $i->invoked);
+    Assert::equals('admin', $i->name);
+  }
+
+  #[Test]
+  public function primary_constructor_invoking_parent() {
+    $b= $this->declare('class %T {
+      public $invoked= 0;
+      public function __construct($invoked= 1) { $this->invoked+= $invoked; }
+    }');
+    $i= $this->declare('class %T(public string $name) extends '.$b->literal().'() { }')->newInstance('admin');
+
+    Assert::equals(1, $i->invoked);
+    Assert::equals('admin', $i->name);
+  }
+
+  #[Test]
+  public function primary_constructor_passing_value_to_parent() {
+    $b= $this->declare('class %T {
+      public $invoked= 0;
+      public function __construct($invoked= 1) { $this->invoked+= $invoked; }
+    }');
+    $i= $this->declare('class %T(public string $name) extends '.$b->literal().'(2) { }')->newInstance('admin');
+
+    Assert::equals(2, $i->invoked);
+    Assert::equals('admin', $i->name);
+  }
+
+  #[Test]
+  public function primary_constructor_passing_param_to_parent() {
+    $b= $this->declare('class %T {
+      public $invoked= 0;
+      public function __construct($invoked= 1) { $this->invoked+= $invoked; }
+    }');
+    $i= $this->declare('class %T(public string $name, $i= 2) extends '.$b->literal().'($i) { }')->newInstance('admin');
+
+    Assert::equals(2, $i->invoked);
+    Assert::equals('admin', $i->name);
+  }
+
+  #[Test]
+  public function primary_constructor_with_hooks() {
+    $t= $this->declare('class %T(
+      public private(set) float $celsius {
+        set {
+          if ($value < -273.15) {
+            throw new \lang\IllegalArgumentException("below absolute zero");
+          }
+          $this->celsius = $value;
+        }
+      }
+    ) { }');
+
+    Assert::equals(0.0, $t->newInstance(0.0)->celsius);
+    Assert::throws(InvocationFailed::class, fn() => $t->newInstance(-300.0));
+  }
+
+  #[Test]
+  public function primary_constructor_doc_comment() {
+    $t= $this->declare('/** Test */ class %T(public string $name) { }');
+
+    Assert::equals('Test', $t->comment());
+    Assert::equals('Test', $t->constructor()->comment());
+  }
+
+  #[Test]
+  public function primary_constructor_param_annotations() {
+    $t= $this->declare('class %T(#[Inject] public string $name) { }');
+
+    Assert::true($t->constructor()->parameter('name')->annotations()->provides('Inject'));
   }
 }
